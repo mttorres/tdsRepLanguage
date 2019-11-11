@@ -1,0 +1,19 @@
+k = 1
+dado1 = 0
+dado2 = 1
+p = true
+q = false
+
+
+tdsnames = {(dado1,k,a), (dado2,k,b)}
+
+for i = 0 to 1 do
+
+	if( p -> q )
+		contr = true
+
+	else
+		contr = false
+
+
+
