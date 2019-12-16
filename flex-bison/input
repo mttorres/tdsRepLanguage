@@ -1,19 +1,33 @@
-k = 1
+processMergeTDS(tdsnamesAnteriores,tempoAtual){
+	for i = 0 to i < tempoAtual do 
+		if( tdsnamesAnteriores(i).dado == tdsnamesAnteriores(i+1).dado ){
+			contr = tdsnamesAnteriores(0)
+			return (contr,tempoAtual,'C')
+		}
+
+		else{
+			contr = tdsnamesAnteriores(tempoAtual)
+		}
+
+	return (contr,tempoAtual,'C')
+}
+
+
+i = 0
 dado1 = 0
 dado2 = 1
+nomeA= 'A'
+nomeB= 'B'
+
 p = true
 q = false
 
 
-tdsnames = {(dado1,k,a), (dado2,k,b)}
+tdsnamesOutrasPortas = {(dado1,i,nomeA), (dado2,i+1,nomeB)}
 
-for i = 0 to 1 do
+// C recebe B (está na vez de B) !
+tdsnamesNext = processMergeTDS(tdsnamesOutrasPortas,i+1)
 
-	if( p -> q )
-		contr = true
-
-	else
-		contr = false
 
 
 

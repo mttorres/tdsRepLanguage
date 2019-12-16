@@ -13,6 +13,7 @@
 \n 				 
 [ \t\n]          
 \t        ; /* ignora tab*/
+"//".*"\n"        {yylineno++;}
 [0-1]+            printf("TOKEN: RAWNUMBERDATA,  LINHA: %d \n",yylineno);
 ==                printf("TOKEN: EQUAL,  LINHA: %d \n",yylineno);
 =				          printf("TOKEN: ASSIGN , LINHA : %d \n",yylineno);
