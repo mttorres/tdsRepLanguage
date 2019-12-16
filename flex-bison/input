@@ -1,32 +1,35 @@
-processMergeTDS(tdsnamesAnteriores,tempoAtual){
-	for i = 0 to i < tempoAtual do 
-		if( tdsnamesAnteriores(i).dado == tdsnamesAnteriores(i+1).dado ){
-			contr = tdsnamesAnteriores(0)
-			return (contr,tempoAtual,'C')
+processMergeTDS(tdsnamesOutrasPortas,tempoAtual,numPortas){
+	contr = NULL
+	for i = 0 to i < (numPortas-1) do 
+		if(tdsnamesAnteriores(i).dado == tdsnamesAnteriores(i+1).dado and tdsnamesAnteriores(i).tempo == tempoAtual){
+			contr = tdsnamesAnteriores(i)
 		}
-
 		else{
-			contr = tdsnamesAnteriores(tempoAtual)
+			if(tdsnamesAnteriores(i+1).tempo == tempoAtual){
+				contr = tdsnamesAnteriores(i+1)	
+			}
 		}
 
 	return (contr,tempoAtual,'C')
 }
 
 
+//DADOS DEFINIDOS PELO USUARIO
 i = 0
-dado1 = 0
-dado2 = 1
+dadoA = 0
+dadoB = 1
+
 nomeA= 'A'
 nomeB= 'B'
+nomeC= 'C'
+numeroPortas = 3
 
-p = true
-q = false
 
 
 tdsnamesOutrasPortas = {(dado1,i,nomeA), (dado2,i+1,nomeB)}
 
 // C recebe B (está na vez de B) !
-tdsnamesNext = processMergeTDS(tdsnamesOutrasPortas,i+1)
+tdsnamesNext = processMergeTDS(tdsnamesOutrasPortas,i+1,numeroPortas)
 
 
 
