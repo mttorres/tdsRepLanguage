@@ -1,8 +1,8 @@
 %{
   #include <stdlib.h>
   #include <stdio.h>
-  #include <string.h> 
-  int lineno = 0;
+  #include <string.h>
+  
 
 %}
 %option noyywrap
@@ -10,42 +10,43 @@
 
 /* TOKENS */
 %%
-\n 				 
-[ \t\n]          
-\t        ; /* ignora tab*/
-"//".*"\n"        {yylineno++;}
-[0-1]+            printf("TOKEN: RAWNUMBERDATA,  LINHA: %d \n",yylineno);
-==                printf("TOKEN: EQUAL,  LINHA: %d \n",yylineno);
-=				          printf("TOKEN: ASSIGN , LINHA : %d \n",yylineno);
-[A-Za-z_]         printf("TOKEN: ID, LINHA: %d \n",yylineno);
-true | false			printf("TOKEN: BOOLEAN, LINHA: %d \n",yylineno);
-return		        printf("TOKEN: RETURN, LINHA: %d \n",yylineno);
-for				        printf("TOKEN: FOR, LINHA: %d \n",yylineno);
-to 				        printf("TOKEN: TO, LINHA: %d \n",yylineno);
-do				        printf("TOKEN: DO, LINHA: %d \n",yylineno);
-[{]				        printf("TOKEN: LBRACE, LINHA: %d \n",yylineno);
-[}]				        printf("TOKEN: RBRACE, LINHA: %d \n",yylineno);
-[(]				        printf("TOKEN: LPAREN, LINHA: %d \n",yylineno);
-[)]				        printf("TOKEN: RPAREN, LINHA: %d \n",yylineno);
-if				        printf("TOKEN: IF, LINHA: %d \n",yylineno);
-else			        printf("TOKEN: ELSE, LINHA: %d \n",yylineno);
-,				          printf("TOKEN: COMMA, LINHA: %d \n",yylineno);
-and				        printf("TOKEN: AND, LINHA: %d \n",yylineno);
-or				        printf("TOKEN: OR, LINHA: %d \n",yylineno);
-->				        printf("TOKEN: IMPLIES, LINHA: %d \n",yylineno);
-xor				        printf("TOKEN: XOR, LINHA: %d \n",yylineno);
-[<=]              printf("TOKEN: LE, LINHA: %d \n",yylineno);
-[>=]              printf("TOKEN: GE, LINHA: %d \n",yylineno);
-[<]               printf("TOKEN: LT, LINHA: %d \n",yylineno);
-[>]               printf("TOKEN: GT, LINHA: %d \n",yylineno);
+[\n] 				 	{}
+[\t]          			{}
+"//".*         	  		{}
+[0-1]+            		printf("TOKEN: RAWNUMBERDATA - %s,  LINHA: %d \n",yytext,yylineno);
+==                		printf("TOKEN: EQUAL - %s,  LINHA: %d \n",yytext,yylineno);
+=				        printf("TOKEN: ASSIGN - %s, LINHA : %d \n",yytext,yylineno);
+true | false			printf("TOKEN: BOOLEAN - %s, LINHA: %d \n",yytext,yylineno);
+return		        	printf("TOKEN: RETURN - %s, LINHA: %d \n",yytext,yylineno);
+for				        printf("TOKEN: FOR - %s, LINHA: %d \n",yytext,yylineno);
+to 				        printf("TOKEN: TO - %s, LINHA: %d \n",yytext,yylineno);
+do				        printf("TOKEN: DO - %s, LINHA: %d \n",yytext,yylineno);
+[{]				        printf("TOKEN: LBRACE - %s, LINHA: %d \n",yytext,yylineno);
+[}]				        printf("TOKEN: RBRACE - %s, LINHA: %d \n",yytext,yylineno);
+[(]				        printf("TOKEN: LPAREN - %s, LINHA: %d \n",yytext,yylineno);
+[)]				        printf("TOKEN: RPAREN - %s, LINHA: %d \n",yytext,yylineno);
+if				        printf("TOKEN: IF - %s, LINHA: %d \n",yytext,yylineno);
+else			        printf("TOKEN: ELSE - %s, LINHA: %d \n",yytext,yylineno);
+NULL			        printf("TOKEN: NULL - %s, LINHA: %d \n",yytext,yylineno);
+:						printf("TOKEN: COLON - %s, LINHA %d \n",yytext,yylineno);
+,				        printf("TOKEN: COMMA - %s, LINHA: %d \n",yytext,yylineno);
+and				        printf("TOKEN: AND - %s, LINHA: %d \n",yytext,yylineno);
+or				        printf("TOKEN: OR - %s, LINHA: %d \n",yytext,yylineno);
+->				        printf("TOKEN: IMPLIES - %s, LINHA: %d \n",yytext,yylineno);
+xor				        printf("TOKEN: XOR - %s, LINHA: %d \n",yytext,yylineno);
+[<=]              		printf("TOKEN: LE - %s, LINHA: %d \n",yytext,yylineno);
+[>=]              	    printf("TOKEN: GE - %s, LINHA: %d \n",yytext,yylineno);
+[<]               	    printf("TOKEN: LT - %s, LINHA: %d \n",yytext,yylineno);
+[>]               		printf("TOKEN: GT - %s, LINHA: %d \n",yytext,yylineno);
+[A-Za-z_]*	         	printf("TOKEN: ID - %s,  LINHA: %d \n",yytext,yylineno);
 
 
 %%
-int main() {
+int main(int argc, char* argv[]) {
   
   FILE *fp;
-
-  fp = fopen("input", "r");
+  //printf("teste %s \n",argv[0]);
+  fp = fopen(argv[1], "r");
   if(!fp){
   	printf("CADE MEU CODIGO!?");
   	return -1;
