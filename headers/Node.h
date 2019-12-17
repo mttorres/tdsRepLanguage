@@ -4,7 +4,7 @@
 
 typedef struct 
 {
-  Node* children;
+  Node** children;
   char** leafs; 	
 } Node;
 
