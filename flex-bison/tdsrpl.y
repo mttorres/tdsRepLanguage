@@ -3,8 +3,10 @@
   #include <stdio.h>
   #include <string.h>
 
-  
-  int yylex();
+  extern int yylex(void);
+  FILE *fp;   //AST
+  FILE *fp2;  //(scope) - Stable
+
   int yyparse();
   FILE *yyin;
  
@@ -20,7 +22,6 @@
 %token <ival> RAWNUMBERDATA
 %token <sval> EQUAL  
 %token <sval> ASSIGN
-%token <sval> ID
 %token <sval> BOOLEAN
 %token <sval> RETURN
 %token <sval> FOR
@@ -31,16 +32,19 @@
 %token <sval> LPAREN
 %token <sval> RPAREN
 %token <sval> IF
+%token <sval> COLON
 %token <sval> COMMA
 %token <sval> AND
 %token <sval> OR
 %token <sval> IMPLIES
 %token <sval> ELSE
+%toekn <sval> NULL
 %token <sval> XOR
 %token <sval> LE
 %token <sval> GE
 %token <sval> LT
 %token <sval> GT
+%token <sval> ID
 
 
 %%
@@ -51,6 +55,7 @@ prog: cmd
 data: ID
 	  | RAWNUMBERDATA
 	  | BOOLEAN
+	  | NULL
 	  ;
 
 functiondef: ID LPAREN  paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
@@ -75,7 +80,7 @@ optionalreturn: RETURN data
 				;
 
 cmd: expr
-	 | FOR ID ASSIGN expr TO expr DO cmd
+	 | FOR ID ASSIGN expr TO expr DO COMMA cmd
 	 | functioncall
 	 | cond
 	 | ID ASSIGN LBRACE content RBRACE 
