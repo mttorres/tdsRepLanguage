@@ -2,10 +2,12 @@
 
 #define NODE_H
 
-typedef struct 
+typedef struct ast_node
 {
-  Node** children;
-  char** leafs; 	
+  ast_node** children;
+  char** leafs;
+  char* name;
+
 } Node;
 
 

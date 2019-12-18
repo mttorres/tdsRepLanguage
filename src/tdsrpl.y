@@ -2,6 +2,7 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
+  #include "../"
 
   extern int yylex(void);
   FILE *fp;   //AST

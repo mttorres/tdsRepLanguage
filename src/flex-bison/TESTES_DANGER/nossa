@@ -1,0 +1,3280 @@
+TOKEN: ID - ELF,  LINHA: 1 
+TOKEN: GE - >, LINHA: 1 
+�@TOKEN: ID - e,  LINHA: 2 
+@8@@@@��888�TOKEN: GE - >, LINHA: 2 
+�TOKEN: GE - >, LINHA: 2 
+ 8TOKEN: ID - M,  LINHA: 2 
+8TOKEN: ID - M,  LINHA: 2 
+ 8TOKEN: ID - M,  LINHA: 2 
+ �� TOKEN: ID - HM,  LINHA: 2 
+TOKEN: ID - HM,  LINHA: 2 
+ TOKEN: ID - HM,  LINHA: 2 
+ ��TOKEN: ID - T,  LINHA: 2 
+TOKEN: ID - T,  LINHA: 2 
+TOKEN: ID - T,  LINHA: 2 
+TOKEN: ID - D,  LINHA: 2 
+TOKEN: ID - D,  LINHA: 2 
+TOKEN: ID - P,  LINHA: 2 
+�TOKEN: ID - td,  LINHA: 2 
+888TOKEN: ID - T,  LINHA: 2 
+TOKEN: ID - T,  LINHA: 2 
+TOKEN: ID - Q,  LINHA: 2 
+�TOKEN: ID - td,  LINHA: 2 
+TOKEN: ID - R,  LINHA: 2 
+�TOKEN: ID - td,  LINHA: 2 
+8TOKEN: ID - M,  LINHA: 2 
+8TOKEN: ID - M,  LINHA: 2 
+ 8TOKEN: ID - M,  LINHA: 2 
+ ��/TOKEN: ID - lib,  LINHA: 2 
+64/TOKEN: ID - ld,  LINHA: 2 
+-TOKEN: ID - linux,  LINHA: 2 
+-TOKEN: ID - x,  LINHA: 2 
+86-64.TOKEN: ID - so,  LINHA: 2 
+.2TOKEN: ID - GNU,  LINHA: 2 
+TOKEN: ID - GNU,  LINHA: 2 
+�TOKEN: LE - <, LINHA: 2 
+TOKEN: ID - l,  LINHA: 2 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 2 
+8�TOKEN: ID - vo,  LINHA: 2 
+׿$�TOKEN: LBRACE - {, LINHA: 2 
+TOKEN: ID - R,  LINHA: 2 
+��TOKEN: ID - n,  LINHA: 2 
+ �TOKEN: RPAREN - ), LINHA: 2 
+�TOKEN: ID - fUa,  LINHA: 2 
+9���9� �$TOKEN: ID - v,  LINHA: 2 
++TOKEN: RBRACE - }, LINHA: 2 
+2�|� TOKEN: ID - J,  LINHA: 2 
+TOKEN: ID - h,  LINHA: 2 
+TOKEN: ID - Z,  LINHA: 2 
+�
+       TOKEN: ID - o,  LINHA: 2 
+� �"TOKEN: ID - S,  LINHA: 2 
+ TOKEN: ID - P,  LINHA: 2 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 2 
+TOKEN: ID - P,  LINHA: 2 
+TOKEN: ID - a,  LINHA: 2 
+@TOKEN: ID - P,  LINHA: 2 
+TOKEN: ID - libc,  LINHA: 2 
+.TOKEN: ID - so,  LINHA: 2 
+.6TOKEN: ID - exit,  LINHA: 2 
+TOKEN: ID - fopen,  LINHA: 2 
+TOKEN: ID - realloc,  LINHA: 2 
+TOKEN: ID - stdin,  LINHA: 2 
+TOKEN: ID - isatty,  LINHA: 2 
+TOKEN: ID - strlen,  LINHA: 2 
+TOKEN: ID - memset,  LINHA: 2 
+TOKEN: ID - __errno_location,  LINHA: 2 
+TOKEN: ID - clearerr,  LINHA: 2 
+TOKEN: ID - stdout,  LINHA: 2 
+TOKEN: ID - malloc,  LINHA: 2 
+TOKEN: ID - stderr,  LINHA: 2 
+TOKEN: ID - fileno,  LINHA: 2 
+TOKEN: ID - fwrite,  LINHA: 2 
+TOKEN: ID - fread,  LINHA: 2 
+TOKEN: ID - fprintf,  LINHA: 2 
+TOKEN: ID - __cxa_finalize,  LINHA: 2 
+TOKEN: ID - _IO_getc,  LINHA: 2 
+TOKEN: ID - __libc_start_main,  LINHA: 2 
+TOKEN: ID - ferror,  LINHA: 2 
+TOKEN: ID - free,  LINHA: 2 
+TOKEN: ID - GLIBC_,  LINHA: 2 
+2.2.5TOKEN: ID - _ITM_deregisterTMCloneTable,  LINHA: 2 
+TOKEN: ID - __gmon_start__,  LINHA: 2 
+TOKEN: ID - _ITM_registerTMCloneTable,  LINHA: 2 
+TOKEN: ID - u,  LINHA: 2 
+TOKEN: ID - i,  LINHA: 2 
+�8TOKEN: ID - M,  LINHA: 2 
+�
+ @TOKEN: ID - M,  LINHA: 2 
+@
+TOKEN: ID - P,  LINHA: 2 
+TOKEN: ID - P,  LINHA: 2 
+ �TOKEN: ID - O,  LINHA: 2 
+ �TOKEN: ID - O,  LINHA: 2 
+ �TOKEN: ID - O,  LINHA: 3 
+ 
+  �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+  TOKEN: ID - P,  LINHA: 3 
+ TOKEN: RAWNUMBERDATA - 0,  LINHA: 3 
+TOKEN: ID - P,  LINHA: 3 
+ @TOKEN: ID - P,  LINHA: 3 
+ TOKEN: ID - PO,  LINHA: 3 
+ TOKEN: ID - XO,  LINHA: 3 
+ `TOKEN: ID - O,  LINHA: 3 
+ TOKEN: ID - hO,  LINHA: 3 
+ TOKEN: ID - pO,  LINHA: 3 
+ TOKEN: ID - xO,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+�TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ 
+ �TOKEN: ID - O,  LINHA: 3 
+�TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ �TOKEN: ID - O,  LINHA: 3 
+ TOKEN: ID - H,  LINHA: 3 
+�TOKEN: ID - H,  LINHA: 3 
+��TOKEN: ID - F,  LINHA: 3 
+ TOKEN: ID - H,  LINHA: 3 
+��TOKEN: ID - t,  LINHA: 3 
+��TOKEN: ID - H,  LINHA: 3 
+���5�TOKEN: ID - E,  LINHA: 3 
+ �%�TOKEN: ID - E,  LINHA: 3 
+ @�%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+������%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+�TOKEN: ID - p,  LINHA: 3 
+����%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+�`����%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+�TOKEN: ID - P,  LINHA: 3 
+����%�TOKEN: ID - E,  LINHA: 3 
+ TOKEN: ID - h,  LINHA: 3 
+�@����%�TOKEN: ID - E,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+
+�TOKEN: RAWNUMBERDATA - 0,  LINHA: 4 
+����%�TOKEN: ID - E,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+
+� ����%�TOKEN: ID - E,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+�����%TOKEN: ID - zE,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+�����%TOKEN: ID - rE,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+������%TOKEN: ID - jE,  LINHA: 4 
+ TOKEN: ID - h,  LINHA: 4 
+������%�TOKEN: ID - E,  LINHA: 4 
+ TOKEN: ID - f,  LINHA: 4 
+�TOKEN: RAWNUMBERDATA - 1,  LINHA: 4 
+�TOKEN: ID - I,  LINHA: 4 
+��^TOKEN: ID - H,  LINHA: 4 
+��TOKEN: ID - H,  LINHA: 4 
+���TOKEN: ID - PTL,  LINHA: 4 
+��"TOKEN: ID - H,  LINHA: 4 
+TOKEN: ID - C,  LINHA: 4 
+"TOKEN: ID - H,  LINHA: 4 
+�TOKEN: ASSIGN - =, LINHA : 4 
+�!�6TOKEN: ID - E,  LINHA: 4 
+ �TOKEN: ID - D,  LINHA: 4 
+TOKEN: ID - H,  LINHA: 4 
+�TOKEN: ASSIGN - =, LINHA : 4 
+TOKEN: ID - aE,  LINHA: 4 
+ TOKEN: ID - UH,  LINHA: 4 
+�TOKEN: ID - YE,  LINHA: 4 
+ TOKEN: ID - H,  LINHA: 4 
+9�TOKEN: ID - H,  LINHA: 4 
+��TOKEN: ID - t,  LINHA: 4 
+TOKEN: ID - H,  LINHA: 4 
+�TOKEN: ID - E,  LINHA: 5 
+ TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - t,  LINHA: 5 
+]��TOKEN: ID - f,  LINHA: 5 
+.�]�@TOKEN: ID - f,  LINHA: 5 
+.�TOKEN: ID - H,  LINHA: 5 
+�TOKEN: ASSIGN - =, LINHA : 5 
+!TOKEN: ID - E,  LINHA: 5 
+ TOKEN: ID - H,  LINHA: 5 
+�5TOKEN: ID - E,  LINHA: 5 
+ TOKEN: ID - UH,  LINHA: 5 
+TOKEN: RPAREN - ), LINHA: 5 
+�TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - H,  LINHA: 5 
+��?TOKEN: ID - H,  LINHA: 5 
+�TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - t,  LINHA: 5 
+TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - D,  LINHA: 5 
+ TOKEN: ID - H,  LINHA: 5 
+��TOKEN: ID - t,  LINHA: 5 
+
+]��TOKEN: ID - f,  LINHA: 5 
+�]�@TOKEN: ID - f,  LINHA: 5 
+.��TOKEN: ASSIGN - =, LINHA : 5 
+TOKEN: ID - E,  LINHA: 5 
+ TOKEN: ID - u,  LINHA: 5 
+/TOKEN: ID - H,  LINHA: 5 
+�TOKEN: ASSIGN - =, LINHA : 5 
+�TOKEN: ID - D,  LINHA: 5 
+ TOKEN: ID - UH,  LINHA: 5 
+��TOKEN: ID - t,  LINHA: 5 
+
+TOKEN: ID - H,  LINHA: 5 
+�TOKEN: ASSIGN - =, LINHA : 5 
+�TOKEN: ID - D,  LINHA: 5 
+����TOKEN: ID - H,  LINHA: 5 
+�����TOKEN: ID - D,  LINHA: 5 
+ ]����TOKEN: ID - f,  LINHA: 5 
+TOKEN: ID - D,  LINHA: 5 
+TOKEN: ID - UH,  LINHA: 5 
+��]�TOKEN: ID - f,  LINHA: 5 
+���TOKEN: ID - UH,  LINHA: 5 
+��TOKEN: ID - SH,  LINHA: 5 
+��8��TOKEN: ID - D,  LINHA: 5 
+ ������TOKEN: ID - D,  LINHA: 5 
+ ��TOKEN: ID - D,  LINHA: 5 
+ ��TOKEN: ID - u,  LINHA: 5 
+��TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - u,  LINHA: 6 
+TOKEN: ID - H,  LINHA: 6 
+�^TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - wD,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - xD,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - u,  LINHA: 6 
+TOKEN: ID - H,  LINHA: 6 
+�4TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - eD,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�~TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - t,  LINHA: 6 
+TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - rD,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�[TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - u,  LINHA: 6 
+2��TOKEN: ID - H,  LINHA: 6 
+�TOKEN: LPAREN - (, LINHA: 6 
+TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+�TOKEN: ID - ID,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+2TOKEN: ID - D,  LINHA: 6 
+ TOKEN: ID - H,  LINHA: 6 
+��TOKEN: ID - H,  LINHA: 6 
+��@TOKEN: ID - H,  LINHA: 7 
+���`TOKEN: ID - H,  LINHA: 7 
+���TOKEN: ID - H,  LINHA: 7 
+�.TOKEN: ID - D,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - D,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - D,  LINHA: 7 
+ �TOKEN: ID - E,  LINHA: 7 
+���TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+����TOKEN: ID - Hc,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - m,  LINHA: 7 
+!��TOKEN: ID - E,  LINHA: 7 
+ˋTOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�� �TOKEN: ID - f,  LINHA: 7 
+��TOKEN: ID - tI,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - C,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��TOKEN: ID - C,  LINHA: 7 
+ �3�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��"���TOKEN: ID - E,  LINHA: 7 
+TOKEN: RBRACE - }, LINHA: 7 
+�TOKEN: LE - <, LINHA: 7 
+~�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - Hc,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�
+ "��TOKEN: ID - E,  LINHA: 7 
+ˋTOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�4"����TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��#��9TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - u,  LINHA: 7 
+��TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�"����TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��"���TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��!�TOKEN: ID - f,  LINHA: 7 
+��TOKEN: ID - B,  LINHA: 7 
+�������TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�����TOKEN: ID - E,  LINHA: 7 
+ЃTOKEN: RBRACE - }, LINHA: 7 
+�TOKEN: ID - u,  LINHA: 7 
+TOKEN: COMMA - ,, LINHA: 7 
+TOKEN: ID - H,  LINHA: 7 
+��TOKEN: ID - B,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+���TOKEN: ID - B,  LINHA: 7 
+ �TOKEN: ID - E,  LINHA: 7 
+TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�����TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��TOKEN: ID - B,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - U,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+TOKEN: RPAREN - ), LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�Љ�TOKEN: ID - B,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+����TOKEN: ID - B,  LINHA: 7 
+ TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - zB,  LINHA: 7 
+ �TOKEN: RBRACE - }, LINHA: 7 
+�TOKEN: ID - tX,  LINHA: 7 
+�TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��TOKEN: ID - H,  LINHA: 7 
+��#���TOKEN: ID - t,  LINHA: 7 
+TOKEN: ASSIGN - =, LINHA : 7 
+�TOKEN: ID - E,  LINHA: 7 
+��TOKEN: RPAREN - ), LINHA: 7 
+TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - iB,  LINHA: 7 
+ �TOKEN: ID - E,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+�TOKEN: ID - H,  LINHA: 7 
+��TOKEN: LE - <, LINHA: 7 
+TOKEN: ID - u,  LINHA: 8 
+��TOKEN: ID - A,  LINHA: 8 
+ ����TOKEN: ID - A,  LINHA: 8 
+ �TOKEN: ID - E,  LINHA: 8 
+��TOKEN: ID - IB,  LINHA: 8 
+ 9TOKEN: ID - E,  LINHA: 8 
+�|̐�TOKEN: RBRACE - }, LINHA: 8 
+� �TOKEN: ID - V,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�3'�TOKEN: ID - Hc,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�&'TOKEN: ID - H,  LINHA: 8 
+�����TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+���TOKEN: ID - A,  LINHA: 8 
+ �TOKEN: ID - E,  LINHA: 8 
+�������TOKEN: ID - IA,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#���������#TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#����������@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#����������@ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - hA,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#��TOKEN: ID - l,  LINHA: 8 
+�������@ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - BA,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#��TOKEN: ID - F,  LINHA: 8 
+����[��@ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - A,  LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#�� ����5�TOKEN: ID - e,  LINHA: 8 
+@ TOKEN: ID - H,  LINHA: 8 
+��@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#��������?@ TOKEN: ID - H,  LINHA: 8 
+��@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#���������@ TOKEN: ID - H,  LINHA: 8 
+��@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�#����������? TOKEN: ID - H,  LINHA: 8 
+��@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - z,  LINHA: 8 
+#����������? TOKEN: ID - H,  LINHA: 8 
+�^@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - t,  LINHA: 8 
+#��TOKEN: ID - b,  LINHA: 8 
+����TOKEN: ID - w,  LINHA: 8 
+��? TOKEN: ID - H,  LINHA: 8 
+�8@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - n,  LINHA: 8 
+#��TOKEN: LE - <, LINHA: 8 
+����TOKEN: ID - Q,  LINHA: 8 
+��? TOKEN: ID - H,  LINHA: 8 
+�@ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - d,  LINHA: 8 
+#������+�[? TOKEN: ID - H,  LINHA: 8 
+��? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+\#��������5? TOKEN: ID - H,  LINHA: 8 
+��? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - T,  LINHA: 8 
+#���������? TOKEN: ID - H,  LINHA: 8 
+��? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - N,  LINHA: 8 
+#����������TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - z,  LINHA: 8 
+? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: ID - G,  LINHA: 8 
+#��~�������TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - T,  LINHA: 8 
+? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+TOKEN: GE - >, LINHA: 8 
+#��TOKEN: ID - X,  LINHA: 8 
+����TOKEN: ID - m,  LINHA: 8 
+��TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�.? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+4#��2����TOKEN: ID - G,  LINHA: 8 
+�TOKEN: ID - w,  LINHA: 8 
+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+? TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+/#��
+    ����!�TOKEN: ID - Q,  LINHA: 8 
+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+&#���������+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+#���������TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+#����������TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - p,  LINHA: 8 
+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+#��TOKEN: ID - t,  LINHA: 8 
+�������TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - J,  LINHA: 8 
+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+�"��TOKEN: ID - N,  LINHA: 8 
+����TOKEN: ID - c,  LINHA: 8 
+TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ASSIGN - =, LINHA : 8 
+ �TOKEN: COMMA - ,, LINHA: 8 
+TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - Hc,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: GE - >, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�ѺTOKEN: ID - H,  LINHA: 8 
+��������7��2TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+TOKEN: RPAREN - ), LINHA: 8 
+Ѓ��TOKEN: ID - E,  LINHA: 8 
+���TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��@8��TOKEN: ID - ubH,  LINHA: 8 
+��TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - m,  LINHA: 8 
+TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��@�TOKEN: ID - v,  LINHA: 8 
+TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - c,  LINHA: 8 
+TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - L,  LINHA: 8 
+TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�#TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - A,  LINHA: 8 
+TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�*TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��@8TOKEN: ID - H,  LINHA: 8 
+�"TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�
+  TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - P,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�
+ TOKEN: ASSIGN - =, LINHA : 8 
+ TOKEN: ID - H,  LINHA: 8 
+9�TOKEN: ID - rtH,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+ �TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ ���TOKEN: ID - E,  LINHA: 8 
+TOKEN: ID - E,  LINHA: 8 
+���TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+��TOKEN: RBRACE - }, LINHA: 8 
+�TOKEN: ID - t,  LINHA: 8 
+TOKEN: LPAREN - (, LINHA: 8 
+TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+��TOKEN: ID - E,  LINHA: 8 
+܉TOKEN: ID - E,  LINHA: 8 
+������TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+����������TOKEN: ID - t,  LINHA: 8 
+��TOKEN: ID - tw,  LINHA: 8 
+��TOKEN: ID - t,  LINHA: 8 
+TOKEN: COLON - :, LINHA 8 
+����TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - b,  LINHA: 8 
+TOKEN: LE - <, LINHA: 8 
+ �TOKEN: ID - h,  LINHA: 8 
+TOKEN: LE - <, LINHA: 8 
+ ����������� �TOKEN: ID - E,  LINHA: 8 
+��*���TOKEN: ID - H,  LINHA: 8 
+�^TOKEN: LE - <, LINHA: 8 
+ �TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�/TOKEN: LE - <, LINHA: 8 
+ ���TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+� TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�5TOKEN: LE - <, LINHA: 8 
+ TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�����TOKEN: ID - H,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - P,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��; ���TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+������TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+� �TOKEN: ID - c,  LINHA: 8 
+��TOKEN: ID - t,  LINHA: 8 
+���TOKEN: ID - H,  LINHA: 8 
+��8[]�TOKEN: ID - UH,  LINHA: 8 
+��TOKEN: ID - SH,  LINHA: 8 
+��TOKEN: ID - HH,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - k,  LINHA: 8 
+; TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��; TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - E,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - W,  LINHA: 8 
+; TOKEN: ID - H,  LINHA: 8 
+�@; TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+; TOKEN: ID - Hc,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+�;; TOKEN: ID - H,  LINHA: 8 
+9�TOKEN: ID - s,  LINHA: 8 
+
+TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ASSIGN - =, LINHA : 8 
+� ��TOKEN: ID - H,  LINHA: 8 
+�; TOKEN: ID - H,  LINHA: 8 
+��TOKEN: COLON - :, LINHA 8 
+ TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��@4��TOKEN: ID - u,  LINHA: 8 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 8 
+TOKEN: ID - H,  LINHA: 8 
+�; TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+�; TOKEN: ID - H,  LINHA: 8 
+TOKEN: RPAREN - ), LINHA: 8 
+�TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - H,  LINHA: 8 
+��TOKEN: ID - u,  LINHA: 8 
+������TOKEN: ID - H,  LINHA: 9 
+��TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+��TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+TOKEN: RPAREN - ), LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�Ѓ��TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - E,  LINHA: 9 
+��!TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - U,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - B,  LINHA: 9 
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - M,  LINHA: 9 
+����TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - E,  LINHA: 9 
+�;TOKEN: ID - E,  LINHA: 9 
+�|�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - t,  LINHA: 9 
+TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+�]TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��@8��TOKEN: ID - u,  LINHA: 9 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 9 
+�]TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - J,  LINHA: 9 
+TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+�3TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��?TOKEN: COLON - :, LINHA 9 
+ �TOKEN: ID - P,  LINHA: 9 
+�#TOKEN: ID - H,  LINHA: 9 
+�$TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+TOKEN: COLON - :, LINHA 9 
+ TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��@+TOKEN: ID - E,  LINHA: 9 
+ȃ��TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+��9 TOKEN: ID - H,  LINHA: 9 
+��9 TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��9 TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+TOKEN: RPAREN - ), LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�ЉTOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��@ ��TOKEN: ID - ttH,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��@��TOKEN: ID - E,  LINHA: 9 
+ЃTOKEN: RBRACE - }, LINHA: 9 
+�$TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - P,  LINHA: 9 
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��@�TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+����TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - P,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��@�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - P,  LINHA: 9 
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+��@��TOKEN: ID - Hc,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+���TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - P,  LINHA: 9 
+�
+ TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - u,  LINHA: 9 
+
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ASSIGN - =, LINHA : 9 
+TOKEN: COMMA - ,, LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - P,  LINHA: 9 
+�TOKEN: ID - E,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+� 9 TOKEN: ID - H,  LINHA: 9 
+�9 TOKEN: ID - H,  LINHA: 9 
+��8 TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��@+TOKEN: ID - E,  LINHA: 9 
+ȃ��TOKEN: ID - E,  LINHA: 9 
+��TOKEN: RBRACE - }, LINHA: 9 
+�������TOKEN: RBRACE - }, LINHA: 9 
+� ~�TOKEN: ID - E,  LINHA: 9 
+� TOKEN: ID - H,  LINHA: 9 
+��8 TOKEN: ID - H,  LINHA: 9 
+��8 TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��@$�����TOKEN: ID - E,  LINHA: 9 
+�*�TOKEN: ID - E,  LINHA: 9 
+��7TOKEN: ID - H,  LINHA: 9 
+��8 TOKEN: ID - H,  LINHA: 9 
+��8 TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+��TOKEN: ID - U,  LINHA: 9 
+�TOKEN: ID - Hc,  LINHA: 9 
+ʋTOKEN: ID - U,  LINHA: 9 
+�TOKEN: ID - Hc,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+�TOKEN: ID - H,  LINHA: 9 
+ЋTOKEN: ID - U,  LINHA: 9 
+���TOKEN: ID - E,  LINHA: 9 
+��TOKEN: ID - E,  LINHA: 9 
+�;TOKEN: ID - E,  LINHA: 9 
+�TOKEN: RBRACE - }, LINHA: 9 
+TOKEN: ID - H,  LINHA: 9 
+�TOKEN: RAWNUMBERDATA - 1,  LINHA: 9 
+8 TOKEN: ID - H,  LINHA: 9 
+��������TOKEN: ID - E,  LINHA: 9 
+��TOKEN: RBRACE - }, LINHA: 9 
+��TOKEN: ID - t,  LINHA: 9 
+�TOKEN: RBRACE - }, LINHA: 9 
+�TOKEN: ID - u,  LINHA: 10 
+��TOKEN: RBRACE - }, LINHA: 10 
+�TOKEN: ID - u,  LINHA: 11 
+8TOKEN: ID - H,  LINHA: 11 
+�58 TOKEN: ID - H,  LINHA: 11 
+�8 TOKEN: ID - H,  LINHA: 11 
+��TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - E,  LINHA: 11 
+�TOKEN: ID - Hc,  LINHA: 11 
+��TOKEN: ID - E,  LINHA: 11 
+čTOKEN: ID - P,  LINHA: 11 
+�TOKEN: ID - U,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - H,  LINHA: 11 
+ȋTOKEN: ID - U,  LINHA: 11 
+���TOKEN: RBRACE - }, LINHA: 11 
+��TOKEN: ID - u,  LINHA: 11 
+TOKEN: ID - H,  LINHA: 11 
+��7 TOKEN: ID - H,  LINHA: 11 
+���������TOKEN: ID - t,  LINHA: 11 
+
+TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ASSIGN - =, LINHA : 11 
+���TOKEN: ID - E,  LINHA: 11 
+ĉ�7 ���������2��������TOKEN: ID - t,  LINHA: 11 
+
+TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ASSIGN - =, LINHA : 11 
+��TOKEN: ID - p,  LINHA: 11 
+������TOKEN: ID - H,  LINHA: 11 
+�TOKEN: ID - r,  LINHA: 11 
+7 TOKEN: ID - H,  LINHA: 11 
+������TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - c,  LINHA: 12 
+7 �TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+7 TOKEN: ID - H,  LINHA: 12 
+�5TOKEN: ID - h,  LINHA: 12 
+7 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - q,  LINHA: 12 
+�TOKEN: ID - M,  LINHA: 12 
+�TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: LE - <, LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�¾�TOKEN: ID - x,  LINHA: 12 
+����TOKEN: ID - V,  LINHA: 12 
+7 �TOKEN: ID - P,  LINHA: 12 
+7 ��TOKEN: ID - u,  LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+�7 TOKEN: ID - H,  LINHA: 12 
+���9������TOKEN: ID - e,  LINHA: 12 
+���TOKEN: ID - H,  LINHA: 12 
+�"7 TOKEN: ID - H,  LINHA: 12 
+�
+  7 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��7 �TOKEN: ID - P,  LINHA: 12 
+�7 ��TOKEN: ID - uF,  LINHA: 12 
+�TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: ID - u,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��6 TOKEN: ID - H,  LINHA: 12 
+�����/�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��6 TOKEN: ID - H,  LINHA: 12 
+��6 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��@8��TOKEN: ID - E,  LINHA: 12 
+���6 �TOKEN: ID - E,  LINHA: 12 
+ȍ
+ TOKEN: ID - H,  LINHA: 12 
+��6 TOKEN: ID - H,  LINHA: 12 
+��6 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��@9�����6 �TOKEN: ID - E,  LINHA: 12 
+�TOKEN: RBRACE - }, LINHA: 12 
+6 ��ЉTOKEN: ID - E,  LINHA: 12 
+ԋTOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�]6 TOKEN: ID - H,  LINHA: 12 
+TOKEN: ID - F,  LINHA: 12 
+6 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+TOKEN: ID - A,  LINHA: 12 
+6 TOKEN: ID - H,  LINHA: 12 
+�5*6 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+����TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - C,  LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+�6 TOKEN: ID - H,  LINHA: 12 
+�6 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - u,  LINHA: 12 
+
+TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ASSIGN - =, LINHA : 12 
+TOKEN: ID - I,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - U,  LINHA: 12 
+ԃ��TOKEN: ID - P,  LINHA: 12 
+��5 �TOKEN: ID - E,  LINHA: 12 
+�Љ�5 TOKEN: ID - H,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - P,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+��5 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - z,  LINHA: 12 
+5 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���5 TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - b,  LINHA: 12 
+5 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - K,  LINHA: 12 
+5 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - v,  LINHA: 12 
+5 �TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+[]�TOKEN: ID - UH,  LINHA: 12 
+���TOKEN: ID - N,  LINHA: 12 
+5 �TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - X,  LINHA: 12 
+5 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+����TOKEN: ID - t,  LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+����TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+������TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���TOKEN: ID - f,  LINHA: 12 
+��TOKEN: ID - tI,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���4 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��4 �3�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: LE - <, LINHA: 12 
+~�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���9TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - u,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�����TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�.4 TOKEN: ID - H,  LINHA: 12 
+9TOKEN: ID - E,  LINHA: 12 
+�������TOKEN: ID - E,  LINHA: 12 
+�]�TOKEN: ID - UH,  LINHA: 12 
+���TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�4 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���TOKEN: ID - f,  LINHA: 12 
+��TOKEN: ID - tI,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���3 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��3 �3�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: LE - <, LINHA: 12 
+~�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - Hc,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�&��TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - O,  LINHA: 12 
+����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���9TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - u,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: LE - <, LINHA: 12 
+�����TOKEN: ID - E,  LINHA: 12 
+��TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: ID - u,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���]�TOKEN: ID - UH,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 12 
+�TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - u,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�
+ 3 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���2 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+��2 TOKEN: ID - H,  LINHA: 12 
+��2 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+9TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - O,  LINHA: 12 
+��2 ���TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��2 TOKEN: ID - H,  LINHA: 12 
+��2 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - P,  LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+��2 TOKEN: ID - H,  LINHA: 12 
+TOKEN: LBRACE - {, LINHA: 12 
+2 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��@TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - j,  LINHA: 12 
+2 TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - S,  LINHA: 12 
+2 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - P,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - m,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - m,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: RPAREN - ), LINHA: 12 
+2 TOKEN: ID - H,  LINHA: 12 
+�2 TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+9TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - w,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - U,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+TOKEN: RPAREN - ), LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - U,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+TOKEN: RPAREN - ), LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��@��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+���TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ �TOKEN: ID - P,  LINHA: 12 
+TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: RAWNUMBERDATA - 1,  LINHA: 12 
+ TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - H,  LINHA: 12 
+��TOKEN: ID - H,  LINHA: 12 
+9TOKEN: ID - E,  LINHA: 12 
+�TOKEN: ID - s,  LINHA: 12 
+
+TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ASSIGN - =, LINHA : 12 
+��6
+    TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - m,  LINHA: 12 
+��TOKEN: ID - E,  LINHA: 12 
+܉�TOKEN: ID - H,  LINHA: 12 
+�TOKEN: ID - E,  LINHA: 12 
+���TOKEN: RBRACE - }, LINHA: 12 
+�TOKEN: ID - u,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ ����TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - E,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - r,  LINHA: 13 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - E,  LINHA: 13 
+���TOKEN: ASSIGN - =, LINHA : 13 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - E,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: COLON - :, LINHA 13 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ ���TOKEN: ID - UH,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+�TOKEN: LPAREN - (, LINHA: 13 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ �TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ �TOKEN: ID - H,  LINHA: 13 
+�TOKEN: RAWNUMBERDATA - 1,  LINHA: 13 
+ �����TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - P,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+9�TOKEN: ID - v,  LINHA: 13 
+
+TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ ��TOKEN: ID - nH,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+TOKEN: RPAREN - ), LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�ЉTOKEN: ID - E,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ �������TOKEN: ID - t,  LINHA: 13 
+��TOKEN: ID - t,  LINHA: 13 
+��TOKEN: ID - t,  LINHA: 13 
+�-TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - N,  LINHA: 13 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+���TOKEN: ID - t,  LINHA: 13 
+��TOKEN: ID - kH,  LINHA: 13 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ �TOKEN: ID - E,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - a,  LINHA: 13 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ �TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - Y,  LINHA: 13 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ ����TOKEN: ID - E,  LINHA: 13 
+�TOKEN: ID - H,  LINHA: 13 
+�TOKEN: ID - I,  LINHA: 13 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ �TOKEN: ID - H,  LINHA: 13 
+�?TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+��TOKEN: ID - H,  LINHA: 13 
+�4TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ TOKEN: ID - H,  LINHA: 13 
+�-TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ ��TOKEN: RAWNUMBERDATA - 0,  LINHA: 13 
+ �TOKEN: RBRACE - }, LINHA: 13 
+�TOKEN: ID - u,  LINHA: 14 
+��/ ����/ �TOKEN: ID - E,  LINHA: 14 
+���TOKEN: ID - UH,  LINHA: 14 
+��TOKEN: ID - SH,  LINHA: 14 
+��TOKEN: ID - H,  LINHA: 14 
+�TOKEN: RBRACE - }, LINHA: 14 
+�TOKEN: ID - H,  LINHA: 14 
+��/ TOKEN: ID - H,  LINHA: 14 
+��TOKEN: ID - t,  LINHA: 14 
+TOKEN: ID - H,  LINHA: 14 
+��/ TOKEN: ID - H,  LINHA: 14 
+��/ TOKEN: ID - H,  LINHA: 14 
+��TOKEN: ID - H,  LINHA: 14 
+�TOKEN: ID - H,  LINHA: 14 
+�TOKEN: ID - H,  LINHA: 14 
+��TOKEN: ID - u,  LINHA: 14 
+2�TOKEN: ID - X,  LINHA: 14 
+TOKEN: ID - H,  LINHA: 14 
+��/ TOKEN: ID - H,  LINHA: 14 
+��/ TOKEN: ID - H,  LINHA: 14 
+�/ TOKEN: ID - H,  LINHA: 14 
+��TOKEN: ID - H,  LINHA: 14 
+��@TOKEN: ID - H,  LINHA: 15 
+����TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��/ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�/ TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - h,  LINHA: 15 
+/ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - U,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�������TOKEN: ID - H,  LINHA: 15 
+��[]�TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+�3/ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�'/ TOKEN: ID - H,  LINHA: 15 
+�/ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+;TOKEN: ID - E,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - tqH,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - tTH,  LINHA: 15 
+��. ��. �TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���. �TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��. TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - j,  LINHA: 15 
+. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: RBRACE - }, LINHA: 15 
+. ����TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - M,  LINHA: 15 
+. TOKEN: ID - H,  LINHA: 15 
+�6. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��@�?. TOKEN: ID - H,  LINHA: 15 
+�TOKEN: COMMA - ,, LINHA: 15 
+. TOKEN: ID - H,  LINHA: 15 
+�. TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�@TOKEN: ID - H,  LINHA: 15 
+� . TOKEN: ID - H,  LINHA: 15 
+�. TOKEN: ID - H,  LINHA: 15 
+�2. TOKEN: ID - H,  LINHA: 15 
+��- TOKEN: ID - H,  LINHA: 15 
+��- TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��- TOKEN: ID - H,  LINHA: 15 
+��- ���- �]�TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�� TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+��TOKEN: ID - u,  LINHA: 15 
+��@�^TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - u,  LINHA: 15 
+
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ASSIGN - =, LINHA : 15 
+TOKEN: ID - B,  LINHA: 15 
+�TOKEN: ID - a,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��TOKEN: ID - U,  LINHA: 15 
+��TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: RPAREN - ), LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - u,  LINHA: 15 
+
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ASSIGN - =, LINHA : 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@ TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - U,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+����TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+���TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - tvH,  LINHA: 15 
+�- TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�- TOKEN: ID - H,  LINHA: 15 
+��TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+;TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - u,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@ ��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�������TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�� TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - u,  LINHA: 15 
+��������TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+����TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - U,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@4TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - h,  LINHA: 15 
+TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�\TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+TOKEN: COMMA - ,, LINHA: 15 
+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+;TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@TOKEN: COMMA - ,, LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@TOKEN: RAWNUMBERDATA - 0,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+����������&�����~���TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��TOKEN: ID - P,  LINHA: 15 
+$�����TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�����TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@TOKEN: LPAREN - (, LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+��@8TOKEN: ID - H,  LINHA: 15 
+�~+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - r,  LINHA: 15 
++ TOKEN: ID - H,  LINHA: 15 
+�[+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���TOKEN: ID - H,  LINHA: 15 
+;TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - u,  LINHA: 15 
+���������TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: RBRACE - }, LINHA: 15 
+�����TOKEN: ID - H,  LINHA: 15 
+�'+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - tqH,  LINHA: 15 
+�+ TOKEN: ID - H,  LINHA: 15 
+�+ TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - tTH,  LINHA: 15 
+�+ ��* �TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+���* �TOKEN: ID - P,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+/TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - t,  LINHA: 15 
+TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - q,  LINHA: 15 
+* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - f,  LINHA: 15 
+* TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - o,  LINHA: 15 
+* TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - X,  LINHA: 15 
+* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - E,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�������TOKEN: ID - k,  LINHA: 15 
+* ����TOKEN: ID - UH,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�;* TOKEN: ID - H,  LINHA: 15 
+����TOKEN: ID - H,  LINHA: 15 
+�+* TOKEN: ID - H,  LINHA: 15 
+�* TOKEN: ID - H,  LINHA: 15 
+��TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+�TOKEN: ID - H,  LINHA: 15 
+����TOKEN: ID - H,  LINHA: 15 
+�* TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - t,  LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+���TOKEN: ID - H,  LINHA: 16 
+�������TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - t,  LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - t,  LINHA: 16 
+/TOKEN: ID - H,  LINHA: 16 
+��TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - z,  LINHA: 16 
+TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - t,  LINHA: 16 
+������TOKEN: RPAREN - ), LINHA: 16 
+ ��]�TOKEN: ID - UH,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - X,  LINHA: 16 
+TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - urH,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+����TOKEN: ID - H,  LINHA: 16 
+�4TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+�-TOKEN: RPAREN - ), LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - u,  LINHA: 16 
+
+TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ASSIGN - =, LINHA : 16 
+���TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�TOKEN: RPAREN - ), LINHA: 16 
+ �TOKEN: ID - H,  LINHA: 16 
+���TOKEN: ID - T,  LINHA: 16 
+���TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ ��TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - P,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+9���TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+���TOKEN: ID - R,  LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - u,  LINHA: 16 
+
+TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ASSIGN - =, LINHA : 16 
+TOKEN: ID - D,  LINHA: 16 
+�3TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�\TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+TOKEN: ID - M,  LINHA: 16 
+TOKEN: LPAREN - (, LINHA: 16 
+ TOKEN: ID - H,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+ȾTOKEN: ID - H,  LINHA: 16 
+�������TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�.TOKEN: LPAREN - (, LINHA: 16 
+ ��TOKEN: ID - UH,  LINHA: 16 
+��TOKEN: ID - H,  LINHA: 16 
+�� TOKEN: ID - H,  LINHA: 16 
+�TOKEN: RBRACE - }, LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - u,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: RBRACE - }, LINHA: 16 
+�TOKEN: ID - v,  LINHA: 16 
+TOKEN: COMMA - ,, LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - P,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+����TOKEN: ID - u,  LINHA: 16 
+TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - P,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+�TOKEN: ID - E,  LINHA: 16 
+�TOKEN: ID - H,  LINHA: 16 
+����TOKEN: ID - t,  LINHA: 16 
+����@��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ASSIGN - =, LINHA : 17 
+���TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�����TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@ TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@$TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@TOKEN: LPAREN - (, LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@4TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@8TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�������TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+���TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���TOKEN: ID - X,  LINHA: 17 
+�����TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+���TOKEN: ID - H,  LINHA: 17 
+�����TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+؉TOKEN: ID - u,  LINHA: 17 
+ԋTOKEN: ID - E,  LINHA: 17 
+ԃ�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+����TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ASSIGN - =, LINHA : 17 
+���TOKEN: ID - E,  LINHA: 17 
+��#�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - Hc,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+ЋTOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - Hc,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+����TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - E,  LINHA: 17 
+�;TOKEN: ID - E,  LINHA: 17 
+�|ՋTOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - P,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - Hc,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+���TOKEN: RAWNUMBERDATA - 0,  LINHA: 17 
+���TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ASSIGN - =, LINHA : 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+��@ TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+���TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��% TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�Ǹ�TOKEN: ID - y,  LINHA: 17 
+���������TOKEN: ID - UH,  LINHA: 17 
+����% ]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��% ]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��% ]�TOKEN: ID - UH,  LINHA: 17 
+���& ]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��% ]�TOKEN: ID - UH,  LINHA: 17 
+���TOKEN: RBRACE - }, LINHA: 17 
+��TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - P,  LINHA: 17 
+% �]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - z,  LINHA: 17 
+% �]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - l,  LINHA: 17 
+% �]�TOKEN: ID - UH,  LINHA: 17 
+���TOKEN: ID - g,  LINHA: 17 
+% ]�TOKEN: ID - UH,  LINHA: 17 
+���TOKEN: RBRACE - }, LINHA: 17 
+��TOKEN: ID - E,  LINHA: 17 
+��TOKEN: ID - U,  LINHA: 17 
+% �]�TOKEN: ID - UH,  LINHA: 17 
+����$ TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - Q,  LINHA: 17 
+% TOKEN: ID - H,  LINHA: 17 
+�6% TOKEN: ID - H,  LINHA: 17 
+�3% TOKEN: ID - H,  LINHA: 17 
+�@% �TOKEN: GE - >, LINHA: 17 
+% �8% TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��$ �]�TOKEN: ID - UH,  LINHA: 17 
+���TOKEN: ID - TH,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - t,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���TOKEN: ID - H,  LINHA: 17 
+�������TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - _,  LINHA: 17 
+���TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - t,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+��$ TOKEN: ID - H,  LINHA: 17 
+�TOKEN: LBRACE - {, LINHA: 17 
+$ TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - u,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+$ TOKEN: ID - H,  LINHA: 17 
+���TOKEN: ID - V,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - b,  LINHA: 17 
+$ ������]�TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���������TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - U,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+���������TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+����������TOKEN: ID - UH,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+�� �TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�5TOKEN: ID - b,  LINHA: 17 
+
+TOKEN: ID - H,  LINHA: 17 
+�������TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: RBRACE - }, LINHA: 17 
+�TOKEN: ID - u,  LINHA: 17 
+TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ASSIGN - =, LINHA : 17 
+TOKEN: ID - J,  LINHA: 17 
+
+�����������TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - E,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��# ��������TOKEN: ID - u,  LINHA: 17 
+����TOKEN: ID - AWAVI,  LINHA: 17 
+��TOKEN: ID - AUATL,  LINHA: 17 
+�%TOKEN: ID - F,  LINHA: 17 
+  TOKEN: ID - UH,  LINHA: 17 
+�-TOKEN: ID - F,  LINHA: 17 
+  TOKEN: ID - SA,  LINHA: 17 
+��TOKEN: ID - I,  LINHA: 17 
+��TOKEN: ID - L,  LINHA: 17 
+TOKEN: RPAREN - ), LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+���'���TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - t,  LINHA: 17 
+ TOKEN: RAWNUMBERDATA - 1,  LINHA: 17 
+��TOKEN: ID - L,  LINHA: 17 
+��TOKEN: ID - L,  LINHA: 17 
+��TOKEN: ID - D,  LINHA: 17 
+��TOKEN: ID - A,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+��TOKEN: ID - H,  LINHA: 17 
+9�TOKEN: ID - u,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+�[]TOKEN: ID - A,  LINHA: 17 
+\TOKEN: ID - A,  LINHA: 17 
+]TOKEN: ID - A,  LINHA: 17 
+^TOKEN: ID - A_,  LINHA: 17 
+ÐTOKEN: ID - f,  LINHA: 17 
+.���TOKEN: ID - H,  LINHA: 17 
+�TOKEN: ID - H,  LINHA: 17 
+��
+
+      
+
+ TOKEN: ID - A,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+375TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
++#!""TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+TOKEN: ID - B,  LINHA: 19 
+*TOKEN: ID - B,  LINHA: 19 
+#
+TOKEN: ID - B,  LINHA: 19 
+!"TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: GE - >, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: GE - >, LINHA: 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: ASSIGN - =, LINHA : 19 
+TOKEN: LE - <, LINHA: 19 
+TOKEN: LE - <, LINHA: 19 
+
+
++TOKEN: COMMA - ,, LINHA: 20 
+.".;TOKEN: COLON - :, LINHA 20 
+98765432TOKEN: RAWNUMBERDATA - 1,  LINHA: 20 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 20 
+/ -*TOKEN: RPAREN - ), LINHA: 20 
+TOKEN: LPAREN - (, LINHA: 20 
+'&%$#! TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: LE - <, LINHA: 20 
+TOKEN: GE - >, LINHA: 20 
+TOKEN: ASSIGN - =, LINHA : 20 
+TOKEN: GE - >, LINHA: 20 
+TOKEN: COLON - :, LINHA 20 
+843TOKEN: RAWNUMBERDATA - 1,  LINHA: 20 
+/-TOKEN: COMMA - ,, LINHA: 20 
+*'&$# 
+
+               TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: LE - <, LINHA: 21 
+TOKEN: ID - TOKEN,  LINHA: 21 
+TOKEN: COLON - :, LINHA 21 
+ TOKEN: ID - RAWNUMBERDATA,  LINHA: 21 
+ - %TOKEN: ID - s,  LINHA: 21 
+TOKEN: COMMA - ,, LINHA: 21 
+  TOKEN: ID - LINHA,  LINHA: 21 
+TOKEN: COLON - :, LINHA 21 
+ %TOKEN: ID - d,  LINHA: 21 
+ TOKEN: ID - TOKEN,  LINHA: 22 
+TOKEN: COLON - :, LINHA 22 
+ TOKEN: ID - EQUAL,  LINHA: 22 
+ - %TOKEN: ID - s,  LINHA: 22 
+TOKEN: COMMA - ,, LINHA: 22 
+  TOKEN: ID - LINHA,  LINHA: 22 
+TOKEN: COLON - :, LINHA 22 
+ %TOKEN: ID - d,  LINHA: 22 
+ TOKEN: ID - TOKEN,  LINHA: 23 
+TOKEN: COLON - :, LINHA 23 
+ TOKEN: ID - ASSIGN,  LINHA: 23 
+ - %TOKEN: ID - s,  LINHA: 23 
+TOKEN: COMMA - ,, LINHA: 23 
+ TOKEN: ID - LINHA,  LINHA: 23 
+ TOKEN: COLON - :, LINHA 23 
+ %TOKEN: ID - d,  LINHA: 23 
+ TOKEN: ID - TOKEN,  LINHA: 24 
+TOKEN: COLON - :, LINHA 24 
+ TOKEN: ID - RETURN,  LINHA: 24 
+ - %TOKEN: ID - s,  LINHA: 24 
+TOKEN: COMMA - ,, LINHA: 24 
+ TOKEN: ID - LINHA,  LINHA: 24 
+TOKEN: COLON - :, LINHA 24 
+ %TOKEN: ID - d,  LINHA: 24 
+ TOKEN: ID - TOKEN,  LINHA: 25 
+TOKEN: COLON - :, LINHA 25 
+ TOKEN: ID - FOR,  LINHA: 25 
+ - %TOKEN: ID - s,  LINHA: 25 
+TOKEN: COMMA - ,, LINHA: 25 
+ TOKEN: ID - LINHA,  LINHA: 25 
+TOKEN: COLON - :, LINHA 25 
+ %TOKEN: ID - d,  LINHA: 25 
+ TOKEN: ID - TOKEN,  LINHA: 26 
+TOKEN: COLON - :, LINHA 26 
+ TOKEN: ID - TO,  LINHA: 26 
+ - %TOKEN: ID - s,  LINHA: 26 
+TOKEN: COMMA - ,, LINHA: 26 
+ TOKEN: ID - LINHA,  LINHA: 26 
+TOKEN: COLON - :, LINHA 26 
+ %TOKEN: ID - d,  LINHA: 26 
+ TOKEN: ID - TOKEN,  LINHA: 27 
+TOKEN: COLON - :, LINHA 27 
+ TOKEN: ID - DO,  LINHA: 27 
+ - %TOKEN: ID - s,  LINHA: 27 
+TOKEN: COMMA - ,, LINHA: 27 
+ TOKEN: ID - LINHA,  LINHA: 27 
+TOKEN: COLON - :, LINHA 27 
+ %TOKEN: ID - d,  LINHA: 27 
+ TOKEN: ID - TOKEN,  LINHA: 28 
+TOKEN: COLON - :, LINHA 28 
+ TOKEN: ID - LBRACE,  LINHA: 28 
+ - %TOKEN: ID - s,  LINHA: 28 
+TOKEN: COMMA - ,, LINHA: 28 
+ TOKEN: ID - LINHA,  LINHA: 28 
+TOKEN: COLON - :, LINHA 28 
+ %TOKEN: ID - d,  LINHA: 28 
+ TOKEN: ID - TOKEN,  LINHA: 29 
+TOKEN: COLON - :, LINHA 29 
+ TOKEN: ID - RBRACE,  LINHA: 29 
+ - %TOKEN: ID - s,  LINHA: 29 
+TOKEN: COMMA - ,, LINHA: 29 
+ TOKEN: ID - LINHA,  LINHA: 29 
+TOKEN: COLON - :, LINHA 29 
+ %TOKEN: ID - d,  LINHA: 29 
+ TOKEN: ID - TOKEN,  LINHA: 30 
+TOKEN: COLON - :, LINHA 30 
+ TOKEN: ID - LPAREN,  LINHA: 30 
+ - %TOKEN: ID - s,  LINHA: 30 
+TOKEN: COMMA - ,, LINHA: 30 
+ TOKEN: ID - LINHA,  LINHA: 30 
+TOKEN: COLON - :, LINHA 30 
+ %TOKEN: ID - d,  LINHA: 30 
+ TOKEN: ID - TOKEN,  LINHA: 31 
+TOKEN: COLON - :, LINHA 31 
+ TOKEN: ID - RPAREN,  LINHA: 31 
+ - %TOKEN: ID - s,  LINHA: 31 
+TOKEN: COMMA - ,, LINHA: 31 
+ TOKEN: ID - LINHA,  LINHA: 31 
+TOKEN: COLON - :, LINHA 31 
+ %TOKEN: ID - d,  LINHA: 31 
+ TOKEN: ID - TOKEN,  LINHA: 32 
+TOKEN: COLON - :, LINHA 32 
+ TOKEN: ID - IF,  LINHA: 32 
+ - %TOKEN: ID - s,  LINHA: 32 
+TOKEN: COMMA - ,, LINHA: 32 
+ TOKEN: ID - LINHA,  LINHA: 32 
+TOKEN: COLON - :, LINHA 32 
+ %TOKEN: ID - d,  LINHA: 32 
+ TOKEN: ID - TOKEN,  LINHA: 33 
+TOKEN: COLON - :, LINHA 33 
+ TOKEN: ID - ELSE,  LINHA: 33 
+ - %TOKEN: ID - s,  LINHA: 33 
+TOKEN: COMMA - ,, LINHA: 33 
+ TOKEN: ID - LINHA,  LINHA: 33 
+TOKEN: COLON - :, LINHA 33 
+ %TOKEN: ID - d,  LINHA: 33 
+ TOKEN: ID - TOKEN,  LINHA: 34 
+TOKEN: COLON - :, LINHA 34 
+ TOKEN: NULL - NULL, LINHA: 34 
+ - %TOKEN: ID - s,  LINHA: 34 
+TOKEN: COMMA - ,, LINHA: 34 
+ TOKEN: ID - LINHA,  LINHA: 34 
+TOKEN: COLON - :, LINHA 34 
+ %TOKEN: ID - d,  LINHA: 34 
+ TOKEN: ID - TOKEN,  LINHA: 35 
+TOKEN: COLON - :, LINHA 35 
+ TOKEN: ID - COLON,  LINHA: 35 
+ - %TOKEN: ID - s,  LINHA: 35 
+TOKEN: COMMA - ,, LINHA: 35 
+ TOKEN: ID - LINHA,  LINHA: 35 
+ %TOKEN: ID - d,  LINHA: 35 
+ TOKEN: ID - TOKEN,  LINHA: 36 
+TOKEN: COLON - :, LINHA 36 
+ TOKEN: ID - COMMA,  LINHA: 36 
+ - %TOKEN: ID - s,  LINHA: 36 
+TOKEN: COMMA - ,, LINHA: 36 
+ TOKEN: ID - LINHA,  LINHA: 36 
+TOKEN: COLON - :, LINHA 36 
+ %TOKEN: ID - d,  LINHA: 36 
+ TOKEN: ID - TOKEN,  LINHA: 37 
+TOKEN: COLON - :, LINHA 37 
+ TOKEN: ID - AND,  LINHA: 37 
+ - %TOKEN: ID - s,  LINHA: 37 
+TOKEN: COMMA - ,, LINHA: 37 
+ TOKEN: ID - LINHA,  LINHA: 37 
+TOKEN: COLON - :, LINHA 37 
+ %TOKEN: ID - d,  LINHA: 37 
+ TOKEN: ID - TOKEN,  LINHA: 38 
+TOKEN: COLON - :, LINHA 38 
+ TOKEN: ID - OR,  LINHA: 38 
+ - %TOKEN: ID - s,  LINHA: 38 
+TOKEN: COMMA - ,, LINHA: 38 
+ TOKEN: ID - LINHA,  LINHA: 38 
+TOKEN: COLON - :, LINHA 38 
+ %TOKEN: ID - d,  LINHA: 38 
+ TOKEN: ID - TOKEN,  LINHA: 39 
+TOKEN: COLON - :, LINHA 39 
+ TOKEN: ID - IMPLIES,  LINHA: 39 
+ - %TOKEN: ID - s,  LINHA: 39 
+TOKEN: COMMA - ,, LINHA: 39 
+ TOKEN: ID - LINHA,  LINHA: 39 
+TOKEN: COLON - :, LINHA 39 
+ %TOKEN: ID - d,  LINHA: 39 
+ TOKEN: ID - TOKEN,  LINHA: 40 
+TOKEN: COLON - :, LINHA 40 
+ TOKEN: ID - XOR,  LINHA: 40 
+ - %TOKEN: ID - s,  LINHA: 40 
+TOKEN: COMMA - ,, LINHA: 40 
+ TOKEN: ID - LINHA,  LINHA: 40 
+TOKEN: COLON - :, LINHA 40 
+ %TOKEN: ID - d,  LINHA: 40 
+ TOKEN: ID - TOKEN,  LINHA: 41 
+TOKEN: COLON - :, LINHA 41 
+ TOKEN: ID - LE,  LINHA: 41 
+ - %TOKEN: ID - s,  LINHA: 41 
+TOKEN: COMMA - ,, LINHA: 41 
+ TOKEN: ID - LINHA,  LINHA: 41 
+TOKEN: COLON - :, LINHA 41 
+ %TOKEN: ID - d,  LINHA: 41 
+ TOKEN: ID - TOKEN,  LINHA: 42 
+TOKEN: COLON - :, LINHA 42 
+ TOKEN: ID - GE,  LINHA: 42 
+ - %TOKEN: ID - s,  LINHA: 42 
+TOKEN: COMMA - ,, LINHA: 42 
+ TOKEN: ID - LINHA,  LINHA: 42 
+TOKEN: COLON - :, LINHA 42 
+ %TOKEN: ID - d,  LINHA: 42 
+ TOKEN: ID - TOKEN,  LINHA: 43 
+TOKEN: COLON - :, LINHA 43 
+ TOKEN: ID - LT,  LINHA: 43 
+ - %TOKEN: ID - s,  LINHA: 43 
+TOKEN: COMMA - ,, LINHA: 43 
+ TOKEN: ID - LINHA,  LINHA: 43 
+TOKEN: COLON - :, LINHA 43 
+ %TOKEN: ID - d,  LINHA: 43 
+ TOKEN: ID - TOKEN,  LINHA: 44 
+TOKEN: COLON - :, LINHA 44 
+ TOKEN: ID - GT,  LINHA: 44 
+ - %TOKEN: ID - s,  LINHA: 44 
+TOKEN: COMMA - ,, LINHA: 44 
+ TOKEN: ID - LINHA,  LINHA: 44 
+TOKEN: COLON - :, LINHA 44 
+ %TOKEN: ID - d,  LINHA: 44 
+ TOKEN: ID - TOKEN,  LINHA: 45 
+TOKEN: COLON - :, LINHA 45 
+ TOKEN: ID - ID,  LINHA: 45 
+ - %TOKEN: ID - s,  LINHA: 45 
+TOKEN: COMMA - ,, LINHA: 45 
+  TOKEN: ID - LINHA,  LINHA: 45 
+TOKEN: COLON - :, LINHA 45 
+ %TOKEN: ID - d,  LINHA: 45 
+ TOKEN: ID - fatal,  LINHA: 46 
+ TOKEN: ID - flex,  LINHA: 46 
+ TOKEN: ID - scanner,  LINHA: 46 
+ TOKEN: ID - internal,  LINHA: 46 
+ TOKEN: ID - error,  LINHA: 46 
+--TOKEN: ID - no,  LINHA: 46 
+ TOKEN: ID - action,  LINHA: 46 
+ TOKEN: ID - found,  LINHA: 46 
+����������������+���TOKEN: ID - Q,  LINHA: 46 
+���TOKEN: ID - w,  LINHA: 46 
+���TOKEN: ID - w,  LINHA: 46 
+������������������5���[����������������������?���TOKEN: ID - e,  LINHA: 46 
+�������������������#���TOKEN: ID - I,  LINHA: 46 
+���TOKEN: ID - o,  LINHA: 46 
+�������������������TOKEN: ID - fatal,  LINHA: 46 
+ TOKEN: ID - flex,  LINHA: 46 
+ TOKEN: ID - scanner,  LINHA: 46 
+ TOKEN: ID - internal,  LINHA: 46 
+ TOKEN: ID - error,  LINHA: 46 
+--TOKEN: ID - end,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - buffer,  LINHA: 46 
+ TOKEN: ID - missed,  LINHA: 46 
+TOKEN: ID - fatal,  LINHA: 46 
+ TOKEN: ID - error,  LINHA: 46 
+ - TOKEN: ID - scanner,  LINHA: 46 
+ TOKEN: ID - input,  LINHA: 46 
+ TOKEN: ID - buffer,  LINHA: 46 
+ TOKEN: ID - overflow,  LINHA: 46 
+TOKEN: ID - input,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - flex,  LINHA: 46 
+ TOKEN: ID - scanner,  LINHA: 46 
+ TOKEN: ID - failed,  LINHA: 46 
+TOKEN: ID - out,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - dynamic,  LINHA: 46 
+ TOKEN: ID - memory,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yy_get_next_buffer,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+TOKEN: ID - flex,  LINHA: 46 
+ TOKEN: ID - scanner,  LINHA: 46 
+ TOKEN: ID - push,  LINHA: 46 
+-TOKEN: ID - back,  LINHA: 46 
+ TOKEN: ID - overflow,  LINHA: 46 
+TOKEN: ID - out,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - dynamic,  LINHA: 46 
+ TOKEN: ID - memory,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yy_create_buffer,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+TOKEN: ID - out,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - dynamic,  LINHA: 46 
+ TOKEN: ID - memory,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yyensure_buffer_stack,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+TOKEN: ID - out,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - dynamic,  LINHA: 46 
+ TOKEN: ID - memory,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yy_scan_buffer,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+TOKEN: ID - out,  LINHA: 46 
+ TOKEN: ID - of,  LINHA: 46 
+ TOKEN: ID - dynamic,  LINHA: 46 
+ TOKEN: ID - memory,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yy_scan_bytes,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+TOKEN: ID - bad,  LINHA: 46 
+ TOKEN: ID - buffer,  LINHA: 46 
+ TOKEN: ID - in,  LINHA: 46 
+ TOKEN: ID - yy_scan_bytes,  LINHA: 46 
+TOKEN: LPAREN - (, LINHA: 46 
+TOKEN: RPAREN - ), LINHA: 46 
+%TOKEN: ID - s,  LINHA: 46 
+TOKEN: ID - r,  LINHA: 47 
+TOKEN: ID - CADE,  LINHA: 47 
+ TOKEN: ID - MEU,  LINHA: 47 
+ TOKEN: ID - CODIGO,  LINHA: 47 
+!?;TOKEN: ID - T,  LINHA: 47 
+TOKEN: RPAREN - ), LINHA: 47 
+@����`����TOKEN: ID - p,  LINHA: 47 
+���TOKEN: ID - p,  LINHA: 47 
+TOKEN: ID - z,  LINHA: 47 
+��������TOKEN: COMMA - ,, LINHA: 47 
+���TOKEN: LPAREN - (, LINHA: 47 
+TOKEN: ID - Y,  LINHA: 47 
+���TOKEN: ID - H,  LINHA: 47 
+TOKEN: ID - V,  LINHA: 47 
+���TOKEN: ID - h,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+����TOKEN: ID - n,  LINHA: 47 
+����������������
+                     TOKEN: RAWNUMBERDATA - 1,  LINHA: 47 
+���TOKEN: COMMA - ,, LINHA: 47 
+����TOKEN: ID - L,  LINHA: 47 
+����TOKEN: ID - l,  LINHA: 47 
+����"��������4����TOKEN: RAWNUMBERDATA - 0,  LINHA: 47 
+���
+   TOKEN: ID - Z,  LINHA: 47 
+���TOKEN: COMMA - ,, LINHA: 47 
+TOKEN: COMMA - ,, LINHA: 47 
+���TOKEN: ID - L,  LINHA: 47 
+TOKEN: ID - a,  LINHA: 47 
+���TOKEN: ID - h,  LINHA: 47 
+TOKEN: ID - m,  LINHA: 47 
+����TOKEN: ID - z,  LINHA: 47 
+���������������������TOKEN: LPAREN - (, LINHA: 47 
+����TOKEN: ID - H,  LINHA: 47 
+����TOKEN: ID - h,  LINHA: 47 
+����������TOKEN: ID - i,  LINHA: 47 
+��������TOKEN: COMMA - ,, LINHA: 47 
+��TOKEN: ID - Q,  LINHA: 47 
+���TOKEN: LPAREN - (, LINHA: 47 
+TOKEN: ID - l,  LINHA: 47 
+���TOKEN: ID - H,  LINHA: 47 
+����TOKEN: ID - h,  LINHA: 47 
+@����TOKEN: ID - zR,  LINHA: 47 
+TOKEN: ID - x,  LINHA: 47 
+
+  �����+TOKEN: ID - zR,  LINHA: 47 
+TOKEN: ID - x,  LINHA: 47 
+
+  �$���� TOKEN: ID - F,  LINHA: 47 
+TOKEN: ID - J,  LINHA: 47 
+
+TOKEN: ID - w,  LINHA: 47 
+�?;*3$"TOKEN: ID - D,  LINHA: 47 
+��� \����\TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - E,  LINHA: 47 
+�TOKEN: ID - R,  LINHA: 47 
+
+ �����TOKEN: ID - V,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - E,  LINHA: 47 
+�TOKEN: ID - L,  LINHA: 47 
+
+�����-TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: LPAREN - (, LINHA: 47 
+
+�����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  ������TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+   ����-TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: LPAREN - (, LINHA: 47 
+
+ $�����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - E,  LINHA: 47 
+��
+   TOKEN: ID - H,  LINHA: 47 
+TOKEN: ID - I,  LINHA: 47 
+����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  TOKEN: ID - h,  LINHA: 47 
+����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  ������TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  ������TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  �TOKEN: ID - i,  LINHA: 47 
+����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  ����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  TOKEN: LPAREN - (, LINHA: 47 
+TOKEN: ID - n,  LINHA: 47 
+����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  TOKEN: ID - H,  LINHA: 47 
+-���3TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+.
+   TOKEN: ID - h,  LINHA: 47 
+@����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  ����*TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - e,  LINHA: 47 
+
+�&����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  �����5TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�����
+        TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - G,  LINHA: 47 
+
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - H,  LINHA: 47 
+
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - H,  LINHA: 47 
+
+TOKEN: ID - D,  LINHA: 47 
+����
+     TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - G,  LINHA: 47 
+
+TOKEN: ID - d,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - H,  LINHA: 47 
+
+�����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - N,  LINHA: 47 
+
+�����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - Q,  LINHA: 47 
+
+�TOKEN: ID - y,  LINHA: 47 
+���TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - Q,  LINHA: 47 
+
+�TOKEN: ID - o,  LINHA: 47 
+���
+   TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - G,  LINHA: 47 
+
+[���TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - N,  LINHA: 47 
+
+$TOKEN: ID - N,  LINHA: 47 
+���TOKEN: ID - k,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - f,  LINHA: 47 
+
+TOKEN: ID - D,  LINHA: 47 
+�����TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+�
+  TOKEN: ID - d,  LINHA: 47 
+"���TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - U,  LINHA: 47 
+
+����%TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+`
+ �!���TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - V,  LINHA: 47 
+
+����TOKEN: ID - d,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+�TOKEN: ID - C,  LINHA: 47 
+TOKEN: ID - _,  LINHA: 47 
+
+TOKEN: ID - D,  LINHA: 47 
+�`���TOKEN: ID - e,  LINHA: 47 
+TOKEN: ID - B,  LINHA: 47 
+�TOKEN: ID - B,  LINHA: 47 
+�TOKEN: ID - E,  LINHA: 47 
+ �TOKEN: ID - B,  LINHA: 47 
+TOKEN: LPAREN - (, LINHA: 47 
+�TOKEN: ID - H,  LINHA: 47 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 47 
+�TOKEN: ID - H,  LINHA: 47 
+8�TOKEN: ID - M,  LINHA: 47 
+@TOKEN: ID - r,  LINHA: 47 
+8TOKEN: ID - A,  LINHA: 47 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 47 
+TOKEN: ID - A,  LINHA: 47 
+TOKEN: LPAREN - (, LINHA: 47 
+TOKEN: ID - B,  LINHA: 47 
+ TOKEN: ID - B,  LINHA: 47 
+TOKEN: ID - B,  LINHA: 47 
+TOKEN: ID - B,  LINHA: 47 
+TOKEN: COMMA - ,, LINHA: 47 
+�����
+      @
+       
+TOKEN: ID - T,  LINHA: 47 
+-8TOKEN: ID - M,  LINHA: 47 
+ @TOKEN: ID - M,  LINHA: 47 
+ ���TOKEN: ID - o,  LINHA: 47 
+�8�
+      
+       8TOKEN: ID - O,  LINHA: 48 
+ �����TOKEN: ID - o,  LINHA: 48 
+���TOKEN: ID - o,  LINHA: 48 
+TOKEN: ID - x,  LINHA: 48 
+���TOKEN: ID - o,  LINHA: 48 
+���TOKEN: ID - o,  LINHA: 48 
+TOKEN: ID - D,  LINHA: 48 
+���TOKEN: ID - o,  LINHA: 48 
+TOKEN: ID - HM,  LINHA: 48 
+ TOKEN: ID - f,  LINHA: 48 
+TOKEN: ID - v,  LINHA: 48 
+��������&6TOKEN: ID - F,  LINHA: 52 
+TOKEN: ID - V,  LINHA: 53 
+TOKEN: ID - f,  LINHA: 54 
+TOKEN: ID - P,  LINHA: 55 
+ TOKEN: ID - GCC,  LINHA: 55 
+TOKEN: COLON - :, LINHA 55 
+ TOKEN: LPAREN - (, LINHA: 55 
+TOKEN: ID - Ubuntu,  LINHA: 55 
+ 7.4.TOKEN: RAWNUMBERDATA - 0,  LINHA: 55 
+-TOKEN: RAWNUMBERDATA - 1,  LINHA: 55 
+TOKEN: ID - ubuntu,  LINHA: 55 
+TOKEN: RAWNUMBERDATA - 1,  LINHA: 55 
+~TOKEN: RAWNUMBERDATA - 1,  LINHA: 55 
+8.TOKEN: RAWNUMBERDATA - 0,  LINHA: 55 
+4.TOKEN: RAWNUMBERDATA - 1,  LINHA: 55 
+TOKEN: RPAREN - ), LINHA: 55 
+ 7.4.TOKEN: RAWNUMBERDATA - 0,  LINHA: 55 
+8TOKEN: ID - T,  LINHA: 55 
+TOKEN: ID - t,  LINHA: 55 
+��8TOKEN: ID - D,  LINHA: 55 
+TOKEN: ID - x,  LINHA: 55 
+��
+       8
+         TOKEN: ID - P,  LINHA: 56 
+TOKEN: ID - p,  LINHA: 56 
+�TOKEN: ID - T,  LINHA: 58 
+-`-8TOKEN: ID - h,  LINHA: 58 
+98TOKEN: ID - M,  LINHA: 58 
+ @TOKEN: ID - M,  LINHA: 58 
+ TOKEN: ID - HM,  LINHA: 58 
+ 8TOKEN: ID - O,  LINHA: 58 
+ TOKEN: ID - P,  LINHA: 58 
+  TOKEN: ID - P,  LINHA: 58 
+ ��
+       ��!@
+              7TOKEN: ID - HP,  LINHA: 60 
+ TOKEN: ID - F,  LINHA: 60 
+@TOKEN: ID - M,  LINHA: 60 
+ TOKEN: ID - m,  LINHA: 60 
+�
+  TOKEN: ID - y,  LINHA: 60 
+8TOKEN: ID - M,  LINHA: 60 
+ ����TOKEN: ID - hP,  LINHA: 60 
+�TOKEN: ID - pP,  LINHA: 60 
+�TOKEN: ID - xP,  LINHA: 60 
+��TOKEN: ID - P,  LINHA: 60 
+ ��TOKEN: ID - P,  LINHA: 60 
+ ��TOKEN: ID - P,  LINHA: 60 
+��TOKEN: ID - P,  LINHA: 60 
+ �TOKEN: ID - P,  LINHA: 60 
+�TOKEN: ID - P,  LINHA: 60 
+ TOKEN: RPAREN - ), LINHA: 60 
+�-TOKEN: ID - z,  LINHA: 60 
+3.9/!TOKEN: ID - A,  LINHA: 60 
+@/~TOKEN: ID - I,  LINHA: 60 
+�/~TOKEN: ID - P,  LINHA: 60 
+@TOKEN: RAWNUMBERDATA - 0,  LINHA: 60 
+�TOKEN: ID - W,  LINHA: 60 
+ TOKEN: RAWNUMBERDATA - 1,  LINHA: 60 
+�^2|TOKEN: ID - t,  LINHA: 60 
+�TOKEN: ID - P,  LINHA: 60 
+ ��TOKEN: ID - P,  LINHA: 60 
+�'3� "��TOKEN: LE - <, LINHA: 60 
+-�TOKEN: ID - i,  LINHA: 60 
+���TOKEN: ID - V,  LINHA: 60 
+TOKEN: LE - <, LINHA: 60 
+*5TOKEN: ID - f,  LINHA: 60 
+�TOKEN: ID - Q,  LINHA: 60 
+-%�#�4+TOKEN: ID - k,  LINHA: 60 
+��TOKEN: ID - D,  LINHA: 60 
+�TOKEN: GE - >, LINHA: 60 
+��TOKEN: ID - R,  LINHA: 60 
+@TOKEN: ID - M,  LINHA: 60 
+ TOKEN: ID - c,  LINHA: 60 
+TOKEN: ID - HM,  LINHA: 60 
+ TOKEN: ID - l,  LINHA: 60 
+8TOKEN: ID - M,  LINHA: 60 
+ 8�8TOKEN: ID - O,  LINHA: 60 
+ �-!��TOKEN: ID - P,  LINHA: 60 
+ TOKEN: COMMA - ,, LINHA: 60 
+ TOKEN: ID - P,  LINHA: 60 
+^ TOKEN: ID - P,  LINHA: 60 
+ @TOKEN: ID - T,  LINHA: 60 
+TOKEN: ID - h,  LINHA: 60 
+TOKEN: LBRACE - {, LINHA: 60 
+TOKEN: RAWNUMBERDATA - 0,  LINHA: 60 
+TOKEN: ID - P,  LINHA: 60 
+�TOKEN: ID - P,  LINHA: 60 
+ �TOKEN: ID - PP,  LINHA: 60 
+�TOKEN: ID - T,  LINHA: 60 
+-���*
+         ��TOKEN: ID - P,  LINHA: 60 
+�TOKEN: LE - <, LINHA: 60 
+TOKEN: COMMA - ,, LINHA: 60 
+%���"��TOKEN: ID - P,  LINHA: 60 
+ �`TOKEN: ID - P,  LINHA: 60 
+"TOKEN: COMMA - ,, LINHA: 60 
+TOKEN: ID - a,  LINHA: 60 
+TOKEN: COMMA - ,, LINHA: 60 
+!�*.TOKEN: ID - D,  LINHA: 60 
+TOKEN: LPAREN - (, LINHA: 60 
+�TOKEN: ASSIGN - =, LINHA : 60 
+\TOKEN: ID - P,  LINHA: 60 
+ TOKEN: ID - i,  LINHA: 60 
+TOKEN: ID - XP,  LINHA: 60 
+TOKEN: ID - o,  LINHA: 60 
+@TOKEN: RPAREN - ), LINHA: 60 
+*~�*��TOKEN: ID - j,  LINHA: 60 
+TOKEN: RPAREN - ), LINHA: 60 
+�� �TOKEN: ID - q,  LINHA: 60 
+*
+ �TOKEN: ID - P,  LINHA: 60 
+ ���*
+         �`-.%+TOKEN: ID - A,  LINHA: 60 
+#�TOKEN: LE - <, LINHA: 60 
+�TOKEN: COMMA - ,, LINHA: 60 
+TOKEN: ID - e,  LINHA: 60 
+TOKEN: ID - L,  LINHA: 60 
+`TOKEN: ID - v,  LINHA: 60 
+2&�^�TOKEN: ID - P,  LINHA: 60 
+ ��TOKEN: ID - P,  LINHA: 60 
+ TOKEN: ID - b,  LINHA: 60 
+�+��TOKEN: ID - P,  LINHA: 61 
+ �|TOKEN: COMMA - ,, LINHA: 61 
+TOKEN: ID - d,  LINHA: 61 
+��
+   \��$���TOKEN: RBRACE - }, LINHA: 61 
+��TOKEN: ID - P,  LINHA: 61 
+  4�*@�*TOKEN: ID - J,  LINHA: 61 
+"TOKEN: ID - F,  LINHA: 61 
+
+ 8TOKEN: ID - f,  LINHA: 61 
+TOKEN: ID - y,  LINHA: 61 
++�TOKEN: ID - t,  LINHA: 61 
+@TOKEN: ID - P,  LINHA: 61 
+TOKEN: ID - crtstuff,  LINHA: 61 
+.TOKEN: ID - c,  LINHA: 61 
+TOKEN: ID - deregister_tm_clones,  LINHA: 61 
+TOKEN: ID - __do_global_dtors_aux,  LINHA: 61 
+TOKEN: ID - completed,  LINHA: 61 
+.7697TOKEN: ID - __do_global_dtors_aux_fini_array_entry,  LINHA: 61 
+TOKEN: ID - frame_dummy,  LINHA: 61 
+TOKEN: ID - __frame_dummy_init_array_entry,  LINHA: 61 
+TOKEN: ID - lex,  LINHA: 61 
+.TOKEN: ID - yy,  LINHA: 61 
+.TOKEN: ID - c,  LINHA: 61 
+TOKEN: ID - yy_buffer_stack_top,  LINHA: 61 
+TOKEN: ID - yy_buffer_stack_max,  LINHA: 61 
+TOKEN: ID - yy_buffer_stack,  LINHA: 61 
+TOKEN: ID - yy_hold_char,  LINHA: 61 
+TOKEN: ID - yy_n_chars,  LINHA: 61 
+TOKEN: ID - yy_c_buf_p,  LINHA: 61 
+TOKEN: ID - yy_init,  LINHA: 61 
+TOKEN: ID - yy_start,  LINHA: 61 
+TOKEN: ID - yy_did_buffer_switch_on_eof,  LINHA: 61 
+TOKEN: ID - yy_accept,  LINHA: 61 
+TOKEN: ID - yy_ec,  LINHA: 61 
+TOKEN: ID - yy_meta,  LINHA: 61 
+TOKEN: ID - yy_base,  LINHA: 61 
+TOKEN: ID - yy_def,  LINHA: 61 
+TOKEN: ID - yy_nxt,  LINHA: 61 
+TOKEN: ID - yy_chk,  LINHA: 61 
+TOKEN: ID - yy_rule_can_match_eol,  LINHA: 61 
+TOKEN: ID - yy_last_accepting_state,  LINHA: 61 
+TOKEN: ID - yy_last_accepting_cpos,  LINHA: 61 
+TOKEN: ID - yyensure_buffer_stack,  LINHA: 61 
+TOKEN: ID - yy_load_buffer_state,  LINHA: 61 
+TOKEN: ID - yy_get_previous_state,  LINHA: 61 
+TOKEN: ID - yy_try_NUL_trans,  LINHA: 61 
+TOKEN: ID - yy_get_next_buffer,  LINHA: 61 
+TOKEN: ID - yy_fatal_error,  LINHA: 61 
+TOKEN: ID - yyunput,  LINHA: 61 
+TOKEN: ID - input,  LINHA: 61 
+TOKEN: ID - yy_init_buffer,  LINHA: 61 
+TOKEN: ID - yy_init_globals,  LINHA: 61 
+TOKEN: ID - __FRAME_END__,  LINHA: 61 
+TOKEN: ID - __init_array_end,  LINHA: 61 
+TOKEN: ID - _DYNAMIC,  LINHA: 61 
+TOKEN: ID - __init_array_start,  LINHA: 61 
+TOKEN: ID - __GNU_EH_FRAME_HDR,  LINHA: 61 
+TOKEN: ID - _GLOBAL_OFFSET_TABLE_,  LINHA: 61 
+TOKEN: ID - yy_switch_to_buffer,  LINHA: 61 
+TOKEN: ID - __libc_csu_fini,  LINHA: 61 
+TOKEN: ID - yyrestart,  LINHA: 61 
+TOKEN: ID - free,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - __errno_location,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yyget_out,  LINHA: 61 
+TOKEN: ID - _ITM_deregisterTMCloneTable,  LINHA: 61 
+TOKEN: ID - stdout,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - ferror,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - isatty,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - fread,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - stdin,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - _edata,  LINHA: 61 
+TOKEN: ID - yyin,  LINHA: 61 
+TOKEN: ID - strlen,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yyget_debug,  LINHA: 61 
+TOKEN: ID - yytext,  LINHA: 61 
+TOKEN: ID - yyrealloc,  LINHA: 61 
+TOKEN: ID - yy_create_buffer,  LINHA: 61 
+TOKEN: ID - yylineno,  LINHA: 61 
+TOKEN: ID - yy_flex_debug,  LINHA: 61 
+TOKEN: ID - memset,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yyget_text,  LINHA: 61 
+TOKEN: ID - yyalloc,  LINHA: 61 
+TOKEN: ID - yyfree,  LINHA: 61 
+TOKEN: ID - yyset_lineno,  LINHA: 61 
+TOKEN: ID - yy_scan_buffer,  LINHA: 61 
+TOKEN: ID - __libc_start_main,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - __data_start,  LINHA: 61 
+TOKEN: ID - yyout,  LINHA: 61 
+TOKEN: ID - yy_scan_string,  LINHA: 61 
+TOKEN: ID - yyset_in,  LINHA: 61 
+TOKEN: ID - fprintf,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yy_scan_bytes,  LINHA: 61 
+TOKEN: ID - __gmon_start__,  LINHA: 61 
+TOKEN: ID - yyget_lineno,  LINHA: 61 
+TOKEN: ID - __dso_handle,  LINHA: 61 
+TOKEN: ID - clearerr,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yyget_leng,  LINHA: 61 
+TOKEN: ID - _IO_stdin_used,  LINHA: 61 
+TOKEN: ID - yypush_buffer_state,  LINHA: 61 
+TOKEN: ID - fileno,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yy_delete_buffer,  LINHA: 61 
+TOKEN: ID - __libc_csu_init,  LINHA: 61 
+TOKEN: ID - malloc,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - _IO_getc,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yypop_buffer_state,  LINHA: 61 
+TOKEN: ID - yyleng,  LINHA: 61 
+TOKEN: ID - realloc,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - __bss_start,  LINHA: 61 
+TOKEN: ID - main,  LINHA: 61 
+TOKEN: ID - yylex,  LINHA: 61 
+TOKEN: ID - yy_flush_buffer,  LINHA: 61 
+TOKEN: ID - fopen,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yyget_in,  LINHA: 61 
+TOKEN: ID - exit,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - fwrite,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - __TMC_END__,  LINHA: 61 
+TOKEN: ID - _ITM_registerTMCloneTable,  LINHA: 61 
+TOKEN: ID - yyset_debug,  LINHA: 61 
+TOKEN: ID - yyset_out,  LINHA: 61 
+TOKEN: ID - __cxa_finalize,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5TOKEN: ID - yylex_destroy,  LINHA: 61 
+TOKEN: ID - stderr,  LINHA: 61 
+@@TOKEN: ID - GLIBC_,  LINHA: 61 
+2.2.5.TOKEN: ID - symtab,  LINHA: 61 
+.TOKEN: ID - strtab,  LINHA: 61 
+.TOKEN: ID - shstrtab,  LINHA: 61 
+.TOKEN: ID - interp,  LINHA: 61 
+.TOKEN: ID - note,  LINHA: 61 
+.TOKEN: ID - ABI,  LINHA: 61 
+-TOKEN: ID - tag,  LINHA: 61 
+.TOKEN: ID - note,  LINHA: 61 
+.TOKEN: ID - gnu,  LINHA: 61 
+.TOKEN: ID - build,  LINHA: 61 
+-TOKEN: ID - id,  LINHA: 61 
+.TOKEN: ID - gnu,  LINHA: 61 
+.TOKEN: ID - hash,  LINHA: 61 
+.TOKEN: ID - dynsym,  LINHA: 61 
+.TOKEN: ID - dynstr,  LINHA: 61 
+.TOKEN: ID - gnu,  LINHA: 61 
+.TOKEN: ID - version,  LINHA: 61 
+.TOKEN: ID - gnu,  LINHA: 61 
+.TOKEN: ID - version_r,  LINHA: 61 
+.TOKEN: ID - rela,  LINHA: 61 
+.TOKEN: ID - dyn,  LINHA: 61 
+.TOKEN: ID - rela,  LINHA: 61 
+.TOKEN: ID - plt,  LINHA: 61 
+.TOKEN: ID - init,  LINHA: 61 
+.TOKEN: ID - plt,  LINHA: 61 
+.TOKEN: ID - got,  LINHA: 61 
+.TOKEN: ID - text,  LINHA: 61 
+.TOKEN: ID - fini,  LINHA: 61 
+.TOKEN: ID - rodata,  LINHA: 61 
+.TOKEN: ID - eh_frame_hdr,  LINHA: 61 
+.TOKEN: ID - eh_frame,  LINHA: 61 
+.TOKEN: ID - init_array,  LINHA: 61 
+.TOKEN: ID - fini_array,  LINHA: 61 
+.TOKEN: ID - dynamic,  LINHA: 61 
+.TOKEN: ID - data,  LINHA: 61 
+.TOKEN: ID - bss,  LINHA: 61 
+.TOKEN: ID - comment,  LINHA: 61 
+88#TOKEN: ID - T,  LINHA: 61 
+TOKEN: ID - T,  LINHA: 61 
+ TOKEN: RAWNUMBERDATA - 1,  LINHA: 61 
+TOKEN: ID - t,  LINHA: 61 
+TOKEN: ID - t,  LINHA: 61 
+$TOKEN: ID - D,  LINHA: 61 
+���TOKEN: ID - o,  LINHA: 61 
+��TOKEN: RAWNUMBERDATA - 0,  LINHA: 61 
+TOKEN: ID - N,  LINHA: 61 
+
+��TOKEN: ID - p,  LINHA: 61 
+TOKEN: ID - V,  LINHA: 61 
+88
+    ^���TOKEN: ID - o,  LINHA: 61 
+TOKEN: ID - D,  LINHA: 61 
+TOKEN: ID - D,  LINHA: 61 
+4TOKEN: ID - k,  LINHA: 61 
+���TOKEN: ID - o,  LINHA: 61 
+TOKEN: ID - x,  LINHA: 61 
+TOKEN: ID - x,  LINHA: 61 
+ TOKEN: ID - z,  LINHA: 61 
+���TOKEN: ID - B,  LINHA: 61 
+����88�TOKEN: ID - P,  LINHA: 61 
+TOKEN: ID - P,  LINHA: 61 
+ �TOKEN: ID - p,  LINHA: 61 
+TOKEN: ID - p,  LINHA: 62 
+����"�TOKEN: ID - T,  LINHA: 65 
+-TOKEN: ID - T,  LINHA: 65 
+-�`-`-� �88TOKEN: ID - T,  LINHA: 66 
+�TOKEN: ID - h,  LINHA: 66 
+9TOKEN: ID - h,  LINHA: 66 
+9TOKEN: ID - p,  LINHA: 66 
+�8TOKEN: ID - M,  LINHA: 66 
+ 8TOKEN: ID - M,  LINHA: 66 
+�@TOKEN: ID - M,  LINHA: 66 
+ @TOKEN: ID - M,  LINHA: 66 
+�TOKEN: ID - HM,  LINHA: 66 
+ TOKEN: ID - HM,  LINHA: 66 
+��8TOKEN: ID - O,  LINHA: 66 
+ 8TOKEN: ID - O,  LINHA: 66 
+�TOKEN: ID - P,  LINHA: 66 
+ TOKEN: ID - P,  LINHA: 66 
+ TOKEN: ID - P,  LINHA: 66 
+ TOKEN: ID - P,  LINHA: 66 
+� �TOKEN: RAWNUMBERDATA - 0,  LINHA: 66 
+TOKEN: ID - P,  LINHA: 66 
++@TOKEN: ID - P,  LINHA: 66 
+TOKEN: ID - P,  LINHA: 66 
+TOKEN: ID - H,  LINHA: 66 
+�]�TOKEN: ID - d,  LINHA: 66
