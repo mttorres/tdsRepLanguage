@@ -11,6 +11,10 @@ typedef struct ast_node
 } Node;
 
 
+Node create(Node* firstchild, char* name, char** leafs);
+
 void printNode(Node* n);
+
+
 
 #endif

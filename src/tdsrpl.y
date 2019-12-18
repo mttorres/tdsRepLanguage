@@ -2,7 +2,7 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
-  #include "../"
+  #include "../headers/Node.h"
 
   extern int yylex(void);
   FILE *fp;   //AST
