@@ -5,19 +5,26 @@
   
 
 %}
+/*
+Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "automagico"
+*/
+
 %option noyywrap
 %option yylineno
 
-/* TOKENS */
+/* 
+  TOKENS: ER'S não se pode usar /d como em outras linguagens. 
+  Define-se uma ER e então uma ação para cada token, geralmente retornar ele para o nosso parser.
+*/
 %%
-[\n] 				         	{}
-[\t]          			  {}
-"//".*         	  		{}
-[0-1]+            		printf("TOKEN: RAWNUMBERDATA - %s,  LINHA: %d \n",yytext,yylineno);
-==                		printf("TOKEN: EQUAL - %s,  LINHA: %d \n",yytext,yylineno);
+[\n] 				    {}
+[\t]          	{}
+"//".*         	{}
+[0-9]+                printf("TOKEN: RAWNUMBERDATA - %s,  LINHA: %d \n",yytext,yylineno);
+==                    printf("TOKEN: EQUAL - %s,  LINHA: %d \n",yytext,yylineno);
 =				              printf("TOKEN: ASSIGN - %s, LINHA : %d \n",yytext,yylineno);
-true | false			    printf("TOKEN: BOOLEAN - %s, LINHA: %d \n",yytext,yylineno);
-return		        	  printf("TOKEN: RETURN - %s, LINHA: %d \n",yytext,yylineno);
+true | false		      printf("TOKEN: BOOLEAN - %s, LINHA: %d \n",yytext,yylineno);
+return		            printf("TOKEN: RETURN - %s, LINHA: %d \n",yytext,yylineno);
 for				            printf("TOKEN: FOR - %s, LINHA: %d \n",yytext,yylineno);
 to 				            printf("TOKEN: TO - %s, LINHA: %d \n",yytext,yylineno);
 do				            printf("TOKEN: DO - %s, LINHA: %d \n",yytext,yylineno);
@@ -38,10 +45,19 @@ xor				            printf("TOKEN: XOR - %s, LINHA: %d \n",yytext,yylineno);
 [>=]              	  printf("TOKEN: GE - %s, LINHA: %d \n",yytext,yylineno);
 [<]               	  printf("TOKEN: LT - %s, LINHA: %d \n",yytext,yylineno);
 [>]               		printf("TOKEN: GT - %s, LINHA: %d \n",yytext,yylineno);
++                     printf("TOKEN: PLUS - %s, LINHA: %d \n",yytext,yylineno);
+-                     printf("TOKEN: MINUS - %s, LINHA: %d \n",yytext,yylineno);
+*                     printf("TOKEN: TIMES - %s, LINHA: %d \n",yytext,yylineno);
+/                     printf("TOKEN: DIVIDE - %s, LINHA: %d \n",yytext,yylineno);
 [A-Za-z_]*	         	printf("TOKEN: ID - %s,  LINHA: %d \n",yytext,yylineno);
 
 
 %%
+
+/*
+  Programa principal responsável por ler o código passado como argv e retornar os tokens.
+*/
+
 int main(int argc, char* argv[]) {
   
   FILE *fp;
