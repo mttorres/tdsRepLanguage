@@ -8,7 +8,7 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/Enum.h"	
-  //#include "../headers/Node.h"
+  //#include "../headers\node.h"
 
   int yylex(void);
   FILE *fp;   //AST
@@ -18,6 +18,8 @@
   FILE *yyin;
  
   void yyerror(const char *s);
+
+  //typedef enum {false, true} BOOLEANO;
 
 %}
 
@@ -30,10 +32,10 @@
 
 %union {
   int ival;
-  float fval
+  float fval;
   char *sval;
-  bool boolean
-}
+  //BOOLEANO boolval
+};
 
 
 /*
@@ -43,7 +45,7 @@
 %token <ival> RAWNUMBERDATA
 %token <sval> EQUAL  
 %token <sval> ASSIGN
-%token <boolval> BOOLEAN
+%token <sval> BOOLEAN
 %token <sval> RETURN
 %token <sval> FOR
 %token <sval> TO
@@ -62,7 +64,7 @@
 %token <sval> NOT
 %token <sval> IMPLIES
 %token <sval> ELSE
-%token <sval> NULL
+%token <sval> Null
 %token <sval> XOR
 %token <sval> LE
 %token <sval> GE
@@ -83,34 +85,34 @@
 
 prog: cmd
       | functiondef
-      {printf("comando ou definição de função /n")} ;
+      {printf("comando ou definição de função \n");} 
 
 data: ID
 	  | RAWNUMBERDATA
 	  | BOOLEAN
-	  | NULL
-	  {printf("dados /n")};
+	  | Null
+	  {printf("dados \n");}
 
 functiondef: ID LPAREN  paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
-            {printf("definição de função /n") };
+            {printf("definição de função \n"); }
 
 paramsoptional: params 
 			    | /* empty */
-			    {printf("parametros opcionais /n")};
+			    {printf("parametros opcionais \n");}
 
 params:	ID paramslist 
 	    | tdsformat paramslist
-	    {printf("parametros /n")};
+	    {printf("parametros \n");}
 
 paramslist: paramslist COMMA ID
 		    | paramslist COMMA tdsformat
 		    | /* empty */
-		    {printf("mais parametros /n")};
+		    {printf("mais parametros \n");}
 
 optionalreturn: RETURN data
 				| RETURN tdsformat
 				| /* empty */
-				{printf("return /n")};
+				{printf("return \n");}
 
 cmd: expr
 	 | FOR ID ASSIGN expr TO expr DO COMMA cmd
@@ -118,70 +120,70 @@ cmd: expr
 	 | cond
 	 | ID ASSIGN LBRACE content RBRACE 
 	 | ID ASSIGN data
-	 {printf("comando /n")};
+	 {printf("comando \n");}
 
 expr: arit 
 	 | logical
 	 | ineq
-	 {printf("expressao /n")};
+	 {printf("expressao \n");}
 
 
 arit: aritoperator
 	  | arit aritoperation aritoperator
-	  {printf("expressao ARITIMETICA /n")};
+	  {printf("expressao ARITIMETICA \n");}
 
 aritoperator: RAWNUMBERDATA
 	  		  | ID
-	  		  {printf("operarador ARITIMETICO /n")};
+	  		  {printf("operarador ARITIMETICO \n");}
 
 aritoperation: PLUS
 			   | MINUS
 			   | TIMES
 			   | DIVIDE
-			   {printf("operacao ARITIMETICO /n")};
+			   {printf("operacao ARITIMETICO \n");}
 
 logical: clause
 		 | logical conec clause
-		 {printf("exp logica  /n")};
+		 {printf("exp logica  \n");}
 
 clause: BOOLEAN 
 		| NOT BOOLEAN
 		| ID
 		| NOT ID
-		{printf(" clausula /n")};
+		{printf(" clausula \n");}
 
 conec: AND
 	   | OR
 	   | IMPLIES
 	   | XOR
-	   {printf("conector logico  /n")};
+	   {printf("conector logico  \n");}
 
 ineq: expr ineqop expr
-	  {printf("inequacao /n")};
+	  {printf("inequacao \n");}
 
 ineqop: LT 
 	  | LE 
 	  | GT 
 	  | GE 
 	  | EQUAL
-	  {printf("inequacao operador  /n")};;
+	  {printf("inequacao operador  \n");}
 
 functioncall: ID LPAREN paramsoptional RPAREN
-			  {printf("chamada de função /n")};
+			  {printf("chamada de função \n");}
 
 cond: IF LPAREN logical RPAREN LBRACE cmd RBRACE matchornot
-	  {printf("if /n")};
+	  {printf("if \n");}
 
 matchornot: ELSE LBRACE cmd RBRACE 
 			| /* empty */
-			{printf("else /n")};
+			{printf("else \n");}
 
 content: content COMMA tdsformat 
 		 | tdsformat
-		 {printf("conjunto de tds's /n")};
+		 {printf("conjunto de tds's \n");}
 
 tdsformat: LPAREN data COMMA RAWNUMBERDATA COMMA ID RPAREN
-		   {printf("tds /n")};
+		   {printf("tds \n");}
 
 
 %%
@@ -205,6 +207,6 @@ int main(int argc, char* argv[]) {
 
 
 void yyerror(const char *s) {
-  printf("Erro de parsing! %s",s);
+  printf("Erro de parsing! %s \n",s);
   exit(-1);
 }

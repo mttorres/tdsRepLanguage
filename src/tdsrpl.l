@@ -2,6 +2,8 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
+  #include "tdsrpl.tab.h"
+
   
 
 %}
@@ -20,39 +22,39 @@ Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "
 [\n] 				    {}
 [\t]          	{}
 "//".*         	{}
-[0-9]+                printf("TOKEN: RAWNUMBERDATA - %s,  LINHA: %d \n",yytext,yylineno);
-==                    printf("TOKEN: EQUAL - %s,  LINHA: %d \n",yytext,yylineno);
-=				              printf("TOKEN: ASSIGN - %s, LINHA : %d \n",yytext,yylineno);
-true | false		      {yylval.boolval = strdup(yytext);}
-return		            {yylval.sval = strdup(yytext);}
-for				            {yylval.sval = strdup(yytext);}
-to 				            {yylval.sval = strdup(yytext);}
-do				            {yylval.sval = strdup(yytext);}
-[{]				            {yylval.sval = strdup(yytext);}
-[}]				            {yylval.sval = strdup(yytext);}
-[(]				            {yylval.sval = strdup(yytext);}
-[)]				            {yylval.sval = strdup(yytext);}
-[[]                   {yylval.sval = strdup(yytext);}
-[]]                   {yylval.sval = strdup(yytext);}
-if				            {yylval.sval = strdup(yytext);}
-else			            {yylval.sval = strdup(yytext);}
-NULL			            {yylval.sval = strdup(yytext);}
-:						          {yylval.sval = strdup(yytext);}
-,				              {yylval.sval = strdup(yytext);}
-and				            {yylval.sval = strdup(yytext);}
-or				            {yylval.sval = strdup(yytext);}
-not                   {yylval.sval = strdup(yytext);}
-->				            {yylval.sval = strdup(yytext);}
-xor				            {yylval.sval = strdup(yytext);}
-[<=]              		{yylval.sval = strdup(yytext);}
-[>=]              	  {yylval.sval = strdup(yytext);}
-[<]               	  {yylval.sval = strdup(yytext);}
-[>]               		{yylval.sval = strdup(yytext);}
-[+]                   {yylval.sval = strdup(yytext);}
-[-]                   {yylval.sval = strdup(yytext);}
-[*]                   {yylval.sval = strdup(yytext);}
-[/]                   {yylval.sval = strdup(yytext);}
-[A-Za-z_]*	         	{yylval.sval = strdup(yytext);}
+[0-9]+                { yylval.ival = atoi(yytext); return RAWNUMBERDATA;}
+==                    {yylval.sval = strdup(yytext); return EQUAL;}
+=				              {yylval.sval = strdup(yytext); return ASSIGN;}
+true | false          {yylval.sval = strdup(yytext); return BOOLEAN;}
+return		            {yylval.sval = strdup(yytext); return RETURN;}
+for				            {yylval.sval = strdup(yytext); return FOR;}
+to 				            {yylval.sval = strdup(yytext); return TO;}
+do				            {yylval.sval = strdup(yytext); return DO;}
+[{]				            {yylval.sval = strdup(yytext); return LBRACE;}
+[}]				            {yylval.sval = strdup(yytext); return RBRACE;}
+[(]				            {yylval.sval = strdup(yytext); return LPAREN;}
+[)]				            {yylval.sval = strdup(yytext); return RPAREN;}
+[[]                   {yylval.sval = strdup(yytext); return LBRACK;}
+[]]                   {yylval.sval = strdup(yytext); return RBRACK;}
+if				            {yylval.sval = strdup(yytext); return IF;}
+else			            {yylval.sval = strdup(yytext); return ELSE;}
+NULL			            {yylval.sval = strdup(yytext); return Null;}
+:						          {yylval.sval = strdup(yytext); return COLON;}
+,				              {yylval.sval = strdup(yytext); return COMMA;}
+and				            {yylval.sval = strdup(yytext); return AND;}
+or				            {yylval.sval = strdup(yytext); return OR;}
+not                   {yylval.sval = strdup(yytext); return NOT;}
+->				            {yylval.sval = strdup(yytext); return IMPLIES;}
+xor				            {yylval.sval = strdup(yytext); return XOR;}
+[<=]              		{yylval.sval = strdup(yytext); return LE;}
+[>=]              	  {yylval.sval = strdup(yytext); return GE;}
+[<]               	  {yylval.sval = strdup(yytext); return LT;}
+[>]               		{yylval.sval = strdup(yytext); return GT; }
+[+]                   {yylval.sval = strdup(yytext); return PLUS;}
+[-]                   {yylval.sval = strdup(yytext); return MINUS;}
+[*]                   {yylval.sval = strdup(yytext); return TIMES;}
+[/]                   {yylval.sval = strdup(yytext); return DIVIDE;}
+[A-Za-z_]*	         	{yylval.sval = strdup(yytext); return ID;}
 
 
 %%
@@ -61,17 +63,3 @@ xor				            {yylval.sval = strdup(yytext);}
   Programa principal responsável por ler o código passado como argv e retornar os tokens.
 */
 
-int main(int argc, char* argv[]) {
-  
-  FILE *fp;
-  //printf("teste %s \n",argv[0]);
-  fp = fopen(argv[1], "r");
-  if(!fp){
-  	printf("CADE MEU CODIGO!?");
-  	return -1;
-  } 
-  yyin = fp;
-
-  while (yylex());
-  fclose(fp);
-}
