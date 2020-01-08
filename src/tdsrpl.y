@@ -43,7 +43,7 @@
 %token <ival> RAWNUMBERDATA
 %token <sval> EQUAL  
 %token <sval> ASSIGN
-%token <boolean> BOOLEAN
+%token <boolval> BOOLEAN
 %token <sval> RETURN
 %token <sval> FOR
 %token <sval> TO
@@ -59,9 +59,10 @@
 %token <sval> COMMA
 %token <sval> AND
 %token <sval> OR
+%token <sval> NOT
 %token <sval> IMPLIES
 %token <sval> ELSE
-%toekn <sval> NULL
+%token <sval> NULL
 %token <sval> XOR
 %token <sval> LE
 %token <sval> GE
@@ -198,6 +199,8 @@ int main(int argc, char* argv[]) {
   } 
   yyin = fp;
   yyparse();
+  fclose(fp);
+
 }
 
 
