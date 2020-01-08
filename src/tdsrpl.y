@@ -50,6 +50,8 @@
 %token <sval> DO
 %token <sval> LBRACE
 %token <sval> RBRACE
+%token <sval> LBRACK
+%token <sval> RBRACK
 %token <sval> LPAREN
 %token <sval> RPAREN
 %token <sval> IF
@@ -75,12 +77,12 @@
 %%
 
 /*
-	Gramatica para o parser
+	Gramatica para o parser, necessita free para cada produção 
 */
 
 prog: cmd
       | functiondef
-      {printf("comando ou definição de função /n")};
+      {printf("comando ou definição de função /n")} ;
 
 data: ID
 	  | RAWNUMBERDATA
@@ -89,7 +91,7 @@ data: ID
 	  {printf("dados /n")};
 
 functiondef: ID LPAREN  paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
-            {printf("definição de função /n")};
+            {printf("definição de função /n") };
 
 paramsoptional: params 
 			    | /* empty */
