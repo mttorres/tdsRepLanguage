@@ -1,20 +1,7 @@
-#ifdef NODE_H
-
-#define NODE_H
-
-typedef struct astnode
-{
-  struct astnode** children;
-  char** leafs;
-  char* name;
-
-}Node;
-
-
-Node* create(Node** children, char* name, char** leafs);
-
-void printNode(Node* n);
-
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include "../../headers/Node.h"
 
 
 
@@ -43,4 +30,14 @@ void printNode(Node* n){
 
 
 
-#endif
+
+int main(){
+
+	printNode(NULL);
+	return 0;
+}
+
+
+
+
+
