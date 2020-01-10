@@ -75,6 +75,7 @@
 %token <sval> TIMES
 %token <sval> DIVIDE
 %token <sval> ID
+%token <sval> FUNCTION
 
 
 %%
@@ -83,28 +84,39 @@
 	Gramatica para o parser, necessita free para cada produção 
 */
 
-prog: cmd
-      | functiondef
+prog: cmds
+      | functiondefs
+      | /* empty */
       {printf("comando ou definição de função \n");} 
+
+
+cmds: cmds cmd 
+	  | /* empty */
+	  {printf("comando(s) \n");} 	
+
+functiondefs: functiondefs functiondef 
+	  | /* empty */
+	  {printf("funções(s) \n");} 	
 
 data: ID
 	  | RAWNUMBERDATA
 	  | BOOLEAN
 	  | Null
+	  | functioncall
 	  {printf("dados \n");}
 
-functiondef: ID LPAREN  paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
+functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
             {printf("definição de função \n"); }
 
 paramsoptional: params 
 			    | /* empty */
 			    {printf("parametros opcionais \n");}
 
-params:	ID paramslist 
+params:	expr paramslist 
 	    | tdsformat paramslist
 	    {printf("parametros \n");}
 
-paramslist: paramslist COMMA ID
+paramslist: paramslist COMMA expr
 		    | paramslist COMMA tdsformat
 		    | /* empty */
 		    {printf("mais parametros \n");}
@@ -182,7 +194,7 @@ content: content COMMA tdsformat
 		 | tdsformat
 		 {printf("conjunto de tds's \n");}
 
-tdsformat: LPAREN data COMMA RAWNUMBERDATA COMMA ID RPAREN
+tdsformat: LPAREN data COMMA expr COMMA ID RPAREN
 		   {printf("tds \n");}
 
 

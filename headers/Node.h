@@ -16,8 +16,6 @@ Node* create(Node** children, char* name, char** leafs);
 void printNode(Node* n);
 
 
-
-
 Node* create(Node** children, char* name, char** leafs){
 	Node* current_node = malloc(sizeof(Node *));
 	if(children){

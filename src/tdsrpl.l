@@ -22,11 +22,12 @@ Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "
 [\n] 				    {}
 [\t]          	{}
 "//".*         	{}
-[0-9]+                { yylval.ival = atoi(yytext); return RAWNUMBERDATA;}
+[0-9]+                {yylval.ival = atoi(yytext); return RAWNUMBERDATA;}
 ==                    {yylval.sval = strdup(yytext); return EQUAL;}
 =				              {yylval.sval = strdup(yytext); return ASSIGN;}
 true | false          {yylval.sval = strdup(yytext); return BOOLEAN;}
 return		            {yylval.sval = strdup(yytext); return RETURN;}
+function              {yylval.sval = strdup(yytext); return FUNCTION;}
 for				            {yylval.sval = strdup(yytext); return FOR;}
 to 				            {yylval.sval = strdup(yytext); return TO;}
 do				            {yylval.sval = strdup(yytext); return DO;}
