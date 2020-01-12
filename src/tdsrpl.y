@@ -8,9 +8,9 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/Enum.h"	
-  #include "../../headers/STable.h"
-  #include "../../headers/constants.h"
-  #include "../../headers/Node.h"	
+  #include "../headers/STable.h"
+  #include "../headers/constants.h"
+  #include "../headers/Node.h"	
 
   int yylex(void);
   FILE *fp;   //AST
@@ -86,7 +86,8 @@
 	Gramatica para o parser, necessita free para cada produção 
 */
 
-prog: cmds
+prog: cmds 
+	  {}
       | functiondefs
       | /* empty */
       {printf("comando ou definição de função \n");} 

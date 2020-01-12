@@ -7,7 +7,7 @@
 
 
 
-typedef enum { GLOBAL, FUNC, LOOP, IF, ELSE} SCOPETYPE;
+typedef enum { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPETYPE;
 
 
 typedef struct S_TABLE
