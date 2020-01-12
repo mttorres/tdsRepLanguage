@@ -7,13 +7,12 @@
 
 Node* create(Node** children, char* name, char** leafs, int sizechildren, int sizeleafs){
 	
+
+	Node* current_node = (Node*) malloc(sizeof(Node)); // se por node depois de size childreen ele crasha!? SE TIRAR O PRINT TMB?
+
 	int nt = sizechildren/sizeof (Node*);
 	int nl = sizeleafs/sizeof (char *);
-	
-	printf("%d \n",nt);
-	printf("%d \n",nl);
-
-	Node* current_node = malloc(sizeof(Node*));
+		
 	
 	current_node->nchild = nt;
 	current_node->nleafs = nl;
@@ -86,26 +85,41 @@ int main(){
 	int sizeleafs1 = sizeof(testeLeaf1);
 	int sizeleafs2 = sizeof(testeLeaf2);
 
-	Node* filho1 = create(NULL, "Daze.",testeLeaf1,0,sizeleafs1);
-	Node* filho2 = create(NULL, "ZAWORLDO.",testeLeaf2,0,sizeleafs2);
+	char* nome = "Yare Yare...?";
+	char* nome1 = "Daze?";
+	char* nome2 = "ZAWAROLDO.";
+
+
+
+
+
+	Node* filho1 = create(NULL, nome1,testeLeaf1,0,sizeleafs1);
+	Node* filho2 = create(NULL, nome2,testeLeaf2,0,sizeleafs2);
 
 	Node * filhos[] = {
 		filho1,
 		filho2,
 };
 	
-	int tamanho = sizeof(filhos)/sizeof(Node*);
-	
-	printNode(filho1);
-	printNode(filho2);
+	int tamanho = sizeof(filhos);
 
-	//Node* no = create(filhos, "Yare yare...?", testeLeaf,tamanho,sizeleafs);
-	//printNode(no);
+
+
+	//printNode(filho1);
+	//printNode(filho2);
+
+	Node* no = create(filhos, "Yare yare...?", testeLeaf,tamanho,sizeleafs);
+	printNode(no);
 
 	int i;
+	tamanho = sizeof(filhos)/sizeof(Node);
+
+
+
 	for(i = 0; i< tamanho;i++){
 		letgo(filhos[i]);
 	}
+
 	
 	return 0;
 }
