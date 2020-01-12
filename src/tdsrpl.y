@@ -8,7 +8,9 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/Enum.h"	
-  //#include "../headers\node.h"
+  #include "../../headers/STable.h"
+  #include "../../headers/constants.h"
+  #include "../../headers/Node.h"	
 
   int yylex(void);
   FILE *fp;   //AST
