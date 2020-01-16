@@ -13,7 +13,7 @@
   #include "../headers/Node.h"	
 
   int yylex(void);
-  FILE *fp;   //AST
+  FILE *fp1;   //AST
   FILE *fp2;  //(scope) - Stable
 
   int yyparse();
@@ -36,6 +36,7 @@
   int ival;
   float fval;
   char *sval;
+  Node* ast;
   //BOOLEANO boolval
 };
 
@@ -80,54 +81,175 @@
 %token <sval> FUNCTION
 
 
+%type <ast> prog
+%type <ast> cmds cmd
+%type <ast> functiondefs functiondef
+%type <ast> paramsoptional paramslist params  
+
+
+%left LOWER_THAN_ELSE
+%left ELSE
+%left MULT DIV MINUS PLUS LE GE GT LT EQ NE
+
+
+%start prog
+
+
 %%
 
 /*
-	Gramatica para o parser, necessita free para cada produção 
+	Gramatica para o parser 
 */
 
-prog: cmds 
-	  {}
-      | functiondefs
+prog: cmds functiondefs {
+		
+		Node * filhos[] = {
+			 $1,
+			 $2,
+		};
+		char* nome = "Prog -  comandos ou definições de função";
+		int tamanhofilhos = sizeof(filhos);
+		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		$$ = prog; 
+	  }
       | /* empty */
-      {printf("comando ou definição de função \n");} 
+      ; 
 
 
-cmds: cmds cmd 
+cmds: cmds cmd {
+		
+		Node * filhos[] = {
+			 $1,
+			 $2,
+		};
+		char* nome = "Cmds -  comando(s)";
+		int tamanhofilhos = sizeof(filhos);
+		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		$$ = cmds; 
+
+	  } 
 	  | /* empty */
-	  {printf("comando(s) \n");} 	
+	  ;	
 
-functiondefs: functiondefs functiondef 
+functiondefs: functiondefs functiondef {
+		
+		Node * filhos[] = {
+			 $1,
+			 $2,
+		};
+		char* nome = "Functiondefs -  definição(ões) de função ";
+		int tamanhofilhos = sizeof(filhos);
+		Node* functiondefs = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		$$ = functiondefs; 
+
+	  }  
 	  | /* empty */
-	  {printf("funções(s) \n");} 	
+	  ; 	
 
-data: ID
-	  | RAWNUMBERDATA
-	  | BOOLEAN
-	  | Null
-	  | functioncall
-	  {printf("dados \n");}
 
-functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn
-            {printf("definição de função \n"); }
+functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmd RBRACE optionalreturn {
 
-paramsoptional: params 
-			    | /* empty */
-			    {printf("parametros opcionais \n");}
+		Node * filhos[] = {
+			 $4,
+			 $7,
+			 $9,
+		};
 
-params:	expr paramslist 
-	    | tdsformat paramslist
-	    {printf("parametros \n");}
 
-paramslist: paramslist COMMA expr
-		    | paramslist COMMA tdsformat
-		    | /* empty */
-		    {printf("mais parametros \n");}
+		char * folhas[] = {
+    		$1,
+    		$2,
+    		$3,
+    		$5,
+    		$6,
+    		$8,
 
-optionalreturn: RETURN data
-				| RETURN tdsformat
-				| /* empty */
-				{printf("return \n");}
+		};
+
+		char* nome = "Functiondef -  definição de função ";
+
+		int tamanhofilhos = sizeof(filhos);
+		int tamanhofolhas = sizeof(folhas);
+
+		Node* functiondef = createNode(filhos, nome,folhas,tamanhofilhos,tamanhofolhas);
+		$$ = functiondef; 
+}
+;
+
+paramsoptional: params {
+
+		
+		Node * filhos[] = {
+			 $1,
+		};
+		
+		char* nome = "Paramsoptional -  parametro(s) opcionais da definição de função ";
+		int tamanhofilhos = sizeof(filhos);
+		Node* paramsoptional = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		$$ = paramsoptional; 
+
+		}
+		| /* empty */
+		;
+
+params:	ID paramslist {
+
+		Node * filhos[] = {
+			 $1,
+		};
+		
+		char* nome = "Params -  parametro(s)  da definição de função ";
+		int tamanhofilhos = sizeof(filhos);
+		Node* params = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		$$ = params; 
+		}
+	    | /* empty */
+	    ;
+
+paramslist: paramslist COMMA expr {
+
+		Node * filhos[] = {
+			 $1,
+			 $3,
+		};
+
+		char * folhas[] = {
+    		$2,
+		};		
+		
+		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
+		int tamanhofilhos = sizeof(filhos);
+		int tamanhofolhas = sizeof(folhas);
+
+		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+		$$ = paramslist; 
+		}
+	    | /* empty */
+	    ;
+
+
+
+optionalreturn: RETURN data {
+
+		
+		Node * filhos[] = {
+			 $2,
+		};
+
+		char * folhas[] = {
+    		$1,
+		};			
+		
+		char* nome = "Optionalreturn -  retorno opcional ";
+
+		int tamanhofilhos = sizeof(filhos);
+		int tamanhofolhas = sizeof(folhas);
+
+		Node* optionalreturn = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+		$$ = optionalreturn; 
+		}
+	    | /* empty */
+	    ;
 
 cmd: expr
 	 | FOR ID ASSIGN expr TO expr DO COMMA cmd
@@ -136,6 +258,22 @@ cmd: expr
 	 | ID ASSIGN LBRACE content RBRACE 
 	 | ID ASSIGN data
 	 {printf("comando \n");}
+
+
+
+
+
+data: ID
+	  | RAWNUMBERDATA
+	  | BOOLEAN
+	  | Null
+	  | functioncall
+	  {printf("dados \n");}
+
+
+
+
+
 
 expr: arit 
 	 | logical
