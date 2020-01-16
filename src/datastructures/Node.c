@@ -38,22 +38,38 @@ void printNode(Node* n){
 	}
 	int i;
 	if(n->children){
-		printf("NOT-TERMINAL: \n");
+		printf("--------------CHILDREN: \n");
 		for(i=0; i < n->nchild; i++){
 			printNode(n->children[i]);
 		}
+		printf("--------------------------- \n");
 	}
 	if(n->leafs){
-		printf("TERMINAL: \n");
+		printf("---------------NOT-TERMINAL: \n");
 		for(i = 0; i< n->nleafs;i++){
 			printf(" -->%s\n",n->leafs[i]);
 		}
+		printf("--------------------------- \n");
 	}
 	
 	printf("-------\n");
 }
 
 void letgoNode(Node* n){
+	if(!n){
+		return;
+	}
+	int i;
+	if(n->children){
+		for(i=0; i < n->nchild; i++){
+			letgoNode(n->children[i]);
+		}
+	}
+	if(n->leafs){
+		for(i=0; i < n->nleafs; i++){
+			free(n->leafs[i]);
+		}
+	}	
 	free(n);
 }
 
