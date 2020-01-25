@@ -24,7 +24,8 @@ Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "
 "//".*         	{}
 [0-9]+                {yylval.ival = atoi(yytext); return RAWNUMBERDATA;}
 ==                    {yylval.sval = strdup(yytext); return EQUAL;}
-=				              {yylval.sval = strdup(yytext); return ASSIGN;}
+==                    {yylval.sval = strdup(yytext); return NOTEQUAL;}
+!=				              {yylval.sval = strdup(yytext); return ASSIGN;}
 true | false          {yylval.sval = strdup(yytext); return BOOLEAN;}
 return		            {yylval.sval = strdup(yytext); return RETURN;}
 function              {yylval.sval = strdup(yytext); return FUNCTION;}
@@ -40,6 +41,7 @@ do				            {yylval.sval = strdup(yytext); return DO;}
 if				            {yylval.sval = strdup(yytext); return IF;}
 else			            {yylval.sval = strdup(yytext); return ELSE;}
 NULL			            {yylval.sval = strdup(yytext); return Null;}
+.							{yylval.sval = strdup(yytext); return POINT;}
 :						          {yylval.sval = strdup(yytext); return COLON;}
 ,				              {yylval.sval = strdup(yytext); return COMMA;}
 and				            {yylval.sval = strdup(yytext); return AND;}
@@ -60,7 +62,5 @@ xor				            {yylval.sval = strdup(yytext); return XOR;}
 
 %%
 
-/*
-  Programa principal responsável por ler o código passado como argv e retornar os tokens.
-*/
+
 
