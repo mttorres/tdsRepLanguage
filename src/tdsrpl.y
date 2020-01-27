@@ -81,7 +81,7 @@
 %token <sval> DIVIDE
 %token <sval> ID
 %token <sval> FUNCTION
-
+%token <sval> LABEL
 
 %type <ast> prog
 %type <ast> cmds cmd

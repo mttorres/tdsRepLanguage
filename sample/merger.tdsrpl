@@ -1,11 +1,12 @@
 //DADOS DEFINIDOS PELO USUARIO
+
 i = 0
 dadoA = 0
 dadoB = 1
 
-nomeA = A
-nomeB = B
-nomeC = C
+nomeA = 'A'
+nomeB = 'B'
+nomeC = 'C'
 numeroPortas = 3
 
 tdsnamesOutrasPortas = {(dadoA,i,nomeA), (dadoA,i+1,nomeB)}
