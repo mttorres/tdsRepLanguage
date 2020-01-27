@@ -100,6 +100,8 @@
 %type <ast> content
 %type <ast> variableprop
 %type <ast> functioncall
+%type <ast> param
+%type <ast> paramsoptionalCall paramslistCall paramsCall  
 %type <ast> tdsformat
 %type <ast> matchornot
 
@@ -126,6 +128,7 @@ prog: cmds functiondefs {
 		char* nome = "Prog -  comandos ou definições de função";
 		int tamanhofilhos = sizeof(filhos);
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		printf("PROGRAMA \n");
 		$$ = prog; 
 	  }
       | /* empty */
@@ -141,6 +144,7 @@ cmds: cmds cmd {
 		char* nome = "Cmds -  comando(s)";
 		int tamanhofilhos = sizeof(filhos);
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		printf("comandos \n");
 		$$ = cmds; 
 
 	  } 
@@ -205,6 +209,8 @@ paramsoptional: params {
 		$$ = paramsoptional; 
 
 		}
+
+
 		| /* empty */
 		;
 
@@ -222,7 +228,7 @@ params:	ID paramslist {
 		};
 		
 		char* nome = "Params -  parametro(s)  da definição de função ";
-		
+
 		int tamanhofilhos = sizeof(filhos);
 		int tamanhofolhas = sizeof(folhas);
 		
@@ -291,6 +297,7 @@ cmd: condstmt {
 	
 
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		printf("comando \n");
 		$$ = cmd; 
 	
 	  
@@ -307,11 +314,13 @@ cmd: condstmt {
 	
 
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		printf("comando \n");
 		$$ = cmd; 		
 
 
 	 }
 	 ;
+
 
 otherstmt: FOR expr TO expr DO COMMA cmds {
 	
@@ -389,6 +398,7 @@ assignment: ID ASSIGN expr {
 		int tamanhofolhas = sizeof(folhas);
 
 		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+		printf("atribuicao \n");
 		$$ = assignment; 
 
 
@@ -957,24 +967,31 @@ variabledata: ID {
 
 
 		}
-			  | content {
+			| LBRACE content RBRACE {
+
+			char * folhas[] = {
+			 	$1,
+			 	$3,
+				
+			};
 
 			Node * filhos[] = {
-			 	$1,
+			 	$2,
 				
 			};
 
 			char* nome = "Dados de conteudos/conjuntos ";
 
 			int tamanhofilhos = sizeof(filhos);
+			int tamanhofolhas = sizeof(folhas);
 
-
-			Node* variabledata = createNode(filhos, nome, NULL ,tamanhofilhos,0);
+			Node* variabledata = createNode(filhos, nome, folhas ,tamanhofilhos,tamanhofolhas);
+			printf("TDS FORMAT! \n");
 			$$ = variabledata;	
 
 
 			  }
-			  | variableprop {
+		| variableprop {
 
 			Node * filhos[] = {
 			 	$1,
@@ -991,8 +1008,25 @@ variabledata: ID {
 
 
 
-			  } 
-			  ;
+			}
+		| LABEL {
+			
+			char * folhas[] = {
+			 	$1,
+				
+			};
+
+			char* nome = "LABEL";
+
+			int tamanhofolhas = sizeof(folhas);
+
+
+			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			printf("LABEL \n");
+			$$ = data;					
+		
+		}
+		;
 
 
 variableprop: ID POINT ID {
@@ -1051,7 +1085,7 @@ variableprop: ID POINT ID {
 
 
 
-functioncall: ID LPAREN paramsoptional RPAREN {
+functioncall: ID LPAREN paramsoptionalCall RPAREN {
 	
 			Node * filhos[] = {
 				$3,
@@ -1074,6 +1108,70 @@ functioncall: ID LPAREN paramsoptional RPAREN {
 
 
 }
+
+paramsoptionalCall: paramsCall {
+
+		
+		Node * filhos[] = {
+			 $1,
+		};
+		
+		char* nome = "Paramsoptional -  parametro(s) opcionais da chamada de função ";
+		int tamanhofilhos = sizeof(filhos);
+		Node* paramsoptional = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		$$ = paramsoptional; 
+
+		}
+
+
+		| /* empty */
+		;
+
+paramsCall:	expr paramslistCall {
+
+		
+		Node * filhos[] = {
+			 $1,
+			 $2,
+		};
+		
+		char* nome = "Params -  parametro(s)  da chamada de função ";
+
+		int tamanhofilhos = sizeof(filhos);
+		
+
+		Node* params = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		
+		$$ = params; 
+		}
+	    | /* empty */
+	    ;
+
+
+
+paramslistCall: paramslistCall COMMA expr {
+
+		Node * filhos[] = {
+			 $1,
+			 $3,	 
+		};
+
+		char * folhas[] = {
+    		$2,
+		};		
+		
+		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
+		int tamanhofilhos = sizeof(filhos);
+		int tamanhofolhas = sizeof(folhas);
+
+		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+		$$ = paramslist; 
+		}
+	    | /* empty */
+	    ;
+
+
+
 	
 condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	
