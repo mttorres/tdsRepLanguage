@@ -18,6 +18,9 @@
 
   int yyparse();
   FILE *yyin;
+
+
+  Node* root;
  
   void yyerror(const char *s);
 
@@ -130,6 +133,7 @@ prog: cmds functiondefs {
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		printf("PROGRAMA \n");
 		$$ = prog; 
+		root = prog;
 	  }
       | /* empty */
       ; 
@@ -1308,6 +1312,7 @@ int main(int argc, char* argv[]) {
   } 
   yyin = fp;
   yyparse();
+  printf("%s \n",root->name);
   fclose(fp);
 
 }
