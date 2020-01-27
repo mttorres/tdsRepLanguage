@@ -210,13 +210,24 @@ paramsoptional: params {
 
 params:	ID paramslist {
 
+		
+		char * folhas[] = {
+    		$1,
+    		
+		};
+
+
 		Node * filhos[] = {
-			 $1,
+			 $2,
 		};
 		
 		char* nome = "Params -  parametro(s)  da definição de função ";
+		
 		int tamanhofilhos = sizeof(filhos);
-		Node* params = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		int tamanhofolhas = sizeof(folhas);
+		
+		Node* params = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+		
 		$$ = params; 
 		}
 	    | /* empty */
@@ -894,7 +905,7 @@ data: RAWNUMBERDATA {
 	  }
 	  | functioncall {
 
-			char * filhos[] = {
+			Node * filhos[] = {
 			 	$1,
 				
 			};
@@ -911,7 +922,7 @@ data: RAWNUMBERDATA {
 	  }
 	  | variabledata {
 
-			char * filhos[] = {
+			Node * filhos[] = {
 			 	$1,
 				
 			};
@@ -948,7 +959,7 @@ variabledata: ID {
 		}
 			  | content {
 
-			char * filhos[] = {
+			Node * filhos[] = {
 			 	$1,
 				
 			};
@@ -1140,7 +1151,7 @@ content: content COMMA tdsformat {
 		 }
 		 | tdsformat {
 
-			char * filhos[] = {
+			Node * filhos[] = {
 			 	$1,
 				
 			};
