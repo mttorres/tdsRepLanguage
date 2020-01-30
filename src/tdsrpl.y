@@ -103,7 +103,6 @@
 %type <ast> content
 %type <ast> variableprop
 %type <ast> functioncall
-%type <ast> param
 %type <ast> paramsoptionalCall paramslistCall paramsCall  
 %type <ast> tdsformat
 %type <ast> matchornot
@@ -122,7 +121,7 @@
 	Gramatica para o parser 
 */
 
-prog: cmds functiondefs {
+prog: functiondefs cmds  {
 		
 		Node * filhos[] = {
 			 $1,
@@ -165,18 +164,19 @@ functiondefs: functiondefs functiondef {
 		int tamanhofilhos = sizeof(filhos);
 		Node* functiondefs = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		$$ = functiondefs; 
+		printf("iniciando definição de função \n");
 
 	  }  
 	  | /* empty */
 	  ; 	
 
 
-functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds RBRACE optionalreturn {
+functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds optionalreturn RBRACE  {
 
 		Node * filhos[] = {
 			 $4,
 			 $7,
-			 $9,
+			 $8,
 		};
 
 
@@ -186,7 +186,7 @@ functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds RBRACE optiona
     		$3,
     		$5,
     		$6,
-    		$8,
+    		$9,
 
 		};
 
@@ -196,6 +196,7 @@ functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds RBRACE optiona
 		int tamanhofolhas = sizeof(folhas);
 
 		Node* functiondef = createNode(filhos, nome,folhas,tamanhofilhos,tamanhofolhas);
+		printf("DEFINICAO DE FUNÇÃO \n");
 		$$ = functiondef; 
 }
 ;
@@ -266,7 +267,7 @@ paramslist: paramslist COMMA ID {
 
 
 
-optionalreturn: RETURN data {
+optionalreturn: RETURN expr {
 
 		
 		Node * filhos[] = {
@@ -283,7 +284,10 @@ optionalreturn: RETURN data {
 		int tamanhofolhas = sizeof(folhas);
 
 		Node* optionalreturn = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = optionalreturn; 
+		$$ = optionalreturn;
+
+		printf("RETORNO \n");
+		
 		}
 	    | /* empty */
 	    ;
@@ -326,7 +330,7 @@ cmd: condstmt {
 	 ;
 
 
-otherstmt: FOR expr TO expr DO COMMA cmds {
+otherstmt: FOR assignment TO expr DO COLON cmds {
 	
 		Node * filhos[] = {
 			 $2,
@@ -346,6 +350,8 @@ otherstmt: FOR expr TO expr DO COMMA cmds {
 		int tamanhofilhos = sizeof(filhos);
 		int tamanhofolhas = sizeof(folhas);
 
+		printf("CMD - NAO IF/ELSE \n");
+		
 		Node* otherstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = otherstmt; 
 		
@@ -543,7 +549,7 @@ expr: MINUS expr {
 	 ;
 
 
-multiexp: multiexp TIMES multiexp {
+multiexp: multiexp TIMES expr {
 	
 			Node * filhos[] = {
 			 	$1,
@@ -565,7 +571,7 @@ multiexp: multiexp TIMES multiexp {
 
 
 		}
-		|multiexp DIVIDE multiexp {
+		|multiexp DIVIDE expr {
 
 			Node * filhos[] = {
 				 $1,
@@ -604,7 +610,7 @@ multiexp: multiexp TIMES multiexp {
 		}
 		;
 
-ineqexp:  ineqexp LE ineqexp {
+ineqexp:  ineqexp LE expr {
 	
 			Node * filhos[] = {
 			 	$1,
@@ -627,7 +633,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
 		}
-		| ineqexp GE ineqexp {
+		| ineqexp GE expr {
 
 			Node * filhos[] = {
 			 	$1,
@@ -650,7 +656,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
 		}
-		| ineqexp LT ineqexp {
+		| ineqexp LT expr {
 
 			Node * filhos[] = {
 			 	$1,
@@ -673,7 +679,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
 		}
-		| ineqexp GT ineqexp {
+		| ineqexp GT expr {
 
 			Node * filhos[] = {
 			 	$1,
@@ -696,7 +702,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
 		}
-        | ineqexp EQUAL ineqexp {
+        | ineqexp EQUAL expr {
 
 			Node * filhos[] = {
 			 	$1,
@@ -719,7 +725,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
         }
-        | ineqexp NOTEQUAL ineqexp {
+        | ineqexp NOTEQUAL expr {
 
 			Node * filhos[] = {
 			 	$1,
@@ -754,6 +760,7 @@ ineqexp:  ineqexp LE ineqexp {
 
 
 			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
+			printf("logical \n");
 			$$ = ineqexp;	
 
         }
@@ -854,7 +861,7 @@ logical: NOT logical {
 
 			int tamanhofilhos = sizeof(filhos);
 
-
+			printf("dados genericos \n");
 			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
 			$$ = ineqexp;	
 
@@ -895,6 +902,7 @@ data: RAWNUMBERDATA {
 
 
 			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			printf("BOOLEANO \n");
 			$$ = data;	
 
 
@@ -1198,9 +1206,10 @@ condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 
 			int tamanhofilhos = sizeof(filhos);
 			int tamanhofolhas = sizeof(folhas);
-
+			
 			Node* condstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 			$$ = condstmt;	
+			printf("CMD -  IF\n");
 
 
 
@@ -1225,7 +1234,7 @@ matchornot: ELSE LBRACE cmds RBRACE {
 
 			Node* matchornot = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 			$$ = matchornot;
-			
+			printf("CMD - ELSE \n");
 
 			}
 			| /* empty */
@@ -1248,6 +1257,9 @@ content: content COMMA tdsformat {
 			int tamanhofolhas = sizeof(folhas);
 
 			Node* content = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+			
+			printf("CONTEUDO/conjunto DE TDS \n");
+
 			$$ = content;
 			
 		 }
@@ -1264,24 +1276,27 @@ content: content COMMA tdsformat {
 
 
 			Node* content = createNode(filhos, nome, NULL ,tamanhofilhos,0);
+
+			printf("formato  DE TDS \n");
+
 			$$ = content;	
 
 		 }
 		 
 
-tdsformat: LPAREN data COMMA expr COMMA ID RPAREN {
+tdsformat: LPAREN expr COMMA expr COMMA expr RPAREN {
 	
 
 			Node * filhos[] = {
 				$2,
 				$4,
+				$6,
 			};
 
 			char * folhas[] = {
     			$1,
     			$3,
     			$5,
-    			$6,
     			$7,
 			};			
 		

@@ -3,6 +3,8 @@ i = 0
 dadoA = 0
 dadoB = 1
 
+j = NULL
+
 nomeA = 'A'
 nomeB = 'B'
 nomeC = 'C'
