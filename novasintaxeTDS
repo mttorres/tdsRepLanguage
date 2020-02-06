@@ -1,0 +1,9 @@
+tdsA = {
+	portname : 'A'
+	data-time: {0: 'cadeia', 1: 'de', 2: 'dados'}
+}
+
+tdsB = {
+	portname : 'B'
+	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) }
+}
