@@ -34,7 +34,7 @@ Node* createNode(Node** children, char* name, char** leafs, int sizechildren, in
 
 void printNode(Node* n){	
 
-	int info = n != NULL
+	int info = n != NULL;
 	printf("info: - %d \n",info);	
 	if(n){
 		printf("NODE: - %s \n",n->name);
