@@ -33,26 +33,32 @@ Node* createNode(Node** children, char* name, char** leafs, int sizechildren, in
 
 
 void printNode(Node* n){	
+
+	int info = n != NULL
+	printf("info: - %d \n",info);	
 	if(n){
 		printf("NODE: - %s \n",n->name);
-	}
-	int i;
-	if(n->children){
+		int i;
+		if(n->children){
 		printf("--------------CHILDREN: \n");
 		for(i=0; i < n->nchild; i++){
 			printNode(n->children[i]);
 		}
-		printf("--------------------------- \n");
+		printf("------------END CHILDREN--------------- \n");
 	}
-	if(n->leafs){
-		printf("---------------NOT-TERMINAL: \n");
-		for(i = 0; i< n->nleafs;i++){
-			printf(" -->%s\n",n->leafs[i]);
-		}
-		printf("--------------------------- \n");
+		if(n->leafs){
+			printf("---------------NOT-TERMINAL: \n");
+			for(i = 0; i< n->nleafs;i++){
+				printf(" -->%s\n",n->leafs[i]);
+			}
+		printf("------------END NOT-TERMINAL--------------- \n");
 	}
 	
-	printf("-------\n");
+	printf("-----------------------------------------------\n");
+
+
+
+	}
 }
 
 void letgoNode(Node* n){
