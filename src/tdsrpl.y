@@ -130,11 +130,11 @@ prog: functiondefs cmds  {
 		char* nome = "Prog -  comandos ou definições de função";
 		int tamanhofilhos = sizeof(filhos);
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("PROGRAMA \n");
+		//printf("PROGRAMA \n");
 		$$ = prog; 
 		root = prog;
 	  }
-      | /* empty */
+      | /* empty */ {$$ = NULL;}
       ; 
 
 
@@ -147,11 +147,11 @@ cmds: cmds cmd {
 		char* nome = "Cmds -  comando(s)";
 		int tamanhofilhos = sizeof(filhos);
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("comandos \n");
+		//printf("comandos \n");
 		$$ = cmds; 
 
 	  } 
-	  | /* empty */
+	  | /* empty */  {$$ = NULL;}
 	  ;	
 
 functiondefs: functiondefs functiondef {
@@ -164,10 +164,10 @@ functiondefs: functiondefs functiondef {
 		int tamanhofilhos = sizeof(filhos);
 		Node* functiondefs = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		$$ = functiondefs; 
-		printf("iniciando definição de função \n");
+		//printf("iniciando definição de função \n");
 
 	  }  
-	  | /* empty */
+	  | /* empty */  {$$ = NULL;}
 	  ; 	
 
 
@@ -181,12 +181,12 @@ functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds optionalreturn
 
 
 		char * folhas[] = {
-    		$1,
-    		$2,
-    		$3,
-    		$5,
-    		$6,
-    		$9,
+    			$1,
+    			$2,
+    			$3,
+    			$5,
+    			$6,
+    			$9,
 
 		};
 
@@ -196,7 +196,7 @@ functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds optionalreturn
 		int tamanhofolhas = sizeof(folhas);
 
 		Node* functiondef = createNode(filhos, nome,folhas,tamanhofilhos,tamanhofolhas);
-		printf("DEFINICAO DE FUNÇÃO \n");
+		//printf("DEFINICAO DE FUNÇÃO \n");
 		$$ = functiondef; 
 }
 ;
@@ -216,14 +216,14 @@ paramsoptional: params {
 		}
 
 
-		| /* empty */
+		| /* empty */  {$$ = NULL;}
 		;
 
 params:	ID paramslist {
 
 		
 		char * folhas[] = {
-    		$1,
+    			$1,
     		
 		};
 
@@ -241,7 +241,7 @@ params:	ID paramslist {
 		
 		$$ = params; 
 		}
-	    | /* empty */
+	    | /* empty */  {$$ = NULL;}
 	    ;
 
 paramslist: paramslist COMMA ID {
@@ -251,8 +251,8 @@ paramslist: paramslist COMMA ID {
 		};
 
 		char * folhas[] = {
-    		$2,
-    		$3,
+    			$2,
+    			$3,
 		};		
 		
 		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
@@ -262,7 +262,7 @@ paramslist: paramslist COMMA ID {
 		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = paramslist; 
 		}
-	    | /* empty */
+	    | /* empty */  {$$ = NULL;}
 	    ;
 
 
@@ -275,7 +275,7 @@ optionalreturn: RETURN expr {
 		};
 
 		char * folhas[] = {
-    		$1,
+    			$1,
 		};			
 		
 		char* nome = "Optionalreturn -  retorno opcional ";
@@ -286,10 +286,10 @@ optionalreturn: RETURN expr {
 		Node* optionalreturn = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = optionalreturn;
 
-		printf("RETORNO \n");
+		//printf("RETORNO \n");
 		
 		}
-	    | /* empty */
+	    | /* empty */  {$$ = NULL;}
 	    ;
 
 
@@ -305,7 +305,7 @@ cmd: condstmt {
 	
 
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("comando \n");
+		//printf("comando \n");
 		$$ = cmd; 
 	
 	  
@@ -322,7 +322,7 @@ cmd: condstmt {
 	
 
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("comando \n");
+		//printf("comando \n");
 		$$ = cmd; 		
 
 
@@ -339,8 +339,8 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 		};
 
 		char * folhas[] = {
-    		$1,
-    		$3,
+    			$1,
+    			$3,
 			$5,
 			$6,
 		};			
@@ -350,7 +350,7 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 		int tamanhofilhos = sizeof(filhos);
 		int tamanhofolhas = sizeof(folhas);
 
-		printf("CMD - NAO IF/ELSE \n");
+		//printf("CMD - NAO IF/ELSE \n");
 		
 		Node* otherstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = otherstmt; 
@@ -408,7 +408,7 @@ assignment: ID ASSIGN expr {
 		int tamanhofolhas = sizeof(folhas);
 
 		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		printf("atribuicao \n");
+		//printf("atribuicao \n");
 		$$ = assignment; 
 
 
@@ -421,10 +421,10 @@ assignment: ID ASSIGN expr {
 		};
 
 		char * folhas[] = {
-    		$1,
-    		$2,
-    		$4,
-    		$5,
+    			$1,
+    			$2,
+    			$4,
+    			$5,
 		};			
 		
 		char* nome = "Assignment(estrutura/conjunto de dados) -  atribuição de ED/conjunto de dados  ";
@@ -444,10 +444,10 @@ assignment: ID ASSIGN expr {
 		};
 
 		char * folhas[] = {
-    		$1,
-    		$2,
-    		$3,
-    		$4,
+    			$1,
+    			$2,
+    			$3,
+    			$4,
 		};			
 		
 		char* nome = "Assignment(propriedade de variavel/objeto) -  atribuição a uma propriedade  ";
@@ -470,7 +470,7 @@ expr: MINUS expr {
 		};
 
 		char * folhas[] = {
-    		$1,
+    			$1,
 
 		};			
 		
@@ -492,7 +492,7 @@ expr: MINUS expr {
 		};
 
 		char * folhas[] = {
-    		$2,
+    			$2,
 
 		};			
 		
@@ -516,7 +516,7 @@ expr: MINUS expr {
 		};
 
 		char * folhas[] = {
-    		$2,
+    			$2,
 
 		};			
 		
@@ -553,12 +553,12 @@ multiexp: multiexp TIMES expr {
 	
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
-
+    				$2,
+	
 			};			
 		
 			char* nome = "Expressão Básica - Multiplicação ";
@@ -579,7 +579,7 @@ multiexp: multiexp TIMES expr {
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -614,11 +614,11 @@ ineqexp:  ineqexp LE expr {
 	
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -637,11 +637,11 @@ ineqexp:  ineqexp LE expr {
 
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -664,7 +664,7 @@ ineqexp:  ineqexp LE expr {
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -683,11 +683,11 @@ ineqexp:  ineqexp LE expr {
 
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -706,11 +706,11 @@ ineqexp:  ineqexp LE expr {
 
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -729,11 +729,11 @@ ineqexp:  ineqexp LE expr {
 
 			Node * filhos[] = {
 			 	$1,
-				 $3,
+				$3,
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -760,7 +760,7 @@ ineqexp:  ineqexp LE expr {
 
 
 			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
-			printf("logical \n");
+			//printf("logical \n");
 			$$ = ineqexp;	
 
         }
@@ -774,7 +774,7 @@ logical: NOT logical {
 			};
 
 			char * folhas[] = {
-    			$1,
+    				$1,
 
 			};			
 		
@@ -795,7 +795,7 @@ logical: NOT logical {
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -816,8 +816,8 @@ logical: NOT logical {
 			};
 
 			char * folhas[] = {
-    			$2,
-
+    				$2,
+	
 			};			
 		
 			char* nome = "Lógico  - OR ";
@@ -837,7 +837,7 @@ logical: NOT logical {
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 
 			};			
 		
@@ -861,7 +861,7 @@ logical: NOT logical {
 
 			int tamanhofilhos = sizeof(filhos);
 
-			printf("dados genericos \n");
+			//printf("dados genericos \n");
 			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
 			$$ = ineqexp;	
 
@@ -902,7 +902,7 @@ data: RAWNUMBERDATA {
 
 
 			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			printf("BOOLEANO \n");
+			//printf("BOOLEANO \n");
 			$$ = data;	
 
 
@@ -998,7 +998,7 @@ variabledata: ID {
 			int tamanhofolhas = sizeof(folhas);
 
 			Node* variabledata = createNode(filhos, nome, folhas ,tamanhofilhos,tamanhofolhas);
-			printf("TDS FORMAT! \n");
+			//printf("TDS FORMAT! \n");
 			$$ = variabledata;	
 
 
@@ -1034,7 +1034,7 @@ variabledata: ID {
 
 
 			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			printf("LABEL \n");
+			//printf("LABEL \n");
 			$$ = data;					
 		
 		}
@@ -1136,7 +1136,7 @@ paramsoptionalCall: paramsCall {
 		}
 
 
-		| /* empty */
+		| /* empty */  {$$ = NULL;}
 		;
 
 paramsCall:	expr paramslistCall {
@@ -1156,7 +1156,7 @@ paramsCall:	expr paramslistCall {
 		
 		$$ = params; 
 		}
-	    | /* empty */
+	    | /* empty */  {$$ = NULL;}
 	    ;
 
 
@@ -1169,7 +1169,7 @@ paramslistCall: paramslistCall COMMA expr {
 		};
 
 		char * folhas[] = {
-    		$2,
+    			$2,
 		};		
 		
 		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
@@ -1179,7 +1179,7 @@ paramslistCall: paramslistCall COMMA expr {
 		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = paramslist; 
 		}
-	    | /* empty */
+	    | /* empty */  {$$ = NULL;}
 	    ;
 
 
@@ -1194,11 +1194,11 @@ condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 			};
 
 			char * folhas[] = {
-    			$1,
-    			$2,
-    			$4,
-    			$5,
-    			$7,
+    				$1,
+    				$2,
+    				$4,
+    				$5,
+    				$7,
 
 			};			
 		
@@ -1209,7 +1209,7 @@ condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 			
 			Node* condstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 			$$ = condstmt;	
-			printf("CMD -  IF\n");
+			//printf("CMD -  IF\n");
 
 
 
@@ -1222,9 +1222,9 @@ matchornot: ELSE LBRACE cmds RBRACE {
 			};
 
 			char * folhas[] = {
-    			$1,
-    			$2,
-    			$4,
+    				$1,
+    				$2,
+    				$4,
 			};			
 		
 			char* nome = "Condicional - ELSE";
@@ -1234,10 +1234,10 @@ matchornot: ELSE LBRACE cmds RBRACE {
 
 			Node* matchornot = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 			$$ = matchornot;
-			printf("CMD - ELSE \n");
+			//printf("CMD - ELSE \n");
 
 			}
-			| /* empty */
+			| /* empty */  {$$ = NULL;}
 
 content: content COMMA tdsformat {
 	
@@ -1248,7 +1248,7 @@ content: content COMMA tdsformat {
 			};
 
 			char * folhas[] = {
-    			$2,
+    				$2,
 			};			
 		
 			char* nome = "Conjunto ";
@@ -1258,7 +1258,7 @@ content: content COMMA tdsformat {
 
 			Node* content = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 			
-			printf("CONTEUDO/conjunto DE TDS \n");
+			//printf("CONTEUDO/conjunto DE TDS \n");
 
 			$$ = content;
 			
@@ -1277,7 +1277,7 @@ content: content COMMA tdsformat {
 
 			Node* content = createNode(filhos, nome, NULL ,tamanhofilhos,0);
 
-			printf("formato  DE TDS \n");
+			//printf("formato  DE TDS \n");
 
 			$$ = content;	
 
@@ -1294,10 +1294,10 @@ tdsformat: LPAREN expr COMMA expr COMMA expr RPAREN {
 			};
 
 			char * folhas[] = {
-    			$1,
-    			$3,
-    			$5,
-    			$7,
+    				$1,
+    				$3,
+    				$5,
+    				$7,
 			};			
 		
 			char* nome = "Informações de TDS";
@@ -1327,7 +1327,7 @@ int main(int argc, char* argv[]) {
   } 
   yyin = fp;
   yyparse();
-  printf("%s \n",root->name);
+  //printf("%s \n",root->name);
   fclose(fp);
 
 }
