@@ -130,7 +130,7 @@ prog: functiondefs cmds  {
 		char* nome = "Prog -  comandos ou definições de função";
 		int tamanhofilhos = sizeof(filhos);
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);	
-		//printf("PROGRAMA \n");
+		printf("PROGRAMA (%s) (%s) (%d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL);
 		root = prog;		
 		$$ = prog; 
 	  } 
@@ -147,12 +147,14 @@ cmds: cmds cmd {
 		char* nome = "Cmds -  comando(s)";
 		int tamanhofilhos = sizeof(filhos);
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("comandos (%s) (%s) \n \n \n",cmds->name,cmds->children[0]->name);
+		printf("comandos (%s) (%s) n- %d \n \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
 		$$ = cmds; 
 
 	  } 
 	  | cmd {
-		printf("repassa \n \n");	  	
+		Node* n = $1;		
+		printf("repassa (%s) n- %d \n \n",n->name,n->nchild);	  	
+				
 		$$ = $1;
 	  } 	
 	  | /* empty */  {printf("nao teve mais \n \n"); $$ = NULL;}
@@ -408,7 +410,7 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 
 
 		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("CMD - NAO IF/ELSE (%s) (%s) \n \n",otherstmt->name, otherstmt->children[0]->name);
+		printf("CMD - NAO IF/ELSE (%s) (%s) - n- %d \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
 		$$ = otherstmt;
 		
 
