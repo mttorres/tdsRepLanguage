@@ -147,15 +147,24 @@ cmds: cmds cmd {
 		char* nome = "Cmds -  comando(s)";
 		int tamanhofilhos = sizeof(filhos);
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("comandos (%s) (%s) n- %d \n \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
+		printf("comandos (%s) (%s) (%s) n- %d \n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
 		$$ = cmds; 
 
 	  } 
 	  | cmd {
-		Node* n = $1;		
-		printf("repassa (%s) n- %d \n \n",n->name,n->nchild);	  	
+		Node* n = $1;
+		printf("repassa (%s) n- %d \n \n",n->name,n->nchild);
+		Node * filhos[] = {
+			 $1,
+		};
+		char* nome = "Cmds -  comando(s)(REPASSA)";
+		int tamanhofilhos = sizeof(filhos);
+
+		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
+
+		$$ = cmds; 	
+		
 				
-		$$ = $1;
 	  } 	
 	  | /* empty */  {printf("nao teve mais \n \n"); $$ = NULL;}
 	  ;	
@@ -322,7 +331,7 @@ cmd: condstmt {
 			 $1,
 		};
 		
-		char* nome = "CMD -  Comando (statement) ";
+		char* nome = "CMD -  Comando (condstatement) ";
 
 		int tamanhofilhos = sizeof(filhos);
 	
@@ -343,7 +352,6 @@ cmd: condstmt {
 
 		int tamanhofilhos = sizeof(filhos);
 	
-
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
 		printf("comando(other) (%s) (%s) \n \n",cmd->name,cmd->children[0]->name);
 		$$ = cmd; 		
