@@ -35,29 +35,32 @@ Node* createNode(Node** children, char* name, char** leafs, int sizechildren, in
 void printNode(Node* n){	
 
 	int info = n != NULL;
-	printf("info: - %d \n",info);	
-	if(n){
+	printf("info: - %d \n",info);		
+	if(info) {
+		printf("!! \n");			
 		printf("NODE: - %s \n",n->name);
-		int i;
+		int i = 0;
 		if(n->children){
-		printf("--------------CHILDREN: \n");
-		for(i=0; i < n->nchild; i++){
-			printNode(n->children[i]);
-		}
-		printf("------------END CHILDREN--------------- \n");
-	}
-		if(n->leafs){
-			printf("---------------NOT-TERMINAL: \n");
-			for(i = 0; i< n->nleafs;i++){
-				printf(" -->%s\n",n->leafs[i]);
+			printf("--------------CHILDREN: \n");
+			for(i= 0; i < n->nchild; i++){
+				if(n->children[i]) {
+					printNode(n->children[i]);
+				}
+				else {
+					printf("NULL \n");	
+				}
+
 			}
-		printf("------------END NOT-TERMINAL--------------- \n");
-	}
-	
-	printf("-----------------------------------------------\n");
-
-
-
+			printf("------------END CHILDREN--------------- \n");
+		}
+		if(n->leafs) {
+			printf("---------------NOT-TERMINAL: \n");
+			for(i = 0; i< n->nleafs;i++){					
+			   printf(" --> %s \n",n->leafs[i]);
+			}
+			printf("------------END NOT-TERMINAL--------------- \n");
+		}
+		printf("-----------------------------------------------\n");
 	}
 }
 

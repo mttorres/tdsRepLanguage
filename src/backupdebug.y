@@ -153,7 +153,6 @@ cmds: cmds cmd {
 	  } 
 	  | cmd {
 		Node* n = $1;
-		printf("repassa (%s) n- %d \n \n",n->name,n->nchild);
 		Node * filhos[] = {
 			 $1,
 		};
@@ -161,7 +160,7 @@ cmds: cmds cmd {
 		int tamanhofilhos = sizeof(filhos);
 
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-
+		printf("repassa (%s) n- %d \n \n",cmds->children[0]->name,cmds->nchild);
 		$$ = cmds; 	
 		
 				
@@ -353,7 +352,7 @@ cmd: condstmt {
 		int tamanhofilhos = sizeof(filhos);
 	
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("comando(other) (%s) (%s) \n \n",cmd->name,cmd->children[0]->name);
+		printf("(%s) (%s) \n \n",cmd->name,cmd->children[0]->name);
 		$$ = cmd; 		
 
 
