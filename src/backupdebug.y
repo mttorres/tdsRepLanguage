@@ -87,9 +87,13 @@
 %token <sval> LABEL
 
 %type <ast> prog
-%type <ast> cmds cmd
-%type <ast> functiondefs functiondef
-%type <ast> paramsoptional paramslist params  
+%type <ast> cmds
+%type <ast> cmd
+%type <ast> functiondefs 
+%type <ast> functiondef
+%type <ast> paramsoptional 
+%type <ast> paramslist 
+%type <ast> params  
 %type <ast> optionalreturn
 %type <ast> data
 %type <ast> condstmt
@@ -103,7 +107,9 @@
 %type <ast> content
 %type <ast> variableprop
 %type <ast> functioncall
-%type <ast> paramsoptionalCall paramslistCall paramsCall  
+%type <ast> paramsoptionalCall   
+%type <ast> paramslistCall 
+%type <ast> paramsCall
 %type <ast> tdsformat
 %type <ast> matchornot
 
@@ -130,11 +136,10 @@ prog: functiondefs cmds  {
 		char* nome = "Prog -  comandos ou definições de função";
 		int tamanhofilhos = sizeof(filhos);
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);	
-		printf("PROGRAMA (%s) (%s) (%d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL);
-		root = prog;		
-		$$ = prog; 
+		printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL,prog->nchild); 			$$ = prog; 
+		root = $$;
 	  } 
-      	  | /* empty */ {$$ = NULL;}
+      	  | /* empty */ {printf("nao teve mais (prog) \n \n"); $$ = NULL;}
       	  ; 
 
 
@@ -147,12 +152,11 @@ cmds: cmds cmd {
 		char* nome = "Cmds -  comando(s)";
 		int tamanhofilhos = sizeof(filhos);
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("comandos (%s) (%s) (%s) n- %d \n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
+		printf("%s (%s) (%s) (filhos: %d)\n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
 		$$ = cmds; 
 
 	  } 
 	  | cmd {
-		Node* n = $1;
 		Node * filhos[] = {
 			 $1,
 		};
@@ -160,12 +164,15 @@ cmds: cmds cmd {
 		int tamanhofilhos = sizeof(filhos);
 
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("repassa (%s) n- %d \n \n",cmds->children[0]->name,cmds->nchild);
+		printf("%s (%s) (filhos: %d) \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
 		$$ = cmds; 	
 		
 				
 	  } 	
-	  | /* empty */  {printf("nao teve mais \n \n"); $$ = NULL;}
+	  | /* empty */  {
+		printf("nao teve mais (cmds) \n \n"); 
+		$$ = NULL;
+	  }
 	  ;	
 
 functiondefs: functiondefs functiondef {
@@ -185,7 +192,7 @@ functiondefs: functiondefs functiondef {
 	  	
 		$$ = $1; 	
 	  }  
-	  | /* empty */  {$$ = NULL;}
+	  | /* empty */  {printf("nao teve mais (functionsdefs) \n \n"); $$ = NULL;}
 	  ; 	
 
 
@@ -233,7 +240,7 @@ paramsoptional: params {
 
 		}
 
-		| /* empty */  {$$ = NULL;}
+		| /* empty */  {printf("nao teve mais (paramsoptional) \n \n"); $$ = NULL;}
 		;
 
 params:	ID paramslist {
@@ -258,7 +265,7 @@ params:	ID paramslist {
 		
 		$$ = params; 
 	    }
-	    | /* empty */  {$$ = NULL;}
+	    | /* empty */  {printf("nao teve mais(params) \n \n"); $$ = NULL;}
 	    ;
 
 paramslist: paramslist COMMA ID {
@@ -293,7 +300,7 @@ paramslist: paramslist COMMA ID {
 		Node* paramslist = createNode(NULL, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = paramslist; 
 	    }
-	    | /* empty */  {$$ = NULL;}
+	    | /* empty */  { printf("nao teve mais (paramslist) \n \n"); $$ = NULL;}
 	    ;
 
 
@@ -320,7 +327,7 @@ optionalreturn: RETURN expr {
 		//printf("RETORNO \n");
 		
 		}
-	    | /* empty */  {$$ = NULL;}
+	    | /* empty */  {printf("nao teve mais(optionalreturn) \n \n"); $$ = NULL;}
 	    ;
 
 
@@ -347,12 +354,12 @@ cmd: condstmt {
 			 $1,
 		};
 
-		char* nome = "CMD -  Comando (statement) ";
+		char* nome = "CMD -  Comando (otherstatement) ";
 
 		int tamanhofilhos = sizeof(filhos);
 	
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("(%s) (%s) \n \n",cmd->name,cmd->children[0]->name);
+		printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
 		$$ = cmd; 		
 
 
@@ -417,7 +424,7 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 
 
 		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("CMD - NAO IF/ELSE (%s) (%s) - n- %d \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
+		printf("%s (%s) - (filhos: %d) \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
 		$$ = otherstmt;
 		
 
@@ -1153,7 +1160,7 @@ functioncall: ID LPAREN paramsoptionalCall RPAREN {
 			$$ = functioncall;	
 
 
-}
+};
 
 paramsoptionalCall: paramsCall {
 
@@ -1170,7 +1177,7 @@ paramsoptionalCall: paramsCall {
 		}
 
 
-		| /* empty */  {$$ = NULL;}
+		| /* empty */  {printf("nao teve mais (paramsoptionalCall) \n \n"); $$ = NULL;}
 		;
 
 paramsCall: expr paramslistCall {
@@ -1190,7 +1197,7 @@ paramsCall: expr paramslistCall {
 		
 		$$ = params; 
 		}
-	    | /* empty */  {$$ = NULL;}
+	    | /* empty */  {printf("nao teve mais (paramsCall) \n \n"); $$ = NULL;}
 	    ;
 
 
@@ -1213,7 +1220,7 @@ paramslistCall: paramslistCall COMMA expr {
 		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		$$ = paramslist; 
 		}
-	    | /* empty */  {$$ = NULL;}
+	    | /* empty */  {printf("nao teve mais (paramslistCall) \n \n"); $$ = NULL;}
 	    ;
 
 
@@ -1271,7 +1278,7 @@ matchornot: ELSE LBRACE cmds RBRACE {
 			//printf("CMD - ELSE \n");
 
 			}
-			| /* empty */  {$$ = NULL;}
+			| /* empty */  { printf("nao teve mais (matchornot) \n \n"); $$ = NULL;}
 
 content: content COMMA tdsformat {
 	
@@ -1363,6 +1370,7 @@ int main(int argc, char* argv[]) {
   yyparse();
   printf("%s \n",root->name);
   printNode(root);
+  letgoNode(root);
   fclose(fp);
 
 }
