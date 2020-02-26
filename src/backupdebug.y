@@ -129,29 +129,49 @@
 
 prog: functiondefs cmds  {
 		
-		Node * filhos[] = {
+		Node * filhono[] = {
+			 $1,
 			 $2,
 		};
+
+		printf("END1: %d \n \n",&filhono[0]);
+
 		char* nome = "Prog -  comandos ou definições de função";
-		int tamanhofilhos = sizeof(filhos);
-		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);	
+		int tamanhofilhos = sizeof(filhono);
+		Node* prog = createNode(filhono, nome,NULL,tamanhofilhos,0);	
 		//printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL,prog->nchild); 	
 
 		printf("nome :(%s) (ref : %d) \n \n \n",$2->name,$2->children[0] != NULL); 
+
+		printf("END2: %d \n \n",prog->children);
 
 		$$ = prog; 
 		root = $$;
 		infoNode($$);
 
-		printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n \n",prog->name,prog->children[0]->name ,prog->children[0] == NULL,prog->nchild);
+		printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n \n",prog->name,prog->children[1]->name ,prog->children[1] == NULL,prog->nchild);
 
-		printf("nome :(%s) (ref : %d) \n \n \n",$$->children[0]->name,$$->children[0]->children[0] != NULL); 
+		printf("nome :(%s) (ref : %d) \n \n \n",$$->children[1]->name,$$->children[1]->children[0] != NULL); 
 	  } 
       	  | /* empty */ {printf("nao teve mais (prog) \n \n"); $$ = NULL;}
       	  ; 
 
 
-cmds:  cmd {
+cmds: cmds cmd {
+		
+		Node * filhos[] = {
+			 $1,
+			 $2,
+		};
+		char* nome = "Cmds -  comando(s)";
+		int tamanhofilhos = sizeof(filhos);
+		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
+		//printf("%s (%s) (%s) (filhos: %d)\n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
+		$$ = cmds; 
+		infoNode($$);
+
+	  } 
+	  | cmd {
 		Node * filhos[] = {
 			 $1,
 		};
@@ -161,11 +181,23 @@ cmds:  cmd {
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		//printf("%s (%s) (filhos: %d) \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
 		$$ = cmds; 	
+
+		printf("END1(CMDS): %d \n \n",&filhos);
+
+		printf("END2(CMDS): %d \n \n",cmds->children);
+
 		infoNode($$);
 
 		printf("nome :(%s) (ref : %d) \n \n \n",$$->name,$$->children[0] != NULL); 
 
-
+		free(filhos[0]);
+		free(filhos[1]);
+		
+				
+	  } 	
+	  | /* empty */  {
+		printf("nao teve mais (cmds) \n \n"); 
+		$$ = NULL;
 	  }
 	  ;	
 
