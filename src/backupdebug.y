@@ -130,33 +130,28 @@
 prog: functiondefs cmds  {
 		
 		Node * filhos[] = {
-			 $1,
 			 $2,
 		};
 		char* nome = "Prog -  comandos ou definições de função";
 		int tamanhofilhos = sizeof(filhos);
 		Node* prog = createNode(filhos, nome,NULL,tamanhofilhos,0);	
-		printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL,prog->nchild); 			$$ = prog; 
+		//printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL,prog->nchild); 	
+
+		printf("nome :(%s) (ref : %d) \n \n \n",$2->name,$2->children[0] != NULL); 
+
+		$$ = prog; 
 		root = $$;
+		infoNode($$);
+
+		printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n \n",prog->name,prog->children[0]->name ,prog->children[0] == NULL,prog->nchild);
+
+		printf("nome :(%s) (ref : %d) \n \n \n",$$->children[0]->name,$$->children[0]->children[0] != NULL); 
 	  } 
       	  | /* empty */ {printf("nao teve mais (prog) \n \n"); $$ = NULL;}
       	  ; 
 
 
-cmds: cmds cmd {
-		
-		Node * filhos[] = {
-			 $1,
-			 $2,
-		};
-		char* nome = "Cmds -  comando(s)";
-		int tamanhofilhos = sizeof(filhos);
-		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("%s (%s) (%s) (filhos: %d)\n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
-		$$ = cmds; 
-
-	  } 
-	  | cmd {
+cmds:  cmd {
 		Node * filhos[] = {
 			 $1,
 		};
@@ -164,14 +159,13 @@ cmds: cmds cmd {
 		int tamanhofilhos = sizeof(filhos);
 
 		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
-		printf("%s (%s) (filhos: %d) \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
+		//printf("%s (%s) (filhos: %d) \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
 		$$ = cmds; 	
-		
-				
-	  } 	
-	  | /* empty */  {
-		printf("nao teve mais (cmds) \n \n"); 
-		$$ = NULL;
+		infoNode($$);
+
+		printf("nome :(%s) (ref : %d) \n \n \n",$$->name,$$->children[0] != NULL); 
+
+
 	  }
 	  ;	
 
@@ -186,6 +180,7 @@ functiondefs: functiondefs functiondef {
 		Node* functiondefs = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		$$ = functiondefs; 
 		//printf("iniciando definição de função \n");
+		infoNode($$);
 
 	  }
 	  |  functiondef {
@@ -223,6 +218,7 @@ functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds optionalreturn
 		Node* functiondef = createNode(filhos, nome,folhas,tamanhofilhos,tamanhofolhas);
 		//printf("DEFINICAO DE FUNÇÃO \n");
 		$$ = functiondef; 
+		infoNode($$);
 }
 ;
 
@@ -343,9 +339,9 @@ cmd: condstmt {
 	
 
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("comando(cond) \n");
+		//printf("comando(cond) \n");
 		$$ = cmd; 
-	
+		infoNode($$);
 	  
 	  }
 	 | otherstmt {
@@ -359,8 +355,9 @@ cmd: condstmt {
 		int tamanhofilhos = sizeof(filhos);
 	
 		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
+		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
 		$$ = cmd; 		
+		infoNode($$);
 
 
 	 }
@@ -393,7 +390,7 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 		$$ = otherstmt; 
 
 		//printf("CMD - NAO IF/ELSE \n",otherstmt->name);
-		
+		infoNode($$);
 
 
 	 }
@@ -410,6 +407,7 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 
 		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
 		$$ = otherstmt;
+		infoNode($$);
 
 	 }
 	 | assignment {
@@ -424,8 +422,9 @@ otherstmt: FOR assignment TO expr DO COLON cmds {
 
 
 		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		printf("%s (%s) - (filhos: %d) \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
+		//printf("%s (%s) - (filhos: %d) \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
 		$$ = otherstmt;
+		infoNode($$);
 		
 
 	 }
@@ -451,7 +450,7 @@ assignment: ID ASSIGN expr {
 		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
 		printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 		$$ = assignment; 
-
+		infoNode($$);
 
 	 }
 	 | ID LBRACK expr RBRACK ASSIGN expr {
