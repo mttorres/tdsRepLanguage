@@ -68,8 +68,8 @@ void infoNode(Node* n){
 	if(n){
 		printf("-------------INFO---------------\n");
 		printf("NODE: - %s \n",n->name);
-		printf("nChild: - %d  ref: \n",n->nchild,n->children != NULL);
-		printf("nLeafs: - %d  ref: \n",n->nleafs,n->leafs != NULL);
+		printf("nChild: - %d  ref: %d \n",n->nchild,n->children != NULL);
+		printf("nLeafs: - %d  ref: %d \n",n->nleafs,n->leafs != NULL);
 		printf("--------------END-INFO--------------\n \n");
 	}
 	
