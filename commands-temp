@@ -1,0 +1,22 @@
+    1  hist
+    2  clear
+    3  history
+    4  clear
+    5  history
+    6  clear
+    7  gcc
+    8  sudo apt install gcc
+    9  sudo apt install git
+   10  sudo apt-get update
+   11  sudo apt install git
+   12  sudo apt install flex
+   13  sudo apt install bison
+   14  history
+   15  history > commands-temp 
+   ...
+   25* 
+   26  git config --global user.name Arch
+   27  history
+   28  git config --global user.email 33100644+mttorres@users.noreply.github.com
+   29  history
+
