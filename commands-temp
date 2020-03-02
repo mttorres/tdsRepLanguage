@@ -20,3 +20,14 @@
    28  git config --global user.email 33100644+mttorres@users.noreply.github.com
    29  history
 
+
+
+
+LINKS UTEIS:
+
+
+https://stackoverflow.com/questions/13590812/c-freeing-structs
+https://stackoverflow.com/questions/6280055/how-do-i-check-if-a-variable-is-of-a-certain-type-compare-two-types-in-c
+https://codereview.stackexchange.com/questions/44649/dynamic-array-of-structs-in-c
+http://www.cplusplus.com/reference/cstdarg/va_arg/
+
