@@ -1,1 +1,987 @@
-                                       
+--------------TREE--------------------
+!! 
+NODE: - Prog -  comandos ou definições de função 
+--------------CHILDREN: 
+NULL 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s) 
+--------------CHILDREN: 
+!! 
+NODE: - Cmds -  comando(s)(REPASSA) 
+--------------CHILDREN: 
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> i 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 0 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> dadoA 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 0 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> dadoB 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 1 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> j 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - NULL 
+---------------NOT-TERMINAL: 
+ --> NULL 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> nomeA 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - LABEL 
+---------------NOT-TERMINAL: 
+ --> 'A' 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> nomeB 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - LABEL 
+---------------NOT-TERMINAL: 
+ --> 'B' 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> nomeC 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - LABEL 
+---------------NOT-TERMINAL: 
+ --> 'C' 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> numeroPortas 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 3 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> tdsnamesOutrasPortas 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Dados de conteudos/conjuntos  
+---------------NOT-TERMINAL: 
+ --> { 
+ --> } 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Conjunto  
+---------------NOT-TERMINAL: 
+ --> , 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - TDS 
+--------------CHILDREN: 
+!! 
+NODE: - Informações de TDS 
+---------------NOT-TERMINAL: 
+ --> ( 
+ --> , 
+ --> , 
+ --> ) 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> dadoA 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> i 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> nomeA 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Informações de TDS 
+---------------NOT-TERMINAL: 
+ --> ( 
+ --> , 
+ --> , 
+ --> ) 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> dadoA 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica - soma  
+---------------NOT-TERMINAL: 
+ --> + 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> i 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 1 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> nomeB 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - CMD -  Comando (otherstatement)  
+--------------CHILDREN: 
+!! 
+NODE: - Otherstmt(assignment) -  comandos diferente de if e else  
+--------------CHILDREN: 
+!! 
+NODE: - Assignment(simples) -  atribuição de variavel   
+---------------NOT-TERMINAL: 
+ --> tdsnamesNext 
+ --> = 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de chamada de função  
+--------------CHILDREN: 
+!! 
+NODE: - Chamada de função 
+---------------NOT-TERMINAL: 
+ --> processMergeTDS 
+ --> ( 
+ --> ) 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Paramsoptional -  parametro(s) opcionais da chamada de função  
+--------------CHILDREN: 
+!! 
+NODE: - Params -  parametro(s)  da chamada de função  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> tdsnamesOutrasPortas 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Paramslist - lista de parâmetros a mais de uma função  
+---------------NOT-TERMINAL: 
+ --> , 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Paramslist - lista de parâmetros a mais de uma função  
+---------------NOT-TERMINAL: 
+ --> , 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Paramslist - lista de parâmetros a mais de uma função  
+---------------NOT-TERMINAL: 
+ --> , 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+NULL 
+!! 
+NODE: - Expressão Básica - soma  
+---------------NOT-TERMINAL: 
+ --> + 
+------------END NOT-TERMINAL--------------- 
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> i 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Número 
+---------------NOT-TERMINAL: 
+ --> 1 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> nomeC 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+!! 
+NODE: - Expressão Básica  
+--------------CHILDREN: 
+!! 
+NODE: - Expressão Básica - inequações/lógicas  
+--------------CHILDREN: 
+!! 
+NODE: - Lógico   
+--------------CHILDREN: 
+!! 
+NODE: - Dados do componente de uma expressão   
+--------------CHILDREN: 
+!! 
+NODE: - Dados de outras variaveis ou estruturas 
+--------------CHILDREN: 
+!! 
+NODE: - Variavel 
+---------------NOT-TERMINAL: 
+ --> numeroPortas 
+------------END NOT-TERMINAL--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------
+------------END CHILDREN--------------- 
+-----------------------------------------------

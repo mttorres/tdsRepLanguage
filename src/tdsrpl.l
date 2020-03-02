@@ -26,7 +26,7 @@ Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "
 [\n] 			{}
 [\t]          		{}
 "//".*         		{}
-[0-9]+                	{yylval.ival = atoi(yytext); return RAWNUMBERDATA;}
+[0-9]+                	{yylval.sval = strdup(yytext); return RAWNUMBERDATA;}
 ==                    	{yylval.sval = strdup(yytext); return EQUAL;}
 !=                    	{yylval.sval = strdup(yytext); return NOTEQUAL;}
 =		        {yylval.sval = strdup(yytext); return ASSIGN;}
