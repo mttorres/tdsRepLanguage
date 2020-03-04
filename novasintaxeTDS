@@ -1,26 +1,36 @@
 tdsA = {
 	portname : 'A'
-	data-time: {0: 'cadeia', 1: 'de', 2: 'dados'}
-}
-
+	data-time: {0: 'cadeia', 1: 'de', 2: 'dados'} // define de forma estatica qual vai ser o dado de b nos segundos 0 , 1 e 2 , no 	link: tdsC(exemplo)							 //restante é assumido que não tem dado em A
+											     // por sintaxe (link?) (serve quando se pensar em produto de automato, ou em portas que sejam "continuação uma da outra", isto é tenham os dados do mesmo dominio.
+} 
+	
 tdsB = {
 	portname : 'B'
-	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) }
+	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) } // nesse caso é definido por 
+	link: tdsC
 }
 
 
-http://web.eecs.utk.edu/~bvanderz/teaching/cs461Sp11/notes/parse_tree/
-https://efxa.org/2014/05/25/how-to-create-an-abstract-syntax-tree-while-parsing-an-input-stream/
+function fluxoPortempo(tempo , modoEntrada){
+	
+	// dado definido por duas funções (regras matematicas) dependendo do modo de entrada.
+	// naturalmente seria limitado a inteiros, já que o nuXmv não tem float/double...
+	// poderia tanto aceitar definições matematicas ou algo mais como uma linguagem de programação imperativa e simples
 
-https://stackoverflow.com/questions/50821203/how-can-i-debug-my-flex-bison-grammar
+	if(modoEntrada == true and tempo != 0){
+		dado = t + 30 
+	}
+	else{
+		dado = t - 30	
 
-http://dinosaur.compilertools.net/bison/bison_11.html
+	}
+
+}
+
+tdsC = {
+	
+	linked: {tdsA, tdsB} // pode ter como saida tanto A como B
+}
 
 
-https://www.gnu.org/software/bison/manual/html_node/Debugging.html
-
-https://stackoverflow.com/questions/44866852/cmake-with-flex-bison-in-clion
-
-
-https://www.eskimo.com/~scs/cclass/int/sx8.html
 
