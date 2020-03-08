@@ -7,8 +7,8 @@ VAR
 ASSIGN 
     init(time) := 0;
     next(time) := case
-        time < 3: time + 1;
-        TRUE     : time;
+        time < 3 : time + 1;
+        TRUE     : 0;
     esac;
 
 
@@ -19,22 +19,15 @@ MODULE merger(time, mode)
  --ports : portsModule ;  -- eliminar portsModule? usar o time ou algum OUTRO PARÂMETRO para "definir"/"calcular" o dado da porta.
  cs: {q0};
  a: {cadeia,de,dados,NULL};
- b: 0..100;
+ b: {NULL, -27, -28, -29, 0, 31, 32, 33}; -- para isso ele teria que limitar o intervalo de dados da função... (no outro arquivo time = 0, sem dado)
+ 								 -- e ele teria que CALCULAR OS VALORES FINITOS EM FUNÇÃO DE TIME!
  --c: {0..100, NULL,cadeia,de,dados};   -- nuXmv aceita isso? 
- c: array 0..104 of {cadeia,de,dados,NULL,datapoint};  -- tentativa de equivalencia
+ c: {cadeia,de,dados, NULL, -27, -28, -29, 0, 31, 32, 33 };  -- tentativa de equivalencia (une os dois conjuntos de enums)
  ASSIGN
 
-	init(a):= 30;
-	init(b):= cadeia;
-	init(c):= 30; 
-
-	next(b):=
-			case
-				mode = TRUE : time + 30; 
-				mode = FALSE : time - 30;
-				TRUE : {a, NULL};
-
-			esac;
+	init(a):= cadeia;
+	init(b):= NULL;
+	init(c):= NULL; 
 
 	next(a):=
 			case
@@ -44,18 +37,34 @@ MODULE merger(time, mode)
 				TRUE : NULL;
 			esac;
 
+	next(b):=
+			case
+				time = 0 : 0;
+				mode = TRUE : time + 30; 
+				mode = FALSE : time - 30;
+				TRUE : NULL;
+			esac;			
+
 	next(c):=
 			case
-				a = NULL & b < 101 : c[b] = datapoint; 
-				b = NULL & a = cadeia : c[101] = cadeia;
-				b = NULL & a = de : c[102] = de;
-				b = NULL & a = dados : c[103] = dados;
-				TRUE : NULL;
+				a = NULL : b ; 
+				b = NULL : a ;
+				TRUE : NULL ;
 			esac;
 
 	-- problemas: Obrigar que o tipo de dado seja igual? (ex C nao poderia receber dados dos dois conjuntos de a e b? os 3 deveriam ser do mesmo tipo?)
 	-- o quanto eu posso modificar / integrar o trabalho do daniel?
 
  TRANS
- ((cs = q0 & b = NULL & c != NULL & a = c[a]) -> next(cs) = q0 )  & (( cs = q0 & a = NULL & c != NULL & b = c[b])  -> next(cs) = q0);
+ ( (cs = q0 & 
+ 	b = NULL & 
+ 	c != NULL & 
+ 	a = c) 
+ 	-> next(cs) = q0 )  
+ & 
+ (( cs = q0 & 
+ 	a = NULL & 
+ 	c != NULL & 
+ 	b = c)  
+ 	-> next(cs) = q0);
 
