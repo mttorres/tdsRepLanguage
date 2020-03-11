@@ -37,10 +37,10 @@ MODULE merger(time, mode)
 
 	next(b):=
 			case
-				time = 0 : NULL; -- RESET
-				mode = TRUE : (time mod 2); 
-				mode = FALSE & (time mod 2) + 1  > 1 : 0;
-				mode = FALSE & (time mod 2) + 1  < 1 : (time mod 2) + 1;
+				time = 0 : (time mod 2) + 1; -- reset 
+				mode = FALSE  & (time mod 2) + 1  > 1  : 0;
+				mode = FALSE  & (time mod 2) + 1  < 1 : (time mod 2) + 1;
+				mode = TRUE & time != 0: (time mod 2); 
 				TRUE : NULL;
 			esac;			
 
