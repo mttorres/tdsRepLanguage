@@ -1,0 +1,32 @@
+tdsA = {
+	portname : 'A'
+	data-time: {0: 0, 1: 1, 2: 0} 
+} 
+	
+tdsB = {
+	portname : 'B'
+	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) } // nesse caso é definido por 
+	link: tdsC
+}
+
+
+function fluxoPortempo(tempo , modoEntrada){
+	
+
+	if(modoEntrada == true and tempo != 0) {
+		dado = t % 2 
+	}
+	if(modoEntrada == false) {
+		dado = t % 2 + 1	
+
+	}
+
+}
+
+tdsC = {
+	
+	linked: {tdsA, tdsB} 
+}
+
+
+

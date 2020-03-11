@@ -1,0 +1,72 @@
+MODULE main
+VAR
+    time : 0..4;
+    mode : boolean;
+    merger : merger(time,mode);
+
+ASSIGN 
+    init(time) := 0;
+    next(time) := case
+        time < 4 : time + 1;
+        TRUE     : 0;
+    esac;
+
+
+
+
+MODULE merger(time, mode)
+ VAR
+ 
+ cs: {q0};
+ a: {0, 1, NULL};
+ b: {0, 1, NULL};
+ c: {0, 1, NULL};
+ ASSIGN
+
+	init(a):= 0;
+	init(b):= NULL;
+	init(c):= case
+				a = NULL : b ; 
+				b = NULL : a ;
+				TRUE : NULL ;
+			esac; 
+
+	next(a):=
+			case
+				time = 0 : 1;
+				time = 1 : 0;
+				time = 4 : 0; -- reset
+				TRUE : NULL;
+			esac;
+
+	next(b):=
+			case
+				time = 4 : NULL; -- reset 
+				mode = FALSE  & (next(time) mod 2) + 1  > 1  : 0;
+				mode = FALSE  & (next(time) mod 2) + 1  < 1 : (time mod 2) + 1;
+				mode = TRUE : (next(time) mod 2); 
+				TRUE : NULL;
+			esac;			
+
+	next(c):=
+			case
+				next(a) = NULL : next(b) ; 
+				next(b) = NULL : next(a) ;
+				TRUE : NULL ;
+			esac;
+
+
+
+ TRANS
+ ( (cs = q0 & 
+ 	b = NULL & 
+ 	c != NULL & 
+ 	a = c) 
+ 	-> next(cs) = q0 )  
+ & 
+ (( cs = q0 & 
+ 	a = NULL & 
+ 	c != NULL & 
+ 	b = c)  
+ 	-> next(cs) = q0);
+
