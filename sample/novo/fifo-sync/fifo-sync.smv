@@ -15,4 +15,8 @@ VAR
 
 	( (cs = p0q0 & a = NULL & e = 0 & (b != NULL & b = e) ) -> next(cs) -> q0q0 ) &
 
-	( (cs = q0q0 & e = NULL & b = NULL & a = 0 ) -> next(cs) -> p0q0 ) &
+	( (cs = p0q0) -> ( (next(cs) != p1q0 ) ) ) &
+
+	( (cs = p1q0 & a = NULL & e = 1 & (b != NULL & b = e) ) -> next(cs) -> q0q0 ) &
+
+	( (cs = p0q0) -> ( (next(cs) != p0q0 ) ) ) 
