@@ -20,7 +20,7 @@ function fluxoPortempo(tempo , modoEntrada){
 	if(modoEntrada == true and tempo != 0){
 		dado = t + 30 
 	}
-	if(modoEntrada == false) {
+	if(modoEntrada == false and tempo != 0) {
 		dado = t - 30	
 	}
 
