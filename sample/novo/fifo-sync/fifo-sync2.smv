@@ -1,12 +1,12 @@
 MODULE main
 VAR
-    time : 0..3;
+    time : 0..6;
     merger : finalAutomata(time);
 
 ASSIGN 
     init(time) := 0;
     next(time) := case
-        time < 3 : time + 1;
+        time < 6 : time + 1;
         TRUE     : 0;
     esac;
 
@@ -29,15 +29,11 @@ VAR
 			case
 				time = 0 : 1;
 				time = 1 : 0;
-				time = 3 : 1; -- reset *(trocando o sinal para teste) ( oque fazer quando : a nunca fica NULL (obrigar? isto é transparente ao usuario(delayed) ))
+				time = 6 : 0; -- reset
 				TRUE : NULL;
 			esac;
 
-		next(e):= 
-			case
-				a != NULL & e != NULL : e;
-				TRUE : a;
-			esac;			
+		next(e):= a;
 
 		next(b):= next(e);							
 
