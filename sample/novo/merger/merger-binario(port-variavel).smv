@@ -1,0 +1,88 @@
+MODULE main
+VAR
+    time : 0..4;
+    mode : boolean;
+    merger : merger(time,mode);
+
+ASSIGN 
+    init(time) := 0;
+    next(time) := case
+        time < 4 : time + 1;
+        TRUE     : 0;
+    esac;
+
+MODULE portsModule(time,mode)
+--FROZENVAR
+--   a : array 0..4 of {NULL,0};
+--   c : array 0..4 of {NULL,0};
+--ASSIGN 
+--    init(a[0]) := 0;
+--    init(a[1]) := NULL;
+--    init(a[2]) := 0;
+--    init(a[3]) := NULL;
+--    init(c[0]) := NULL;
+--    init(c[1]) := 0;
+--    init(c[2]) := NULL;
+--    init(c[3]) := 0;
+-- usar variaveis ou vetor(vetor é menos genérico, porém permite olhar estados no passado)
+VAR
+
+a: {0, 1, NULL};
+b: {0, 1, NULL};
+c: {0, 1, NULL};
+
+
+ASSIGN
+
+	init(a):= 0;
+	init(b):= NULL;
+	init(c):= case
+				a = NULL : b ; 
+				b = NULL : a ;
+				TRUE : NULL ;
+			esac; 
+
+	next(a):=
+			case
+				time = 0 : 1;
+				time = 1 : 0;
+				time = 4 : 0; -- reset
+				TRUE : NULL;
+			esac;
+
+	next(b):=
+			case
+				time = 4 : NULL; -- reset 
+				mode = FALSE  & (next(time) mod 2) + 1  > 1  : 0;
+				mode = FALSE  & (next(time) mod 2) + 1  < 1 : (time mod 2) + 1;
+				mode = TRUE : (next(time) mod 2); 
+				TRUE : NULL;
+			esac;			
+
+	next(c):=
+			case
+				next(a) = NULL : next(b) ; 
+				next(b) = NULL : next(a) ;
+				TRUE : NULL ;
+			esac;
+
+
+MODULE merger(time, mode)
+ VAR
+ 
+ cs: {q0};
+ ports : portsModule(time,mode); 
+ 
+ TRANS
+ ( (cs = q0 & 
+ 	ports.b = NULL & 
+ 	ports.c != NULL & 
+ 	ports.a = ports.c) 
+ 	-> next(cs) = q0 )  
+ & 
+ (( cs = q0 & 
+ 	ports.a = NULL & 
+ 	ports.c != NULL & 
+ 	ports.b = ports.c)  
+ 	-> next(cs) = q0);
+

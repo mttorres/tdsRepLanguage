@@ -1,0 +1,39 @@
+"Percorrer" statements simples( varíaveis intermédiarias podem ser usadas para alguma operação de alguma TDS)
+
+	--> identificar varíaveis comuns, armazenar para caso sejam referênciadas. (usar estrutura)
+
+	--> identificar TDS's (é um statement diferente dos demais)
+		 --> verificar integridade das TDS's : sempre tem que ter o nome da porta, 
+			nome de porta não repetida e sempre tem que ter a data-time (função ou conjunto que define os dados).
+		
+		--> caso data-time seja uma função, guardar parâmetros e varíaveis que são utilizadas 
+		em relações lógicas (if, else...) para serem utilizadas no CASE do nuXmv.
+			--> a funções sempre funções sempre devem retornar algum dado a não ser que seja escrita de forma matemática
+				-->  ex:  function fluxo(t) { t % 2}   ou function fluxo(t) { dado = t % 2  ...(procesamento) ... return dado } 
+			
+			--> processar funções antes dos statements(?)
+
+
+		--> verificar opções extras da porta (link e linked) 			
+			--> link : referência outra porta (fornece dado para ela) ex: A ---sync---> B. tdsA teria link = tdsB
+				--> verificar se referência existe.
+
+			--> linked : utilizada como "relação contrária". ex: A e B ---merger---> C.  tdsC tem linked {A,B}
+			ou seja é uma junção dos conjuntos de dados de A e B, permitindo ter como saída tanto o que já veio de A ou B.
+
+			--> verificar tds referênciadas existem (após ter identificado todas as TDS's)(?)  		 
+				
+			--> outras opções (?)	
+
+		--> (!!!!) verificar se o automato utilizado (modelado pelo nuXmv) possui o MESMO DE NÚMERO DE PORTAS QUE AS TDS'S GERADAS PELA LINGUAGEM.
+		    --> ou isso ficaria tudo por conta da linguagem? Ou depende do conector em si? Ou a ideia é ficar genérico o bastante para o usuário especificar quantas portas quiser?
+ 		
+
+	--> associar varíaveis usadas pelas TDS's (usar estrutura que inclusive aponte para a TDS já identificada)
+
+	--> se o programa não tiver TDS'S definidas de forma completa e apenas chamadas de funções e atribuições de varíaveis
+	pode-se assumir para facilitar o uso que só se possui UMA porta e que uma varíavel especificada(usando alguma notação) é o valor dessa porta 
+	de forma constante(?) (ou seria melhor limitar o programa a sempre ter que seguir a declaração "completa" de tds)
+		 
+
+

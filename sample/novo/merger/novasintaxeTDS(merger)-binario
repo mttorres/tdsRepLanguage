@@ -1,6 +1,9 @@
+modoEntrada = false // pode ser um parâmetro passado pro programa, por exemplo
+
 tdsA = {
 	portname : 'A'
 	data-time: {0: 0, 1: 1, 2: 0} 
+	link: tdsC
 } 
 	
 tdsB = {

@@ -12,11 +12,9 @@ ASSIGN
     esac;
 
 
-
-
 MODULE merger(time, mode)
  VAR
- --ports : portsModule ;  -- eliminar portsModule? usar o time ou algum OUTRO PARÂMETRO para "definir"/"calcular" o dado da porta.
+-- ports : portsModule ;  
  cs: {q0};
  a: {cadeia,de,dados,NULL};
  b: {NULL, -30, -29, -28, -27, -26, 0, 30, 31, 32, 33, 34}; -- para isso ele teria que limitar o intervalo de dados da função... (no outro arquivo time = 0, sem dado)

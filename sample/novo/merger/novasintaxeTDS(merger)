@@ -1,3 +1,5 @@
+modoEntrada = false // pode ser um parâmetro passado pro programa, por exemplo
+
 tdsA = {
 	portname : 'A'
 	data-time: {0: 'cadeia', 1: 'de', 2: 'dados'} // define de forma estatica qual vai ser o dado de b nos segundos 0 , 1 e 2 , no 	link: tdsC(exemplo)							 //restante é assumido que não tem dado em A
@@ -6,7 +8,7 @@ tdsA = {
 	
 tdsB = {
 	portname : 'B'
-	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) } // nesse caso é definido por 
+	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) } // os parêmetros da função referênciam varíaveis 
 	link: tdsC
 }
 

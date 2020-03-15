@@ -1,0 +1,74 @@
+MODULE main
+VAR
+    time : 0..4;
+    mode : boolean;
+    merger : merger(time,mode);
+
+ASSIGN 
+    init(time) := 0;
+    next(time) := case
+        time < 4 : time + 1;
+        TRUE     : 0;
+    esac;
+
+MODULE portsModule(time,mode)
+
+VAR
+   a : array 0..4 of {0, 1, NULL};
+   b : array 0..4 of {0, 1, NULL};
+   c : array 0..4 of {0, 1, NULL};
+
+ASSIGN
+
+	init(a[time]):= 0;
+	init(b[time]):= NULL;
+	init(c[time]):= case
+				a[time] = NULL : b[time] ; 
+				b[time] = NULL : a[time] ;
+				TRUE : NULL ;
+			esac; 
+
+	next(a[time]):=
+			case
+				time = 0 : 1;
+				time = 1 : 0;
+				time = 4 : 0; -- reset
+				TRUE : NULL;
+			esac;
+
+	next(b[time]):=
+			case
+				time = 4 : NULL; -- reset 
+				mode = FALSE  & (next(time) mod 2) + 1  > 1  : 0;
+				mode = FALSE  & (next(time) mod 2) + 1  < 1 : (time mod 2) + 1;
+				mode = TRUE : (next(time) mod 2); 
+				TRUE : NULL;
+			esac;			
+
+	next(c[time]):=
+			case
+				a[time] = NULL : b[time] ; 
+				b[time] = NULL : a[time] ;
+				TRUE : NULL ;
+			esac;
+
+
+MODULE merger(time, mode)
+ VAR
+ 
+ cs: {q0};
+ ports : portsModule(time,mode); 
+ 
+ TRANS
+ ( (cs = q0 & 
+ 	ports.b = NULL & 
+ 	ports.c != NULL & 
+ 	ports.a = ports.c) 
+ 	-> next(cs) = q0 )  
+ & 
+ (( cs = q0 & 
+ 	ports.a = NULL & 
+ 	ports.c != NULL & 
+ 	ports.b = ports.c)  
+ 	-> next(cs) = q0);
+
