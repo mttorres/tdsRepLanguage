@@ -1,39 +1,321 @@
-"Percorrer" statements simples( varíaveis intermédiarias podem ser usadas para alguma operação de alguma TDS)
+"Percorrer" nós: 
 
-	--> identificar varíaveis comuns, armazenar para caso sejam referênciadas. (usar estrutura)
+-------funções-------- 
 
-	--> identificar TDS's (é um statement diferente dos demais)
-		 --> verificar integridade das TDS's : sempre tem que ter o nome da porta, 
-			nome de porta não repetida e sempre tem que ter a data-time (função ou conjunto que define os dados).
-		
-		--> caso data-time seja uma função, guardar parâmetros e varíaveis que são utilizadas 
-		em relações lógicas (if, else...) para serem utilizadas no CASE do nuXmv.
-			--> a funções sempre funções sempre devem retornar algum dado a não ser que seja escrita de forma matemática
-				-->  ex:  function fluxo(t) { t % 2}   ou function fluxo(t) { dado = t % 2  ...(procesamento) ... return dado } 
+-->identificar funções  
+	--> guardar "resultados" da função com o nome da mesma em alguma estrutura (ex: tabela)
+	--> funções sempre devem ter um parâmetro TIME e podem ter outro a mais para controle parâmetros
+	--> toda função statements simples e compostos 
+	--> toda função deve retornar um valor para a TDS no momento TIME atual
+		-->  ex:  function fluxo(t) { t % 2}   ou function fluxo(t) { dado = t % 2  ...(procesamento) ... return dado } 
 			
-			--> processar funções antes dos statements(?)
 
 
-		--> verificar opções extras da porta (link e linked) 			
+----------statements simples--------
+(em geral atribuições, e expressões, varíaveis intermédiarias podem ser usadas para alguma operação de alguma TDS e a  TDS em si ):
+
+
+Cada varíavel que não for TDS será "escrita" de maneira equivalente no MAIN MODULE da saída nuXmv. 
+Varíaveis TDS serão "escrita" de maneira equivalente no PORTS MODULE da saída nuXmv.
+
+
+--> identificar varíaveis comuns, armazenar para caso sejam referênciadas.  (ex: tabela) (ou declarar ela em C dependendo do escopo se for uma função podemos decalrar ela já que o código será executado diretamente)
+
+gera no nuXmv : 
+
+init(variavel):= VALOR;
+
+	
+
+
+--> identificar TDS's (é uma varíavel "diferente" das demais) (armazenar em tabela, já que toda vezes que um TIME variar uma escrita dela será feita no nuXmv)
+
+		 --> verificar integridade das TDS's : sempre tem que ter o nome da porta, 
+			nome de porta não repetida e sempre tem que ter a data-time 
+		
+			tdsA = {
+				portname : 'A'
+				link : tdsC
+				data-time: {0: 0, 1: 1, 2: 0} //(função ou conjunto que define os dados em cada instante de tempo)
+				ou 
+				data-time: function-domain: fluxoPortempo(time,modo,...)
+			}
+
+			os parâmetros das funções são passados para o PORTS MODULE.
+
+			MODULE portsModule(time,modo,...)
+										
+			ou caso não tenha função ou dados ela deve ser alimentada por outra porta(link/linked)
+
+			tdsC = {
+				linked: {tdsA, tdsB} // pode ter como saida tanto A como B
+			}	
+
+		--> caso data-time seja uma função essa deve ser recuperada* ("pré processamento das funções")
+
+		--> toda TDS da gera no instante zero (TIME ZERO NO nuXmv):
+
+			init(b):= NULL;	
+		
+
+	--> verificar opções extras da porta (link e linked, delayed) 			
+			
 			--> link : referência outra porta (fornece dado para ela) ex: A ---sync---> B. tdsA teria link = tdsB
 				--> verificar se referência existe.
 
 			--> linked : utilizada como "relação contrária". ex: A e B ---merger---> C.  tdsC tem linked {A,B}
 			ou seja é uma junção dos conjuntos de dados de A e B, permitindo ter como saída tanto o que já veio de A ou B.
+			
+			link e linked geram respectivamente : 
+					 
+					next(b):=
+						case
+							next(a) != NULL : next(a) ; 
+							TRUE : NULL ;
+						esac;
 
-			--> verificar tds referênciadas existem (após ter identificado todas as TDS's)(?)  		 
-				
+
+					
+					 next(c):=
+						case
+							next(a) = NULL : next(b) ; 
+							next(b) = NULL : next(a) ;  --(somente um de cada vez)
+							TRUE : NULL ;
+						esac;
+
+			--> verificar se tds referênciadas existem 
+
+
+			--> delayed : uma porta linkada por outra só receberia o valor da porta fornecedora NA PROXIMA PASSADA no nuXmv.
+					--> ex: fifo:    A -FIFO---> B.  gera:  
+
+						init(a) = x0 (operação envolvendo x e t)(ou valor definido em t) --x(t)  
+						init(B) = NULL
+						...
+
+						next(a) = xi (operação envolvendo x e t+1)(ou valor definido em t+1)  --x(t+1) 
+
+
+						next(b) = a(x0).  
+
 			--> outras opções (?)	
 
-		--> (!!!!) verificar se o automato utilizado (modelado pelo nuXmv) possui o MESMO DE NÚMERO DE PORTAS QUE AS TDS'S GERADAS PELA LINGUAGEM.
-		    --> ou isso ficaria tudo por conta da linguagem? Ou depende do conector em si? Ou a ideia é ficar genérico o bastante para o usuário especificar quantas portas quiser?
+			Os CASE'S gerados para uma TDS consideram intervalo do TIME passado pelo arquivo nuXmv (?)
+			assim "reiniciando" assim como o Módulo MAIN : 
+
+				ex: modulo main já gerado pelo Reo2nuXmv
+					
+					 ASSIGN 
+    						init(time) := 0;
+    						next(time) := case
+        					time < 4 : time + 1;
+        					TRUE     : 0;
+    					esac;
+		
+
+				 ports module para uma porta:
+
+						next(a):=
+							case
+								time = 0 : 1;
+								time = 1 : 0;
+								time = 4 : 0; -- reset
+								TRUE : NULL;
+							esac;
+				
+
+			--> (!!!!) verificar se o automato utilizado (modelado pelo nuXmv) possui o MESMO DE NÚMERO DE PORTAS QUE AS TDS'S GERADAS PELA LINGUAGEM.
+	    		--> ou isso ficaria tudo por conta da linguagem? Ou depende do conector em si? Ou a ideia é ficar genérico o bastante para o usuário especificar quantas portas quiser?
  		
-
-	--> associar varíaveis usadas pelas TDS's (usar estrutura que inclusive aponte para a TDS já identificada)
-
-	--> se o programa não tiver TDS'S definidas de forma completa e apenas chamadas de funções e atribuições de varíaveis
-	pode-se assumir para facilitar o uso que só se possui UMA porta e que uma varíavel especificada(usando alguma notação) é o valor dessa porta 
-	de forma constante(?) (ou seria melhor limitar o programa a sempre ter que seguir a declaração "completa" de tds)
-		 
+			
 
 
+
+---- statements compostos -------
+
+Equivalências desses serão escritos no nuXmv.
+
+Caso sejam statements função referênciada por uma TDS os statements são escritos no PORTS MODULE.
+
+Caso sejam statements fora serão escritos de maneira equivalente no MAIN MODULE.
+
+	
+---> em relações lógicas (if, else...) 
+	
+	identificar a varíavel que foi alterada ou usada na relação e gerar a equivalência com ASSIGN / CASE no nuXmv
+
+	ex:
+
+		if(modoEntrada == true and time != 0) {
+			dado = t % 2 
+		}
+
+		init(b):= NULL;		
+
+		next(b):=
+			case 
+				modoEntrada = FALSE  & (next(time) mod 2) + 1  > 1  : 0;
+				modoEntrada = FALSE  & (next(time) mod 2) + 1  < 1 : (time mod 2) + 1;
+				modoEntrada = TRUE : (next(time) mod 2); 
+				TRUE : NULL;
+			esac;
+
+
+--> loops:
+
+realizar as operações do loop (alterar valores da varíavel, processar a lógica ou qualquer mudança de varíaveis)
+que vão ser escritas no nuXmv usando os valores desse resultado.
+
+
+
+
+
+----- EXEMPLO--------
+
+
+function fluxoPortempo(tempo , modoEntrada){
+	
+	dado = NULL
+	
+	modoEntrada = !modoEntrada
+
+	if(modoEntrada == true and tempo != 0) {
+		dado = t % 2 
+	}
+	if(modoEntrada == false and tempo != 0) {
+		dado = t % 2 + 1	
+
+	}
+
+	return dado
+
+}
+
+
+modoEntrada = false // pode ser um parâmetro passado para o  programa, por exemplo
+
+
+
+
+tdsA = {
+	portname : 'A'
+	data-time: {0: 0, 1: 1, 2: 0} 
+	link: tdsC
+} 
+	
+tdsB = {
+	portname : 'B'
+	data-time: { function-domain: fluxoPortempo(conjuntoDedados,condicoes,...) } ~
+	link: tdsC
+}
+
+
+
+tdsC = {
+	
+	linked: {tdsA, tdsB} 
+}
+
+
+CONVERTIDO PRO nuXmv: 
+
+As alterações propostas estão comentadas: 
+
+
+MODULE main
+VAR
+    time : 0..4;
+    modoEntrada : boolean; -- adicionou a variavel de controle
+    merger : merger(time,modoEntrada);
+
+ASSIGN 
+    init(time) := 0;
+    init(modoEntrada) := FALSE;  -- adicionou a variavel de controle
+    next(time) := case
+        time < 4 : time + 1;
+        TRUE     : 0;
+    esac;
+
+
+MODULE merger(time, modoEntrada)
+ VAR
+ 
+ cs: {q0};
+ ports : portsModule(time,modoEntrada); 
+ 
+ TRANS
+ ( (cs = q0 & 
+ 	ports.b = NULL & 
+ 	ports.c != NULL & 
+ 	ports.a = ports.c) 
+ 	-> next(cs) = q0 )  
+ & 
+ (( cs = q0 & 
+ 	ports.a = NULL & 
+ 	ports.c != NULL & 
+ 	ports.b = ports.c)  
+ 	-> next(cs) = q0);
+
+
+-- ALTERAÇÃO INTEIRA NO PORTS MODULE
+
+
+MODULE portsModule(time,modoEntrada)
+
+VAR
+ 
+-- cada uma das TDS'S declaradas com o tipo de dado
+a: {0, 1, NULL};
+b: {0, 1, NULL};
+c: {0, 1, NULL}; -- C é a junção dos dados de a e b (nesse caso são iguais) 
+
+modoEntradaEscopo: boolean; -- variavel declarada dentro da função
+
+ASSIGN
+	init(modoEntradaEscopo) := !modoEntrada;
+	init(a):= 0;
+	init(b):= NULL;
+	init(c):= case
+			a = NULL : b ; 
+			b = NULL : a ;
+			TRUE : NULL ;
+			esac; 
+
+	next(modoEntradaEscopo) := !modoEntradaEscopo;
+
+	-- data-time definido por valores do usuário
+	next(a):=
+			case
+				time = 0 : 1;
+				time = 1 : 0;
+				time = 4 : 0; -- reset (considerando o intervalo do MAIN MODULE)
+				TRUE : NULL;
+			esac;
+
+	--data-time definido por função , converte seus statements QUE USAM O dado (o RETORNO DA FUNÇÃO)
+	para atribuições com condições no nuXmv.
+
+	next(b):=
+			case
+				time = 4 : NULL; -- reset (considerando o intervalo do MAIN MODULE)
+				modoEntradaEscopo = FALSE  & (next(time) mod 2) + 1  > 1  : 0;
+				modoEntradaEscopo = FALSE  & (next(time) mod 2) + 1  < 1 : (time mod 2) + 1;
+				modoEntradaEscopo = TRUE : (next(time) mod 2); 
+				TRUE : NULL;
+			esac;			
+
+	-- caso com link e LINKED C não tem função própria ou conjunto definido pelo usuário.
+
+	next(c):=
+			case
+				next(a) = NULL : next(b) ; 
+				next(b) = NULL : next(a) ;
+				TRUE : NULL ;
+			esac;
+
+
+
+
+
+
+	
