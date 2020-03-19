@@ -53,9 +53,13 @@ init(variavel):= VALOR;
 
 		--> caso data-time seja uma função essa deve ser recuperada* ("pré processamento das funções")
 
-		--> toda TDS da gera no instante zero (TIME ZERO NO nuXmv):
+		--> toda TDS gera no instante zero (TIME ZERO NO nuXmv) denro do portmodule:
 
-			init(b):= NULL;	
+			init(b):= VALORINICIAL;	
+
+			--> nos demais casos:
+
+			 next(b) := VALORASSOCIADO;
 		
 
 	--> verificar opções extras da porta (link e linked, delayed) 			
