@@ -82,9 +82,14 @@
 %token <sval> MINUS
 %token <sval> TIMES
 %token <sval> DIVIDE
-%token <sval> ID
+%token <sval> FUNCTIONDOMAIN
 %token <sval> FUNCTION
 %token <sval> LABEL
+%token <sval> DATATIME
+%token <sval> PORTNAME
+%token <sval> LINK
+%token <sval> LINKED
+%token <sval> ID
 
 %type <ast> prog
 %type <ast> cmds
