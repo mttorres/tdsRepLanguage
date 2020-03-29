@@ -66,6 +66,7 @@ xor			            {yylval.sval = strdup(yytext); return XOR;}
 linked              {yylval.sval = strdup(yytext); return LINKED;}
 link                {yylval.sval = strdup(yytext); return LINK;}
 data-time           {yylval.sval = strdup(yytext); return DATATIME;}
+delayed             {yylval.sval = strdup(yytext); return DELAYED;}
 portname            {yylval.sval = strdup(yytext); return PORTNAME;}
 [A-Za-z_]*		      {yylval.sval = strdup(yytext); return ID;}
 

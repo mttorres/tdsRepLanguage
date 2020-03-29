@@ -86,6 +86,7 @@
 %token <sval> FUNCTION
 %token <sval> LABEL
 %token <sval> DATATIME
+%token <sval> DELAYED
 %token <sval> PORTNAME
 %token <sval> LINK
 %token <sval> LINKED
@@ -109,10 +110,8 @@
 %type <ast> ineqexp
 %type <ast> logical
 %type <ast> variabledata
-%type <ast> content
 %type <ast> variableprop
 %type <ast> functioncall 
-%type <ast> paramslistCall 
 %type <ast> paramsCall
 %type <ast> tdsformat
 %type <ast> matchornot
@@ -961,226 +960,70 @@ logical: NOT logical {
 		 
 data: RAWNUMBERDATA {
 	
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Número";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			Node* data = createNode(4,0,1,"Número", $1);	
 			$$ = data;	
-
-
 
 	  }
 	  | BOOLEAN {
 
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Booleano";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			//printf("BOOLEANO \n");
+			Node* data = createNode(4,0,1,"Booleano", $1);	
 			$$ = data;	
-
-
 
 	  }
 	  | Null {
 
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "NULL";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			Node* data = createNode(4,0,1,"NULL", $1);	
 			$$ = data;	
 
-
 	  }
-	  | functioncall {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Dados de chamada de função ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* data = createNode(filhos, nome, NULL ,tamanhofilhos,0);
+	  | LABEL {
+			
+			Node* data = createNode(4,0,1,"LABEL", $1);	
 			$$ = data;	
 
-
 	  }
+
 	  | variabledata {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
+	  	Node* data = createNode(4,1,0,"Dados de tds ou função", $1);	
+		$$ = data;	
 
-			char* nome = "Dados de outras variaveis ou estruturas";
+	  }
 
-			int tamanhofilhos = sizeof(filhos);
+	  | ID extraaccesses {
 
-
-			Node* data = createNode(filhos, nome, NULL ,tamanhofilhos,0);
-			$$ = data;	
-
+			Node* data = createNode(5,1,1,"variáveis simples ou compostas", $2, $1);	
+			$$ = data;		
 
 	  }
 	  ;
 
 
-variabledata: ID {
+
+// diferenciar depoisnumber (index) e number data! (apesar de serem tokens "identicos em teoria")
+// vetores de tds?  avaliar
+extraaccesses : LBRACK RAWNUMBERDATA LBRACK variableprop {
 	
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Variavel";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			$$ = data;	
-
-
-		}
-			| LBRACE content RBRACE {
-
-			char * folhas[] = {
-			 	$1,
-			 	$3,
-				
-			};
-
-			Node * filhos[] = {
-			 	$2,
-				
-			};
-
-			char* nome = "Dados de conteudos/conjuntos ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* variabledata = createNode(filhos, nome, folhas ,tamanhofilhos,tamanhofolhas);
-			//printf("TDS FORMAT! \n");
-			$$ = variabledata;	
-
+			  	 	Node* extraaccesses = createNode(4,1,3,"propriedades extra de variavel composta", $4,  $1,$2,$3);	
+					$$ = extraaccesses;		
 
 			  }
-		| variableprop {
+			  | variableprop {
+			  	 	
+			  	 	Node* extraaccesses = createNode(4,1,0,"propriedades extra de variavel simples", $1);	
+					$$ = extraaccesses;	
+			  }
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Dados de propriedades de um objeto/variavel ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* variabledata = createNode(filhos, nome, NULL ,tamanhofilhos,0);
-			$$ = variabledata;	
-
-
+//! trocar para propriedades da TDS (vai ser vetor e tds as "estruturas dessa linguagem")
+variableprop: POINT tdsprop {
+	
+				Node* variableprop = createNode(6,1,2,"Propriedade de variavel - tdsprop", $3,   $1,$2);
+				$$ = variableprop;   
 
 			}
-		| LABEL {
-			
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "LABEL";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			//printf("LABEL \n");
-			$$ = data;					
-		
-		}
-		;
-
-//! trocar para propriedades da TDS
-variableprop: ID POINT ID {
-	
-
-			char * folhas[] = {
-			 	$1,
-			 	$2,
-			 	$3,
-				
-			};
-
-			char* nome = "Propriedade de variavel";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* variableprop = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			$$ = variableprop;	
-
-
-
-
-			  }
-			  | ID LBRACK expr LBRACK POINT ID {
-
-
-			Node * filhos[] = {
-			 	$3,
-				
-			};			
-
-
-			char * folhas[] = {
-			 	$1,
-			 	$2,
-			 	$4,
-			 	$5,
-			 	$6,
-				
-			};
-
-			char* nome = "Propriedade de variavel de estrutura ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* variableprop = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = variableprop;	
-
-
-		}
-		;
+			| /* empty */  { $$ = NULL;}
+			;
 
 
 
@@ -1212,29 +1055,60 @@ paramsCall: expr {
 	    }
 
 
-//DEAD(!)
-paramslistCall: paramslistCall COMMA expr {
 
-		Node * filhos[] = {
-			 $1,
-			 $3,	 
-		};
 
-		char * folhas[] = {
-    			$2,
-		};		
+tdsprop: functioncall {
 		
-		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
+		Node* prop = createNode(4,1,0,"Props TDS - function", $1);
+		$$ = prop; 	
+	  
+	  }
+	  | PORTNAME {
 
-		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = paramslist; 
-		}
-	    | /* empty */  {printf("nao teve mais (paramslistCall) \n \n"); $$ = NULL;}
-	    ;
+		Node* prop = createNode(4,0,1,"Props TDS - portname", $1);
+		$$ = prop; 	
+
+	  }
+	  | DATATIME {
+
+		Node* prop = createNode(4,0,1,"Props TDS - datatime", $1);
+		$$ = prop; 		  
+
+	  }
+	  | LINK {
+
+		Node* prop = createNode(4,0,1,"Props TDS - link", $1);
+		$$ = prop; 	
+
+	  }
+	  | LINKED {
+
+		Node* prop = createNode(4,0,1,"Props TDS - linked", $1);
+		$$ = prop; 		  
+
+	  }
+	  | DELAYED {
+
+		Node* prop = createNode(4,0,1,"Props TDS - delay", $1);
+		$$ = prop; 	
+
+	  }
 
 
+
+variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COMMA LBRACE dataflow RBRACE COMMA extra RBRACE {
+		
+			Node* tdsformat = createNode(16,2,11,"Informações de TDS", $9,$12,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$11,$13);
+			$$ = tdsformat;
+
+		} 
+	  	| functioncall {
+
+			Node* variabledata = createNode(4,1,0,"Dados de chamada de função", $1);	
+			$$ = variabledata;	
+
+	  	}			  
+		;
 
 	
 condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
@@ -1254,50 +1128,6 @@ matchornot: ELSE LBRACE cmds RBRACE {
 		}
 		| /* empty */  { $$ = NULL;}
 		;
-
-
-
-
-//DEAD(substituir)
-content: content COMMA tdsformat {
-	
-
-			Node * filhos[] = {
-				$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-			};			
-		
-			char* nome = "Conjunto ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* content = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			
-			//printf("CONTEUDO/conjunto DE TDS \n");
-
-			$$ = content;
-			
-		 }
-		 | tdsformat {
-			
-			Node* content = createNode(4,1,0,"TDS", $1);			
-			//printf("formato  DE TDS \n");
-			$$ = content;	
-
-		 }
-		 
-
-tdsformat:  LBRACE PORTNAME COLON LABEL COMMA DATATIME COMMA LBRACE dataflow RBRACE COMMA extra RBRACE {
-		
-	Node* tdsformat = createNode(16,2,11,"Informações de TDS", $9,$12,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$11,$13);
-	$$ = tdsformat;
-
-}
 
 dataflow: LBRACE domain RBRACE  {
 	
