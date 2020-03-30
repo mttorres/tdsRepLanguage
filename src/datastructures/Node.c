@@ -5,28 +5,51 @@
 
 
 
-Node* createNode(Node** children, char* name, char** leafs, int sizechildren, int sizeleafs){
+Node* createNode(int numArgs, ...){
 	
+   Node* current_node = (Node*) malloc(sizeof(Node)); // se por node depois de size childreen ele crasha!? SE TIRAR O PRINT TMB?
 
-	Node* current_node = (Node*) malloc(sizeof(Node)); // se por node depois de size childreen ele crasha!? SE TIRAR O PRINT TMB?
-
-	int nt = sizechildren/sizeof (Node*);
-	int nl = sizeleafs/sizeof (char *);
-		
+   va_list args;
+   va_start(args, numArgs); // (nada)
+   int i;
+   int parametrosInicializacao = 4;
+   
+   current_node->nchild = va_arg(args, int); // 1
+   //printf("arg(1): %d \n",current_node->nchild); 
+   current_node->nleafs = va_arg(args, int); // 2
+   //printf("arg(2): %d \n",current_node->nleafs);   
+   current_node->name = va_arg(args, char*); // 3
+   //printf("arg(3): %s \n",current_node->name);
+   
+   int parametrosFilhos = parametrosInicializacao + current_node->nchild;
+   //printf("parametrosFilhosSTART : %d \n",parametrosFilhos);
+   
 	
-	current_node->nchild = nt;
-	current_node->nleafs = nl;
-
-	if(children){
+	if(current_node->nchild > 0){
+		//printf("CRIANDO FILHOS \n");
+		Node** children = (Node**) malloc(current_node->nchild*sizeof(Node*));
+		int pos = 0;
+		for(i = parametrosInicializacao; i < parametrosFilhos; i++){
+		    children[pos] = va_arg(args, Node*); 
+		    pos++;
+		}
 		current_node->children = children;
 	}
-	if(name){
-		current_node->name = name;
-	}
-	if(leafs){
+
+	if(current_node->nleafs > 0){
+		//printf("CRIANDO FOLHAS \n");
+		char** leafs = (char**) malloc(current_node->nleafs*sizeof(char*));
+		int pos = 0;
+		for(i = parametrosFilhos; i <= numArgs; i++){
+		    
+		    leafs[pos] = va_arg(args, char*); 
+		    pos++;
+		}		
 		current_node->leafs = leafs;
 		
 	}
+	
+	va_end(args);
 
 	return current_node;
 }
@@ -86,11 +109,10 @@ void letgoNode(Node* n){
 		for(i=0; i < n->nchild; i++){
 			letgoNode(n->children[i]);
 		}
+		free(n->children);
 	}
 	if(n->leafs){
-		for(i=0; i < n->nleafs; i++){
-			free(n->leafs[i]);
-		}
+		free(n->leafs);
 	}	
 	free(n);
 }

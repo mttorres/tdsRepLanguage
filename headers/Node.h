@@ -11,11 +11,11 @@ typedef struct astnode
 }Node;
 
 
-Node* createNode(Node** children, char* name, char** leafs, int sizechildren, int sizeleafs);
+Node* createNode(int numArgs, ...);
 
 void printNode(Node* n);
 
-void letgoNode(Node *);
+void letgoNode(Node* n);
 
 
 
