@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include "../../headers/Node.h"
 
 
@@ -58,13 +59,13 @@ Node* createNode(int numArgs, ...){
 void printNode(Node* n){	
 
 	int info = n != NULL;
-	printf("info: - %d \n",info);		
+	//printf("info: - %d \n",info);		
 	if(info) {
-		printf("!! \n");			
-		printf("NODE: - %s \n",n->name);
+		//printf("!! \n");			
+		printf("NODE: - %s \n\n",n->name);
 		int i = 0;
 		if(n->children){
-			printf("--------------CHILDREN: \n");
+			printf("--------------CHILDREN: \n\n");
 			for(i= 0; i < n->nchild; i++){
 				if(n->children[i]) {
 					printNode(n->children[i]);
@@ -77,19 +78,19 @@ void printNode(Node* n){
 			printf("------------END CHILDREN--------------- \n");
 		}
 		if(n->leafs) {
-			printf("---------------NOT-TERMINAL: \n");
+			printf("---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   printf(" --> %s \n",n->leafs[i]);
 			}
-			printf("------------END NOT-TERMINAL--------------- \n");
+			printf("------------END TERMINAL--------------- \n\n");
 		}
-		printf("-----------------------------------------------\n");
+		printf("-----------------------------------------------\n\n");
 	}
 }
 
 void infoNode(Node* n){
 	if(n){
-		printf("-------------INFO---------------\n");
+		printf("-------------INFO---------------\n\n");
 		printf("NODE: - %s \n",n->name);
 		printf("nChild: - %d  ref: %d \n",n->nchild,n->children != NULL);
 		printf("nLeafs: - %d  ref: %d \n",n->nleafs,n->leafs != NULL);

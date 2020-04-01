@@ -104,7 +104,6 @@
 %type <ast> mreturn
 %type <ast> data
 %type <ast> otherstmt
-%type <ast> assignment
 %type <ast> expr
 %type <ast> multiexp
 %type <ast> ineqexp
@@ -113,14 +112,15 @@
 %type <ast> variableprop
 %type <ast> functioncall 
 %type <ast> paramsCall
-%type <ast> tdsformat
 %type <ast> matchornot
 %type <ast> extraaccesses
 %type <ast> extra
 %type <ast> dataflow
+%type <ast> tdsprop
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
+%type <ast> linked
 
 %left ELSE
 %left MULT DIV MINUS PLUS LE GE GT LT EQ NE
@@ -157,7 +157,7 @@ prog: functiondefs cmds  {
 	  }
 	  | cmds {
 
-		Node* prog = createNode(5,1,0,"Prog -  comandos ", $1);	  
+		Node* prog = createNode(4,1,0,"Prog -  comandos ", $1);	  
 	  	$$ = prog; 
 	  	root = $$;
 	  } 
@@ -207,7 +207,7 @@ functiondefs: functiondefs functiondef {
 
 functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 
-			Node* functiondef = createNode(12,3,5,"Functiondef -  definição de função ", $4,$7,$8 , $1,$2,$3,$5,$6,$9);
+			Node* functiondef = createNode(11,2,6,"Functiondef -  definição de função ", $4,$7, $1,$2,$3,$5,$6,$8);
 			//printf("DEFINICAO DE FUNÇÃO \n");
 			$$ = functiondef; 
 			//infoNode($$);
@@ -215,7 +215,7 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 		}
 		| FUNCTION ID LPAREN RPAREN LBRACE functionbody  RBRACE  {
 
-			Node* functiondef = createNode(11,2,5,"Functiondef -  definição de procedimento ", $7,$8 , $1,$2,$3,$5,$6,$9);
+			Node* functiondef = createNode(10,1,6,"Functiondef -  definição de procedimento ", $6, $1,$2,$3,$4,$5,$7);
 			//printf("DEFINICAO DE FUNÇÃO \n");
 			$$ = functiondef; 
 			//infoNode($$);
@@ -249,7 +249,7 @@ mreturn: expr {
 
 optionalreturn: RETURN expr {
 
-		Node* optionalreturn = createNode(5,1,1,"Optionalreturn -  retorno opcional ", $1, $2);
+		Node* optionalreturn = createNode(5,1,1,"Optionalreturn -  retorno opcional ", $2, $1);
 		$$ = optionalreturn; 
 
 		//printf("RETORNO \n");
@@ -293,6 +293,39 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	 ;
 
 
+
+paramsCall: expr {
+		
+			Node* paramsCall = createNode(4,1,0,"Params -  parametro da chamada de função ", $1);
+			$$ = paramsCall; 		
+
+		}
+	    | paramsCall COMMA expr {
+			
+			Node* paramsCall = createNode(6,2,1,"Params -  parametro(s)  da chamada de função LOOP", $1,$3, $2);
+			$$ = paramsCall; 	
+	    }
+
+
+
+functioncall: ID LPAREN paramsCall RPAREN {
+	
+				Node* functioncall = createNode(7,1,3,"Chamada de função", $3,  $1,$2,$4);
+				$$ = functioncall;		
+
+			}
+			| ID LPAREN RPAREN {
+				
+				Node* functioncall = createNode(6,0,3,"Chamada de função", $1,$2,$3);
+				$$ = functioncall;				
+			
+			}
+
+
+
+
+
+
 otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 	
 		Node* otherstmt = createNode(12,3,6,"Otherstmt(for) -  comandos diferente de if e else ",   $4,$6,$9,  $1,$2,$3,$5,$7,$8);
@@ -311,7 +344,7 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 	 }
 	 | ID extraaccesses ASSIGN expr {
 		
-		Node* assignment = createNode(7,2,2,"Assignment(simples) -  atribuição de variavel  ", $1,$3,  $2,$4);
+		Node* assignment = createNode(7,2,2,"Assignment(simples) -  atribuição de variavel  ", $2,$4, $1,$3);
 		$$ = assignment;	
 
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
@@ -445,7 +478,7 @@ logical: NOT expr {
 		 }
 		 | data {
 
-		 	$$ = $1
+		 	$$ = $1;
 
 		 }
 		 ;
@@ -504,7 +537,7 @@ data: RAWNUMBERDATA {
 // vetores de tds?  avaliar
 extraaccesses : LBRACK expr LBRACK variableprop {
 	
-			  	 	Node* extraaccesses = createNode(4,2,3,"propriedades extra de variavel composta", $2,$4,  $1,$3);	
+			  	 	Node* extraaccesses = createNode(7,2,2,"propriedades extra de variavel composta", $2,$4,  $1,$3);	
 					$$ = extraaccesses;		
 
 			  }
@@ -515,43 +548,16 @@ extraaccesses : LBRACK expr LBRACK variableprop {
 			  }
 
 //! trocar para propriedades da TDS (vai ser vetor e tds as "estruturas dessa linguagem")
+
 variableprop: POINT tdsprop {
 	
-				Node* variableprop = createNode(6,1,2,"Propriedade de variavel - tdsprop", $3,   $1,$2);
+				Node* variableprop = createNode(5,1,1,"Propriedade de variavel - tdsprop", $2,   $1);
 				$$ = variableprop;   
 
 			}
 			| /* empty */  { $$ = NULL;}
 			;
 
-
-
-
-functioncall: ID LPAREN paramsCall RPAREN {
-	
-				Node* functioncall = createNode(7,1,3,"Chamada de função", $3,  $1,$2,$4);
-				$$ = functioncall;		
-
-			}
-			| ID LPAREN RPAREN {
-				
-				Node* functioncall = createNode(6,0,3,"Chamada de função", $1,$2,$3);
-				$$ = functioncall;				
-			
-			}
-
-
-paramsCall: expr {
-		
-			Node* paramsCall = createNode(4,1,0,"Params -  parametro da chamada de função ", $1);
-			$$ = paramsCall; 		
-
-		}
-	    | paramsCall COMMA expr {
-			
-			Node* paramsCall = createNode(6,2,1,"Params -  parametro(s)  da chamada de função LOOP", $1,$3, $2);
-			$$ = paramsCall; 	
-	    }
 
 
 
@@ -595,11 +601,17 @@ tdsprop: functioncall {
 
 
 
-variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COMMA LBRACE dataflow RBRACE COMMA extra RBRACE {
+variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extra RBRACE {
 		
-			Node* tdsformat = createNode(16,2,11,"Informações de TDS", $9,$12,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$11,$13);
+			Node* tdsformat = createNode(15,2,10,"Informações de TDS", $9,$11,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$12);
 			$$ = tdsformat;
 
+		}
+		| LBRACE PORTNAME COLON LABEL linked extra RBRACE {
+			
+			Node* tdsformat = createNode(10,2,5,"Informações de TDS", $5,$6,  $1,$2,$3,$4,$7);
+			$$ = tdsformat;
+		
 		} 
 	  	| functioncall {
 
@@ -621,10 +633,12 @@ matchornot: ELSE LBRACE cmds RBRACE {
 		| /* empty */  { $$ = NULL;}
 		;
 
-dataflow: LBRACE domain RBRACE  {
+
+
+dataflow:  domain   {
 	
 	// evita conflitos (nó a mais porem evita)
-	Node* dataflow = createNode(4,1,0,"dataflow-TDS", $1,$3, $2);
+	Node* dataflow = createNode(4,1,0,"dataflow-TDS", $1);
 	$$ = dataflow; 	
 }
 
@@ -635,9 +649,9 @@ domain: timelist {
 			$$ = domain;    
 
 		}
-		| FUNCTIONDOMAIN COLON functionCall {
+		| FUNCTIONDOMAIN COLON functioncall {
 
-			Node* domain = createNode(6,1,2,"DOMAIN-TDS-func", $1,$2, $3);
+			Node* domain = createNode(6,1,2,"DOMAIN-TDS-func", $3, $1,$2);
 			$$ = domain;    
 
 		}
@@ -660,23 +674,27 @@ timelist: timecomponent {
 
 		  |timelist COMMA timecomponent {
 
-			Node* timelist = createNode(6,2,1,"TIME-LIST-TDS-loop", $1,$3, $2 );
+			Node* timelist = createNode(6,2,1,"TIME-LIST-TDS-loop", $1,$3,  $2 );
 			$$ = timelist;		  		  
 
 		  }
 
 
-extra : LINK COLON ID {
-	
-			Node* extra = createNode(6,0,3,"LINK-EXTRA-ARGS-TDS", $1,$2,$3);
-			$$ = extra;
-	   }
-	   | LINKED LBRACE params RBRACE {
-	   	 	Node* extra = createNode(7,1,3,"LINKED-EXTRA-ARGS-TDS",$3, $1,$2,$4);
+
+linked:	COMMA LINKED COLON LBRACE params RBRACE {
+	   	 	
+	   	 	Node* extra = createNode(9,1,5,"LINKED-EXTRA-ARGS-TDS",$5, $1,$2,$3,$4,$6);
 	   	 	$$ = extra;
 	   }
-	   | DELAYED COLON BOOLEAN {
-	   		Node* extra = createNode(6,0,3,"DELAYED-EXTRA-ARGS-TDS", $1,$2,$3);
+
+
+extra : COMMA LINK COLON ID {
+	
+			Node* extra = createNode(6,0,4,"LINK-EXTRA-ARGS-TDS", $1,$2,$3,$4);
+			$$ = extra;
+	   }
+	   | COMMA DELAYED COLON BOOLEAN {
+	   		Node* extra = createNode(6,0,4,"DELAYED-EXTRA-ARGS-TDS", $1,$2,$3,$4);
 	   		$$ = extra;
 	   }
 	   | /* empty */ {  $$ = NULL;}

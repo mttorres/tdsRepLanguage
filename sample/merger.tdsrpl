@@ -10,7 +10,24 @@ nomeB = 'B'
 nomeC = 'C'
 numeroPortas = 3
 
-tdsnamesOutrasPortas = {(dadoA,i,nomeA), (dadoA,i+1,nomeB)}
 
-// C recebe B (na vez de B) !
-tdsnamesNext = processMergeTDS(tdsnamesOutrasPortas,i+1,nomeC,numeroPortas)
+modoEntrada = false 
+
+tdsA = {
+	portname  : 'A',
+	data-time : {0: 'cadeia', 1: 'de', 2: 'dados'} } 
+	
+tdsB = {
+	portname : 'B',
+	data-time : { function-domain: fluxoPortempo(conjuntoDedados,condicoes) },  
+	link: tdsC
+}
+
+
+
+tdsC = {
+	portname : 'C',
+	linked : {tdsA, tdsB} }
+
+
+
