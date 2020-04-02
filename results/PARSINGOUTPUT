@@ -1,7 +1,105 @@
-                                                     --------------TREE--------------------
-NODE: - Prog -  comandos  
+                                                            --------------TREE--------------------
+NODE: - Prog -  comandos e definições de função 
 
 --------------CHILDREN: 
+
+NODE: - Functiondef -  definição de função  
+
+--------------CHILDREN: 
+
+NODE: - Params -  parametro(s)  da definição de função 
+
+---------------TERMINAL: 
+
+ --> modoEntrada 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+NODE: - Functionbody - função matemática  
+
+--------------CHILDREN: 
+
+NODE: - retorno - função matemática  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - soma  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - inequações/lógicas  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - TIME-DIRECTIVE 
+
+---------------TERMINAL: 
+
+ --> F_TIME 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Expressão Básica - inequações/lógicas  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - Número 
+
+---------------TERMINAL: 
+
+ --> 30 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> + 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> function 
+ --> fluxoPortempo 
+ --> ( 
+ --> ) 
+ --> { 
+ --> } 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
 
 NODE: - Cmds -  comando(s) 
 
@@ -812,7 +910,7 @@ NODE: - Chamada de função
 
 --------------CHILDREN: 
 
-NODE: - Params -  parametro(s)  da chamada de função LOOP 
+NODE: - ParamsOpcional -  parametros são utilizados 
 
 --------------CHILDREN: 
 
@@ -843,7 +941,7 @@ NULL
 ------------END CHILDREN--------------- 
 ---------------TERMINAL: 
 
- --> conjuntoDedados 
+ --> modoEntrada 
 ------------END TERMINAL--------------- 
 
 -----------------------------------------------
@@ -857,46 +955,7 @@ NULL
 ------------END CHILDREN--------------- 
 -----------------------------------------------
 
-NODE: - Expressão Básica - inequações/lógicas  
-
---------------CHILDREN: 
-
-NODE: - Expressão Básica - Lógica 
-
---------------CHILDREN: 
-
-NODE: - variáveis simples ou compostas 
-
---------------CHILDREN: 
-
-NODE: - propriedades extra de variavel simples 
-
---------------CHILDREN: 
-
-NULL 
 ------------END CHILDREN--------------- 
------------------------------------------------
-
-------------END CHILDREN--------------- 
----------------TERMINAL: 
-
- --> condicoes 
-------------END TERMINAL--------------- 
-
------------------------------------------------
-
-------------END CHILDREN--------------- 
------------------------------------------------
-
-------------END CHILDREN--------------- 
------------------------------------------------
-
-------------END CHILDREN--------------- 
----------------TERMINAL: 
-
- --> , 
-------------END TERMINAL--------------- 
-
 -----------------------------------------------
 
 ------------END CHILDREN--------------- 

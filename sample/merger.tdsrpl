@@ -1,4 +1,11 @@
 //DADOS DEFINIDOS PELO USUARIO
+function fluxoPortempo(modoEntrada){
+	
+    F_TIME + 30
+
+}
+
+
 i = 0
 dadoA = 0
 dadoB = 1
@@ -9,9 +16,8 @@ nomeA = 'A'
 nomeB = 'B'
 nomeC = 'C'
 numeroPortas = 3
-
-
 modoEntrada = false 
+
 
 tdsA = {
 	portname  : 'A',
@@ -19,7 +25,7 @@ tdsA = {
 	
 tdsB = {
 	portname : 'B',
-	data-time : { function-domain: fluxoPortempo(conjuntoDedados,condicoes) },  
+	data-time : { function-domain: fluxoPortempo(modoEntrada) },  
 	link: tdsC
 }
 
