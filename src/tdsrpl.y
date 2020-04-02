@@ -7,15 +7,9 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
-  #include "../headers/Enum.h"	
-  #include "../headers/STable.h"
-  #include "../headers/constants.h"
   #include "../headers/Node.h"	
 
   int yylex(void);
-  FILE *fp1;   //AST
-  FILE *fp2;  //(scope) - Stable
-
   int yyparse();
   FILE *yyin;
 
@@ -23,6 +17,11 @@
   Node* root;
  
   void yyerror(const char *s);
+
+  void yyerror(const char *s) {
+  printf("Erro de parsing! %s \n",s);
+  exit(-1);
+}
 
   //typedef enum {false, true} BOOLEANO;
 
@@ -82,40 +81,49 @@
 %token <sval> MINUS
 %token <sval> TIMES
 %token <sval> DIVIDE
-%token <sval> ID
+%token <sval> FUNCTIONDOMAIN
 %token <sval> FUNCTION
 %token <sval> LABEL
+%token <sval> DATATIME
+%token <sval> DELAYED
+%token <sval> PORTNAME
+%token <sval> LINK
+%token <sval> LINKED
+%token <sval> TIME
+%token <sval> ID
 
 %type <ast> prog
 %type <ast> cmds
 %type <ast> cmd
 %type <ast> functiondefs 
 %type <ast> functiondef
-%type <ast> paramsoptional 
-%type <ast> paramslist 
+%type <ast> functionbody 
 %type <ast> params  
 %type <ast> optionalreturn
+%type <ast> paramsOpcional
+%type <ast> mreturn
 %type <ast> data
-%type <ast> condstmt
 %type <ast> otherstmt
-%type <ast> assignment
 %type <ast> expr
 %type <ast> multiexp
 %type <ast> ineqexp
 %type <ast> logical
 %type <ast> variabledata
-%type <ast> content
 %type <ast> variableprop
-%type <ast> functioncall
-%type <ast> paramsoptionalCall   
-%type <ast> paramslistCall 
+%type <ast> functioncall 
 %type <ast> paramsCall
-%type <ast> tdsformat
 %type <ast> matchornot
-
+%type <ast> extraaccesses
+%type <ast> extra
+%type <ast> dataflow
+%type <ast> tdsprop
+%type <ast> domain
+%type <ast> timelist
+%type <ast> timecomponent
+%type <ast> linked
 
 %left ELSE
-%left MULT DIV MINUS PLUS LE GE GT LT EQ NE
+%left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
 
 %start prog
@@ -129,228 +137,120 @@
 
 prog: functiondefs cmds  {
 		
-		Node * filhono[] = {
-			 $1,
-			 $2,
-		};
-
-		printf("END1: %d \n \n",&filhono[0]);
-
-		char* nome = "Prog -  comandos ou definições de função";
-		int tamanhofilhos = sizeof(filhono);
-		Node* prog = createNode(filhono, nome,NULL,tamanhofilhos,0);	
+		Node* prog = createNode(5,2,0,"Prog -  comandos e definições de função", $1,$2);
+		
 		//printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n",prog->name,prog->children[1]->name ,prog->children[0] == NULL,prog->nchild); 	
 
-		printf("nome :(%s) (ref : %d) \n \n \n",$2->name,$2->children[0] != NULL); 
+		//printf("nome :(%s) (ref : %d) \n \n \n",$2->name,$2->children[0] != NULL); 
 
-		printf("END2: %d \n \n",prog->children);
-
-		$$ = prog; 
-		root = $$;
-		infoNode($$);
+		//printf("END2: %d \n \n",prog->children);
+		
+		//infoNode($$);
 
 		//printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n \n",prog->name,prog->children[1]->name ,prog->children[1] == NULL,prog->nchild);
 
 		//printf("nome :(%s) (ref : %d) \n \n \n",$$->children[1]->name,$$->children[1]->children[0] != NULL); 
+
+		$$ = prog; 
+		root = $$;
+
+	  }
+	  | cmds {
+
+		Node* prog = createNode(4,1,0,"Prog -  comandos ", $1);	  
+	  	$$ = prog; 
+	  	root = $$;
 	  } 
-      	  | /* empty */ {printf("nao teve mais (prog) \n \n"); $$ = NULL;}
-      	  ; 
+      ; 
 
 
 cmds: cmds cmd {
 		
-		Node * filhos[] = {
-			 $1,
-			 $2,
-		};
-		char* nome = "Cmds -  comando(s)";
-		int tamanhofilhos = sizeof(filhos);
-		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
+	  	Node* cmds = createNode(5,2,0,"Cmds -  comando(s)", $1,$2);
 		//printf("%s (%s) (%s) (filhos: %d)\n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
 		$$ = cmds; 
-		infoNode($$);
+		//infoNode($$);
 
 	  } 
 	  | cmd {
 		
-		Node** filhos;
-
-		filhos = (Node*) malloc(sizeof(Node*));
-
-		filhos[0] = $1;
 		
-		char* nome = "Cmds -  comando(s)(REPASSA)";
-		int tamanhofilhos = sizeof(filhos);
+	    $$ = $1; 
 
-		Node* cmds = createNode(filhos, nome,NULL,tamanhofilhos,0);
 		//printf("%s (%s) (filhos: %d) \n \n",cmds->name,cmds->children[0]->name,cmds->nchild);
-		$$ = cmds; 	
+			
 
-		printf("END1(CMDS): %d \n \n",&filhos);
+		//printf("END1(CMDS): %d \n \n",&filhos);
 
-		printf("END2(CMDS): %d \n \n",cmds->children);
+		//printf("END2(CMDS): %d \n \n",cmds->children);
 
-		infoNode($$);
+		//infoNode($$);
 
-		printf("nome :(%s) (ref : %d) \n \n \n",$$->name,$$->children[0] != NULL); 
+		//printf("nome :(%s) (ref : %d) \n \n \n",$$->name,$$->children[0] != NULL); 
 						
 	  } 	
-	  | /* empty */  {
-		printf("nao teve mais (cmds) \n \n"); 
-		$$ = NULL;
-	  }
 	  ;	
 
 functiondefs: functiondefs functiondef {
 		
-		Node * filhos[] = {
-			 $1,
-			 $2,
-		};
-		char* nome = "Functiondefs -  definição(ões) de função ";
-		int tamanhofilhos = sizeof(filhos);
-		Node* functiondefs = createNode(filhos, nome,NULL,tamanhofilhos,0);
+	  	Node* functiondefs = createNode(5,2,0,"Functiondefs -  definição(ões) de função - loop", $1,$2);
 		$$ = functiondefs; 
 		//printf("iniciando definição de função \n");
-		infoNode($$);
+		//infoNode($$);
 
 	  }
 	  |  functiondef {
 	  	
-		$$ = $1; 	
+		   $$ = $1; 	
 	  }  
-	  | /* empty */  {printf("nao teve mais (functionsdefs) \n \n"); $$ = NULL;}
 	  ; 	
 
+functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 
-functiondef: FUNCTION ID LPAREN paramsoptional RPAREN LBRACE cmds optionalreturn RBRACE  {
-
-		Node * filhos[] = {
-			 $4,
-			 $7,
-			 $8,
-		};
-
-
-		char * folhas[] = {
-    			$1,
-    			$2,
-    			$3,
-    			$5,
-    			$6,
-    			$9,
-
-		};
-
-		char* nome = "Functiondef -  definição de função ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* functiondef = createNode(filhos, nome,folhas,tamanhofilhos,tamanhofolhas);
-		//printf("DEFINICAO DE FUNÇÃO \n");
-		$$ = functiondef; 
-		infoNode($$);
-}
-;
-
-paramsoptional: params {
-
+			Node* functiondef = createNode(11,2,6,"Functiondef -  definição de função ", $4,$7, $1,$2,$3,$5,$6,$8);
+			//printf("DEFINICAO DE FUNÇÃO \n");
+			$$ = functiondef; 
+			//infoNode($$);
 		
-		Node * filhos[] = {
-			 $1,
-		};
-		
-		char* nome = "Paramsoptional -  parametro(s) opcionais da definição de função ";
-		int tamanhofilhos = sizeof(filhos);
-		Node* paramsoptional = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		$$ = paramsoptional; 
+		}
+		| FUNCTION ID LPAREN RPAREN LBRACE functionbody  RBRACE  {
+
+			Node* functiondef = createNode(10,1,6,"Functiondef -  definição de procedimento ", $6, $1,$2,$3,$4,$5,$7);
+			//printf("DEFINICAO DE FUNÇÃO \n");
+			$$ = functiondef; 
+			//infoNode($$);
 
 		}
 
-		| /* empty */  {printf("nao teve mais (paramsoptional) \n \n"); $$ = NULL;}
-		;
-
-params:	ID paramslist {
-
 		
-		char * folhas[] = {
-    			$1,
-    		
-		};
+;
 
 
-		Node * filhos[] = {
-			 $2,
-		};
-		
-		char* nome = "Params -  parametro(s)  da definição de função ";
+functionbody: cmds optionalreturn {
+	
+	  		Node* functionbody = createNode(5,2,0,"Functionbody - função composta/programa ", $1,$2);
+			$$ = functionbody; 
+			
+		}
+		| mreturn {
 
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-		
-		Node* params = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		
-		$$ = params; 
-	    }
-	    | /* empty */  {printf("nao teve mais(params) \n \n"); $$ = NULL;}
-	    ;
+			Node* functionbody = createNode(6,1,0,"Functionbody - função matemática ", $1);
+			$$ = functionbody; 
+		}
 
-paramslist: paramslist COMMA ID {
 
-		Node * filhos[] = {
-			 $1,	 
-		};
 
-		char * folhas[] = {
-    			$2,
-    			$3,
-		};		
-		
-		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = paramslist; 
-	    }
-	    | COMMA ID {
-	    	
-		char * folhas[] = {
-    			$1,
-    			$2,
-		};		
-		
-		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
-		int tamanhofilhos = 0;
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* paramslist = createNode(NULL, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = paramslist; 
-	    }
-	    | /* empty */  { printf("nao teve mais (paramslist) \n \n"); $$ = NULL;}
-	    ;
-
+mreturn: expr {
+	
+			Node* mreturn = createNode(6,1,0,"retorno - função matemática ", $1);
+			$$ = mreturn; 	
+}
 
 
 optionalreturn: RETURN expr {
 
-		
-		Node * filhos[] = {
-			 $2,
-		};
-
-		char * folhas[] = {
-    			$1,
-		};			
-		
-		char* nome = "Optionalreturn -  retorno opcional ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* optionalreturn = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = optionalreturn;
+		Node* optionalreturn = createNode(5,1,1,"Optionalreturn -  retorno opcional ", $2, $1);
+		$$ = optionalreturn; 
 
 		//printf("RETORNO \n");
 		
@@ -359,1062 +259,449 @@ optionalreturn: RETURN expr {
 	    ;
 
 
-cmd: condstmt {
-	
-		Node * filhos[] = {
-			 $1,
-		};
+
+
+params: ID {
 		
-		char* nome = "CMD -  Comando (condstatement) ";
+			Node* params = createNode(4,0,1,"Params -  parametro(s)  da definição de função", $1);
+			$$ = params; 		
 
-		int tamanhofilhos = sizeof(filhos);
+		}
+	    | params COMMA ID {
+			
+			Node* params = createNode(6,1,2,"Paramslist - lista de parâmetros a mais de uma função ", $1, $2,$3);
+			$$ = params; 	
+	    }
+
+
+
+
+cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	
-
-		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		//printf("comando(cond) \n");
-		$$ = cmd; 
-		infoNode($$);
+		Node* condstmt = createNode(11,3,5,"cmd - Condicional - IF", $3,$6,$8 , $1,$2,$4,$5,$7);	
+		$$ = condstmt;
+		//printf("CMD -  IF\n");
 	  
-	  }
+	 }
 	 | otherstmt {
 
-		Node** filhos;
-
-		filhos = (Node**) malloc(sizeof(Node*));
-
-		filhos[0] = $1;
-
-		char* nome = "CMD -  Comando (otherstatement) ";
-
-		int tamanhofilhos = sizeof(filhos);
-	
-		Node* cmd = createNode(filhos, nome, NULL,tamanhofilhos,0);
+		Node* cmd = createNode(4,1,0,"CMD -  Comando (otherstatement)", $1); 
+		//infoNode($$);
 		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
 		$$ = cmd; 		
-		infoNode($$);
-
-
 	 }
 	 ;
 
 
-otherstmt: FOR assignment TO expr DO COLON cmds {
+paramsOpcional: paramsCall {
+
+		Node* paramsCall = createNode(4,1,0,"ParamsOpcional -  parametros são utilizados", $1);
+		$$ = paramsCall; 
+
+	}
+	| /* empty */ {  $$ = NULL;}
+
+
+paramsCall: expr {
+		
+			Node* paramsCall = createNode(4,1,0,"Params -  parametro da chamada de função ", $1);
+			$$ = paramsCall; 		
+
+		}
+	    | paramsCall COMMA expr {
+			
+			Node* paramsCall = createNode(6,2,1,"Params -  parametro(s)  da chamada de função LOOP", $1,$3, $2);
+			$$ = paramsCall; 	
+	    }
+
+
+
+functioncall: ID LPAREN paramsOpcional RPAREN {
 	
-		Node * filhos[] = {
-			 $2,
-			 $4,
-			 $7,
-		};
+				Node* functioncall = createNode(7,1,3,"Chamada de função", $3,  $1,$2,$4);
+				$$ = functioncall;		
 
-		char * folhas[] = {
-    			$1,
-    			$3,
-			$5,
-			$6,
-		};			
-		
-		char* nome = "Otherstmt(for) -  comandos diferente de if e else ";
+			}
 
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
 
-		
-		
-		Node* otherstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+
+
+
+
+otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
+	
+		Node* otherstmt = createNode(12,3,6,"Otherstmt(for) -  comandos diferente de if e else ",   $4,$6,$9,  $1,$2,$3,$5,$7,$8);
 		$$ = otherstmt; 
-
 		//printf("CMD - NAO IF/ELSE \n",otherstmt->name);
-		infoNode($$);
+		//infoNode($$);
 
 
 	 }
 	 | functioncall {
 
-		Node** filhos;
-
-		filhos = (Node**) malloc(sizeof(Node*));
-
-		filhos[0] = $1;
-
-		char* nome = "Otherstmt(functioncall) -  comandos diferente de if e else ";
-
-		int tamanhofilhos = sizeof(filhos);
-
-
-		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		$$ = otherstmt;
-		infoNode($$);
+		Node* otherstmt = createNode(4,1,0,"Otherstmt(functioncall) -  comandos diferente de if e else ", $1);
+		$$ = otherstmt; 
+		//infoNode($$);
 
 	 }
-	 | assignment {
-
-		Node** filhos;
-
-		filhos = (Node**) malloc(sizeof(Node*));
-
-		filhos[0] = $1;
-
-		char* nome = "Otherstmt(assignment) -  comandos diferente de if e else ";
-
-		int tamanhofilhos = sizeof(filhos);
-
-
-		Node* otherstmt = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		//printf("%s (%s) - (filhos: %d) \n \n",otherstmt->name, otherstmt->children[0]->name,otherstmt->nchild);
-		$$ = otherstmt;
-		infoNode($$);
+	 | ID extraaccesses ASSIGN expr {
 		
+		Node* assignment = createNode(7,2,2,"Assignment(simples) -  atribuição de variavel  ", $2,$4, $1,$3);
+		$$ = assignment;	
+
+		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+		//infoNode($$);
 
 	 }
 	 ;
-
-
-assignment: ID ASSIGN expr {
-		
-		Node * filhos[] = {
-			 $3,
-		};
-
-		char * folhas[] = {
-    			$1,
-    			$2,
-		};			
-		
-		char* nome = "Assignment(simples) -  atribuição de variavel  ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
-		$$ = assignment; 
-		infoNode($$);
-
-	 }
-	 | ID LBRACK expr RBRACK ASSIGN expr {
-
-		Node * filhos[] = {
-			 $3,
-			 $6,
-		};
-
-		char * folhas[] = {
-    			$1,
-    			$2,
-    			$4,
-    			$5,
-		};			
-		
-		char* nome = "Assignment(estrutura/conjunto de dados) -  atribuição de ED/conjunto de dados  ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = assignment; 
-
-
-	 }
-	 | ID POINT ID ASSIGN expr {
-
-		Node * filhos[] = {
-			 $5,
-		};
-
-		char * folhas[] = {
-    			$1,
-    			$2,
-    			$3,
-    			$4,
-		};			
-		
-		char* nome = "Assignment(propriedade de variavel/objeto) -  atribuição a uma propriedade  ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* assignment = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = assignment;
-	 }
-	 ; 
-
-
 
 
 expr: MINUS expr {
 	
-		Node * filhos[] = {
-			 $2,
-		};
-
-		char * folhas[] = {
-    			$1,
-
-		};			
-		
-		char* nome = "Expressão Básica - negativo";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* expr = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = expr;	
+		Node* expr = createNode(5,1,1,"Expressão Básica - negativo", $2,  $1);
+		$$ = expr;		
 
 
 	 }
-	 | expr MINUS expr {
-
-		Node * filhos[] = {
-			 $1,
-			 $3,
-		};
-
-		char * folhas[] = {
-    			$2,
-
-		};			
+	 | expr MINUS multiexp {
 		
-		char* nome = "Expressão Básica - subtração ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* expr = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = expr;		 
-
-
-
+		Node* expr = createNode(6,2,1,"Expressão Básica - subtração ", $1,$3,  $2);
+		$$ = expr;			
 
 	 }
-	 | expr PLUS expr {
+	 | expr PLUS multiexp {
 
-		Node * filhos[] = {
-			 $1,
-			 $3,
-		};
-
-		char * folhas[] = {
-    			$2,
-
-		};			
+		Node* expr = createNode(6,2,1,"Expressão Básica - soma ", $1,$3,  $2);
+		$$ = expr;						
 		
-		char* nome = "Expressão Básica - soma ";
-
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* expr = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = expr;	
-
 
 	 }
 	 | multiexp {
 
-		Node * filhos[] = {
-			 $1,
-		};
-
-		
-		char* nome = "Expressão Básica ";
-
-		int tamanhofilhos = sizeof(filhos);
-		
-
-		Node* expr = createNode(filhos, nome, NULL, tamanhofilhos,0);
-		$$ = expr;	
+		$$ = $1;	
 
 	 }
 	 ;
 
 
-multiexp: multiexp TIMES expr {
+multiexp: multiexp TIMES ineqexp {
 	
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-	
-			};			
+			Node* multiexp = createNode(6,2,1,"Expressão Básica - Multiplicação", $1,$3,  $2);
+			$$ = multiexp;					
 		
-			char* nome = "Expressão Básica - Multiplicação ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* multiexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = multiexp;	
-
 
 		}
-		|multiexp DIVIDE expr {
-
-			Node * filhos[] = {
-				 $1,
-				 $3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
+		|multiexp DIVIDE ineqexp {
+	
+			Node* multiexp = createNode(6,2,1,"Expressão Básica - Divisão ", $1,$3,  $2);
+			$$ = multiexp;					
 		
-			char* nome = "Expressão Básica - Divisão ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* multiexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = multiexp;	
 
 		}
 		|ineqexp {
 
-			Node * filhos[] = {
-				 $1,
-			};
-
-		
-			char* nome = "Expressão Básica - inequações/lógicas ";
-
-			int tamanhofilhos = sizeof(filhos);
-		
-
-			Node* multiexp = createNode(filhos, nome, NULL, tamanhofilhos,0);
-			$$ = multiexp;				
-
+			Node* multiexp = createNode(4,1,0,"Expressão Básica - inequações/lógicas ", $1);
+			$$ = multiexp;			
+			
 		}
 		;
 
-ineqexp:  ineqexp LE expr {
+ineqexp:  ineqexp LE logical {
 	
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
 
-			char * folhas[] = {
-    				$2,
-
-			};			
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Menor igual a ", $1,$3,  $2);
+			$$ = ineqexp;						
 		
-			char* nome = "Inequação  - Menor igual a ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = ineqexp;	
-
-
 
 		}
-		| ineqexp GE expr {
+		| ineqexp GE logical {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Inequação  - Maior igual a ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = ineqexp;	
-
-
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Maior igual a ", $1,$3,  $2);
+			$$ = ineqexp;				
 
 		}
-		| ineqexp LT expr {
+		| ineqexp LT logical {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Inequação  - Menor que ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = ineqexp;	
-
-
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Menor que ", $1,$3,  $2);
+			$$ = ineqexp;
 
 		}
-		| ineqexp GT expr {
+		| ineqexp GT logical {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Maior que ", $1,$3,  $2);
+			$$ = ineqexp;			
 
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Inequação  - Maior que ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = ineqexp;	
-
-
-
+	
 		}
-        | ineqexp EQUAL expr {
+        | ineqexp EQUAL logical {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Igual a ", $1,$3,  $2);
+			$$ = ineqexp;				
 		
-			char* nome = "Inequação  - Igual a ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = ineqexp;	
-
-
-
         }
-        | ineqexp NOTEQUAL expr {
+        | ineqexp NOTEQUAL logical {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Inequação  - Diferente de ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* ineqexp = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+			Node* ineqexp = createNode(6,2,1,"Inequação  - Diferente de ", $1,$3,  $2);
 			$$ = ineqexp;	
-
-
+	
         }
         | logical {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Lógico  ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
+			Node* ineqexp = createNode(4,1,0,"Expressão Básica - Lógica", $1);
+			$$ = ineqexp;				
 			//printf("logical \n");
-			$$ = ineqexp;	
-
         }
         ;
 
 
-logical: NOT logical {
+logical: NOT data {
 	
-			Node * filhos[] = {
-			 	$2,
-			};
+			Node* logical = createNode(5,1,1,"Lógico  - Negação ", $2,  $1);
+			$$ = logical;					
 
-			char * folhas[] = {
-    				$1,
+		 }
+		 | logical AND data {
 
-			};			
-		
-			char* nome = "Lógico  - Negação ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* logical = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
+			Node* logical = createNode(6,2,1,"Lógico  - AND ", $1,$3,  $2);
 			$$ = logical;	
 
 		 }
-		 | logical AND logical {
+		 | logical OR data {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Lógico  - AND ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* logical = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = logical;	
+			Node* logical = createNode(6,2,1,"Lógico  - OR ", $1,$3,  $2);
+			$$ = logical;			
 
 		 }
-		 | logical OR logical {
+		 | logical IMPLIES data {
 
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-	
-			};			
-		
-			char* nome = "Lógico  - OR ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* logical = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = logical;	
-
-		 }
-		 | logical IMPLIES logical {
-
-			Node * filhos[] = {
-			 	$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-
-			};			
-		
-			char* nome = "Lógico  - IMPLICAÇÃO ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* logical = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = logical;	
+			Node* logical = createNode(6,2,1,"Lógico  - IMPLICAÇÃO ", $1,$3,  $2);
+			$$ = logical;			
 
 		 }
 		 | data {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Dados do componente de uma expressão  ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-			//printf("dados genericos \n");
-			Node* ineqexp = createNode(filhos, nome, NULL,tamanhofilhos,0);
-			$$ = ineqexp;	
-
-
-
+		 	$$ = $1;
 
 		 }
 		 ;
 		 
 data: RAWNUMBERDATA {
 	
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Número";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			Node* data = createNode(4,0,1,"Número", $1);	
 			$$ = data;	
-
-
 
 	  }
 	  | BOOLEAN {
 
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Booleano";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			//printf("BOOLEANO \n");
+			Node* data = createNode(4,0,1,"Booleano", $1);	
 			$$ = data;	
-
-
 
 	  }
 	  | Null {
 
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "NULL";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
+			Node* data = createNode(4,0,1,"NULL", $1);	
 			$$ = data;	
 
-
 	  }
-	  | functioncall {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
+	  | TIME {
 
-			char* nome = "Dados de chamada de função ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* data = createNode(filhos, nome, NULL ,tamanhofilhos,0);
+			Node* data = createNode(4,0,1,"TIME-DIRECTIVE", $1);	
 			$$ = data;	
 
+	  }	  
+
+	  | LABEL {
+			
+			Node* data = createNode(4,0,1,"LABEL", $1);	
+			$$ = data;	
 
 	  }
+
 	  | variabledata {
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
+	  	Node* data = createNode(4,1,0,"Dados de tds ou função", $1);	
+		$$ = data;	
 
-			char* nome = "Dados de outras variaveis ou estruturas";
+	  }
 
-			int tamanhofilhos = sizeof(filhos);
+	  | ID extraaccesses {
 
-
-			Node* data = createNode(filhos, nome, NULL ,tamanhofilhos,0);
-			$$ = data;	
-
+			Node* data = createNode(5,1,1,"variáveis simples ou compostas", $2, $1);	
+			$$ = data;		
 
 	  }
 	  ;
 
 
-variabledata: ID {
+
+// diferenciar depoisnumber (index) e number data! (apesar de serem tokens "identicos em teoria")
+// vetores de tds?  avaliar
+extraaccesses : LBRACK expr RBRACK variableprop {
 	
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "Variavel";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			$$ = data;	
-
-
-		}
-			| LBRACE content RBRACE {
-
-			char * folhas[] = {
-			 	$1,
-			 	$3,
-				
-			};
-
-			Node * filhos[] = {
-			 	$2,
-				
-			};
-
-			char* nome = "Dados de conteudos/conjuntos ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* variabledata = createNode(filhos, nome, folhas ,tamanhofilhos,tamanhofolhas);
-			//printf("TDS FORMAT! \n");
-			$$ = variabledata;	
-
+			  	 	Node* extraaccesses = createNode(7,2,2,"propriedades extra de variavel composta", $2,$4,  $1,$3);	
+					$$ = extraaccesses;		
 
 			  }
-		| variableprop {
+			  | variableprop {
+			  	 	
+			  	 	Node* extraaccesses = createNode(4,1,0,"propriedades extra de variavel simples", $1);	
+					$$ = extraaccesses;	
+			  }
 
-			Node * filhos[] = {
-			 	$1,
-				
-			};
+//! trocar para propriedades da TDS (vai ser vetor e tds as "estruturas dessa linguagem")
 
-			char* nome = "Dados de propriedades de um objeto/variavel ";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* variabledata = createNode(filhos, nome, NULL ,tamanhofilhos,0);
-			$$ = variabledata;	
-
-
+variableprop: POINT tdsprop {
+	
+				Node* variableprop = createNode(5,1,1,"Propriedade de variavel - tdsprop", $2,   $1);
+				$$ = variableprop;   
 
 			}
-		| LABEL {
+			| /* empty */  { $$ = NULL;}
+			;
+
+
+
+
+
+tdsprop: functioncall {
+		
+		Node* prop = createNode(4,1,0,"Props TDS - function", $1);
+		$$ = prop; 	
+	  
+	  }
+	  | PORTNAME {
+
+		Node* prop = createNode(4,0,1,"Props TDS - portname", $1);
+		$$ = prop; 	
+
+	  }
+	  | DATATIME {
+
+		Node* prop = createNode(4,0,1,"Props TDS - datatime", $1);
+		$$ = prop; 		  
+
+	  }
+	  | LINK {
+
+		Node* prop = createNode(4,0,1,"Props TDS - link", $1);
+		$$ = prop; 	
+
+	  }
+	  | LINKED {
+
+		Node* prop = createNode(4,0,1,"Props TDS - linked", $1);
+		$$ = prop; 		  
+
+	  }
+	  | DELAYED {
+
+		Node* prop = createNode(4,0,1,"Props TDS - delay", $1);
+		$$ = prop; 	
+
+	  }
+
+
+
+variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extra RBRACE {
+		
+			Node* tdsformat = createNode(15,2,10,"Informações de TDS", $9,$11,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$12);
+			$$ = tdsformat;
+
+		}
+		| LBRACE PORTNAME COLON LABEL linked extra RBRACE {
 			
-			char * folhas[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "LABEL";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* data = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			//printf("LABEL \n");
-			$$ = data;					
+			Node* tdsformat = createNode(10,2,5,"Informações de TDS", $5,$6,  $1,$2,$3,$4,$7);
+			$$ = tdsformat;
 		
-		}
+		} 
+	  	| functioncall {
+
+			Node* variabledata = createNode(4,1,0,"Dados de chamada de função", $1);	
+			$$ = variabledata;	
+
+	  	}			  
 		;
 
-
-variableprop: ID POINT ID {
 	
-
-			char * folhas[] = {
-			 	$1,
-			 	$2,
-			 	$3,
-				
-			};
-
-			char* nome = "Propriedade de variavel";
-
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* variableprop = createNode(NULL, nome, folhas,0,tamanhofolhas);
-			$$ = variableprop;	
-
-
-
-
-			  }
-			  | ID LBRACK expr LBRACK POINT ID {
-
-
-			Node * filhos[] = {
-			 	$3,
-				
-			};			
-
-
-			char * folhas[] = {
-			 	$1,
-			 	$2,
-			 	$4,
-			 	$5,
-			 	$6,
-				
-			};
-
-			char* nome = "Propriedade de variavel de estrutura ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-
-			Node* variableprop = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = variableprop;	
-
-
-		}
-		;
-
-
-
-
-functioncall: ID LPAREN paramsoptionalCall RPAREN {
-	
-			Node * filhos[] = {
-				$3,
-			};
-
-			char * folhas[] = {
-    			$1,
-    			$2,
-    			$4,
-
-			};			
-		
-			char* nome = "Chamada de função";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* functioncall = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = functioncall;	
-
-
-};
-
-paramsoptionalCall: paramsCall {
-
-		
-		Node * filhos[] = {
-			 $1,
-		};
-		
-		char* nome = "Paramsoptional -  parametro(s) opcionais da chamada de função ";
-		int tamanhofilhos = sizeof(filhos);
-		Node* paramsoptional = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		$$ = paramsoptional; 
-
-		}
-
-
-		| /* empty */  {printf("nao teve mais (paramsoptionalCall) \n \n"); $$ = NULL;}
-		;
-
-paramsCall: expr paramslistCall {
-
-		
-		Node * filhos[] = {
-			 $1,
-			 $2,
-		};
-		
-		char* nome = "Params -  parametro(s)  da chamada de função ";
-
-		int tamanhofilhos = sizeof(filhos);
-		
-
-		Node* params = createNode(filhos, nome, NULL,tamanhofilhos,0);
-		
-		$$ = params; 
-		}
-	    | /* empty */  {printf("nao teve mais (paramsCall) \n \n"); $$ = NULL;}
-	    ;
-
-
-
-paramslistCall: paramslistCall COMMA expr {
-
-		Node * filhos[] = {
-			 $1,
-			 $3,	 
-		};
-
-		char * folhas[] = {
-    			$2,
-		};		
-		
-		char* nome = "Paramslist - lista de parâmetros a mais de uma função ";
-		int tamanhofilhos = sizeof(filhos);
-		int tamanhofolhas = sizeof(folhas);
-
-		Node* paramslist = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-		$$ = paramslist; 
-		}
-	    | /* empty */  {printf("nao teve mais (paramslistCall) \n \n"); $$ = NULL;}
-	    ;
-
-
-
-	
-condstmt: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
-	
-			Node * filhos[] = {
-				$3,
-				$6,
-				$8,
-			};
-
-			char * folhas[] = {
-    				$1,
-    				$2,
-    				$4,
-    				$5,
-    				$7,
-
-			};			
-		
-			char* nome = "Condicional - IF";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-			
-			Node* condstmt = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = condstmt;	
-			//printf("CMD -  IF\n");
-
-
-
-}
 	
 matchornot: ELSE LBRACE cmds RBRACE {
 	
-			Node * filhos[] = {
-				$3,
-			};
+		Node* matchornot = createNode(7,1,3,"Condicional - ELSE", $3 , $1,$2,$4);	
+		$$ = matchornot;
+		//printf("CMD - ELSE \n");
 
-			char * folhas[] = {
-    				$1,
-    				$2,
-    				$4,
-			};			
-		
-			char* nome = "Condicional - ELSE";
+		}
+		| /* empty */  { $$ = NULL;}
+		;
 
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
 
-			Node* matchornot = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = matchornot;
-			//printf("CMD - ELSE \n");
 
-			}
-			| /* empty */  { printf("nao teve mais (matchornot) \n \n"); $$ = NULL;}
-
-content: content COMMA tdsformat {
+dataflow:  domain   {
 	
-
-			Node * filhos[] = {
-				$1,
-				$3,
-			};
-
-			char * folhas[] = {
-    				$2,
-			};			
-		
-			char* nome = "Conjunto ";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* content = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			
-			//printf("CONTEUDO/conjunto DE TDS \n");
-
-			$$ = content;
-			
-		 }
-		 | tdsformat {
-
-			Node * filhos[] = {
-			 	$1,
-				
-			};
-
-			char* nome = "TDS";
-
-			int tamanhofilhos = sizeof(filhos);
-
-
-			Node* content = createNode(filhos, nome, NULL ,tamanhofilhos,0);
-
-			//printf("formato  DE TDS \n");
-
-			$$ = content;	
-
-		 }
-		 
-
-tdsformat: LPAREN expr COMMA expr COMMA expr RPAREN {
-	
-
-			Node * filhos[] = {
-				$2,
-				$4,
-				$6,
-			};
-
-			char * folhas[] = {
-    				$1,
-    				$3,
-    				$5,
-    				$7,
-			};			
-		
-			char* nome = "Informações de TDS";
-
-			int tamanhofilhos = sizeof(filhos);
-			int tamanhofolhas = sizeof(folhas);
-
-			Node* tdsformat = createNode(filhos, nome, folhas,tamanhofilhos,tamanhofolhas);
-			$$ = tdsformat;
-
-
+	// evita conflitos (nó a mais porem evita)
+	Node* dataflow = createNode(4,1,0,"dataflow-TDS", $1);
+	$$ = dataflow; 	
 }
 
+
+domain: timelist { 
+
+			Node* domain = createNode(4,1,0,"DOMAIN-TDS-non-func", $1);
+			$$ = domain;    
+
+		}
+		| FUNCTIONDOMAIN COLON functioncall {
+
+			Node* domain = createNode(6,1,2,"DOMAIN-TDS-func", $3, $1,$2);
+			$$ = domain;    
+
+		}
+
+
+
+timecomponent: RAWNUMBERDATA COLON expr {
+			   
+	Node* timecomponent = createNode(6,1,2,"TIME-COMPONENT-TDS", $3, $1,$2);
+	$$ = timecomponent;    
+}
+
+
+
+timelist: timecomponent { 
+
+			Node* timelist = createNode(4,1,0,"TIME-LIST-TDS-one", $1);
+			$$ = timelist;    			 		  
+		  }
+
+		  |timelist COMMA timecomponent {
+
+			Node* timelist = createNode(6,2,1,"TIME-LIST-TDS-loop", $1,$3,  $2 );
+			$$ = timelist;		  		  
+
+		  }
+
+
+
+linked:	COMMA LINKED COLON LBRACE params RBRACE {
+	   	 	
+	   	 	Node* extra = createNode(9,1,5,"LINKED-EXTRA-ARGS-TDS",$5, $1,$2,$3,$4,$6);
+	   	 	$$ = extra;
+	   }
+
+
+extra : COMMA LINK COLON ID {
+	
+			Node* extra = createNode(6,0,4,"LINK-EXTRA-ARGS-TDS", $1,$2,$3,$4);
+			$$ = extra;
+	   }
+	   | COMMA DELAYED COLON BOOLEAN {
+	   		Node* extra = createNode(6,0,4,"DELAYED-EXTRA-ARGS-TDS", $1,$2,$3,$4);
+	   		$$ = extra;
+	   }
+	   | /* empty */ {  $$ = NULL;}
+       ; 
 
 %%
 
 
-int main(int argc, char* argv[]) {
-  
-  
-  FILE *fp;
-
-  fp = fopen(argv[1], "r");
-  if(!fp){
-  	printf("CADE MEU CODIGO!?");
-  	return -1;
-  } 
-  yyin = fp;
-  yyparse();
-
-  printf("--------------TREE--------------------\n");
-  printNode(root);
-  letgoNode(root);
-  fclose(fp);
-
-}
-
-
-void yyerror(const char *s) {
-  printf("Erro de parsing! %s \n",s);
-  exit(-1);
-}

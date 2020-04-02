@@ -1,5 +1,5 @@
 all:
-	bison  -d src/tdsrpl-Copia.y -b src/tdsrpl
+	bison  -d src/tdsrpl.y -b src/tdsrpl
 	flex -o src/lex.yy.c src/tdsrpl.l  
-	gcc src/tdsrpl.tab.c src/lex.yy.c src/datastructures/Node.c src/datastructures/constants.c -o results/tdsPARSING
+	gcc src/main.c src/tdsrpl.tab.c src/lex.yy.c src/datastructures/Node.c src/datastructures/constants.c -o results/tdsPARSING
 	./results/tdsPARSING sample/merger.tdsrpl > results/PARSINGOUTPUT
