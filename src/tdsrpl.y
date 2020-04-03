@@ -81,6 +81,7 @@
 %token <sval> MINUS
 %token <sval> TIMES
 %token <sval> DIVIDE
+%token <sval> MOD
 %token <sval> FUNCTIONDOMAIN
 %token <sval> FUNCTION
 %token <sval> LABEL
@@ -89,7 +90,8 @@
 %token <sval> PORTNAME
 %token <sval> LINK
 %token <sval> LINKED
-%token <sval> TIME
+%token <sval> CURRENTTIME
+%token <sval> FINALTIME
 %token <sval> ID
 
 %type <ast> prog
@@ -398,6 +400,12 @@ multiexp: multiexp TIMES ineqexp {
 		
 
 		}
+		|multiexp MOD ineqexp {
+	
+			Node* multiexp = createNode(6,2,1,"Expressão Básica - MOD ", $1,$3,  $2);
+			$$ = multiexp;
+
+		}
 		|ineqexp {
 
 			Node* multiexp = createNode(4,1,0,"Expressão Básica - inequações/lógicas ", $1);
@@ -504,12 +512,20 @@ data: RAWNUMBERDATA {
 
 	  }
 
-	  | TIME {
+	  | CURRENTTIME {
 
-			Node* data = createNode(4,0,1,"TIME-DIRECTIVE", $1);	
+			Node* data = createNode(4,0,1,"CURRENTTIME-DIRECTIVE", $1);	
 			$$ = data;	
 
-	  }	  
+	  }
+
+	  | FINALTIME {
+
+			Node* data = createNode(4,0,1,"FINALTIME-DIRECTIVE", $1);	
+			$$ = data;	
+
+	  }
+	  	  
 
 	  | LABEL {
 			

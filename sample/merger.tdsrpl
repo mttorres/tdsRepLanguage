@@ -1,7 +1,14 @@
 //DADOS DEFINIDOS PELO USUARIO
 function fluxoPortempo(modoEntrada){
 	
-    F_TIME + 30
+    if(modoEntrada == false) {
+	dado = C_TIME % 2  
+   } 
+   else {
+	dado = C_TIME % 2 + 1
+   }
+
+  return dado
 
 }
 

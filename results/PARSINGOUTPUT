@@ -1,4 +1,4 @@
-                                                            --------------TREE--------------------
+                                                                                       --------------TREE--------------------
 NODE: - Prog -  comandos e definições de função 
 
 --------------CHILDREN: 
@@ -16,15 +16,97 @@ NODE: - Params -  parametro(s)  da definição de função
 
 -----------------------------------------------
 
-NODE: - Functionbody - função matemática  
+NODE: - Functionbody - função composta/programa  
 
 --------------CHILDREN: 
 
-NODE: - retorno - função matemática  
+NODE: - cmd - Condicional - IF 
 
 --------------CHILDREN: 
 
-NODE: - Expressão Básica - soma  
+NODE: - Expressão Básica - inequações/lógicas  
+
+--------------CHILDREN: 
+
+NODE: - Inequação  - Igual a  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - variáveis simples ou compostas 
+
+--------------CHILDREN: 
+
+NODE: - propriedades extra de variavel simples 
+
+--------------CHILDREN: 
+
+NULL 
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> modoEntrada 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - variáveis simples ou compostas 
+
+--------------CHILDREN: 
+
+NODE: - propriedades extra de variavel simples 
+
+--------------CHILDREN: 
+
+NULL 
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> false 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> == 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - CMD -  Comando (otherstatement) 
+
+--------------CHILDREN: 
+
+NODE: - Assignment(simples) -  atribuição de variavel   
+
+--------------CHILDREN: 
+
+NODE: - propriedades extra de variavel simples 
+
+--------------CHILDREN: 
+
+NULL 
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Expressão Básica - MOD  
 
 --------------CHILDREN: 
 
@@ -36,11 +118,11 @@ NODE: - Expressão Básica - Lógica
 
 --------------CHILDREN: 
 
-NODE: - TIME-DIRECTIVE 
+NODE: - CURRENTTIME-DIRECTIVE 
 
 ---------------TERMINAL: 
 
- --> F_TIME 
+ --> C_TIME 
 ------------END TERMINAL--------------- 
 
 -----------------------------------------------
@@ -49,6 +131,117 @@ NODE: - TIME-DIRECTIVE
 -----------------------------------------------
 
 ------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - Número 
+
+---------------TERMINAL: 
+
+ --> 2 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> % 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> dado 
+ --> = 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Condicional - ELSE 
+
+--------------CHILDREN: 
+
+NODE: - CMD -  Comando (otherstatement) 
+
+--------------CHILDREN: 
+
+NODE: - Assignment(simples) -  atribuição de variavel   
+
+--------------CHILDREN: 
+
+NODE: - propriedades extra de variavel simples 
+
+--------------CHILDREN: 
+
+NULL 
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Expressão Básica - soma  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - MOD  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - inequações/lógicas  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - CURRENTTIME-DIRECTIVE 
+
+---------------TERMINAL: 
+
+ --> C_TIME 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - Número 
+
+---------------TERMINAL: 
+
+ --> 2 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> % 
+------------END TERMINAL--------------- 
+
 -----------------------------------------------
 
 NODE: - Expressão Básica - inequações/lógicas  
@@ -63,7 +256,7 @@ NODE: - Número
 
 ---------------TERMINAL: 
 
- --> 30 
+ --> 1 
 ------------END TERMINAL--------------- 
 
 -----------------------------------------------
@@ -83,6 +276,83 @@ NODE: - Número
 -----------------------------------------------
 
 ------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> dado 
+ --> = 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> else 
+ --> { 
+ --> } 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> if 
+ --> ( 
+ --> ) 
+ --> { 
+ --> } 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+NODE: - Optionalreturn -  retorno opcional  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - inequações/lógicas  
+
+--------------CHILDREN: 
+
+NODE: - Expressão Básica - Lógica 
+
+--------------CHILDREN: 
+
+NODE: - variáveis simples ou compostas 
+
+--------------CHILDREN: 
+
+NODE: - propriedades extra de variavel simples 
+
+--------------CHILDREN: 
+
+NULL 
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> dado 
+------------END TERMINAL--------------- 
+
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+-----------------------------------------------
+
+------------END CHILDREN--------------- 
+---------------TERMINAL: 
+
+ --> return 
+------------END TERMINAL--------------- 
+
 -----------------------------------------------
 
 ------------END CHILDREN--------------- 
