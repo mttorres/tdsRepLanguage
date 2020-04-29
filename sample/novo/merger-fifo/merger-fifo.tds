@@ -19,8 +19,8 @@ function fluxoPortempo(modoEntrada){
 
 
 tdsA = {
-	portname : 'A'
-	data-time: {0: 0, 1: 1, 2: 0} 
+	portname : 'A',
+	data-time: {0: 0, 1: 1, 2: 0}, 
 	link: tdsC
 } 
 	
@@ -44,14 +44,14 @@ C_TIME = 0 // valem por todo o intervalo
 
 tdsC = {
 	portname : 'C',
-	linked : {tdsA, tdsB} 
-	link: tdsD 
+	linked : {tdsA, tdsB}, 
+	link: tdsD, 
 	delayed : true } // caso que fifo (ou outras portas em que verificação se tem dado na saida e feita no ESTADO SEGUINTE)
 				   // ex :  a = 0    c = NULL,    a = 1, e = 0   ou  a = 0 c = NULL , a = NULL , c = 0
 
 
 tdsD = {
-	
+	portname: 'D',	
 	linked: {tdsC} 
 }
 

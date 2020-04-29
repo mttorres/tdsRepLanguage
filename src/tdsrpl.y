@@ -13,15 +13,10 @@
   int yyparse();
   FILE *yyin;
 
-
+  	
   Node* root;
  
-  void yyerror(const char *s);
-
-  void yyerror(const char *s) {
-  printf("Erro de parsing! %s \n",s);
-  exit(-1);
-}
+  extern void yyerror(const char *s);
 
   //typedef enum {false, true} BOOLEANO;
 
@@ -32,7 +27,7 @@
 	retornados como um yystype.  em que devemos definir os tipos por meio de uma union (pode assumir qualquer um dos valores dela)
 */ 
 
-
+%locations 
 
 %union {
   int ival;
@@ -90,6 +85,7 @@
 %token <sval> PORTNAME
 %token <sval> LINK
 %token <sval> LINKED
+%token <sval> INITTIME
 %token <sval> CURRENTTIME
 %token <sval> FINALTIME
 %token <sval> ID
@@ -116,14 +112,15 @@
 %type <ast> paramsCall
 %type <ast> matchornot
 %type <ast> extraaccesses
-%type <ast> extra
+%type <ast> extras
+%type <ast> delayedoption
 %type <ast> dataflow
 %type <ast> tdsprop
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
 %type <ast> linked
-
+%type <ast> timedirective
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
@@ -355,6 +352,15 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 		//infoNode($$);
 
 	 }
+	 | timedirective ASSIGN expr {
+		
+		Node* assignment = createNode(7,2,1,"Assignment(simples) -  atribuição diretiva ", $1,$3, $2);
+		$$ = assignment;	
+
+		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+		//infoNode($$);
+
+	 }	 
 	 ;
 
 
@@ -512,6 +518,14 @@ data: RAWNUMBERDATA {
 
 	  }
 
+	  | INITTIME {
+		
+			Node* data = createNode(4,0,1,"INITTIME-DIRECTIVE", $1);	
+			$$ = data;
+		
+	  }
+
+
 	  | CURRENTTIME {
 
 			Node* data = createNode(4,0,1,"CURRENTTIME-DIRECTIVE", $1);	
@@ -550,7 +564,27 @@ data: RAWNUMBERDATA {
 	  ;
 
 
+timedirective: INITTIME {
+		
+			Node* data = createNode(4,0,1,"CHANGE-INITTIME-DIRECTIVE", $1);	
+			$$ = data;
+		
+	  }
 
+
+	  | CURRENTTIME {
+
+			Node* data = createNode(4,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", $1);	
+			$$ = data;	
+
+	  }
+
+	  | FINALTIME {
+
+			Node* data = createNode(4,0,1,"CHANGE-FINALTIME-DIRECTIVE", $1);	
+			$$ = data;
+
+	  }
 // diferenciar depoisnumber (index) e number data! (apesar de serem tokens "identicos em teoria")
 // vetores de tds?  avaliar
 extraaccesses : LBRACK expr RBRACK variableprop {
@@ -619,13 +653,13 @@ tdsprop: functioncall {
 
 
 
-variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extra RBRACE {
+variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extras RBRACE {
 		
 			Node* tdsformat = createNode(15,2,10,"Informações de TDS", $9,$11,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$12);
 			$$ = tdsformat;
 
 		}
-		| LBRACE PORTNAME COLON LABEL linked extra RBRACE {
+		| LBRACE PORTNAME COLON LABEL linked extras RBRACE {
 			
 			Node* tdsformat = createNode(10,2,5,"Informações de TDS", $5,$6,  $1,$2,$3,$4,$7);
 			$$ = tdsformat;
@@ -705,15 +739,18 @@ linked:	COMMA LINKED COLON LBRACE params RBRACE {
 	   	 	$$ = extra;
 	   }
 
-
-extra : COMMA LINK COLON ID {
+extras: COMMA LINK COLON ID delayedoption {
 	
-			Node* extra = createNode(6,0,4,"LINK-EXTRA-ARGS-TDS", $1,$2,$3,$4);
-			$$ = extra;
-	   }
-	   | COMMA DELAYED COLON BOOLEAN {
-	   		Node* extra = createNode(6,0,4,"DELAYED-EXTRA-ARGS-TDS", $1,$2,$3,$4);
-	   		$$ = extra;
+		Node* extra = createNode(8,1,4,"LINK-EXTRA-ARGS-TDS", $5, $1,$2,$3,$4);
+		$$ = extra;
+	}
+	| delayedoption
+	
+
+delayedoption: COMMA DELAYED COLON expr {
+	   		
+		Node* extra = createNode(7,1,4,"DELAYED-EXTRA-ARGS-TDS", $4,$1,$2,$3);
+	   	$$ = extra;
 	   }
 	   | /* empty */ {  $$ = NULL;}
        ; 

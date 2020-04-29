@@ -11,6 +11,7 @@
 Opções:  noyywrap para facilitar o uso(?) e yylineno contador de linenumbers "automagico"
 */
 
+
 %option noyywrap
 %option yylineno
 
@@ -59,6 +60,7 @@ xor			{yylval.sval = strdup(yytext); return XOR;}
 [*]                 	{yylval.sval = strdup(yytext); return TIMES;}
 [/]                 	{yylval.sval = strdup(yytext); return DIVIDE;}
 [%]			{yylval.sval = strdup(yytext); return MOD;}
+I_TIME			{yylval.sval = strdup(yytext); return INITTIME;}
 C_TIME		    	{yylval.sval = strdup(yytext); return CURRENTTIME;}
 F_TIME		    	{yylval.sval = strdup(yytext); return FINALTIME;}
 '[A-Za-z_]*'        	{yylval.sval = strdup(yytext); return LABEL;}
@@ -72,5 +74,9 @@ portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
 
 %%
 
+void yyerror(const char *s) {
+  printf("Erro de parsing! %s, perto da linha %d \n",s,yylineno);
+  exit(-1);
+}
 
 
