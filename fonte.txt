@@ -12,3 +12,5 @@ https://stackoverflow.com/questions/44866852/cmake-with-flex-bison-in-clion
 
 
 https://www.eskimo.com/~scs/cclass/int/sx8.html
+
+https://books.google.com.br/books?id=aB1EgF0jB-MC&pg=PA116&lpg=PA116&dq=C+if+i+have+2+other+headers+that+use+a+third+header+should+i+include+this+one+on+my+main&source=bl&ots=pJZH49Wa1m&sig=ACfU3U0dYjqD-yn7W2Qb6toMJ1E7VrxWiQ&hl=pt-BR&sa=X&ved=2ahUKEwi8ofOm-qzpAhUIHrkGHSWODDIQ6AEwAHoECAgQAQ#v=onepage&q=C%20if%20i%20have%202%20other%20headers%20that%20use%20a%20third%20header%20should%20i%20include%20this%20one%20on%20my%20main&f=false
