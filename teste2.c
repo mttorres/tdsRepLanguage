@@ -19,6 +19,8 @@ void preProcessSmv(FILE* smvP, long* ds) {
 
 	char* portsModuleString = "MODULE portsModule";
 	char* automataString = "MODULE finalAutomata(time)";
+
+	int limpaPortsModule = 0;	
 	
 	buffer = (char *) malloc(bufsize * sizeof(char));
    	while ((fgets(buffer,bufsize,smvP))) {
@@ -28,7 +30,8 @@ void preProcessSmv(FILE* smvP, long* ds) {
 		} 		
 		if(strstr(buffer,portsModuleString)){
 			printf("%s \n",buffer);			
-			ds[2] = ftell(smvP);		
+			ds[2] = ftell(smvP);
+					
 		}
 		
 	}
@@ -40,11 +43,31 @@ void preProcessSmv(FILE* smvP, long* ds) {
 
 int main()
 {
+    //TESTE PARMETROS MODULOS
+
+    printf("-----------EITA----------------------\n");
+    char* automataString = "MODULE finalAutomata(time)";
+    char *lastParStr = (char*)malloc(sizeof(char)*(strlen(automataString)+1));
+    strncpy(lastParStr, automataString,strlen(automataString));
+    printf("lets head back... %s \n",lastParStr);
+    printf("-----------EITA----------------------\n");
+    free(lastParStr);
+    printf("\n");
+
+//TESTE PARMETROS MODULOS
+
     //printf("EITA");
     FILE *smvP; // .smv file;
     //printf("EITA");
     smvP = fopen("sample/novo/merger-fifo/nuxmv.smv","r+");
-    long * partesArquivoSmv = (long*) malloc(sizeof(long)*3); // MAIN, PORTS MODULE, AUTOMATO 
+    long * partesArquivoSmv = (long*) malloc(sizeof(long)*3); // MAIN, AUTOMATO, PORTS MODULE
+    //long * partesArquivoSmv = (long*) malloc(sizeof(long)*2); // VAR, assign
+
+    // "outra struct"  ---> localização dos principais "cabeçalhos" (3 exatamente)  e um offset que deve ser verificado...
+
+    // onde salvar? IDEIA: MAIN (ESCOPO-MAIN), AUTOMATO (outra struct), PORTS MODULE (outra struct tmb "header") 
+    //				 --> cada variavel : entrada e "pos" no arquivo			--> cada tds: entrada e "pos" no arquivo
+    // fazer em "ordem" ou atualizar as entradas depois? (mesmo em ordem pode necessitar atualizar depois?)   
     preProcessSmv(smvP,partesArquivoSmv); 
 
     char *buffer;
