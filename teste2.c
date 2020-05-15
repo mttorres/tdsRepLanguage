@@ -42,22 +42,19 @@ HeaderSmv* createHeader(int type, long moduleP, long varP, long assignP, long tr
 void printHeader(HeaderSmv* h){
 
   if(h) {
-	if(h->type  && h->modulePointer){
+	
 		printf("%d: MODULE() - %ld \n",h->type,h->modulePointer);
 	
-	}
-	if(h->varPointer){
+	
+	
 		printf(" VAR - %ld \n",h->varPointer);
-	}
-	if(h->assignPointer){
+	
 		printf(" ASSIGN - %ld \n",h->assignPointer);
-	}
-	if(h->transPointer){
+	
 		printf(" TRANS - %ld \n",h->transPointer);
-	}	
-	if(h->CURR_OFFSET){
+	
 		printf(" OFFSET - %ld \n",h->CURR_OFFSET);
- 	} 
+ 	
  }
 }
 
@@ -73,9 +70,9 @@ void letgoHeader(HeaderSmv* h){
 
 HeaderSmv** initHeadersStruct(int size);
 
-void letGoHeadersStruct(int size);
+void letGoHeadersStruct(HeaderSmv** hs, int size);
 
-void preProcessSmv(FILE* smvP, long* ds);
+void preProcessSmv(FILE* smvP, HeaderSmv** ds);
 
 void postProcessSmv(FILE* smvP, int* ds);
 
@@ -88,6 +85,7 @@ HeaderSmv** initHeadersStruct(int size){
 
 void letGoHeadersStruct(HeaderSmv** hs, int size){
   
+  int i;
   for(i = 0; i< size; i++){
 	letgoHeader(hs[i]);
 	hs[i] = NULL;
@@ -135,20 +133,20 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			varCursor = prevFcursor;			
 		}
 
-		if(strstr(buffer,fVarString){
-			varCursor = preFcursor;	
+		if(strstr(buffer,fVarString)){
+			varCursor = prevFcursor;	
 		}
 
-		if(strstr(buffer,assignString){
-			assignCursor = preFcursor;
+		if(strstr(buffer,assignString)){
+			assignCursor = prevFcursor;
 			if(readPortsModule){
 			  clearPortsModule = 1;				
 			}
 			ds[PORTS-1]=createHeader(PORTS,moduleCursor,varCursor,assignCursor,0,0);
 				
 		}
-		if(strstr(buffer,transString){
-			transCursor = preFcursor;
+		if(strstr(buffer,transString)){
+			transCursor = prevFcursor;
 			if(readAutomata){
 				//renomear refs.			
 			}	
@@ -196,7 +194,6 @@ int main()
     free(lastParStr);
     printf("\n");
 
-    
 
 //TESTE PARMETROS MODULOS
 
@@ -212,7 +209,7 @@ int main()
     //				 --> cada variavel : entrada e "pos" no arquivo			--> cada tds: entrada e "pos" no arquivo
     // fazer em "ordem" ou atualizar as entradas depois? (mesmo em ordem pode necessitar atualizar depois?)   
     
-    //preProcessSmv(smvP,headers); 
+    preProcessSmv(smvP,headers); 
 
 /*
     char *buffer;
@@ -231,7 +228,10 @@ int main()
     } 
 */
     fclose(smvP);
-    
+    printHeader(headers[0]);
+    printHeader(headers[1]);
+    printHeader(headers[2]);
+    letGoHeadersStruct(headers,3);   
 //  free(buffer);	
     return 0;
 }
