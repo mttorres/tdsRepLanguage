@@ -130,7 +130,10 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 		}		
 
 		if(strstr(buffer,varString)){
-			varCursor = prevFcursor;			
+			varCursor = prevFcursor;
+			if(readAutomata){
+			 	printf("yare yare...\n");
+			}			
 		}
 
 		if(strstr(buffer,fVarString)){
@@ -153,18 +156,19 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 		}		
 
 		if(strstr(buffer,automataString)){
-			ds[MAIN-1] = createHeader(MAIN, moduleCursor, varCursor, assignCursor, transCursor, 0);	
+			moduleCursor = prevFcursor;			
+			ds[MAIN-1] = createHeader(MAIN, 0, varCursor, assignCursor, 0, 0);	
 			readMain = 0;	
-			readAutomata = 1;	
+			readAutomata = 1;				
 			//printf("%s \n",buffer);
 					
 		} 	
 	
 		if(strstr(buffer,portsModuleString)){
+			moduleCursor = prevFcursor;
 		       ds[AUTOMATA-1]=createHeader(AUTOMATA,moduleCursor,varCursor,assignCursor,transCursor,0);				
 			readAutomata = 0;
 			readPortsModule = 1;			
-			
 					
 		}
 
@@ -200,9 +204,6 @@ int main()
     
     FILE *smvP; // .smv file;
     smvP = fopen("sample/novo/merger-fifo/nuxmv.smv","r+");
-//    long * partesArquivoSmv = (long*) malloc(sizeof(long)*3); // MAIN, AUTOMATO, PORTS MODULE
-    //long * partesArquivoSmv = (long*) malloc(sizeof(long)*2); // VAR, assign
-
     // "outra struct"  ---> localização dos principais "cabeçalhos" (3 exatamente)  e um offset que deve ser verificado...
 
     // onde salvar? IDEIA: MAIN (ESCOPO-MAIN), AUTOMATO (outra struct), PORTS MODULE (outra struct tmb "header") 
@@ -211,22 +212,32 @@ int main()
     
     preProcessSmv(smvP,headers); 
 
-/*
+
     char *buffer;
     size_t bufsize = 300;
     buffer = (char *) malloc(bufsize * sizeof(char));	
     fgets(buffer,bufsize,smvP);
-    //printf("%s \n",buffer);    
-
-    int i = 0;
+    int i;
     for(i = 0; i < 3; i++) {
-    	printf("PARTES: %ld \n",partesArquivoSmv[i]);
-	fseek(smvP,partesArquivoSmv[i],SEEK_SET);
+    	//printf("PARTES: %ld \n",partesArquivoSmv[i]);
+	fseek(smvP,headers[i]->modulePointer,SEEK_SET);
 	fgets(buffer,bufsize,smvP);
-	printf("%s \n",buffer);
+	printf("(%d) %s \n",i,buffer);
 	
+	fseek(smvP,headers[i]->varPointer,SEEK_SET);
+	fgets(buffer,bufsize,smvP);
+	printf("(%d) %s \n",i,buffer);
+
+	fseek(smvP,headers[i]->assignPointer,SEEK_SET);
+	fgets(buffer,bufsize,smvP);
+	printf("(%d) %s \n",i,buffer);
+
+	fseek(smvP,headers[i]->transPointer,SEEK_SET);
+	fgets(buffer,bufsize,smvP);
+	printf("(%d) %s \n",i,buffer);
+
     } 
-*/
+
     fclose(smvP);
     printHeader(headers[0]);
     printHeader(headers[1]);
