@@ -22,6 +22,18 @@ void printHeader(HeaderSmv* h);
 
 void letgoHeader(HeaderSmv* h);
 
+HeaderSmv** initHeadersStruct(int size);
+
+void letGoHeadersStruct(HeaderSmv** hs, int size);
+
+char * customCat(char* dest, char* src, int mode);
+
+char* addParamModule(char* original, char* param);
+
+void preProcessSmv(FILE* smvP, HeaderSmv** ds);
+
+void postProcessSmv(FILE* smvP, int* ds);
+
 
 
 HeaderSmv* createHeader(int type, long moduleP, long varP, long assignP, long transP, long offset){
@@ -67,14 +79,6 @@ void letgoHeader(HeaderSmv* h){
 
 
 }
-
-HeaderSmv** initHeadersStruct(int size);
-
-void letGoHeadersStruct(HeaderSmv** hs, int size);
-
-void preProcessSmv(FILE* smvP, HeaderSmv** ds);
-
-void postProcessSmv(FILE* smvP, int* ds);
 
 
 HeaderSmv** initHeadersStruct(int size){
@@ -126,14 +130,11 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
    	while ((fgets(buffer,bufsize,smvP))) {
 		
 		if(clearPortsModule){
-			fwrite("", 1, sizeof(buffer), smvP);
+			//fwrite("", 1, sizeof(buffer), smvP);
 		}		
 
-		if(strstr(buffer,varString)){
-			varCursor = prevFcursor;
-			if(readAutomata){
-			 	printf("yare yare...\n");
-			}			
+		if(!strstr(buffer,"INVAR") && strstr(buffer,varString)){
+			varCursor = prevFcursor;			
 		}
 
 		if(strstr(buffer,fVarString)){
@@ -164,13 +165,18 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 					
 		} 	
 	
-		if(strstr(buffer,portsModuleString)){
+		if(strstr(buffer,portsModuleString)){		       
+		       ds[AUTOMATA-1]=createHeader(AUTOMATA,moduleCursor,varCursor,assignCursor,transCursor,0);
 			moduleCursor = prevFcursor;
-		        //buffer = 
-		       ds[AUTOMATA-1]=createHeader(AUTOMATA,moduleCursor,varCursor,assignCursor,transCursor,0);				
 			readAutomata = 0;
-			readPortsModule = 1;			
-					
+			readPortsModule = 1;
+			
+			// escrever time em ports module!			
+			//printf("LINHA : %s \n",buffer);
+			buffer = addParamModule(buffer,"time");
+			//printf("NOVO : %s \n",buffer);
+			fseek(smvP,moduleCursor,SEEK_SET);
+			fputs(buffer,smvP);				
 		}
 
 		prevFcursor = ftell(smvP);
@@ -181,22 +187,21 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 
 }
 
-char * customCat(char* dest, char* src, int mode);
 
 char * customCat(char* dest, char* src, int mode) {
 
 	while(*dest){
-		printf("%s \n",dest);				
+		//printf("%s \n",dest);				
 		dest++;
 	}
 	while(*src){
 		*dest = *src;
-		printf("d : %s \n",dest);
-		printf("s : %s \n",src);				
+		//printf("d : %s \n",dest);
+		//printf("s : %s \n",src);				
 		dest++;
 		src++;
 		if( mode && ( *src == ')' || *src == '\n') ){
-			printf("break detected\n");			
+			//printf("break detected\n");			
 			break;
 		}
 	}
@@ -207,7 +212,6 @@ char * customCat(char* dest, char* src, int mode) {
 
 
 
-char* addParamModule(char* original, char* param);
 
 char* addParamModule(char* original, char* param) {
  
@@ -244,25 +248,25 @@ char* addParamModule(char* original, char* param) {
 int main()
 {
 //TESTE PARMETROS MODULOS
-    //HeaderSmv** headers = initHeadersStruct(3);
-    printf("-----------EITA----------------------\n");
-    char* automataString = "MODULE finalAutomata(time)\n";
-    char* portsModuleString = "MODULE portsModule\n";
-    char* param1 = "modoEntrada";    
-    char* param2 = "time";
+    HeaderSmv** headers = initHeadersStruct(3);
+    //printf("-----------EITA----------------------\n");
+    //char* automataString = "MODULE finalAutomata(time)\n";
+    //char* portsModuleString = "MODULE portsModule\n";
+    //char* param1 = "modoEntrada";    
+    //char* param2 = "time";
 
-    char* novo = addParamModule(portsModuleString, param2);     
-    novo = addParamModule(novo, param1); 
-    printf("lets head back... %s \n",novo);
-    printf("-----------EITA----------------------\n");
-    free(novo);
-    printf("\n");
+    //char* novo = addParamModule(portsModuleString, param2);     
+    //novo = addParamModule(novo, param1); 
+    //printf("lets head back... %s \n",novo);
+    //printf("-----------EITA----------------------\n");
+    //free(novo);
+    //printf("\n");
    
 
 
 //TESTE PARMETROS MODULOS
 
-/*    
+    
     FILE *smvP; // .smv file;
     smvP = fopen("sample/novo/merger-fifo/nuxmv.smv","r+");
     // "outra struct"  ---> localização dos principais "cabeçalhos" (3 exatamente)  e um offset que deve ser verificado...
@@ -304,7 +308,7 @@ int main()
     printHeader(headers[1]);
     printHeader(headers[2]);
     letGoHeadersStruct(headers,3);   
-//  free(buffer);	
-*/
+    free(buffer);	
+
     return 0;
 }
