@@ -195,7 +195,8 @@ char * customCat(char* dest, char* src, int mode) {
 		printf("s : %s \n",src);				
 		dest++;
 		src++;
-		if(mode && *src == ')'){
+		if( mode && ( *src == ')' || *src == '\n') ){
+			printf("break detected\n");			
 			break;
 		}
 	}
@@ -211,24 +212,30 @@ char* addParamModule(char* original, char* param);
 char* addParamModule(char* original, char* param) {
  
 	char *newString;
-	if(original[strlen(original)-1] == ')'){
+	int breakline=0;
+	if(original[strlen(original)-1] == '\n'){
+	  breakline = 1;
+	}
+
+	if(original[strlen(original)-1] == ')' || original[strlen(original)-2] == ')'){
 		newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // , e  \0
 		newString = customCat(newString,original,1);
 		newString = customCat(newString,", ",0);
 		newString = customCat(newString,param,0);
-		newString = customCat(newString,")",0);			
-		newString = newString - ((strlen(original)+strlen(param)+2)-1);	
+		newString = customCat(newString,")",0);		
 	}
 	else {
-		printf("%ld %ld \n",strlen(original),strlen(param));	   	
-		newString = (char*) malloc(sizeof(char)*(strlen(original)+1+strlen(param)+1+1)); // ( , ) e  \0	   			
-		newString = customCat(newString,original,0);
+		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
+		newString = (char*) malloc(sizeof(char)*(strlen(original)+1+strlen(param)+1+1)); // ( , ) e  \0	   	
+		newString = customCat(newString,original,1);
 		newString = customCat(newString,"(",0);
 		newString = customCat(newString,param,0);
-		newString = customCat(newString,")",0);	
-		newString = newString - ((strlen(original)+strlen(param)+2)-1); 
+		newString = customCat(newString,")",0); 
 	}
-
+	if(breakline){
+	  newString = customCat(newString,"\n",0);
+	}
+	newString = newString - ((strlen(original)+strlen(param)+2)-1);	
 	return newString;
 }
 
@@ -239,13 +246,13 @@ int main()
 //TESTE PARMETROS MODULOS
     //HeaderSmv** headers = initHeadersStruct(3);
     printf("-----------EITA----------------------\n");
-    char* automataString = "MODULE finalAutomata(time)";
-    char* portsModuleString = "MODULE portsModule";
+    char* automataString = "MODULE finalAutomata(time)\n";
+    char* portsModuleString = "MODULE portsModule\n";
     char* param1 = "modoEntrada";    
     char* param2 = "time";
 
-    char* novo = addParamModule(automataString, param1);    
-    
+    char* novo = addParamModule(portsModuleString, param2);     
+    novo = addParamModule(novo, param1); 
     printf("lets head back... %s \n",novo);
     printf("-----------EITA----------------------\n");
     free(novo);
