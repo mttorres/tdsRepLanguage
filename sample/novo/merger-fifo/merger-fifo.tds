@@ -1,8 +1,3 @@
-I_TIME = 0
-F_TIME = 6
-modoEntrada = false
-enumerado = 'OCUPADO'
-
 function fluxoPortempo(modoEntrada){
 	
    invert = !modoEntrada	 	
@@ -18,14 +13,21 @@ function fluxoPortempo(modoEntrada){
 }
 
 
+I_TIME = 0
+F_TIME = 6
+modoEntrada = false
+enumerado = 'OCUPADO'
+
+
+
 tdsA = {
-	portname : 'A'
-	data-time: {0: 0, 1: 1, 2: 0} 
+	portname : 'A',
+	data-time: {0: 0, 1: 1, 2: 0}, 
 	link: tdsC
 } 
 	
 C_TIME = 2  // tdsB só vai valer a partir do instante 2
-modoEntrada = true // essa varável vale true após o instante 2
+modoEntrada = false // essa varável vale true após o instante 2
 
 tdsB = {
 	portname : 'B',
@@ -34,10 +36,10 @@ tdsB = {
 }
 
 
-tdsBalt = {
-	portname : 'B',
-	data-time : { function-domain: C_TIME/C_TIME }  
-}
+//tdsBalt = {
+//	portname : 'B',
+//	data-time : { function-domain: C_TIME/C_TIME }  
+//}
 
 
 C_TIME = 0 // valem por todo o intervalo
@@ -45,13 +47,13 @@ C_TIME = 0 // valem por todo o intervalo
 tdsC = {
 	portname : 'C',
 	linked : {tdsA, tdsB}, 
-	link: tdsD,
-	delayed : true } // caso que fifo (ou outras portas em que verificação se tem dado na saida e feita no ESTADO SEGUINTE)
+	link: tdsD, 
+	delayed : false } // caso que fifo (ou outras portas em que verificação se tem dado na saida e feita no ESTADO SEGUINTE)
 				   // ex :  a = 0    c = NULL,    a = 1, e = 0   ou  a = 0 c = NULL , a = NULL , c = 0
 
 
 tdsD = {
-	
+	portname: 'D',	
 	linked: {tdsC} 
 }
 

@@ -3,7 +3,8 @@
   #include <string.h>
   #include "../headers/STable.h"
   #include "../headers/constants.h"
-  #include "../headers/Node.h"	
+  #include "../headers/Node.h"
+   	
 
   extern int yylex(void);
   extern int yyparse();
@@ -14,8 +15,12 @@
 int main(int argc, char* argv[]) {
   
   
-  FILE *fp;
+  FILE *fp; // .tds file
+  FILE *smvP; // .smv file;
   fp = fopen(argv[1], "r");
+  smvP = fopen(argv[2], "r+");
+  //printf("%s \n",argv[2]);
+
   if(!fp){
   	printf("CADE MEU CODIGO!?");
   	return -1;
@@ -27,6 +32,8 @@ int main(int argc, char* argv[]) {
   printNode(root);
   letgoNode(root);
   fclose(fp);
+  fclose(smvP);
+  //smvP = fopen(argv[1], "r");
 
 
 }

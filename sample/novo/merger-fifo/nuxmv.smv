@@ -1,0 +1,85 @@
+MODULE main
+VAR
+	time: 0..3;
+	finalAutomata: finalAutomata(time);
+ASSIGN
+	init(time) := 0;
+	next(time) := case
+		time < 3: time + 1;
+		TRUE: time;
+esac;
+
+MODULE merger1(time)
+VAR
+	ports: portsModule;
+	cs: {q0};
+TRANS
+	((cs = q0 & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.a[time] = ports.c[time] & FALSE) -> next(cs) = q0) &
+	((cs = q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & FALSE) -> next(cs) = q0);
+
+MODULE fifo2(time)
+VAR
+	ports: portsModule;
+	cs: {q0,p0,p1};
+ASSIGN
+	init(cs) := {q0};
+TRANS
+	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 0 & FALSE) -> next(cs) = p0) &
+	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 1 & FALSE) -> next(cs) = p1) &
+	((cs = p0 & ports.a[time] = NULL & ports.c[time] = NULL & ports.b[time] = NULL & ports.d[time] = 0) -> next(cs) = q0) &
+	((cs = p0) -> ((next(cs) != p1))) &
+	((cs = p1 & ports.a[time] = NULL & ports.c[time] = NULL & ports.b[time] = NULL & ports.d[time] = 1) -> next(cs) = q0) &
+	((cs = p1) -> ((next(cs) != p0)));
+
+MODULE finalAutomata(time)
+VAR
+	prod1: merger1(time);
+	prod2: fifo2(time);
+	ports: portsModule;
+	cs: {q0q0,q0p0,q0p1};
+ASSIGN
+	init(cs) := {q0q0};
+TRANS
+	((cs = q0q0 & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.a[time] = ports.c[time] & ports.c[time] = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.a[time] = ports.c[time] & ports.c[time] = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & ports.c[time] = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & ports.c[time] = 1) -> next(cs) = q0p1) &
+	((cs = q0p0) -> ((next(cs) != q0p1))) &
+	((cs = q0p1) -> ((next(cs) != q0p0)));
+INVAR
+	(((prod1.cs = q0) & (prod2.cs = q0)) <-> (cs = q0q0)) &
+	(((prod1.cs = q0) & (prod2.cs = p0)) <-> (cs = q0p0)) &
+	(((prod1.cs = q0) & (prod2.cs = p1)) <-> (cs = q0p1));
+
+MODULE portsModule
+FROZENVAR
+	a : array 0..5 of {NULL, 0, 1};
+	c : array 0..5 of {NULL, 0, 1};
+	b : array 0..5 of {NULL, 0, 1};
+	d : array 0..5 of {NULL, 0, 1};
+ASSIGN
+	init(a[0]) := 1;
+	init(a[1]) := 0;
+	init(a[2]) := 1;
+	init(a[3]) := 0;
+	init(a[4]) := NULL;
+	init(b[0]) := NULL;
+	init(b[1]) := 0;
+	init(b[2]) := NULL;
+	init(b[3]) := 0;
+	init(b[4]) := 1;
+	init(e[0]) := 0;
+	init(e[1]) := 1;
+	init(e[2]) := NULL;
+	init(e[3]) := 0;
+	init(e[4]) := 1;
+	init(c[0]) := NULL;
+	init(c[1]) := 1;
+	init(c[2]) := NULL;
+	init(c[3]) := 1;
+	init(c[4]) := NULL;
+	init(d[0]) := 1;
+	init(d[1]) := 0;
+	init(d[2]) := 0;
+	init(d[3]) := 1;
+	init(d[4]) := 1;
