@@ -2,7 +2,7 @@
 
  - Requires flex & bison
  - A high-level language used to represent data streams for Reo connectors. 
- - Generate smv "code" for the data streams given a Reo Model used for model checking purposes.
+ - Generate smv "code" for the data streams of a given Reo Model used for model checking purposes.
 
 Instructions
 ========
