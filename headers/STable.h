@@ -1,13 +1,22 @@
-//#ifdef TABLE_H
+#ifndef TABLE_H
 
 #define TABLE_H
 
 
+
+
 #define  MAX_TABLE 550;
 
+struct S_TABLE;
 
-
-typedef enum { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPETYPE;
+typedef struct E_TABLE
+{
+  char* name;
+  int type;
+  char* val;
+  int methodParam;
+  struct S_TABLE * parentScope;
+} TableEntry;
 
 
 typedef struct S_TABLE
@@ -17,17 +26,34 @@ typedef struct S_TABLE
   int nchild;
   int level;
   int order;
-  SCOPETYPE type;
+  int type;
   // TABLE DATA (como representar!?)(ponteiros pra void?) (ou criar outra struct chamada TABLE ENTRY)
+  TableEntry** tableData;
+    
 } STable;
 
 
-STable* createTable(SCOPETYPE type, STable* parent,  int level, int order, STable** children, int sizechildren);
+TableEntry* createEntry(char* name, int type, char* val, int methodParam, STable* parentScope);
+
+
+STable* createTable(int type, STable* parent,  int level, int order, STable** children, int sizechildren);
 
 void printTable(STable* t);
 
 void letgoTable(STable* t);
 
-int hash(const char * str); 
+int hash(const char * str);
 
-//#endif
+void insert(STable* t, TableEntry* e); 
+
+TableEntry* lookup(STable* t, const char* name);
+
+
+void printEntry(TableEntry* e);
+
+void letgoEntry(TableEntry* e);
+
+
+
+
+#endif
