@@ -1,3 +1,5 @@
+#ifndef NODE_H
+
 #define NODE_H
 
 typedef struct astnode
@@ -19,4 +21,4 @@ void letgoNode(Node* n);
 
 
 
-
+#endif
