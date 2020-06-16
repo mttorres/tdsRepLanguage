@@ -11,6 +11,7 @@
   extern int yylex(void);
   extern int yyparse();
   extern FILE *yyin;
+  FILE *astout;
   extern Node* root;
   extern void yyerror(const char *s);
 
@@ -20,7 +21,9 @@ int main(int argc, char* argv[]) {
   	FILE *fp; // .tds file
   	FILE *smvP; // .smv file;
   	fp = fopen(argv[1], "r");
+  	astout = fopen("results/astOutput", "w");
   	smvP = fopen(argv[2], "r+");
+  	//printf("%s \n",argv[1]);
   	//printf("%s \n",argv[2]);
 
   	if(!fp){
@@ -30,18 +33,19 @@ int main(int argc, char* argv[]) {
   	yyin = fp;
  	yyparse();
 
-  	printf("--------------TREE--------------------\n");
-  	printNode(root);
-  	letgoNode(root);
+  	fprintf(astout,"--------------TREE--------------------\n");
+  	filePrintNode(root,astout);
+  	fclose(astout);
   	fclose(fp);
-	printf("HELLO!? \n");
-  	HeaderSmv** headers = initHeadersStruct(5);
-  	printf("HELLO! \n");
-	preProcessSmv(smvP,headers);
-  	//TESTE 
-  	char *buffer;
+
+	
+	//pré processamento 
+	HeaderSmv** headers = initHeadersStruct(5);
+  	preProcessSmv(smvP,headers);
+  	
   	size_t bufsize = 300;
-  	buffer = (char *) malloc(bufsize * sizeof(char));
+  	char *buffer = (char *) malloc(bufsize * sizeof(char));
+	
 	int i;
 	for(i = 0; i < 5; i++) {
 	    	fseek(smvP,headers[i]->modulePointer,SEEK_SET);
@@ -61,16 +65,15 @@ int main(int argc, char* argv[]) {
 		printf("(%d) %s \n",i,buffer);
 
     	} 
-
-
-    	printHeader(headers[0]);
-    	printHeader(headers[1]);
-    	printHeader(headers[2]);
-    	printHeader(headers[3]);
-    	printHeader(headers[4]);	
-    	letGoHeadersStruct(headers,5);	
+    printHeader(headers[0]);
+    printHeader(headers[1]);
+    printHeader(headers[2]);
+    printHeader(headers[3]);
+    printHeader(headers[4]);	
+    //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
-  	free(buffer);
+  	//free(buffer);
+  	//letgoNode(root);
   	//smvP = fopen(argv[1], "r");
 }
 
