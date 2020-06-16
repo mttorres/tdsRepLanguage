@@ -99,10 +99,10 @@ char* clearOldPortsRefs(char* oldConstraint) {
         //printf("TESTE antiga: %s \n\n",oldConstraint);
         
         // terminou antes da segunda rodada (evita percorrer desnecessáriamente regiões de memória)
-        if(!*oldConstraint) {
-            //printf("xablau \n");
-            break;
-        }
+//        if(!*oldConstraint) {
+//            //printf("xablau \n");
+//            break;
+//        }
         
         preProx = customCat(preProx,oldConstraint,']',1);
         
@@ -149,7 +149,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 
 	char* portsModuleString = "MODULE portsModule";
 	char* automataString = "MODULE finalAutomata(time)";
-	char* beginAutomataString = "MODULE ";	
+	char* beginModuleString = "MODULE ";	
 	char* confirmAutomataString = "cs: {"; // se não encontrar isso após "começar a ler um automato" quer dizer que era um módulo qualquer
 
 	/*Variáveis de controle de cursor e buffer
@@ -159,8 +159,8 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 	*/
 	
 	char* buffer;
-	char* buffer2;
-    	size_t bufsize = 300;
+	char* bufferAux;
+    size_t bufsize = 300;
 	
 	long prevFcursor = 0L;
 
@@ -182,8 +182,6 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 		-> estamos verificando se o modulo é "importante"
 		-> sabemos sobre o modulo
 		-> estamos lendo algo que não importa 
-		
-
 	*/
 	int readMain = 1;
 	int readAutomata = 0;
@@ -194,7 +192,10 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 	int evalLockText = 0;
 	int evalResult = 0;
 	int lock = -2;
+
 	buffer = (char *) malloc(bufsize * sizeof(char));
+    bufferAux = (char *) malloc(bufsize * sizeof(char));
+
    	while ((fgets(buffer,bufsize,smvP))) {
 		
 		if(transAutomata){
@@ -205,35 +206,37 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 		// só feita para automatos no "inicio" da rodada
 		if(readTrans) {
 			// operação complexa de renomear referencias ao ports module
-			if(buffer[0] == '\n' ){
-				printf("OOOOH YESS \n\n");
+			if(buffer[0] == '\n' ) {
+				//printf("OOOOH YESS \n\n");
 				//printf("%s \n\n",buffer); 
 				readTrans = 0; 
 			}
 			// atualmente só automato pode ter INVAR e após iniciar a leitura de transições
 			// e que representa o fim da leitura de transições
-			else if(strstr(buffer,"INVAR")){
+			else if(strstr(buffer,"INVAR")) {
 				invarCursor = prevFcursor;
-				printf("OOOOH YESS \n\n");				
+				//printf("OOOOH YESS \n\n");				
 				readTrans = 0;			
 			}
 			else {
 				// COMENTADO ENQUANTO BUG NÃO É CORRIGIDO				
 				//printf("OH NÕ \n\n");
-				//printf("ANTES %s \n \n",buffer);				
-				//buffer = clearOldPortsRefs(buffer);
+				//strcpy(bufferAux,buffer);
+				//printf("ANTES %s \n \n",bufferAux);				
+				//buffer = clearOldPortsRefs(bufferAux);
 				//printf("DEPOIS %s \n \n",buffer);
 				//fseek(smvP,prevFcursor,SEEK_SET);
-				//fputs(buffer2,smvP);
-				//memset(buffer2, 0,strlen(buffer2));
-				//free(buffer2);
+				//fputs(buffer,smvP);
+				//memset(buffer, 0,strlen(buffer));
+				//memset(buffer, 0,strlen(bufferAux));
+				//free(bufferAux);
 				//readTrans = 0;
 				//lock++;	
 			}		
 		}
 
 		// salvar cursor de VAR
-		if(!readTrans && strstr(buffer,varString)){
+		if(buffer[0] != 'I' && strstr(buffer,varString)) {
 			varCursor = prevFcursor;
 			// se for um module diferente do main(provavelmente automato) tem que avaliar
 			if(readAutomata) {
@@ -243,28 +246,28 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 		}
 
 		// salvar cursor de FROZENVAR e trocar para VAR
-		if(readPortsModule && strstr(buffer,fVarString)){
+		if(readPortsModule && strstr(buffer,fVarString)) {
 			varCursor = prevFcursor;
 			fseek(smvP,varCursor,SEEK_SET); // trocar para VAR
 			strcpy(buffer,varString);	
 			fputs(buffer,smvP);
 		}
 
-		if(evalLockText){
+		if(evalLockText) {
 			//printf("AVALIAÇÃO (%s) \n\n",buffer);			
-			if(strstr(buffer,confirmAutomataString)){
+			if(strstr(buffer,confirmAutomataString)) {
 				evalResult = 1;
 			}
-			if(evalResult){
+			if(evalResult) {
 				evalLockText = 0;			
 			}
 		}
 
 		// salvar cursor de ASSIGN (e termina a criação de headers no caso de portsmodule)
-		if(!readTrans && strstr(buffer,assignString)){
+		if(!readTrans && strstr(buffer,assignString)) {
 			assignCursor = prevFcursor;
 
-			if(readPortsModule){
+			if(readPortsModule) {
 			  //clearPortsModule = 1;	
 			  ds[PORTS-1]=createHeader(PORTS,moduleCursor,varCursor,assignCursor,0, 0, 0);	
 			  //printf("CRIANDO PORTS HEADER INDICE %d \n\n",PORTS-1); 		
@@ -273,17 +276,17 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 
 
 		// coisas só feitas para o modulo do automato:
-		if(readAutomata){
+		if(readAutomata) {
 		
 			//verifica se vamos ler as transições na proxima rodada do loop (topo)
 			//termina de avaliar um modulo SE É AUTOMATO OU NÃO
 			if(!readTrans && strstr(buffer,transString)) {
 				transCursor = prevFcursor;
-				if(!evalResult){
+				if(!evalResult) {
 					readAutomata = 0; // o módulo na verdade não é um automato
 					//printf("MODULO NÃO AUTOMATO DETECTADO! \n\n");
 				}
-				else{
+				else {
 					//printf("MODULO  AUTOMATO DETECTADO! \n\n");					
 					automataCounter++;
 					transAutomata = 1;					
@@ -293,7 +296,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 				
 
 		// termina a leitura de MAIN ou termina a leitura de outro MÓDULO 
-		if(prevFcursor != 0L && strstr(buffer,beginAutomataString)){			
+		if(prevFcursor != 0L && strstr(buffer,beginModuleString)) {			
 			if(readMain) {
 				moduleCursor = prevFcursor; // salva o inicio do módulo !			
 				ds[MAIN-1] = createHeader(MAIN, 0, varCursor, assignCursor, 0, 0, 0);	 // salva o main lido anteriormente
@@ -304,11 +307,11 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 
 			if(readAutomata) {
 				readTrans = 0;	       
-				if(automataCounter == 1){
+				if(automataCounter == 1) {
 				  	ds[AUTOMATA-1]=createHeader(AUTOMATA,moduleCursor,varCursor,assignCursor,transCursor, invarCursor, 0); 
 				 	//printf("CRIANDO AUTOMATO HEADER INDICE(i) %d \n\n",AUTOMATA-1); 
 				}
-				else if (automataCounter != 0){
+				else if (automataCounter != 0) {
 				 	//printf("CRIANDO AUTOMATO HEADER INDICE(ii) %d \n\n",AUTOMATA+(automataCounter-2));
 				 	ds[AUTOMATA+(automataCounter-2)]=
 						createHeader(AUTOMATA,moduleCursor,varCursor,assignCursor,transCursor, invarCursor, 0);
@@ -318,20 +321,24 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			
 			// chegamos em ports module...
 			if(strstr(buffer,portsModuleString)) {
-				//printf("HERE WE ARE! %ld \n\n",prevFcursor);
+				printf("HERE WE ARE! %ld \n\n",prevFcursor);
 				readAutomata = 0;
 				readTrans = 0;	
 				readPortsModule = 1;				
 				// escrever time em ports module!			
-				//printf("LINHA : %s \n",buffer);
-				//buffer = addParamModule(buffer,"time");
-				//printf("NOVO : %s \n",buffer);
-				//fseek(smvP,prevFcursor,SEEK_SET); // voltar para a leitura anterior!
-				//fputs(buffer,smvP);		  // sobrescrever ports module, cursor volta a ser o atual
+				printf("LINHA : %s \n",buffer);
+				bufferAux = addParamModule(buffer,"time");
+				fseek(smvP,prevFcursor,SEEK_SET); // voltar para a leitura anterior!
+				fputs(bufferAux,smvP);		  // sobrescrever ports module, cursor volta a ser o atual
+				printf("NOVO : %s \n",bufferAux);
+				//printf("NOVO : %lu \n",bufferAux);
+				//free(bufferAux); // pq nao dar free aqui?
+				
 			}											
 		} 
 		prevFcursor = ftell(smvP);
 	}
+	//printf("terminou! \n");
 	free(buffer);	  
 }
 
@@ -347,7 +354,7 @@ char* addParamModule(char* original, char* param) {
 	}
 
 	if(original[strlen(original)-1] == ')' || original[strlen(original)-2] == ')'){
-		newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // , e  \0
+		newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
 		newString = customCat(newString,original,')',0);
 		newString = customCat(newString,", ",0,0);
 		newString = customCat(newString,param,0,0);
@@ -365,6 +372,8 @@ char* addParamModule(char* original, char* param) {
 	  newString = customCat(newString,"\n",0,0);
 	}
 	newString = newString - ((strlen(original)+strlen(param)+2)-1);	
+	//printf("%s\n",newString);
+	//printf("%lu\n",newString);
 	return newString;
 }
 
