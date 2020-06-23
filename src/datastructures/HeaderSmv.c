@@ -72,11 +72,12 @@ char* clearOldPortsRefs(char* oldConstraint) {
     
     char* nova = (char*) malloc(sizeof(oldConstraint));
     char* anterior = NULL;
-    char* preProx;
+    char* preProx = NULL;
     long offsetoriginal = strlen(oldConstraint);
-//    printf("NANI!? : %s \n\n\n",nova);
+    char* ponteiroOldOriginal = oldConstraint;
+    printf("[clearOldPortsRefs]  NANI!? : %s \n\n\n",nova);
     memset(nova,0,strlen(nova));
-//    printf("NARUHOTO!? : %s \n\n\n",nova);
+    printf("[clearOldPortsRefs]  NARUHOTO!? : %s \n\n\n",nova);
     long offsetfinal = offsetoriginal;
     long offsetEntreDeli = 0L;
     
@@ -84,51 +85,61 @@ char* clearOldPortsRefs(char* oldConstraint) {
     
     while(*oldConstraint){
         
-        preProx = customCat(nova,oldConstraint,'[',0);
-        if(anterior != NULL){
-            oldConstraint += ((preProx - anterior)+2);
+        if(!preProx){
+        	preProx = customCat(nova,oldConstraint,'[',0); // primeira vez que roda (não temos o ponteiro para o final da string!)
+        }
+        else{
+        	preProx = customCat(preProx,oldConstraint,'[',0);
+        }
+
+        //printf("[????] %c \n\n\n\n\n\n",ponteiroOldOriginal[offsetoriginal-1]);
+        
+        if(*preProx != ponteiroOldOriginal[offsetoriginal-1] && anterior != NULL){
+            oldConstraint += ((preProx - anterior)+2); // diferença do anterior para o ponteiro final da string (N chars) e delmitador
         }
         else{
             oldConstraint += (strlen(nova)+1);
         }
-        
-        //printf("RODADA I \n\n");
-        //printf("o(i): %ld \n",offsetfinal);
-        //printf("TESTE chegada: %s \n",preProx);
-        //printf("TESTE: %s \n",nova);
-        //printf("TESTE antiga: %s \n\n",oldConstraint);
-        
+
         // terminou antes da segunda rodada (evita percorrer desnecessáriamente regiões de memória)
-//        if(!*oldConstraint) {
-//            //printf("xablau \n");
-//            break;
-//        }
+        if(!*oldConstraint) {
+            printf("[clearOldPortsRefs]  xablau \n");
+            break;
+        }
+        
+        printf("[clearOldPortsRefs]  RODADA I \n\n");
+        printf("[clearOldPortsRefs]  o(i): %ld \n",offsetfinal);
+        printf("[clearOldPortsRefs]  TESTE chegada(devolvido pelo customCat): %s \n",preProx);
+        printf("[clearOldPortsRefs]  TESTE (string nova): %s \n",nova);
+        printf("[clearOldPortsRefs]  TESTE (parte atual da antiga) : %s \n\n",oldConstraint);
+        
+
         
         preProx = customCat(preProx,oldConstraint,']',1);
         
         
-        oldConstraint += (preProx[0]+1);
+        oldConstraint += (preProx[0]+1); // ignorou N caracteres (variavel) e mais o delimitador
         if(offsetEntreDeli == 0){
-            offsetEntreDeli = preProx[0];
+            offsetEntreDeli = preProx[0]; // salvou para as próximas ocorrencias 
         }
         
         //printf("skiped: %d \n\n",preProx[0]+1);
         //printf("skiped: %c \n\n",preProx[0]);
         
         if(preProx[0] == offsetEntreDeli){
-            offsetfinal -= (preProx[0]+2);
+            offsetfinal -= (preProx[0]+2); // delimitadores mais N caracteres se for o "padrão de variavel utilizado" (pode ser necessario remover essa linha no futuro INTEGRACAO)
         }
        
         //printf("o(ii): %lu \n",offsetfinal);
-        preProx[0] = '\0';
-        anterior = preProx; 
+
+        preProx[0] = '\0'; // elimina o offset para a proxima rodada
+        anterior = preProx; // salva ponteiro de preProx
         
-        //printf("RODADA II \n\n");
-        //printf("o(ii): %ld \n",offsetfinal);
-        //printf("TESTE chegada: %s \n",preProx);
-        //printf("TESTE: %s \n",nova);
-        //printf("TESTE antiga: %s \n\n",oldConstraint);
-        
+        printf("[clearOldPortsRefs]  RODADA II \n\n");
+        printf("[clearOldPortsRefs]  o(ii): %ld \n",offsetfinal);
+        printf("[clearOldPortsRefs]  TESTE chegada(devolvido pelo customCat): %s \n",preProx); // vai ser o final da string de antes!
+        printf("[clearOldPortsRefs]  TESTE (string nova): %s \n",nova);
+        printf("[clearOldPortsRefs]  TESTE (parte atual da antiga) : %s \n\n",oldConstraint);       
     }
     nova[offsetfinal] = '\0';
     //printf("o: %ld \n",offsetfinal);
