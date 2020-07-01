@@ -228,6 +228,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			if(buffer[0] == '\n' ) {
 				//printf("OOOOH YESS \n\n");
 				//printf("%s \n\n",buffer); 
+				// para a operação 
 				readTrans = 0; 
 			}
 			// atualmente só automato pode ter INVAR e após iniciar a leitura de transições
@@ -254,7 +255,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			}		
 		}
 
-		// salvar cursor de VAR
+		// salvar cursor de VAR (TROCAR PARA VERIFICAR O FROZEN VAR AQUI DEPOIS)
 		if(buffer[0] != 'I' && strstr(buffer,varString)) {
 			varCursor = prevFcursor;
 			// se for um module diferente do main(provavelmente automato) tem que avaliar
@@ -272,6 +273,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			fputs(buffer,smvP);
 		}
 
+		// melhorar ordem desse if e outros(atualmente ele avalia uma vez a mais se um automato)
 		if(evalLockText) {
 			//printf("AVALIAÇÃO (%s) \n\n",buffer);			
 			if(strstr(buffer,confirmAutomataString)) {
