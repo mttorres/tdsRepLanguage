@@ -39,6 +39,7 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 	if(!ignoreMode){
 	  *dest = '\0';
 	  --dest;   
+	  //printf("\t[customCat - ignoreMode = 0] ponteiro fim : %s \n",dest);	  
 	}
 	else {
 	        *dest = ignoredExtra;

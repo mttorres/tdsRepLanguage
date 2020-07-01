@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
   	fclose(astout);
   	fclose(fp);
 
-/*
+
 	
 	//pré processamento 
 	HeaderSmv** headers = initHeadersStruct(5);
@@ -76,20 +76,33 @@ int main(int argc, char* argv[]) {
   	//free(buffer);
   	//letgoNode(root);
   	//smvP = fopen(argv[1], "r");
-*/
-  	//TESTE PORTS REFS
+
+  	
+
+
+
+//TESTE PORTS REFS (aparentemente tudo funcionando)
+
+/*
   	printf("TESTE PORT REFS !!! \n\n\n");
   	char* string1 = "	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 0 & FALSE) -> next(cs) = p0) &";
   	char* nova =clearOldPortsRefs(string1);
   	printf("ANTES:  %s \n\n\n",string1);
-    printf("DEPOIS:  %s \n\n\n",nova);	
-    free(nova);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);
 
   	char* string2 = "	((cs = q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & FALSE) -> next(cs) = q0);";
   	nova =clearOldPortsRefs(string2);
   	printf("ANTES:  %s \n\n\n",string2);
-    printf("DEPOIS:  %s \n\n\n",nova);	
-    free(nova);    
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova); 
+
+  	char* string3 = "	((cs = q0p0) -> ((next(cs) != q0p1))) &";
+  	nova =  clearOldPortsRefs(string3);
+  	printf("ANTES:  %s \n\n\n",string3);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);    
+*/
 
 }
 

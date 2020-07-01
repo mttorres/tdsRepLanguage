@@ -106,7 +106,14 @@ char* clearOldPortsRefs(char* oldConstraint) {
         	}
         }
         else{
-        	oldConstraint += ((preProx - anterior)+1); // final da string (o +1 é pq preProx e anterior não consideram o caracter terminador!) 
+		if(anterior != NULL) {        	
+		oldConstraint += ((preProx - anterior)+1); // final da string (o +1 é pq preProx e anterior não consideram o caracter terminador!) 
+		}
+		else {
+			// nao terminou e é "primeira vez que roda"
+			//printf("[clearOldPortsRefs] String rejeitada \n\n");
+			oldConstraint += offsetoriginal;
+		}
         }
 
         // terminou antes da segunda rodada (evita percorrer desnecessáriamente regiões de memória)
@@ -213,7 +220,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 	int lock = -2;
 
 	buffer = (char *) malloc(bufsize * sizeof(char));
-    bufferAux = (char *) malloc(bufsize * sizeof(char));
+    //bufferAux = (char *) malloc(bufsize * sizeof(char));
 
    	while ((fgets(buffer,bufsize,smvP))) {
 		
@@ -240,16 +247,15 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			}
 			else {
 				// COMENTADO ENQUANTO BUG NÃO É CORRIGIDO				
-				//printf("OH NÕ \n\n");
-				//strcpy(bufferAux,buffer);
-				//printf("ANTES %s \n \n",bufferAux);				
-				//buffer = clearOldPortsRefs(bufferAux);
-				//printf("DEPOIS %s \n \n",buffer);
+				printf("OH NÕ \n\n");
+				printf("ANTES %s \n \n",buffer);				
+				bufferAux = clearOldPortsRefs(buffer);
+				printf("DEPOIS %s \n \n",bufferAux);
 				//fseek(smvP,prevFcursor,SEEK_SET);
 				//fputs(buffer,smvP);
 				//memset(buffer, 0,strlen(buffer));
 				//memset(buffer, 0,strlen(bufferAux));
-				//free(bufferAux);
+				free(bufferAux);
 				//readTrans = 0;
 				//lock++;	
 			}		
