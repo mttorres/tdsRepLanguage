@@ -185,7 +185,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 	*/
 	
 	char* buffer;
-	char* bufferAux;
+	//char* bufferAux;
     size_t bufsize = 300;
 	
 	long prevFcursor = 0L;
@@ -220,7 +220,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 	int lock = -2;
 
 	buffer = (char *) malloc(bufsize * sizeof(char));
-    //bufferAux = (char *) malloc(bufsize * sizeof(char));
+        //bufferAux = (char *) malloc(bufsize * sizeof(char));
 
    	while ((fgets(buffer,bufsize,smvP))) {
 		
@@ -248,15 +248,17 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			else {
 				// COMENTADO ENQUANTO BUG NÃO É CORRIGIDO				
 				printf("OH NÕ \n\n");
-				printf("ANTES %s \n \n",buffer);				
+				printf("ANTES %s \n \n",buffer);
+				char* bufferAux;				
 				bufferAux = clearOldPortsRefs(buffer);
 				printf("DEPOIS %s \n \n",bufferAux);
-				//fseek(smvP,prevFcursor,SEEK_SET);
-				//fputs(buffer,smvP);
+				fseek(smvP,prevFcursor,SEEK_SET);
+				fputs(bufferAux,smvP);
 				//memset(buffer, 0,strlen(buffer));
 				//memset(buffer, 0,strlen(bufferAux));
-				free(bufferAux);
-				//readTrans = 0;
+				printf("VAI PARTIR \n");
+				//free(bufferAux);
+				readTrans = 0;
 				//lock++;	
 			}		
 		}
@@ -349,6 +351,7 @@ void preProcessSmv(FILE* smvP, HeaderSmv** ds) {
 			// chegamos em ports module...
 			if(strstr(buffer,portsModuleString)) {
 				printf("HERE WE ARE! %ld \n\n",prevFcursor);
+				char* bufferAux;				
 				readAutomata = 0;
 				readTrans = 0;	
 				readPortsModule = 1;				
