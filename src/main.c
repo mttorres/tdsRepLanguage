@@ -38,16 +38,16 @@ int main(int argc, char* argv[]) {
   	fclose(astout);
   	fclose(fp);
 
-
+  HeaderController* controller = createController(5);  
 	
 	//pré processamento 
-	HeaderSmv** headers = initHeadersStruct(5);
-  	preProcessSmv(smvP,headers);
+	preProcessSmv(smvP,controller);
   	
-  	size_t bufsize = 300;
-  	char *buffer = (char *) malloc(bufsize * sizeof(char));
+  size_t bufsize = 300;
+  char *buffer = (char *) malloc(bufsize * sizeof(char));
 	
 	int i;
+  /*
 	for(i = 0; i < 5; i++) {
 	    	fseek(smvP,headers[i]->modulePointer,SEEK_SET);
 		fgets(buffer,bufsize,smvP);
@@ -66,6 +66,7 @@ int main(int argc, char* argv[]) {
 		printf("(%d) %s \n",i,buffer);
 
     	} 
+    */
     printHeader(headers[0]);
     printHeader(headers[1]);
     printHeader(headers[2]);
