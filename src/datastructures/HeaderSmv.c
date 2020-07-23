@@ -195,57 +195,6 @@ void saveLineOnBuffer(int type,int part, char* line, HeaderController* Hcontrol,
 	selectBuffer(part,line,Hcontrol->headers[type-1],controlRename);
 }
 
-
-int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds, int readMain) {
-	
-	// detecta VAR fazendo tratamento se necessário 
-	int evalVar = buffer[0] != 'I' && strstr(buffer,varString);
-	char* stringSave = buffer;
-
-	if(evalVar) {
-		char fVarString[] = "FROZENVAR";
-
-		ds[stage-1]->varPointer = ds[stage-1]->CURR_OFFSET; 
-		
-		if(strstr(buffer,fVarString)) {
-			printf("[computePhase1] Buffer antes da renomeação %s \n\n",stringSave);
-			//trocar para VAR
-			stringSave = varString;
-			printf("[computePhase1] Removendo FROZENVAR , %s \n\n",stringSave); 
-		
-		}
-	}
-	// só salva a linha
-	saveLineOnBuffer(stage, ds[stage-1]->CURR_OFFSET,stringSave,ds);
-	printf("[computePhase2 - %d ] OFFSET STATUS: %ld \n\n",evalVar,ds[stage-1]->CURR_OFFSET);  
-	return evalVar;
-}
-
-// verifica assign e trans (podem ser intercalados)
-int computePhase2(int stage, char* buffer, char* assignString,HeaderSmv** ds, int readAutomata, char* transString) {
-	
-	int evalAssign = !!strstr(buffer,assignString);
-	int phaseResult = 0;
-	
-	if(evalAssign) {
-		ds[stage-1]->assignPointer = ds[stage-1]->CURR_OFFSET;
-		phaseResult = 1;				
-	}
-	
-	// se estamos lendo o automato (e não acabamos de avaliar um Assign)
-	// essa if avalia mais do que devia atualmente, mas nunca sabemos se os módulos de transform(funcao) terão assign ou só transições
-	// vale apenas verificar depois(!)
-	if(!evalAssign && readAutomata && strstr(buffer,transString)) {
-		ds[stage-1]->transPointer = ds[stage-1]->CURR_OFFSET;
-		phaseResult = 2;
-	}
-	saveLineOnBuffer(stage, ds[stage-1]->CURR_OFFSET,buffer,ds); 
-	printf("[computePhase2 - %d ] OFFSET STATUS: %ld \n\n",phaseResult,ds[stage-1]->CURR_OFFSET); 	
-	return phaseResult;
-
-}
-
-
 // fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
 // as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
 // stages são os módulos 0(main), automato(2), ports(3)
@@ -263,7 +212,6 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 
 
 }
-
 
 // depois(!): conversar com o felipe sobre como "diferenciar" smvs do transform 
 void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
@@ -390,14 +338,15 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    			}
 
    		}
-   			processPhase(stage,phase,Hcontrol,bufferAux,controlRename);
-   			if(phase == MODULE){
-   				phase++;
-   			}
-   			if(renamePortsParam && phase == PORTS){
-   				free(bufferAux);
-   				renamePortsParam = 0;
-   			}
+   		
+   		processPhase(stage,phase,Hcontrol,bufferAux,controlRename);
+   		if(phase == MODULE){
+   			phase++;
+   		}
+   		if(renamePortsParam && phase == PORTS){
+   			free(bufferAux);
+   			renamePortsParam = 0;
+   		}
    	}
    	free(buffer);
    	printf("terminou! \n");	

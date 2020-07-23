@@ -47,7 +47,7 @@ void postProcessSmv(FILE* smvP, int* ds);
 void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
 
 // salva a linha do baseada no  header do módulo lido anteriormente
-void saveLineOnBuffer(iint type,int part, char* line, HeaderController* Hcontrol);
+void saveLineOnBuffer(int type,int part, char* line, HeaderController* Hcontrol);
 
 // mudar nome dos evals
 int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);
