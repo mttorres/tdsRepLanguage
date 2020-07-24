@@ -160,9 +160,8 @@ void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol
 
 void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 	int pt;
-	char* aloc; 
+	char* aloc = malloc((strlen(line)+1) * sizeof(char));
 	if(part != TRANS){
-		aloc = malloc((strlen(line)+1) * sizeof(char));
 		strcpy(aloc,line);
 		if(part == VAR) {
 			pt = header->VAR_POINTER;
@@ -178,14 +177,18 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 	else{
 		pt = header->TRANS_POINTER;
 		if(!controlRename){
-			aloc = malloc((strlen(line)+1) * sizeof(char));
 			strcpy(aloc,line);
 			header->transBuffer[pt] = aloc;
 		}
 		else{
-			printf("[selectBuffer] tratamento de rename refs a portsModule ANTES: %s \n\n",line);
-			header->transBuffer[pt] = clearOldPortsRefs(line); // tratamento de rename
-			printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS: %s \n\n",header->transBuffer[pt]);
+			//char** bufferAux = clearOldPortsRefs(line); 
+			printf("[selectBuffer] tratamento de rename refs a portsModule ANTES:%s\n\n",line);
+			//strcpy(aloc,bufferAux);
+			header->transBuffer[pt] = clearOldPortsRefs(line);
+			printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS:%s\n\n",header->transBuffer[pt]);			
+			//if(bufferAux){
+			//	free(bufferAux);	
+			//}
 		}
 		header->TRANS_POINTER += 1;
 

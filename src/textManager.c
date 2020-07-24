@@ -56,9 +56,9 @@ char* clearOldPortsRefs(char* oldConstraint) {
     char* preProx = NULL;
     long offsetoriginal = strlen(oldConstraint);
     char* ponteiroOldOriginal = oldConstraint;
-    //printf("[clearOldPortsRefs]  NANI!? : %s \n\n\n",nova);
+    printf("[clearOldPortsRefs]  NANI!? : %s \n\n\n",nova);
     memset(nova,0,strlen(nova));
-    //printf("[clearOldPortsRefs]  NARUHOTO!? : %s \n\n\n",nova);
+    printf("[clearOldPortsRefs]  NARUHOTO!? : %s \n\n\n",nova);
     long offsetfinal = offsetoriginal;
     long offsetEntreDeli = 0L;
     int avaliacaoFinalString = 0;
@@ -139,6 +139,7 @@ char* clearOldPortsRefs(char* oldConstraint) {
     }
     nova[offsetfinal] = '\0';
     //printf("o: %ld \n",offsetfinal);
+    printf("[clearOldPortsRefs]  RESULTADO : %s \n\n\n",nova);
     return nova;
     
     
