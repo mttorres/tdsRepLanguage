@@ -5,25 +5,6 @@
 #include "../../headers/Enum.h"
 #include "../../headers/textManager.h"
 
-
-enum headerPart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2};
-
-
-HeaderSmv** initHeadersStruct(int size) {
-  
-  HeaderSmv** headers = ( HeaderSmv**) malloc(sizeof(HeaderSmv*)*size);
-  return headers;
-}
-
-HeaderController* createController(int size) {
-	HeaderController* Hcontrol = malloc(sizeof(HeaderController));
-	Hcontrol->CURRENT_SIZE = 0;
-	Hcontrol->headers = initHeadersStruct(size);
-
-	return Hcontrol;
-}
-
-
 HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP) {
 
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
@@ -46,6 +27,70 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
 
   return header; 
 }
+
+void letgoHeader(HeaderSmv* h){
+
+	if(!h){
+		return;
+	}
+	free(h->moduleName);
+	int i;
+ 	
+ 	for(i = 0; i< h->VAR_POINTER; i++){
+		if(h->varBuffer[i]){
+			free(h->varBuffer[i]); // note que poderiamos nos livrar de strings dinamicas nesse caso (reformular métodos CAT e refs para static string?)
+		}					 // not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
+  	}						 // ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
+  	free(h->varBuffer);
+	
+ 	for(i = 0; i< h->ASSIGN_POINTER; i++) {
+		if(h->assignBuffer[i]){
+			free(h->assignBuffer[i]); 
+		}					 
+  	}
+  	free(h->assignBuffer);		
+
+ 	for(i = 0; i< h->TRANS_POINTER; i++) {
+		if(h->transBuffer[i]){
+			free(h->transBuffer[i]); 
+		}					 
+  	}
+  	free(h->transBuffer);	
+
+  	free(h);  				
+}
+
+
+HeaderSmv** initHeadersStruct(int size) {
+  
+  HeaderSmv** headers = ( HeaderSmv**) malloc(sizeof(HeaderSmv*)*size);
+  return headers;
+}
+
+void letGoHeadersStruct(HeaderSmv** hs, int size){
+  
+  int i;
+  for(i = 0; i< size; i++){
+	letgoHeader(hs[i]);
+	hs[i] = NULL;
+  }
+  free(hs);
+}
+
+HeaderController* createController(int size) {
+	HeaderController* Hcontrol = malloc(sizeof(HeaderController));
+	Hcontrol->CURRENT_SIZE = 0;
+	Hcontrol->headers = initHeadersStruct(size);
+
+	return Hcontrol;
+}
+
+
+void letGoHeaderControl(HeaderController* Hcontrol) {
+	letGoHeadersStruct(Hcontrol->headers,Hcontrol->CURRENT_SIZE);
+	free(Hcontrol);
+}
+
 
 void printHeaderBuffer(HeaderSmv* h, int part, char* partString) {
 	int i;
@@ -85,13 +130,13 @@ void printHeader(HeaderSmv* h) {
 	
 		printf(" ASSIGN: %d \n",h->ASSIGN_POINTER);
 	
-		printf(" TRANS: %ld \n",h->TRANS_POINTER);
+		printf(" TRANS: %d \n",h->TRANS_POINTER);
 
 		printf("------------INFO----------- \n \n ");
 
  	
  	}
-	char tiposBuffers[][] = {
+	char* tiposBuffers[] = {
     	"VAR",
     	"ASSIGN",
     	"TRANS",    	
@@ -104,53 +149,6 @@ void printHeader(HeaderSmv* h) {
 
 }
 
-void letgoHeader(HeaderSmv* h){
-
-	if(!h){
-		return;
-	}
-	free(h->moduleName);
-	int i;
- 	
- 	for(i = 0; i< h->VAR_POINTER; i++){
-		if(h->varBuffer[i]){
-			free(h->varBuffer[i]); // note que poderiamos nos livrar de strings dinamicas nesse caso (reformular métodos CAT e refs para static string?)
-		}					 // not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
-  	}						 // ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
-  	free(h->varBuffer);
-	
- 	for(i = 0; i< h->ASSIGN_POINTER; i++) {
-		if(h->assignBuffer[i]){
-			free(h->assignBuffer[i]); 
-		}					 
-  	}
-  	free(h->assignBuffer);		
-
- 	for(i = 0; i< h->TRANS_POINTER; i++) {
-		if(h->transBuffer[i]){
-			free(h->transBuffer[i]); 
-		}					 
-  	}
-  	free(h->transBuffer);	
-
-  	free(h);  				
-}
-
-
-void letGoHeadersStruct(HeaderSmv** hs, int size){
-  
-  int i;
-  for(i = 0; i< size; i++){
-	letgoHeader(hs[i]);
-	hs[i] = NULL;
-  }
-  free(hs);
-}
-
-void letGoHeaderControl(HeaderController* Hcontrol) {
-	letGoHeadersStruct(Hcontrol->headers,Hcontrol->CURRENT_SIZE);
-	free(Hcontrol);
-}
 
 
 // salva o header do módulo lido anteriormente
@@ -168,7 +166,7 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 		strcpy(aloc,line);
 		if(part == VAR) {
 			pt = header->VAR_POINTER;
-			header->varPointer[pt] = aloc;
+			header->varBuffer[pt] = aloc;
 			header->VAR_POINTER += 1;	
 		}
 		if(part == ASSIGN) {
@@ -201,13 +199,13 @@ void saveLineOnBuffer(int type,int part, char* line, HeaderController* Hcontrol,
 void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename) {
 
 	// modulo
-	if(part == MODULE) {
+	if(part == CREATE_MODULE) {
 		printf("[processPhase] Start module %d %s \n",Hcontrol->CURRENT_SIZE,line);
 		initPreProcessHeader(stage,line, Hcontrol);
 	}
 	// VAR, ASSIGN, TRANS
 	else{
-		saveLineOnBuffer(part,line,Hcontrol,controlRename);	
+		saveLineOnBuffer(stage,part,line,Hcontrol,controlRename);	
 	}
 
 
@@ -254,7 +252,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
 	*/
 	int stage = MAIN;
 	int index;
-	int phase = MODULE;
+	int phase = CREATE_MODULE;
 	int readAssign = 0;
 	int readTrans = 0; // o !readTrans mais abaixo é usado para evitar comparações desncessárias com a string gigante de transições 
 	int controlRename = 0;
@@ -276,7 +274,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    			}
    			else{
    				stage = AUTOMATA;
-   				readAutomata = 1
+   				readAutomata = 1;
    			}
    		}
 
@@ -287,17 +285,17 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    				controlRename = readTrans? 0 : 0;
    			}
    			else{
-   				phase = MODULE;
+   				phase = CREATE_MODULE;
    				stage++;
    				readAutomata = 0;
-   				readPortsModule = 0
+   				readPortsModule = 0;
    				continue;
    			}
    		}
    		
    		if(phase == ASSIGN){
    			printf("[preProcessSmv] Buffer pré computePhase 2 %s \n\n",buffer);
-   			if(!portsModule){
+   			if(!readPortsModule){
    				//isto é o módulo não acabou sem as transições 
    				if(buffer[0] != '\n'){
    					readTrans =  (buffer[0] == 'T' && strstr(buffer,transString));
@@ -308,10 +306,10 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    				// módulo acabou 
    				else{
    					// ignorar \n e reiniciar phases
-   					phase = MODULE;
+   					phase = CREATE_MODULE;
    					stage++;
    					readAutomata = 0;
-   					readPortsModule = 0
+   					readPortsModule = 0;
    					continue;
    				}
    			}
@@ -340,7 +338,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    		}
    		
    		processPhase(stage,phase,Hcontrol,bufferAux,controlRename);
-   		if(phase == MODULE){
+   		if(phase == CREATE_MODULE){
    			phase++;
    		}
    		if(renamePortsParam && phase == PORTS){
