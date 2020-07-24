@@ -67,11 +67,11 @@ int main(int argc, char* argv[]) {
 
     	} 
     */
-    printHeader(headers[0]);
-    printHeader(headers[1]);
-    printHeader(headers[2]);
-    printHeader(headers[3]);
-    printHeader(headers[4]);	
+    printHeader(controller->headers[0]);
+    printHeader(controller->headers[1]);
+    printHeader(controller->headers[2]);
+    printHeader(controller->headers[3]);
+    printHeader(controller->headers[4]);	
     //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
   	//free(buffer);
