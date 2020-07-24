@@ -33,7 +33,8 @@ void letGoHeadersStruct(HeaderSmv** hs, int size);
 typedef struct headerController
 {
   HeaderSmv ** headers;
-  int CURRENT_SIZE;
+  int CURRENT_SIZE; // usar current size com -1 (se vc está processando o indice atual(ultimo) é porque ele já alocou para o seguinte!)
+                    // ex:  sétimo membro(6) (CURRENT_SIZE = 7) (ou seja para referenciar o último é só pegar CURRENT-1)
   
 }HeaderController;
 
@@ -56,7 +57,7 @@ void postProcessSmv(FILE* smvP, HeaderController* Hcontrol);
 void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
 
 // salva a linha do baseada no  header do módulo lido anteriormente
-void saveLineOnBuffer(int type,int part, char* line, HeaderController* Hcontrol, int controlRename);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename);
 
 // mudar nome dos evals
 //int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);

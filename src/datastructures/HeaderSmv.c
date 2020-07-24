@@ -180,17 +180,20 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 		if(!controlRename){
 			aloc = malloc((strlen(line)+1) * sizeof(char));
 			strcpy(aloc,line);
+			header->transBuffer[pt] = aloc;
 		}
 		else{
-			//header->transBuffer[pt] = aloc; // tratamento de rename
+			printf("[selectBuffer] tratamento de rename refs a portsModule ANTES: %s \n\n",line);
+			header->transBuffer[pt] = clearOldPortsRefs(line); // tratamento de rename
+			printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS: %s \n\n",header->transBuffer[pt]);
 		}
 		header->TRANS_POINTER += 1;
 
 	}
 }
 
-void saveLineOnBuffer(int type,int part, char* line, HeaderController* Hcontrol, int controlRename) {
-	selectBuffer(part,line,Hcontrol->headers[type-1],controlRename);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename) {
+	selectBuffer(part,line,Hcontrol->headers[pos-1],controlRename);
 }
 
 // fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
@@ -205,7 +208,7 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 	}
 	// VAR, ASSIGN, TRANS
 	else{
-		saveLineOnBuffer(stage,part,line,Hcontrol,controlRename);	
+		saveLineOnBuffer(Hcontrol->CURRENT_SIZE,part,line,Hcontrol,controlRename);	
 	}
 
 
@@ -281,14 +284,15 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    		if(phase == TRANS) {
    			printf("[preProcessSmv] Buffer pré computePhase 3 %s \n\n",buffer);
    			if(buffer[0] != '\n'){
-   				readTrans = (buffer[0] != 'I')? readTrans : 1;
-   				controlRename = readTrans? 0 : 0;
+   				readTrans = (buffer[0] != 'I')? readTrans : 0;
+   				controlRename = readTrans? 1 : 0;
    			}
    			else{
    				phase = CREATE_MODULE;
    				stage++;
    				readAutomata = 0;
    				readPortsModule = 0;
+   				printf("[preProcessSmv] Buffer pré computePhase 2  módulo acabou \n\n");
    				continue;
    			}
    		}
@@ -310,6 +314,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    					stage++;
    					readAutomata = 0;
    					readPortsModule = 0;
+   					printf("[preProcessSmv] Buffer pré computePhase 2  módulo acabou \n\n");
    					continue;
    				}
    			}
@@ -325,8 +330,12 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    			readTrans =  (buffer[0] == 'T' && strstr(buffer,transString));
 
    			if(!(readAssign || readTrans)) {
-   				int iniVar = Hcontrol->headers[stage-1]->VAR_POINTER == 0;
+   				if(readPortsModule){
+   					printf("[preProcessSmv] debug: FVAR %s\n",buffer);
+   				}
+   				int iniVar = Hcontrol->headers[Hcontrol->CURRENT_SIZE-1]->VAR_POINTER == 0;
    				if(iniVar &&  strstr(buffer,fVarString)) {
+   					printf("[preProcessSmv] Trocou FVAR %s\n",buffer);
    					bufferAux = varString; // tratamento de FROZEN VAR
    				}   				
    			}
