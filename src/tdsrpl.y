@@ -64,7 +64,6 @@
 %token <sval> AND
 %token <sval> OR
 %token <sval> NOT
-%token <sval> IMPLIES
 %token <sval> ELSE
 %token <sval> Null
 %token <sval> XOR
@@ -83,12 +82,13 @@
 %token <sval> DATATIME
 %token <sval> DELAYED
 %token <sval> PORTNAME
-%token <sval> LINK
 %token <sval> LINKED
 %token <sval> INITTIME
 %token <sval> CURRENTTIME
 %token <sval> FINALTIME
 %token <sval> ID
+%token <sval> PASS
+%token <sval> DPASS
 
 %type <ast> prog
 %type <ast> cmds
@@ -101,6 +101,7 @@
 %type <ast> paramsOpcional
 %type <ast> data
 %type <ast> otherstmt
+%type <ast> assignable
 %type <ast> expr
 %type <ast> multiexp
 %type <ast> ineqexp
@@ -118,8 +119,8 @@
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
-%type <ast> linked
 %type <ast> timedirective
+%type <ast> anonimtdsop
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
@@ -275,7 +276,26 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
 		$$ = cmd; 		
 	 }
+	 // jogar para nó mais abaixo a operação para avaliar antes de toda a expressão!
+
+	 | LPAREN params RPAREN anonimtdsop ID {
+
+		Node* cmd = createNode(8,2,3,"CMD -  Comando (criação TDS-anonima)", $2,$4,  $1,$3,$5); 
+		//infoNode($$);
+		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
+		$$ = cmd; 	 	
+	 }
 	 ;
+
+
+anonimtdsop: PASS  {
+			Node* p = createNode(4,0,1,"CMD -  PASS", $1); 
+			$$ = p;
+		}
+		| DPASS  {
+			Node* p = createNode(4,0,1,"CMD -  DPASS", $1); 
+			$$ = p;
+		} 
 
 
 paramsOpcional: paramsCall {
@@ -329,18 +349,9 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 		//infoNode($$);
 
 	 }
-	 | ID extraaccesses ASSIGN expr {
+	 | assignable ASSIGN expr {
 		
-		Node* assignment = createNode(7,2,2,"Assignment(simples) -  atribuição de variavel  ", $2,$4, $1,$3);
-		$$ = assignment;	
-
-		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
-		//infoNode($$);
-
-	 }
-	 | timedirective ASSIGN expr {
-		
-		Node* assignment = createNode(7,2,1,"Assignment(simples) -  atribuição diretiva ", $1,$3, $2);
+		Node* assignment = createNode(6,2,1,"Assignment", $1,$3, $2);
 		$$ = assignment;	
 
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
@@ -348,6 +359,28 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 
 	 }	 
 	 ;
+
+
+
+assignable : ID extraaccesses {
+		
+		Node* assignment = createNode(5,1,1,"Assignment(simples) -  atribuição de variavel  ", $2, $1);
+		$$ = assignment;	
+
+		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+		//infoNode($$);
+
+	 }
+	 | timedirective {
+		
+		Node* assignment = createNode(4,1,0,"Assignment(simples) -  atribuição diretiva ", $1);
+		$$ = assignment;	
+
+		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+		//infoNode($$);
+
+	 }	 
+	 ;	 
 
 
 expr: MINUS expr {
@@ -612,12 +645,6 @@ tdsprop: functioncall {
 		$$ = prop; 		  
 
 	  }
-	  | LINK {
-
-		Node* prop = createNode(4,0,1,"Props TDS - link", $1);
-		$$ = prop; 	
-
-	  }
 	  | LINKED {
 
 		Node* prop = createNode(4,0,1,"Props TDS - linked", $1);
@@ -639,12 +666,13 @@ variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow R
 			$$ = tdsformat;
 
 		}
-		| LBRACE PORTNAME COLON LABEL linked extras RBRACE {
+		| LBRACE PORTNAME COLON LABEL extras RBRACE {
 			
-			Node* tdsformat = createNode(10,2,5,"Informações de TDS", $5,$6,  $1,$2,$3,$4,$7);
+			Node* tdsformat = createNode(9,1,5,"Informações de TDS", $5,  $1,$2,$3,$4,$6);
 			$$ = tdsformat;
 		
-		} 
+		} 		 
+		// causa possível da redundancia (podemos separar em procedure call e function call?)
 	  	| functioncall {
 
 			Node* variabledata = createNode(4,1,0,"Dados de chamada de função", $1);	
@@ -681,12 +709,12 @@ domain: timelist {
 			$$ = domain;    
 
 		}
-		| FUNCTIONDOMAIN COLON functioncall {
+		| FUNCTIONDOMAIN COLON expr {
 
 			Node* domain = createNode(6,1,2,"DOMAIN-TDS-func", $3, $1,$2);
 			$$ = domain;    
 
-		}
+		}		
 
 
 
@@ -713,23 +741,21 @@ timelist: timecomponent {
 
 
 
-linked:	COMMA LINKED COLON LBRACE params RBRACE {
-	   	 	
-	   	 	Node* extra = createNode(9,1,5,"LINKED-EXTRA-ARGS-TDS",$5, $1,$2,$3,$4,$6);
+
+extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
+	
+	   	 	Node* extra = createNode(10,2,5,"LINKED-EXTRA-ARGS-TDS",$5,$7,  $1,$2,$3,$4,$6);
 	   	 	$$ = extra;
-	   }
-
-extras: COMMA LINK COLON ID delayedoption {
-	
-		Node* extra = createNode(8,1,4,"LINK-EXTRA-ARGS-TDS", $5, $1,$2,$3,$4);
-		$$ = extra;
 	}
-	| delayedoption
+	| delayedoption {
+			Node* extra = createNode(4,1,0,"LINKED-EXTRA-ARGS-TDS",$1);
+	   	 	$$ = extra;
+	}
 	
 
-delayedoption: COMMA DELAYED COLON expr {
+delayedoption: COMMA DELAYED COLON BOOLEAN {
 	   		
-		Node* extra = createNode(7,1,4,"DELAYED-EXTRA-ARGS-TDS", $4,$1,$2,$3);
+		Node* extra = createNode(7,0,4,"DELAYED-EXTRA-ARGS-TDS", $1,$2,$3,$4);
 	   	$$ = extra;
 	   }
 	   | /* empty */ {  $$ = NULL;}
