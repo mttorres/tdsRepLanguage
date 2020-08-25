@@ -99,7 +99,6 @@
 %type <ast> params  
 %type <ast> optionalreturn
 %type <ast> paramsOpcional
-%type <ast> mreturn
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> expr
@@ -224,26 +223,13 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 		
 ;
 
-
+// MUDANÇA - NAO PERMITIR CHAMADA A TDS CREATE dentro de funções! (ou verificar em tempo de semantica?)
 functionbody: cmds optionalreturn {
 	
 	  		Node* functionbody = createNode(5,2,0,"Functionbody - função composta/programa ", $1,$2);
 			$$ = functionbody; 
 			
 		}
-		| mreturn {
-
-			Node* functionbody = createNode(6,1,0,"Functionbody - função matemática ", $1);
-			$$ = functionbody; 
-		}
-
-
-
-mreturn: expr {
-	
-			Node* mreturn = createNode(6,1,0,"retorno - função matemática ", $1);
-			$$ = mreturn; 	
-}
 
 
 optionalreturn: RETURN expr {
@@ -483,12 +469,6 @@ logical: NOT data {
 		 | logical OR data {
 
 			Node* logical = createNode(6,2,1,"Lógico  - OR ", $1,$3,  $2);
-			$$ = logical;			
-
-		 }
-		 | logical IMPLIES data {
-
-			Node* logical = createNode(6,2,1,"Lógico  - IMPLICAÇÃO ", $1,$3,  $2);
 			$$ = logical;			
 
 		 }
