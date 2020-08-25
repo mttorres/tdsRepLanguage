@@ -22,6 +22,7 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
   header->varBuffer = malloc(sizeof(char*)*300);
   header->assignBuffer = malloc(sizeof(char*)*300);
   if(type == AUTOMATA){
+  	printf("[createHeader] DEBUG: alocando transicoes tipo (%d) \n",type);
   	header->transBuffer = malloc(sizeof(char*)*300); // tamanho default
   }
 
@@ -41,21 +42,28 @@ void letgoHeader(HeaderSmv* h){
 			free(h->varBuffer[i]); // note que poderiamos nos livrar de strings dinamicas nesse caso (reformular métodos CAT e refs para static string?)
 		}					 // not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
   	}						 // ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
-  	free(h->varBuffer);
+  	printf("[letgoHeader] DEBUG: liberando buffer VAR! \n");
+  	//free(h->varBuffer);
 	
  	for(i = 0; i< h->ASSIGN_POINTER; i++) {
 		if(h->assignBuffer[i]){
 			free(h->assignBuffer[i]); 
 		}					 
   	}
+  	printf("[letgoHeader] DEBUG: liberando buffer ASSIGN! \n");
   	free(h->assignBuffer);		
 
- 	for(i = 0; i< h->TRANS_POINTER; i++) {
-		if(h->transBuffer[i]){
-			free(h->transBuffer[i]); 
-		}					 
+  	if(h->transBuffer) {
+		for(i = 0; i< h->TRANS_POINTER; i++) {
+			printf("???\n");
+			if(h->transBuffer[i]){
+				free(h->transBuffer[i]); 
+			}					 
+  		}
+  		printf("[letgoHeader] DEBUG: liberando buffer TRANS! \n");
+  		free(h->transBuffer);
   	}
-  	free(h->transBuffer);	
+  		
 
   	free(h);  				
 }
@@ -124,7 +132,7 @@ void printHeader(HeaderSmv* h) {
 
   if(h) {
 		printf("------------INFO----------- \n \n ");
-		printf(" %s - %d \n",h->moduleName,h->type);
+		printf("(%d) %s",h->type,h->moduleName);
 
 		printf(" VAR: %d \n",h->VAR_POINTER);
 	
@@ -288,7 +296,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    			printf("[preProcessSmv] Buffer pré computePhase 3 %s \n\n",buffer);
    			if(buffer[0] != '\n'){
    				readTrans = (buffer[0] != 'I')? readTrans : 0;
-   				controlRename = readTrans? 1 : 0;
+   				controlRename = readTrans? 0 : 0;
    			}
    			else{
    				phase = CREATE_MODULE;

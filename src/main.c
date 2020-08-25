@@ -38,13 +38,13 @@ int main(int argc, char* argv[]) {
   	fclose(astout);
   	fclose(fp);
 
-  HeaderController* controller = createController(5);  
+  	HeaderController* controller = createController(5);  
 	
 	//pré processamento 
 	preProcessSmv(smvP,controller);
   	
-  size_t bufsize = 300;
-  char *buffer = (char *) malloc(bufsize * sizeof(char));
+  	size_t bufsize = 300;
+  	char *buffer = (char *) malloc(bufsize * sizeof(char));
 	
 	int i;
   /*
@@ -75,8 +75,12 @@ int main(int argc, char* argv[]) {
     //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
   	//free(buffer);
-  	//letgoNode(root);
+  	letgoNode(root);
+  	//letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV
   	//smvP = fopen(argv[1], "r");
+
+  	// pós processamento 
+
 
   	
 
