@@ -26,23 +26,21 @@ tdsA = {
 } 
 	
 C_TIME = 2  // tdsB só vai valer a partir do instante 2
-modoEntrada = false // essa varável vale true após o instante 2
+modoEntrada = ture // essa varável vale true após o instante 2
 
 tdsB = {
 	portname : 'B',
 	data-time : { function-domain: fluxoPortempo(modoEntrada) }
 }
 
+// versão alternativa da tdsB
+//tdsBalt = {
+//	portname : 'B',
+//	data-time : { function-domain: C_TIME/C_TIME }  
+//}
 
-tdsBalt = {
-	portname : 'B',
-	data-time : { function-domain: C_TIME/C_TIME }  
-}
-
-//or
-(tdsA,tdsB) -> tdsC
-
-(tdsC) -||> tdsD
+//or (alternativa) a declarar a tdsC toda
+//(tdsA,tdsB) -> tdsC
 
 C_TIME = 0 // valem por todo o intervalo
 
@@ -52,6 +50,9 @@ tdsC = {
 	delayed : false } // caso que fifo (ou outras portas em que verificação se tem dado na saida e feita no ESTADO SEGUINTE)
 				   // ex :  a = 0    c = NULL,    a = 1, e = 0   ou  a = 0 c = NULL , a = NULL , c = 0
 
+
+//or (alternativa) a declarar a tdsD toda
+//(tdsC) -||> tdsD
 
 tdsD = {
 	portname: 'D',	
