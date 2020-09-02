@@ -40,17 +40,22 @@ void letgoEntry(TableEntry* e){
 
 /// table
 
-STable* createTable(int type, STable* parent,  int level, int order, STable** children, int sizechildren){
+STable* createTable(int type, STable* parent,  int level, int order) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
+	
+	
+/*	
 	int nt = sizechildren /sizeof (STable*);
 	STable** chillist;
 	if(nt){
 	    chillist = (STable**) malloc(nt*sizeof(STable*));   
-	    // quais situações? PASSAR FILHOS COM VAR_ARGS ? (parece complicar desnecessáriamente...)
+	    // quais situações? PASSAR FILHOS COM VAR_ARGS ? (parece complicar desnecessáriamente...)(tabelas não vao ser criadas já com escopos filhos!)
 	    // se não for feito assim vai literalmente não ter nenhuma utilidade passar os filhos para o construtor?
 	}
 	newtable->nchild = nt;
+*/
+
 	newtable->type = type;
 	newtable->level = level;
 	newtable->order = order;
@@ -59,9 +64,11 @@ STable* createTable(int type, STable* parent,  int level, int order, STable** ch
 		newtable->parent = parent;
 	}
 
+/*
 	if(chillist){
 		newtable->children = chillist;
 	}
+*/
 	
 	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
 

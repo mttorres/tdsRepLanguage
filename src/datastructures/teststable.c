@@ -52,7 +52,9 @@ typedef struct S_TABLE
 TableEntry* createEntry(char* name, int type, char* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(int type, STable* parent,  int level, int order, STable** children, int sizechildren);
+STable* createTable(int type, STable* parent,  int level, int order);
+
+void addSubScope(STable** children, int sizechildren);
 
 void printTable(STable* t);
 
@@ -92,17 +94,21 @@ void printEntry(TableEntry* e) {
     
 }
 
-STable* createTable(int type, STable* parent,  int level, int order, STable** children, int sizechildren){
+STable* createTable(int type, STable* parent,  int level, int order) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
+	
+/*	
 	int nt = sizechildren /sizeof (STable*);
 	STable** chillist;
 	if(nt){
 	    chillist = (STable**) malloc(nt*sizeof(STable*));   
-	    // quais situações? PASSAR FILHOS COM VAR_ARGS ? (parece complicar desnecessáriamente...)
+	    // quais situações? PASSAR FILHOS COM VAR_ARGS ? (parece complicar desnecessáriamente...)(tabelas não vao ser criadas já com escopos filhos!)
 	    // se não for feito assim vai literalmente não ter nenhuma utilidade passar os filhos para o construtor?
 	}
 	newtable->nchild = nt;
+*/
+
 	newtable->type = type;
 	newtable->level = level;
 	newtable->order = order;
@@ -111,9 +117,11 @@ STable* createTable(int type, STable* parent,  int level, int order, STable** ch
 		newtable->parent = parent;
 	}
 
+/*
 	if(chillist){
 		newtable->children = chillist;
 	}
+*/
 	
 	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
 
@@ -187,10 +195,13 @@ TableEntry* lookup(STable* t, const char* name) {
 }
 
 
+//testes com struct de TDS: 
+
+
 int main()
 {
     printf("Hello World \n");
-    STable* nova = createTable(GLOBAL,NULL,0,0,NULL,0);
+    STable* nova = createTable(GLOBAL,NULL,0,0);
 	printTable(nova);
 	TableEntry* entrada1 = createEntry("tdsA",TDS,"bigfuckingstruct",1,nova);
 	TableEntry* entrada2 = createEntry("tdsB",TDS,"pequenastruct(list)",0,nova);
