@@ -74,9 +74,15 @@ int main(int argc, char* argv[]) {
     printHeader(controller->headers[4]);	
     //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
+
   	//free(buffer);
+
   	letgoNode(root);
-  	//letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV
+
+  	//letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
+  	
+
+
   	//smvP = fopen(argv[1], "r");
 
   	// pós processamento 
