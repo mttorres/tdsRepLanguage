@@ -38,7 +38,7 @@ TableEntry* createEntry(char* name, int type, char* val, int methodParam, STable
 
 STable* createTable(int type, STable* parent,  int level, int order);
 
-void addSubScope(STable** children, int sizechildren);
+void addSubScope(STable* parent, STable* child);
 
 void printTable(STable* t);
 
