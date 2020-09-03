@@ -14,7 +14,7 @@ typedef struct E_TABLE
   char* name;
   int type;
   char* val;
-  int methodParam;
+  int methodParam; // é usado para saber se a variavel é passada por um método!
   struct S_TABLE * parentScope;
 } TableEntry;
 
@@ -36,7 +36,9 @@ typedef struct S_TABLE
 TableEntry* createEntry(char* name, int type, char* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(int type, STable* parent,  int level, int order, STable** children, int sizechildren);
+STable* createTable(int type, STable* parent,  int level, int order);
+
+void addSubScope(STable** children, int sizechildren);
 
 void printTable(STable* t);
 

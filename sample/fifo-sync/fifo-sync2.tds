@@ -1,21 +1,22 @@
+I_TIME = 0
+F_TIME = 6
+
 tdsA = {
-	portname : 'A'
-	data-time: { 0: 0, 1: 1, 2: 0 } 
-	link: tdsE
+	portname : 'A',
+	data-time: {0: 0, 1: 1, 2: 0}
 }
 
-
 tdsE = {
-	
-	linked: {tdsA}
-	link: tdsB 
+	portname : 'E',
+	linked : {tdsA},
 	delayed : true // caso que fifo (ou outras portas em que verificação se tem dado na saida e feita no ESTADO SEGUINTE)
 				   // ex :  a = 0    e = NULL,    a = 1, e = 0   ou  a = 0 e = NULL , a = NULL , e = 0
 }
 
+
 tdsB = {
-	
-	linked: {tdsE} 
+	portname : 'B',
+	linked : {tdsE} // recebe o dado no mesmo instante de tempo
 }
 
 

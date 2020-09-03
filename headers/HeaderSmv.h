@@ -2,49 +2,66 @@
 
 #define HEADER_H
 
+enum headerPart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2};
 
 typedef struct headersmv
 {
   int type;
-  long modulePointer;
-  long varPointer;
-  long invarPointer;
-  long assignPointer;
-  long transPointer;
-  long CURR_OFFSET;
-
+  char* moduleName;
+  char** varBuffer; // poderia transormar em uma tabela hash(facilidade em achar a variavel, mas acredito que uma vez escrito aqui não vai ter alteração!)
+  char** transBuffer; // vai ser inalterado durante a execução (só no pré processamento, ou seja já é criado preeenchido)
+  char** assignBuffer; // aqui a ordem é importante não pode ser uma tabela hash
+  int VAR_POINTER;
+  int TRANS_POINTER;
+  int ASSIGN_POINTER;
+  
 }HeaderSmv;
 
-
-HeaderSmv* createHeader(int type,long moduleP, long varP, long assignP, long transP, long invarPointer, long offset);
-
-void printHeader(HeaderSmv* h);
+HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP);
 
 void letgoHeader(HeaderSmv* h);
+
+
+/*Controlador de Header(auxiliar)*/
+
 
 HeaderSmv** initHeadersStruct(int size);
 
 void letGoHeadersStruct(HeaderSmv** hs, int size);
 
-char* addParamModule(char* original, char* param);
 
-void preProcessSmv(FILE* smvP, HeaderSmv** ds);
+typedef struct headerController
+{
+  HeaderSmv ** headers;
+  int CURRENT_SIZE; // usar current size com -1 (se vc está processando o indice atual(ultimo) é porque ele já alocou para o seguinte!)
+                    // ex:  sétimo membro(6) (CURRENT_SIZE = 7) (ou seja para referenciar o último é só pegar CURRENT-1)
+  
+}HeaderController;
 
-void postProcessSmv(FILE* smvP, int* ds);
+HeaderController* createController(int size);
 
+void letGoHeaderControl(HeaderController* Hcontrol);
 
-// o que vem antes tem que ser concatenado atrás!
-//  --> alocar string de tamanho = dif e concatenar mais após isso 
-//      --> problema: alocar = dif requer percorrer o(dif), ou seja, se eu quiser ter a string ATÉ O DELIMITADOR (customcat)
-//      e saber o tamanho eu teria que realizar 2 operações uma de contar e copiar a string!
-//      melhor seria: tentar fazer AO MESMO TEMPO, mas isso não parece possível... 
-//      ao mesmo tempo eu já teria que ter a string de destino alocada!
-//      solução possível? Alocar string pelo menos TÃO GRANDE QUANTO A ORIGINAL e a cada passada "liberar" memoria de volta 
-//      ou ao fim do processo dar realloc na string
-//  --> criar "proximo dif" e alocar mais e concatenar 
-//  repetir até o fim da string
-char* clearOldPortsRefs(char* oldConstraint);
+/*Controlador de Header(auxiliar)*/
 
 
+void printHeaderBuffer(HeaderSmv* h, int type, char* typeString);
+
+void printHeader(HeaderSmv* h);
+
+void preProcessSmv(FILE* smvP, HeaderController* Hcontrol);
+
+void postProcessSmv(FILE* smvP, HeaderController* Hcontrol);
+
+// salva o header do módulo lido anteriormente
+void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
+
+// salva a linha do baseada no  header do módulo lido anteriormente
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename);
+
+// mudar nome dos evals
+//int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);
+
+//int computePhase2(int stage, char* buffer, char* assignString,HeaderSmv** ds, int readAutomata, char* transString);
 
 #endif

@@ -17,6 +17,8 @@ Node* createNode(int numArgs, ...);
 
 void printNode(Node* n);
 
+void filePrintNode(Node* n, FILE* fp);
+
 void letgoNode(Node* n);
 
 

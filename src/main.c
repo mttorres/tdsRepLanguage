@@ -11,6 +11,7 @@
   extern int yylex(void);
   extern int yyparse();
   extern FILE *yyin;
+  FILE *astout;
   extern Node* root;
   extern void yyerror(const char *s);
 
@@ -20,7 +21,9 @@ int main(int argc, char* argv[]) {
   	FILE *fp; // .tds file
   	FILE *smvP; // .smv file;
   	fp = fopen(argv[1], "r");
+  	astout = fopen("results/astOutput", "w");
   	smvP = fopen(argv[2], "r+");
+  	//printf("%s \n",argv[1]);
   	//printf("%s \n",argv[2]);
 
   	if(!fp){
@@ -30,19 +33,21 @@ int main(int argc, char* argv[]) {
   	yyin = fp;
  	yyparse();
 
-  	printf("--------------TREE--------------------\n");
-  	printNode(root);
-  	letgoNode(root);
+  	fprintf(astout,"--------------TREE--------------------\n");
+  	filePrintNode(root,astout);
+  	fclose(astout);
   	fclose(fp);
-	printf("HELLO!? \n");
-  	HeaderSmv** headers = initHeadersStruct(5);
-  	printf("HELLO! \n");
-	preProcessSmv(smvP,headers);
-  	//TESTE 
-  	char *buffer;
+
+  	HeaderController* controller = createController(5);  
+	
+	//pré processamento 
+	preProcessSmv(smvP,controller);
+  	
   	size_t bufsize = 300;
-  	buffer = (char *) malloc(bufsize * sizeof(char));
+  	char *buffer = (char *) malloc(bufsize * sizeof(char));
+	
 	int i;
+  /*
 	for(i = 0; i < 5; i++) {
 	    	fseek(smvP,headers[i]->modulePointer,SEEK_SET);
 		fgets(buffer,bufsize,smvP);
@@ -61,16 +66,54 @@ int main(int argc, char* argv[]) {
 		printf("(%d) %s \n",i,buffer);
 
     	} 
-
-
-    	printHeader(headers[0]);
-    	printHeader(headers[1]);
-    	printHeader(headers[2]);
-    	printHeader(headers[3]);
-    	printHeader(headers[4]);	
-    	letGoHeadersStruct(headers,5);	
+    */
+    printHeader(controller->headers[0]);
+    printHeader(controller->headers[1]);
+    printHeader(controller->headers[2]);
+    printHeader(controller->headers[3]);
+    printHeader(controller->headers[4]);	
+    //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
-  	free(buffer);
+
+  	//free(buffer);
+
+  	letgoNode(root);
+
+  	//letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
+  	
+
+
   	//smvP = fopen(argv[1], "r");
+
+  	// pós processamento 
+
+
+  	
+
+
+
+//TESTE PORTS REFS (aparentemente tudo funcionando)
+
+/*
+  	printf("TESTE PORT REFS !!! \n\n\n");
+  	char* string1 = "	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 0 & FALSE) -> next(cs) = p0) &";
+  	char* nova =clearOldPortsRefs(string1);
+  	printf("ANTES:  %s \n\n\n",string1);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);
+
+  	char* string2 = "	((cs = q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & FALSE) -> next(cs) = q0);";
+  	nova =clearOldPortsRefs(string2);
+  	printf("ANTES:  %s \n\n\n",string2);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova); 
+
+  	char* string3 = "	((cs = q0p0) -> ((next(cs) != q0p1))) &";
+  	nova =  clearOldPortsRefs(string3);
+  	printf("ANTES:  %s \n\n\n",string3);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);    
+*/
+
 }
 

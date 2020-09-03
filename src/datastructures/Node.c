@@ -100,6 +100,36 @@ void infoNode(Node* n){
 		
 }
 
+void filePrintNode(Node* n, FILE* fp){	
+
+	int info = n != NULL;	
+	if(info) {		
+		fprintf(fp,"NODE: - %s \n\n",n->name);
+		int i = 0;
+		if(n->children){
+			fprintf(fp,"--------------CHILDREN: \n\n");
+			for(i= 0; i < n->nchild; i++){
+				if(n->children[i]) {
+					filePrintNode(n->children[i],fp);
+				}
+				else {
+					fprintf(fp,"NULL \n");	
+				}
+
+			}
+			fprintf(fp,"------------END CHILDREN--------------- \n");
+		}
+		if(n->leafs) {
+			fprintf(fp,"---------------TERMINAL: \n\n");
+			for(i = 0; i< n->nleafs;i++){					
+			   fprintf(fp," --> %s \n",n->leafs[i]);
+			}
+			fprintf(fp,"------------END TERMINAL--------------- \n\n");
+		}
+		fprintf(fp,"-----------------------------------------------\n\n");
+	}
+}
+
 
 void letgoNode(Node* n){
 	if(!n){
