@@ -59,7 +59,7 @@ TableEntry* createEntry(char* name, int type, void* val, int methodParam, STable
 
 STable* createTable(int type, STable* parent,  int level, int order);
 
-void addSubScope(STable* parent, int type);
+STable* addSubScope(STable* parent, int type);
 
 void printTable(STable* t);
 
@@ -236,8 +236,8 @@ TableEntry* lookup(STable* t, const char* name) {
 
 // op's novas que funcionam
 
-//void ou retorna o filho???
-void addSubScope(STable* parent, int type) {
+//void ou retorna o filho??? Retornar parece melhor, provavelmente ao adicionar um subscope eu vou querer operar sobre ele imediatamente
+STable* addSubScope(STable* parent, int type) {
 	
 	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
 
@@ -246,14 +246,58 @@ void addSubScope(STable* parent, int type) {
 	}
 	parent->children[parent->nchild] = child;
 	parent->nchild++;
+
+	return child;
+
 }
-
-
 
 
 //testes com struct de TDS: 
 
 
+
+typedef struct TDS_VAR
+{
+  char* name;
+  int type;
+  int I_TIME // reflete os valores globais
+  int F_TIME;
+  int C_TIME; // apesar que o C_TIME é do contexto dessa tds... 
+
+  int linked; // lista unica que referencia outra TDS e toma os valores dela! (economiza um campo, evita ref ciclica)
+  int delayed;
+
+  // ainda não sei como isso vai ficar
+  void * fpointer;
+  
+
+  // dados da tds (lista de tamanho = F_TIME - I_TIME), (ACEITAR DADOS DIFERENTES? OU SÓ UM PARA A TDS?)
+  // se for um tipo só : usar union?  (pode ser um de cada vez mais não ao mesmo tempo)
+  // senão usar VOID 
+  void ** values; // delayed? passar lista "alternada?"
+
+
+
+} TDSvar;
+
+// passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
+TDSvar* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int linked, int delayed);
+
+
+TDSvar* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int linked, int delayed) {
+	
+	TDSvar* newTDS = (TDSvar*) malloc(sizeof(TDSvar));
+
+	newTDS->name = name;
+	newTDS->type = type;
+	newTDS->I_TIME = I_TIME;
+	newTDS->F_TIME = F_TIME;
+	newTDS->C_TIME = C_TIME;
+	newTDS->linked = linked;
+	newTDS->delayed = delayed;
+
+	return newTDS;						
+}
 
 
 int main()
@@ -301,16 +345,16 @@ int main()
 
 
 	// if comum (ordem 1(primeiro de verdade, "zero"), nível 1) 
-	addSubScope(global,IF_BLOCK);
-
-	printTable(global->children[0]);
+	//addSubScope(global,IF_BLOCK);
+	printTable(addSubScope(global,IF_BLOCK));
 
 	// else associado (ordem 2("1"), nível 1)
-	addSubScope(global,ELSE_BLOCK);
-
-	printTable(global->children[1]);
+	//addSubScope(global,ELSE_BLOCK);
+	printTable(addSubScope(global,ELSE_BLOCK));
     
     //printTable(global);
+
+
 
 
 	
