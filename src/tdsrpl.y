@@ -561,17 +561,17 @@ data: RAWNUMBERDATA {
 
 	  }
 
-	  | variabledata {
-
-	  	Node* data = createNode(4,1,0,"Dados de tds ou função", $1);	
-		$$ = data;	
-
-	  }
-
 	  | ID extraaccesses {
 
 			Node* data = createNode(5,1,1,"variáveis simples ou compostas", $2, $1);	
 			$$ = data;		
+
+	  }
+
+	  | variabledata {
+
+	  	Node* data = createNode(4,1,0,"Dados de tds ou função", $1);	
+		$$ = data;	
 
 	  }
 	  ;

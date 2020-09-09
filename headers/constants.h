@@ -16,4 +16,11 @@ const char* mappingEnumEntry[] =  {
     "T_DIRECTIVE",
 };
 
+//const char* mappingEnumNodes[] =  {
+//    "VAR",
+//    "TDS",
+//    "T_DIRECTIVE",
+//};  // DEPOIS MAPEAR TODOS OS NOMES DE NÓ PARA OS ENUMS
+
+
 #endif
