@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../../headers/Node.h"
 
 
 #define MAX_TABLE 550
@@ -21,16 +22,14 @@ const char* mappingEnumEntry[] =  {
     "T_DIRECTIVE",
 };
 
-typedef enum { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPE_TYPE;
 
-typedef enum {NUMBER, LOGICAL, LABEL, TDS, T_DIRECTIVE} ENTRY_TYPE;
 
 struct S_TABLE;
 
 typedef struct E_TABLE
 {
   char* name;
-  int type;
+  ENTRY_TYPE type;
   void* val;
   int methodParam;
   int order;
@@ -46,7 +45,7 @@ typedef struct S_TABLE
   int nchild;
   int level;
   int order;
-  int type;
+  SCOPE_TYPE type;
   // TABLE DATA (como representar!?)(ponteiros pra void?) (ou criar outra struct chamada TABLE ENTRY)
   // ave void!
   TableEntry** tableData;
@@ -54,12 +53,12 @@ typedef struct S_TABLE
 } STable;
 
 
-TableEntry* createEntry(char* name, int type, void* val, int methodParam, STable* parentScope);
+TableEntry* createEntry(char* name, ENTRY_TYPE type, void* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(int type, STable* parent,  int level, int order);
+STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
 
-STable* addSubScope(STable* parent, int type);
+STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
 void printTable(STable* t);
 
@@ -76,7 +75,7 @@ void printEntry(TableEntry* e);
 
 void letgoEntry(TableEntry* e);
 
-TableEntry* createEntry(char* name, int type, void* val, int methodParam, STable* parentScope) {
+TableEntry* createEntry(char* name, ENTRY_TYPE type, void* val, int methodParam, STable* parentScope) {
     
     TableEntry* newEntry = (TableEntry*) malloc(sizeof(TableEntry));
     newEntry->name = name; // nota para strings e para valores void criados (talvez seja necessário malloc)
@@ -131,7 +130,7 @@ void printEntry(TableEntry* e) {
     }
 }
 
-STable* createTable(int type, STable* parent,  int level, int order) {
+STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
 	
@@ -237,7 +236,7 @@ TableEntry* lookup(STable* t, const char* name) {
 // op's novas que funcionam
 
 //void ou retorna o filho??? Retornar parece melhor, provavelmente ao adicionar um subscope eu vou querer operar sobre ele imediatamente
-STable* addSubScope(STable* parent, int type) {
+STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
 	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
 
@@ -260,7 +259,7 @@ typedef struct TDS_VAR
 {
   char* name;
   int type;
-  int I_TIME // reflete os valores globais
+  int I_TIME; // reflete os valores globais
   int F_TIME;
   int C_TIME; // apesar que o C_TIME é do contexto dessa tds... 
 
@@ -299,6 +298,31 @@ TDSvar* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int 
 	return newTDS;						
 }
 
+// testando função, por enquanto, não retorna nada (apesar que seria uma boa sintetizar os valores para eivtar consultas na tabela (apesar que consultar a tabela é 0(1) e sinceramente diminui a complexidade absurdamente ao invés de retornar tipos e valores)
+ 
+void* process(Node* n) {
+
+	int info = n != NULL;	
+	if(info) {		
+		int i = 0;
+		if(n->children){
+			for(i= 0; i < n->nchild; i++){
+				if(n->children[i]) {
+					process(n->children[i]); // se tiver filho (desce um nível e resolve as dependencias) 
+				}
+
+
+			}
+		}
+		// ao chegar nas folhas avaliar a informação delas (todas "conjunto") e recuperar dependencias resolvidas do nível mais abaixo 
+		if(n->leafs) {
+			for(i = 0; i< n->nleafs;i++){					
+			    
+			}
+		}
+	}	
+}
+
 
 int main()
 {
@@ -307,7 +331,8 @@ int main()
     // tentando criar o escopo equivalente do merger-fifo.tds
 
     // global (ordem 0(primeiro), nível 0) (e sem pais)
-    STable* global = createTable(GLOBAL,NULL,0,0);
+    	
+	STable* global = createTable(GLOBAL,NULL,0,0);
 	printTable(global);
 
 	int vali = 0;
@@ -319,46 +344,74 @@ int main()
 	//TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE,"pequenastruct(list)",0,nova);
 	//TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE,"pequenastruct(list)",0,nova);
 
-	TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE,&vali,1,global);
+	TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE,&vali,0,global);
 	TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE,&valc,0,global);
 	TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE,&valf,0,global);
 		
-	int valboo = 0;
+	//int valboo = 0;
 
-	TableEntry* modoEntrada = createEntry("modoEntrada",LOGICAL,&valboo,1,global);
+	//TableEntry* modoEntrada = createEntry("modoEntrada",LOGICAL,&valboo,1,global);
 		
-	TableEntry* enumerado = createEntry("enumerado",LABEL,"OCUPADO",0,global);
+	//TableEntry* enumerado = createEntry("enumerado",LABEL,"OCUPADO",0,global);
 
 
 	insert(global, I_TIME);
 	insert(global, C_TIME);
 	insert(global, F_TIME);
-	insert(global, modoEntrada);
-	insert(global, enumerado);
+	//insert(global, modoEntrada);
+	//insert(global, enumerado);
 	
 	printEntry(lookup(global, "I_TIME"));
 	printEntry(lookup(global, "C_TIME"));
 	printEntry(lookup(global, "F_TIME"));
-	printEntry(lookup(global, "modoEntrada"));
-	printEntry(lookup(global, "enumerado"));
+
+	//printEntry(lookup(global, "modoEntrada"));
+	//printEntry(lookup(global, "enumerado"));
 
 
 
 	// if comum (ordem 1(primeiro de verdade, "zero"), nível 1) 
 	//addSubScope(global,IF_BLOCK);
-	printTable(addSubScope(global,IF_BLOCK));
+	//printTable(addSubScope(global,IF_BLOCK));
 
 	// else associado (ordem 2("1"), nível 1)
 	//addSubScope(global,ELSE_BLOCK);
-	printTable(addSubScope(global,ELSE_BLOCK));
+	//printTable(addSubScope(global,ELSE_BLOCK));
     
-    //printTable(global);
 
 
+    	// testando mudanças de Node e fluxo de construção, programa simples com atribuição de variável
 
+	// passo 1: inicia escopo global, inicia diretivas temporais (já feito) 
 
+	// passo 2: percorrer "arovre"  ( v = 10) ("só isso!") 
+
+	// note que ASSIGN_V e todos os outros nós desse tipo na verdade são apenas DATA(no maximo filhos de DATA mais abaixo),
+	// CONCLUSÃO: DIMINUIR A QUANTIDADE EXAGERADA DE ENUMS criados ! (agrupar enums) (apesar que isso atrapalha na tipagem ? ) 
+	// opções: manter enums  (prepare-se para MUITOS IFS AND ELSES)
+	//	   agrupar (porém colocar "subtipos" nos nós (prepare-se para mudar todo o arquivo .y e possivelmente introduzir novos bugs)
+	//	   manter enums (porém "inferir" tipos ao adicionar a tabela, até porque a linguagem só tem 3 tipos, strings, int, e TDS)
+	//	   	-> problema dessa abordagem: como diferenciar strings de números ? (não é tão ruim se parar para pensar, mas necessita escovar bit).
+			// por outro lado: https://stackoverflow.com/questions/29381067/does-c-and-c-guarantee-the-ascii-of-a-f-and-a-f-characters
+
+	Node* expr = createNode(5,0,1,"RAWNUMBERDATA",ASSIGN_V,"10");
+
+	Node* assignable = createNode(5,0,1,"ASSIGNABLE",ASSIGN_V,"v");	
+
+	Node* otherstmt = createNode(7,2,1,"OtherStmt-ASSIGN",OTHER_ASSIGN,assignable,expr,"=");
+
+	Node* cmd = createNode(5,1,0,"OtherStmt",CMD_OTHER,otherstmt);
+
+	Node* root = createNode(5,1,0,"Prog",PROG,cmd);
+
+	
+	printNode(root);
+	
+
+	process(root);
 	
 	
 	letgoTable(global);
-    return 0;
+    
+	return 0;
 }

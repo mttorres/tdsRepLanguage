@@ -13,7 +13,7 @@ Node* createNode(int numArgs, ...){
    va_list args;
    va_start(args, numArgs); // (nada)
    int i;
-   int parametrosInicializacao = 4;
+   int parametrosInicializacao = 5;
    
    current_node->nchild = va_arg(args, int); // 1
    //printf("arg(1): %d \n",current_node->nchild); 
@@ -21,6 +21,9 @@ Node* createNode(int numArgs, ...){
    //printf("arg(2): %d \n",current_node->nleafs);   
    current_node->name = va_arg(args, char*); // 3
    //printf("arg(3): %s \n",current_node->name);
+   current_node->type = va_arg(args, NODE_TYPE); // 4
+  	
+
    
    int parametrosFilhos = parametrosInicializacao + current_node->nchild;
    //printf("parametrosFilhosSTART : %d \n",parametrosFilhos);
@@ -75,14 +78,14 @@ void printNode(Node* n){
 				}
 
 			}
-			printf("------------END CHILDREN--------------- \n");
+			printf("------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
 		}
 		if(n->leafs) {
 			printf("---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   printf(" --> %s \n",n->leafs[i]);
 			}
-			printf("------------END TERMINAL--------------- \n\n");
+			printf("------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
 		}
 		printf("-----------------------------------------------\n\n");
 	}
@@ -117,14 +120,14 @@ void filePrintNode(Node* n, FILE* fp){
 				}
 
 			}
-			fprintf(fp,"------------END CHILDREN--------------- \n");
+			fprintf("------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
 		}
 		if(n->leafs) {
 			fprintf(fp,"---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   fprintf(fp," --> %s \n",n->leafs[i]);
 			}
-			fprintf(fp,"------------END TERMINAL--------------- \n\n");
+			fprintf("------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
 		}
 		fprintf(fp,"-----------------------------------------------\n\n");
 	}

@@ -4,13 +4,13 @@
 
 //typedef enum {false, true} bool;
 
-typedef enum { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPE_TYPE;
+typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPE_TYPE;
 
-typedef enum { VARIABLE, TDS, T_DIRECTIVE} ENTRY_TYPE;
+typedef enum ENTRY_TYPE {NUMBER, LOGICAL, LABEL, TDS, T_DIRECTIVE} ENTRY_TYPE;
 
-typedef enum  {MAIN = 1, AUTOMATA = 2, PORTS = 3} smvtype;
+typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3} smvtype;
 
-typedef enum { 
+typedef enum NODE_TYPE { 
 
 
 	PROG, FUNC_DEFS, CMDS, 
@@ -36,7 +36,7 @@ typedef enum {
 
 	INEQ, INEQ_LE, INEQ_GE, INEQ_LT, INEQ_GT, INEQ_EQ, INEQ_NEQ,
 
-	LOGICAL, LOGICAL_NOT, LOGICAL_AND, LOGICAL_OR, 
+	LOGICAL_EXP, LOGICAL_NOT, LOGICAL_AND, LOGICAL_OR, 
 
 	DATA, DATA_NUM, DATA_BOOL, DATA_NULL, DATA_ITD, DATA_CTD, DATA_FTD, DATA_LABEL, DATA_V, DATA_VCOMPLEX,
 

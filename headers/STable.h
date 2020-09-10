@@ -2,7 +2,7 @@
 
 #define TABLE_H
 
-
+#include "Enum.h"
 
 
 #define  MAX_TABLE 550;
