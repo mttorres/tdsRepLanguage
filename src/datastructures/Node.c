@@ -120,14 +120,14 @@ void filePrintNode(Node* n, FILE* fp){
 				}
 
 			}
-			fprintf("------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
+			fprintf(fp,"------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
 		}
 		if(n->leafs) {
 			fprintf(fp,"---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   fprintf(fp," --> %s \n",n->leafs[i]);
 			}
-			fprintf("------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
+			fprintf(fp,"------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
 		}
 		fprintf(fp,"-----------------------------------------------\n\n");
 	}
