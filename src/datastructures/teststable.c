@@ -299,7 +299,19 @@ TDSvar* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int 
 }
 
 // testando função, por enquanto, não retorna nada (apesar que seria uma boa sintetizar os valores para eivtar consultas na tabela (apesar que consultar a tabela é 0(1) e sinceramente diminui a complexidade absurdamente ao invés de retornar tipos e valores)
- 
+
+
+// melhor do que retornar void! criar "proxy" (guarda o tipo ! e o valor (evita ter problemas de derefernciação))
+typedef struct SYNTH_OBJECT
+{
+  char* name;
+  int type;
+  void ** values; // a pergunta é ... lista de valores ou valor único ?(em geral vai ser unico, pode ser também um ponteiro para uma lista)
+
+} SynthObject;
+
+
+
 void* process(Node* n) {
 
 	int info = n != NULL;	
