@@ -6,7 +6,10 @@
 
 typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPE_TYPE;
 
-typedef enum ENTRY_TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, TDS_ENTRY, T_DIRECTIVE_ENTRY} ENTRY_TYPE;
+typedef enum ENTRY_TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, LABEL_ENTRY ,TDS_ENTRY, T_DIRECTIVE_ENTRY,
+			 LIST	} ENTRY_TYPE;
+
+			 // permitir lista de tipos diferentes? permitir lista de TDS's?
 
 typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3} smvtype;
 

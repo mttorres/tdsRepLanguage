@@ -49,6 +49,7 @@ typedef struct S_TABLE
   // TABLE DATA (como representar!?)(ponteiros pra void?) (ou criar outra struct chamada TABLE ENTRY)
   // ave void!
   TableEntry** tableData;
+  int lastEntryIndex;
     
 } STable;
 
@@ -96,37 +97,37 @@ void printEntry(TableEntry* e) {
 
 	if(e) {
 
-		if(e->type == NUMBER || e->type == T_DIRECTIVE){
-			printf("%s : (%s, %d, methodParam: %d, level: %d, order: %d ) \n"
+		if(e->type == NUMBER_ENTRY || e->type == T_DIRECTIVE_ENTRY){
+			printf("\t %s : (%s, %d, methodParam: %d, level: %d, order: %d ) \n"
 				,e->name,mappingEnumEntry[e->type],*(int *)e->val,e->methodParam,e->level,e->order);
 		}
 
 		// logical == converter para numeros? 
-		if(e->type == LOGICAL){
+		if(e->type == LOGICAL_ENTRY){
 			int boolean = *(int * ) e->val;
 			if(boolean){
-				printf("%s : (%s, %s, methodParam: %d level: %d, order: %d ) \n"
+				printf("\t %s : (%s, %s, methodParam: %d level: %d, order: %d ) \n"
 					,e->name,mappingEnumEntry[e->type],"true",e->methodParam,e->level,e->order);
 			}
 			else{
-				printf("%s : (%s, %s, methodParam: %d level: %d, order: %d ) \n"
+				printf("\t %s : (%s, %s, methodParam: %d level: %d, order: %d ) \n"
 					,e->name,mappingEnumEntry[e->type],"false",e->methodParam,e->level,e->order);
 			}
 		}
 
-		if(e->type == LABEL){
+		if(e->type == TDS_ENTRY){
 			const char* valor; 
 			valor = (char*) e->val;
-		    printf("%s : (%s, '%s', methodParam: %d level: %d, order: %d ) \n"
+		    printf("\t %s : (%s, '%s', methodParam: %d level: %d, order: %d ) \n"
 		    	,e->name,mappingEnumEntry[e->type],valor,e->methodParam,e->level,e->order);
 		}
 
-		if(e->type == TDS){
+		if(e->type == TDS_ENTRY){
 			// TODO (struct TDS)
 		}
     }
     else{
-    	printf("null \n");
+    	//printf("null \n");
     }
 }
 
@@ -151,6 +152,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->type = type;
 	newtable->level = level;
 	newtable->order = order;
+	newtable->lastEntryIndex = 0;
 	
 	if(parent){
 		newtable->parent = parent;
@@ -173,6 +175,13 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 void printTable(STable* t){
 	if(t){
 		printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+		if(t->tableData){
+			printf("|--> Entries: \n");
+			int i;
+			for(i=0;i<= t->lastEntryIndex; i++){
+				printEntry(t->tableData[i]);
+			}
+		}
 	}
 }
 
@@ -220,9 +229,9 @@ int hash(const char * str) {
 void insert(STable* t, TableEntry* e) {
     
     int index = hash(e->name);
-    printf("HASH CALCULADO É: %d \n",index);
-    t->tableData[index] = e;
-    
+    printf("HASH CALCULADO para (%s) É: %d \n",e->name,index);
+   	t->tableData[index] = e;
+    t->lastEntryIndex = index > t->lastEntryIndex ? index : t->lastEntryIndex;
     
 }
 
@@ -234,6 +243,23 @@ TableEntry* lookup(STable* t, const char* name) {
 }
 
 // op's novas que funcionam
+
+// note que ! eu poderia muito bem por que os valores FOLHA dos nós da arvore são os mesmos que ENTRY_TYPE, existe ligeira redundância...
+// QUE POR SINAL.... meu entry_type vai ser o meu "proxy" para valores? 
+		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
+		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
+		// primeiro eu vou testar usando valores literais 
+void addValueCurrentScope(char* name, ENTRY_TYPE type, void* val, int methodParam,STable* current) {
+
+	//nome da variavel,   val vai ser literalmente o valor dela (problema, e quanto for uma lista?)
+	TableEntry* entry = createEntry(name,type,val,methodParam,current);
+	insert(current,entry);
+}
+
+
+
+
+
 
 //void ou retorna o filho??? Retornar parece melhor, provavelmente ao adicionar um subscope eu vou querer operar sobre ele imediatamente
 STable* addSubScope(STable* parent, SCOPE_TYPE type) {
@@ -308,11 +334,11 @@ typedef struct SYNTH_OBJECT
   int type;
   void ** values; // a pergunta é ... lista de valores ou valor único ?(em geral vai ser unico, pode ser também um ponteiro para uma lista)
 
-} SynthObject;
+} Object;
 
 
 
-void* process(Node* n) {
+void* process(Node* n,  STable* currentScope) {
 
 	int info = n != NULL;	
 	if(info) {		
@@ -320,7 +346,7 @@ void* process(Node* n) {
 		if(n->children){
 			for(i= 0; i < n->nchild; i++){
 				if(n->children[i]) {
-					process(n->children[i]); // se tiver filho (desce um nível e resolve as dependencias) 
+					process(n->children[i], currentScope); // se tiver filho (desce um nível e resolve as dependencias) 
 				}
 
 
@@ -328,12 +354,29 @@ void* process(Node* n) {
 		}
 		// ao chegar nas folhas avaliar a informação delas (todas "conjunto") e recuperar dependencias resolvidas do nível mais abaixo 
 		if(n->leafs) {
-			for(i = 0; i< n->nleafs;i++){					
+			// for necessário ?
+			//for(i = 0; i< n->nleafs;i++){	
+
+				// value type node (simplesmente retorna), mas usamos para diferenciar o tipo								
+			    if(n->type == DATA_NUM) {
+			    	return n->leafs[0]; // testando com valores literais (o objeto primitivo da linguagem é necessário!)
+			    }
+			    if(n->type == ASSIGN_V) {
+			    	return n->leafs[0]; // é só o nome da variável
+			    }	
 			    
-			}
+			    // OP (é um tipo de operação) criar método processOp(tipoOP,noAtual) que vai adicionar a varável ao escopo atual
+			    if(n->type == OTHER_ASSIGN){
+			    							// nome  // tipo vindo do objeto primitivo, methodParam (nível 0 e ordem...?) 
+			    	int testeValor = 10; 
+			    	addValueCurrentScope("v", NUMBER_ENTRY,&testeValor, 0, currentScope);
+			    }
+
+			//}
 		}
 	}	
 }
+
 
 
 int main()
@@ -345,7 +388,7 @@ int main()
     // global (ordem 0(primeiro), nível 0) (e sem pais)
     	
 	STable* global = createTable(GLOBAL,NULL,0,0);
-	printTable(global);
+	//printTable(global);
 
 	int vali = 0;
 	int valc = 0;
@@ -356,9 +399,12 @@ int main()
 	//TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE,"pequenastruct(list)",0,nova);
 	//TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE,"pequenastruct(list)",0,nova);
 
-	TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE,&vali,0,global);
-	TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE,&valc,0,global);
-	TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE,&valf,0,global);
+
+	// ATENÇÃO:  PODE ESTAR USANDO ERRADAMENTE, até porque esse inteiro só existe nesse escopo (deve-se alocar memoria)
+
+	TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE_ENTRY,&vali,0,global);
+	TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE_ENTRY,&valc,0,global);
+	TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE_ENTRY,&valf,0,global);
 		
 	//int valboo = 0;
 
@@ -373,9 +419,9 @@ int main()
 	//insert(global, modoEntrada);
 	//insert(global, enumerado);
 	
-	printEntry(lookup(global, "I_TIME"));
-	printEntry(lookup(global, "C_TIME"));
-	printEntry(lookup(global, "F_TIME"));
+	//printEntry(lookup(global, "I_TIME"));
+	//printEntry(lookup(global, "C_TIME"));
+	//printEntry(lookup(global, "F_TIME"));
 
 	//printEntry(lookup(global, "modoEntrada"));
 	//printEntry(lookup(global, "enumerado"));
@@ -392,21 +438,23 @@ int main()
     
 
 
-    	// testando mudanças de Node e fluxo de construção, programa simples com atribuição de variável
+    // testando mudanças de Node e fluxo de construção, programa simples com atribuição de variável
 
 	// passo 1: inicia escopo global, inicia diretivas temporais (já feito) 
 
-	// passo 2: percorrer "arovre"  ( v = 10) ("só isso!") 
+	// passo 2: percorrer "arvore"  ( v = 10) ("só isso!")  (primeiro vamos fazer operações que não "geram escopo")
 
 	// note que ASSIGN_V e todos os outros nós desse tipo na verdade são apenas DATA(no maximo filhos de DATA mais abaixo),
+	
 	// CONCLUSÃO: DIMINUIR A QUANTIDADE EXAGERADA DE ENUMS criados ! (agrupar enums) (apesar que isso atrapalha na tipagem ? ) 
 	// opções: manter enums  (prepare-se para MUITOS IFS AND ELSES)
 	//	   agrupar (porém colocar "subtipos" nos nós (prepare-se para mudar todo o arquivo .y e possivelmente introduzir novos bugs)
 	//	   manter enums (porém "inferir" tipos ao adicionar a tabela, até porque a linguagem só tem 3 tipos, strings, int, e TDS)
 	//	   	-> problema dessa abordagem: como diferenciar strings de números ? (não é tão ruim se parar para pensar, mas necessita escovar bit).
+			// Solução adotada... criar "struct" do objeto da linguagem? (apesar que a E_TABLE faz a mesma coisa não?)
 			// por outro lado: https://stackoverflow.com/questions/29381067/does-c-and-c-guarantee-the-ascii-of-a-f-and-a-f-characters
 
-	Node* expr = createNode(5,0,1,"RAWNUMBERDATA",ASSIGN_V,"10");
+	Node* expr = createNode(5,0,1,"RAWNUMBERDATA",DATA_NUM,"10");
 
 	Node* assignable = createNode(5,0,1,"ASSIGNABLE",ASSIGN_V,"v");	
 
@@ -417,11 +465,13 @@ int main()
 	Node* root = createNode(5,1,0,"Prog",PROG,cmd);
 
 	
-	printNode(root);
+	//printNode(root);
 	
 
-	process(root);
-	
+	process(root, global);
+
+
+	printTable(global);
 	
 	letgoTable(global);
     
