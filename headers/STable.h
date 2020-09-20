@@ -5,18 +5,7 @@
 #include "Enum.h"
 #include "Object.h"
 
-
-
-const char* mappingEnumTable[] =  {
-    "GLOBAL",
-    "FUNC",
-    "LOOP",
-    "IF_BLOCK",
-    "ELSE_BLOCK",
-};
-
-
-#define  MAX_TABLE 950;
+#define  MAX_TABLE 950
 
 struct S_TABLE;
 

@@ -5,6 +5,15 @@
 #include "../../headers/constants.h"
 
 
+const char* mappingEnumTable[] =  {
+    "GLOBAL",
+    "FUNC",
+    "LOOP",
+    "IF_BLOCK",
+    "ELSE_BLOCK",
+};
+
+
 // entry
 TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parentScope) {
     
@@ -27,10 +36,10 @@ void printEntry(TableEntry* e) {
 
 	if(e) 
 	{
-		printf("\t ");
+		printf("\t %s :",e->name);
 		//printf("\t %s : ( ",e->name);
-		prinObject(e->val);
-		printf("\t ( methodParam: %d, level: %d, order: %d ) ",e->methodParam,e->level,e->order);
+		printObject(e->val);
+		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
 
 	}
 
@@ -82,7 +91,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 void printTable(STable* t){
 	if(t){
 		printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
-		if(t->tableData){
+		if(t->lastEntryIndex != 0 && t->tableData){
 			printf("|--> Entries: \n");
 			int i;
 			for(i=0;i<= t->lastEntryIndex; i++){
@@ -93,7 +102,7 @@ void printTable(STable* t){
 }
 
 
-void letgoEntry(TableEntry* e){
+void letgoEntry(TableEntry* e) {
 	if(!e) {
 	    return;
 	}
@@ -101,7 +110,8 @@ void letgoEntry(TableEntry* e){
 }
 
 
-void letgoTable(STable* t){
+void letgoTable(STable* t)
+{
 	if(!t) {
 	    return;
 	}
@@ -113,9 +123,10 @@ void letgoTable(STable* t){
 		free(t->children);
 	}
 	if(t->tableData){
-		for(i=0; i < MAX_TABLE; i++){
-			if(t->tableData[i]) {
-			 letgoEntry(t->tableData[i]);   
+		for(i=0; i < MAX_TABLE; i++)
+		{
+				if(t->tableData[i]) {
+			 	letgoEntry(t->tableData[i]);   
 			}
 		}
 	    free(t->tableData);
@@ -165,10 +176,10 @@ TableEntry* lookup(STable* t, const char* name) {
 		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
 		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
 		// primeiro eu vou testar usando valores literais 
-void addValueCurrentScope(char* name, ENTRY_TYPE type, void* val, int methodParam,STable* current) {
+void addValueCurrentScope(char* name, void* val, int methodParam,STable* current) {
 
 	//nome da variavel,   val vai ser literalmente o valor dela (problema, e quanto for uma lista?)
-	TableEntry* entry = createEntry(name,type,val,methodParam,current);
+	TableEntry* entry = createEntry(name,val,methodParam,current);
 	insert(current,entry);
 }
 

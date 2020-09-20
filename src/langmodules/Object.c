@@ -1,20 +1,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../../headers/constants.h"
 #include "../../headers/Object.h"
 
+const char* mappingEnumObjectType[] =  {
+    "NUMBER",
+    "LOGICAL",
+    "LABEL",
+    "TDS",
+    "T_DIRECTIVE",
+};
 
 
-Object* createObject(char* name, int type, int OBJECT_SIZE, void** values) 
+Object* createObject(int type, int OBJECT_SIZE, void** values) 
 {
 
 
 	Object* o = (Object*) malloc(sizeof(Object));
-	o->name = name;
 	o->type = type;
-	o->dataList = dataList;
+	o->OBJECT_SIZE = OBJECT_SIZE;
 	if(OBJECT_SIZE){
 		void** vo = (void**) malloc(sizeof(void*)*OBJECT_SIZE);
+		int i;
+		for(i = 0; i< OBJECT_SIZE; i++)
+		{
+			vo[i] = values[i];
+		}
+		o->values = vo;	
 	}
 
 }
@@ -24,35 +37,40 @@ void printObject(Object* o)
 {
 	if(o) 
 	{
-
+		int i;
 		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY)
 		{
-			printf("%s : (%s, %d, ) \n",o->name,mappingObjectType[o->type],*(int *)o->val);
+			for(i = 0; i < o->OBJECT_SIZE; i++)
+			{
+				int deref = *(int*) o->values[i];
+				printf(" (%s, %d) \n",mappingEnumObjectType[o->type],deref);
+			}			
+			
 		}
 
 		// logical == converter para numeros? 
-		if(e->val->type== LOGICAL_ENTRY)
+		if(o->type== LOGICAL_ENTRY)
 		{
-			int boolean = *(int * ) e->val;
+			int boolean = *(int * ) o->values[0];
 			if(boolean)
 			{
 
-				printf("%s : (%s, %d, ) \n",o->name,mappingObjectType[o->type],"true");
+				printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],"true");
 			}
 			else
 			{
-				printf("%s : (%s, %d, ) \n",o->name,mappingObjectType[o->type],"false");	
+				printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],"false");	
 			}
 		}
 
-		if(e->type == LABEL_ENTRY)
+		if(o->type == LABEL_ENTRY)
 		{
 			const char* valor; 
-			valor = (char*) e->val;
-			printf("%s : (%s, %d, ) \n",o->name,mappingObjectType[o->type],valor);	
+			valor = (char*) o->values[0];
+			printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],valor);	
 		}
 
-		if(e->type == TDS_ENTRY){
+		if(o->type == TDS_ENTRY){
 			// TODO (struct TDS)
 		}
     }
