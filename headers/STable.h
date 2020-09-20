@@ -3,18 +3,35 @@
 #define TABLE_H
 
 #include "Enum.h"
+#include "Object.h"
 
 
-#define  MAX_TABLE 550;
+
+const char* mappingEnumTable[] =  {
+    "GLOBAL",
+    "FUNC",
+    "LOOP",
+    "IF_BLOCK",
+    "ELSE_BLOCK",
+};
+
+
+#define  MAX_TABLE 950;
+
+struct S_TABLE;
 
 struct S_TABLE;
 
 typedef struct E_TABLE
 {
   char* name;
-  int type;
-  char* val;
-  int methodParam; // é usado para saber se a variavel é passada por um método!
+  Object* val; // encapsular todo objeto da linguagem nesse novo tipo, assim não temos que lidar com "void puro"
+               // porque?  Ao recuperar algo da linguagem se usarmos void diretamente fica "impossível" saber o tipo retornado
+               // isso obrigaria fazer duas coisas:  ou a cada valor retornado criar uma ENTRY, mesmo que só estejamos repassando (oque seria conceitualmente errado)
+               // e poderia causar efeitos colaterais na TABELA DE SIMBOLOS, ou seja é melhor encapsular um valor qualquer em outro objeto!
+  int methodParam;
+  int order;
+  int level;
   struct S_TABLE * parentScope;
 } TableEntry;
 
@@ -26,19 +43,20 @@ typedef struct S_TABLE
   int nchild;
   int level;
   int order;
-  int type;
-  // TABLE DATA (como representar!?)(ponteiros pra void?) (ou criar outra struct chamada TABLE ENTRY)
+  SCOPE_TYPE type;
   TableEntry** tableData;
+  int lastEntryIndex;
     
 } STable;
 
 
-TableEntry* createEntry(char* name, int type, char* val, int methodParam, STable* parentScope);
+TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(int type, STable* parent,  int level, int order);
+STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
 
-void addSubScope(STable* parent, STable* child);
+
+STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
 void printTable(STable* t);
 
@@ -49,7 +67,6 @@ int hash(const char * str);
 void insert(STable* t, TableEntry* e); 
 
 TableEntry* lookup(STable* t, const char* name);
-
 
 void printEntry(TableEntry* e);
 
