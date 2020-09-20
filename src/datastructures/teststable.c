@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../../headers/Node.h"
+//#include "../../headers/Node.h"
+#include "../../headers/STable.h"
 
-
-
-Object* process(Node* n,  STable* currentScope) {
+/*
+Object* process(Node* n,  STable* currentScope) 
+{
 
 	int info = n != NULL;	
 	if(info) {		
@@ -43,7 +44,7 @@ Object* process(Node* n,  STable* currentScope) {
 		}
 	}	
 }
-
+*/
 
 
 int main()
@@ -55,11 +56,18 @@ int main()
     // global (ordem 0(primeiro), nível 0) (e sem pais)
     	
 	STable* global = createTable(GLOBAL,NULL,0,0);
-	//printTable(global);
+
 
 	int vali = 0;
 	int valc = 0;
 	int valf = 3;
+
+	void* pa[] = {&vali};
+
+	void* pb[] = {&valf};
+
+	Object* num0 = createObject(T_DIRECTIVE_ENTRY, 1, pa);
+	Object* num3 = createObject(T_DIRECTIVE_ENTRY, 1, pb);
 
 	// NOSSA ELE CONVERTEU STRING EM NUMERO AHSDJKAHDKSAKDAS
 	//TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE,"bigfuckingstruct",1,nova);
@@ -69,9 +77,9 @@ int main()
 
 	// ATENÇÃO:  PODE ESTAR USANDO ERRADAMENTE, até porque esse inteiro só existe nesse escopo (deve-se alocar memoria)
 
-	TableEntry* I_TIME = createEntry("I_TIME",T_DIRECTIVE_ENTRY,&vali,0,global);
-	TableEntry* C_TIME = createEntry("C_TIME",T_DIRECTIVE_ENTRY,&valc,0,global);
-	TableEntry* F_TIME = createEntry("F_TIME",T_DIRECTIVE_ENTRY,&valf,0,global);
+	TableEntry* I_TIME = createEntry("I_TIME",num0,0,global);
+	TableEntry* C_TIME = createEntry("C_TIME",num0,0,global);
+	TableEntry* F_TIME = createEntry("F_TIME",num3,0,global);
 		
 	//int valboo = 0;
 
@@ -94,6 +102,7 @@ int main()
 	//printEntry(lookup(global, "enumerado"));
 
 
+/*
 
 	// if comum (ordem 1(primeiro de verdade, "zero"), nível 1) 
 	//addSubScope(global,IF_BLOCK);
@@ -137,6 +146,7 @@ int main()
 
 	process(root, global);
 
+*/
 
 	printTable(global);
 	
