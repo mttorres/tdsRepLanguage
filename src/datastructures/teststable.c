@@ -81,38 +81,49 @@ int main()
 	TableEntry* C_TIME = createEntry("C_TIME",num0,0,global);
 	TableEntry* F_TIME = createEntry("F_TIME",num3,0,global);
 		
-	//int valboo = 0;
 
-	//TableEntry* modoEntrada = createEntry("modoEntrada",LOGICAL,&valboo,1,global);
-		
-	//TableEntry* enumerado = createEntry("enumerado",LABEL,"OCUPADO",0,global);
+	int valboo = 0;
+
+	void* pbool[] = {&valboo};
+
+	Object* fabool = createObject(LOGICAL_ENTRY, 1, pbool);
+
+	TableEntry* modoEntrada = createEntry("modoEntrada",fabool,1,global);
 
 
+	char* vallabel = "OCUPADO";
+
+	void* plab[] = {vallabel};
+
+	Object* falab = createObject(LABEL_ENTRY, 1, plab);
+
+	TableEntry* enumerado = createEntry("enumerado",falab,0,global);
+	
 	insert(global, I_TIME);
 	insert(global, C_TIME);
 	insert(global, F_TIME);
-	//insert(global, modoEntrada);
-	//insert(global, enumerado);
+	insert(global, modoEntrada);
+	insert(global, enumerado);
 	
-	//printEntry(lookup(global, "I_TIME"));
-	//printEntry(lookup(global, "C_TIME"));
-	//printEntry(lookup(global, "F_TIME"));
+	printEntry(lookup(global, "I_TIME"));
+	printEntry(lookup(global, "C_TIME"));
+	printEntry(lookup(global, "F_TIME"));
 
-	//printEntry(lookup(global, "modoEntrada"));
-	//printEntry(lookup(global, "enumerado"));
+	printEntry(lookup(global, "modoEntrada"));
+	printEntry(lookup(global, "enumerado"));
 
 
-/*
+
 
 	// if comum (ordem 1(primeiro de verdade, "zero"), nível 1) 
 	//addSubScope(global,IF_BLOCK);
-	//printTable(addSubScope(global,IF_BLOCK));
+	printTable(addSubScope(global,IF_BLOCK));
 
 	// else associado (ordem 2("1"), nível 1)
 	//addSubScope(global,ELSE_BLOCK);
-	//printTable(addSubScope(global,ELSE_BLOCK));
+	printTable(addSubScope(global,ELSE_BLOCK));
     
-
+/*
 
     // testando mudanças de Node e fluxo de construção, programa simples com atribuição de variável
 

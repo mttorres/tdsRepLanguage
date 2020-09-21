@@ -50,24 +50,30 @@ void printObject(Object* o)
 
 		// logical == converter para numeros? 
 		if(o->type== LOGICAL_ENTRY)
-		{
-			int boolean = *(int * ) o->values[0];
-			if(boolean)
-			{
+		{	
+				for(i = 0; i < o->OBJECT_SIZE; i++)
+				{
+					int derefboolean = *(int*) o->values[i];
+					if(derefboolean)
+					{
+						printf(" (%s, %s) \n",mappingEnumObjectType[o->type],"true");
+					}
+					else
+					{
+						printf(" (%s, %s) \n",mappingEnumObjectType[o->type],"false");	
+					}
+				}					
 
-				printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],"true");
-			}
-			else
-			{
-				printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],"false");	
-			}
 		}
 
 		if(o->type == LABEL_ENTRY)
 		{
-			const char* valor; 
-			valor = (char*) o->values[0];
-			printf(" (%s, %d, ) \n",mappingEnumObjectType[o->type],valor);	
+			for(i = 0; i < o->OBJECT_SIZE; i++)
+			{
+				const char* valor = (char*) o->values[i];
+				printf(" (%s, '%s' ) \n",mappingEnumObjectType[o->type],valor);	
+				
+			}				
 		}
 
 		if(o->type == TDS_ENTRY){
@@ -79,3 +85,4 @@ void printObject(Object* o)
     	printf("null \n");
     }
 }
+
