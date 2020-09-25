@@ -15,7 +15,14 @@ typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3} smvtype;
 
 
 
-//separar enums por: OPERAÇÃO, DADOS, 
+//separar enums por: OPERAÇÃO UNÁRIA, OPERAÇÃO BINÁRIA, OPERAÇÃO ATRIBUIÇÃO, DADOS, 
+					
+//		DEFINIÇÃO PROGRAMA, DEFINIÇÃO TDS, DEFINIÇÃO 
+
+									
+
+// ou...   POR "INTERVALOS" ex:  DATA_NUM, DATA_BOOL, DATA_NULL, DATA_ITD, DATA_CTD, DATA_FTD, DATA_LABEL, DATA_V,   if(DATA_NUM  < tipo <  DATA_V) {return processData(node)}
+
 
 
 typedef enum NODE_TYPE { 
