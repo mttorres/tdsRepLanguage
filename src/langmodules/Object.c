@@ -16,30 +16,48 @@ const char* mappingEnumObjectType[] =  {
 Object* createObject(int type, int OBJECT_SIZE, void** values) 
 {
 
+	Object* newOb = (Object*) malloc(sizeof(Object));
 
-	Object* o = (Object*) malloc(sizeof(Object));
-	o->type = type;
-	o->OBJECT_SIZE = OBJECT_SIZE;
-	if(OBJECT_SIZE){
+	newOb->type = type;
+	newOb->OBJECT_SIZE = OBJECT_SIZE;
+	if(OBJECT_SIZE)
+	{
 		void** vo = (void**) malloc(sizeof(void*)*OBJECT_SIZE);
 		int i;
 		for(i = 0; i< OBJECT_SIZE; i++)
 		{
 			vo[i] = values[i];
+			//printf("[DEBUG] createObject valor: %d \n",*(int*) values[i]);
 		}
-		o->values = vo;	
+		newOb->values = vo;	
 	}
+
+
+	//int info = newOb == NULL ?  1 : 0;
+
+	//printf("[DEBUG - createObject] info: %d \n", info);
+
+	//printObject(newOb);
+
+
+	return newOb;
 
 }
 
 
 void printObject(Object* o)
 {
-	if(o) 
+	int info = o == NULL ?  1 : 0;
+
+	//printf("[DEBUG - createObject] info: %d \n", info);
+	
+
+	if(!info)
 	{
 		int i;
 		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY)
 		{
+			//printf("[DEBUG] printObject: NUMBER \n ");
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
 				int deref = *(int*) o->values[i];

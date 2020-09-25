@@ -176,7 +176,8 @@ TableEntry* lookup(STable* t, const char* name) {
 		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
 		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
 		// primeiro eu vou testar usando valores literais 
-void addValueCurrentScope(char* name, void* val, int methodParam,STable* current) {
+
+void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current) {
 
 	//nome da variavel,   val vai ser literalmente o valor dela (problema, e quanto for uma lista?)
 	TableEntry* entry = createEntry(name,val,methodParam,current);
