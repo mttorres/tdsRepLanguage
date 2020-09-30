@@ -6,7 +6,7 @@
   #include "../headers/Node.h"
   #include "../headers/Enum.h"	
   #include "../headers/HeaderSmv.h"
-   	
+  #include "../headers/STable.h" 	
 
   extern int yylex(void);
   extern int yyparse();
@@ -18,11 +18,11 @@
 int main(int argc, char* argv[]) {
   
   
-  	FILE *fp; // .tds file
-  	FILE *smvP; // .smv file;
-  	fp = fopen(argv[1], "r");
-  	astout = fopen("results/astOutput", "w");
-  	smvP = fopen(argv[2], "r+");
+    FILE *fp; // .tds file
+    FILE *smvP; // .smv file;
+    fp = fopen(argv[1], "r");
+    astout = fopen("results/astOutput", "w");
+    smvP = fopen(argv[2], "r+");
   	//printf("%s \n",argv[1]);
   	//printf("%s \n",argv[2]);
 
@@ -38,10 +38,15 @@ int main(int argc, char* argv[]) {
   	fclose(astout);
   	fclose(fp);
 
+    // tabelas e componentes globais
   	HeaderController* controller = createController(5);  
-	
+
+    //STable* global = createTable(GLOBAL,NULL,0,0);
+
+    STable* portsSmv = createTable(SMV_PORTS,NULL,0,0);
+
 	//pré processamento 
-	preProcessSmv(smvP,controller);
+	preProcessSmv(smvP,controller,portsSmv);
   	
   	size_t bufsize = 300;
   	char *buffer = (char *) malloc(bufsize * sizeof(char));

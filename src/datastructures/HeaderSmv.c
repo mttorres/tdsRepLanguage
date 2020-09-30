@@ -4,6 +4,7 @@
 #include "../../headers/HeaderSmv.h"
 #include "../../headers/Enum.h"
 #include "../../headers/textManager.h"
+#include "../../headers/STable.h"
 
 HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP) {
 
@@ -39,11 +40,16 @@ void letgoHeader(HeaderSmv* h){
  	
  	for(i = 0; i< h->VAR_POINTER; i++){
 		if(h->varBuffer[i]){
-			free(h->varBuffer[i]); // note que poderiamos nos livrar de strings dinamicas nesse caso (reformular métodos CAT e refs para static string?)
-		}					 // not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
-  	}						 // ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
+			free(h->varBuffer[i]); 
+
+		}
+	}
+	// note que poderiamos nos livrar de strings dinamicas nesse caso (reformular métodos CAT e refs para static string?)
+	// not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
+  	// ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
+
   	printf("[letgoHeader] DEBUG: liberando buffer VAR! \n");
-  	//free(h->varBuffer);
+  	free(h->varBuffer);
 	
  	for(i = 0; i< h->ASSIGN_POINTER; i++) {
 		if(h->assignBuffer[i]){
@@ -169,26 +175,32 @@ void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol
 void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 	int pt;
 	char* aloc = malloc((strlen(line)+1) * sizeof(char));
-	if(part != TRANS){
+	if(part != TRANS)
+	{
 		strcpy(aloc,line);
-		if(part == VAR) {
+		if(part == VAR) 
+		{
 			pt = header->VAR_POINTER;
 			header->varBuffer[pt] = aloc;
 			header->VAR_POINTER += 1;	
 		}
-		if(part == ASSIGN) {
+		if(part == ASSIGN) 
+		{
 			pt = header->ASSIGN_POINTER;
 			header->assignBuffer[pt] = aloc;
 			header->ASSIGN_POINTER += 1;
 		}
 	}
-	else{
+	else
+	{
 		pt = header->TRANS_POINTER;
-		if(!controlRename){
+		if(!controlRename)
+		{
 			strcpy(aloc,line);
 			header->transBuffer[pt] = aloc;
 		}
-		else{
+		else
+		{
 			//char** bufferAux = clearOldPortsRefs(line); 
 			printf("[selectBuffer] tratamento de rename refs a portsModule ANTES:%s\n\n",line);
 			//strcpy(aloc,bufferAux);
@@ -203,14 +215,20 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename){
 	}
 }
 
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename) {
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readPortsModule) {
 	selectBuffer(part,line,Hcontrol->headers[pos-1],controlRename);
+	if(readPortsModule && part == VAR )
+	{
+		printf("[saveLineOnBuffer] Salvando tabela de portas \n\n");
+
+	}
 }
 
-// fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
-// as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
-// stages são os módulos 0(main), automato(2), ports(3)
-void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename) {
+/* fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
+ 	as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
+ 	stages são os módulos 0(main), automato(2), ports(3)
+*/
+void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readPortsModule) {
 
 	// modulo
 	if(part == CREATE_MODULE) {
@@ -219,14 +237,14 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 	}
 	// VAR, ASSIGN, TRANS
 	else{
-		saveLineOnBuffer(Hcontrol->CURRENT_SIZE,part,line,Hcontrol,controlRename);	
+		saveLineOnBuffer(Hcontrol->CURRENT_SIZE,part,line,Hcontrol,controlRename,readPortsModule);	
 	}
 
 
 }
 
 // depois(!): conversar com o felipe sobre como "diferenciar" smvs do transform 
-void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
+void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv) {
 	
 	/*Strings que são usadas para a busca no arquivo*/
 	char varString[] = "VAR";	
@@ -236,10 +254,12 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
 	char portsModuleString[] = "MODULE portsModule";
 	char automataString[] = "MODULE finalAutomata(time)";
 	char beginModuleString[] = "MODULE ";	
+	
 	char confirmAutomataString[] = "cs: {"; // se não encontrar isso após "começar a ler um automato" quer dizer que era um módulo qualquer
 	// ATUALIZAR:  usar string "caracteristica" para detectar módulos de "função" (transform)
 
-	/*Parâmetro a ser adicionado a ds[ultimo]->buffer[0] = PortsModule */
+
+	/*Parâmetro a ser adicionado a PortsModule */
 	char timeString[] = "time";
 
 	/*Variáveis de controle de cursor e buffer
@@ -256,7 +276,6 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
 	    -> estamos em qual "estagio" de interesse (1 = MAIN,  2 = Módulos(automato e funcoes), 3 = Ports)
 		-> indice baseado no estagio corrente
 		-> em qual fase dos estágios estamos (-1 = lendo inicio do módulo, 0 =var ,  1 = ASSIGN, 2= TRANS  ) (note que assign e trans podem não existir )
-		-> estamos iniciando o main
 		-> estamos lendo um ASSIGN
 		-> estamos lendo a relação de transição do automato
 		-> deve-se renomear referencias a portsModule
@@ -292,72 +311,79 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol) {
    			}
    		}
 
-   		if(phase == TRANS) {
-   			printf("[preProcessSmv] Buffer pré computePhase 3 %s \n\n",buffer);
-   			if(buffer[0] != '\n'){
+
+   		if(buffer[0] != '\n') 
+   		{
+   			if(phase == TRANS)
+   			{
+   				printf("[preProcessSmv] Buffer pré compute Phase 3 %s \n\n",buffer);
    				readTrans = (buffer[0] != 'I')? readTrans : 0;
-   				controlRename = readTrans? 0 : 0;
+   				controlRename = readTrans? 0 : 0; // usado para debugar o nosso renomeador de refs
    			}
-   			else{
-   				phase = CREATE_MODULE;
-   				stage++;
-   				readAutomata = 0;
-   				readPortsModule = 0;
-   				printf("[preProcessSmv] Buffer pré computePhase 2  módulo acabou \n\n");
-   				continue;
-   			}
-   		}
-   		
-   		if(phase == ASSIGN){
-   			printf("[preProcessSmv] Buffer pré computePhase 2 %s \n\n",buffer);
-   			if(!readPortsModule){
-   				//isto é o módulo não acabou sem as transições 
-   				if(buffer[0] != '\n'){
+
+   			if(phase == ASSIGN)
+   			{
+   				
+   				if(!readPortsModule)
+   				{
+   					printf("[preProcessSmv] Buffer pré computePhase 2 %s \n\n",buffer);
    					readTrans =  (buffer[0] == 'T' && strstr(buffer,transString));
-   					if(readTrans){
+   					
+   					// na verdade entramos na fase de leitura de transições que veio LOGO DEPOIS DE ATRIBUIÇÕES
+   					if(readTrans)
+   					{
+   						printf("[preProcessSmv] terminou ASSIGN \n\n");
    						phase = TRANS; // mudou de fase
    					}
+
    				}
-   				// módulo acabou 
-   				else{
-   					// ignorar \n e reiniciar phases
-   					phase = CREATE_MODULE;
-   					stage++;
-   					readAutomata = 0;
-   					readPortsModule = 0;
-   					printf("[preProcessSmv] Buffer pré computePhase 2  módulo acabou \n\n");
-   					continue;
+   				else 
+   				{
+   					break; // não precisa mais ler(vai ser lido da arvore)
    				}
+   				
+
    			}
-   			else{
-   				break; // não precisa mais ler(vai ser lido da arvore)
-   			}
+   			
+   		}
+   		// módulos são separados por quebra de linha
+   		else
+   		{
+   			// reinicio
+   			phase = CREATE_MODULE;
+   			stage++;
+   			readAutomata = 0;
+   			printf("[preProcessSmv] módulo acabou \n\n");
+   			continue;
    		}
 
+
    		// usa a primeira letra de cada parte de interesse primeiro para realizar curto circuito
-   		if(phase == VAR) {
+   		if(phase == VAR) 
+   		{
    			printf("[preProcessSmv] Buffer pré computePhase1 %s \n\n",buffer);
    			readAssign = (buffer[0] == 'A' && strstr(buffer,assignString)); 
    			readTrans =  (buffer[0] == 'T' && strstr(buffer,transString));
 
-   			if(!(readAssign || readTrans)) {
-   				if(readPortsModule){
-   					printf("[preProcessSmv] debug: FVAR %s\n",buffer);
-   				}
+   			if(!(readAssign || readTrans)) 
+   			{
    				int iniVar = Hcontrol->headers[Hcontrol->CURRENT_SIZE-1]->VAR_POINTER == 0;
-   				if(iniVar &&  strstr(buffer,fVarString)) {
+   				if(readPortsModule && iniVar &&  strstr(buffer,fVarString)) {
    					printf("[preProcessSmv] Trocou FVAR %s\n",buffer);
    					bufferAux = varString; // tratamento de FROZEN VAR
    				}   				
    			}
-   			else{
+   			else
+   			{
+   				printf("[preProcessSmv] terminou VAR \n\n");
    				phase = readAssign ? ASSIGN : TRANS;
  				readAssign = 0;
    			}
 
    		}
    		
-   		processPhase(stage,phase,Hcontrol,bufferAux,controlRename);
+   		processPhase(stage,phase,Hcontrol,bufferAux,controlRename,readPortsModule);
+
    		if(phase == CREATE_MODULE){
    			phase++;
    		}

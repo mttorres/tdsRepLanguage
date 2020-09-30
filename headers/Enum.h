@@ -4,7 +4,7 @@
 
 //typedef enum {false, true} bool;
 
-typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK} SCOPE_TYPE;
+typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK, SMV_PORTS} SCOPE_TYPE;
 
 typedef enum TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, LABEL_ENTRY ,TDS_ENTRY, T_DIRECTIVE_ENTRY } ENTRY_TYPE;
 			 // permitir lista de tipos diferentes? permitir lista de TDS's?
