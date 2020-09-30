@@ -11,6 +11,7 @@ const char* mappingEnumTable[] =  {
     "LOOP",
     "IF_BLOCK",
     "ELSE_BLOCK",
+    "SMV_PORTS",
 };
 
 
@@ -18,7 +19,33 @@ const char* mappingEnumTable[] =  {
 TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parentScope) {
     
     TableEntry* newEntry = (TableEntry*) malloc(sizeof(TableEntry));
-    newEntry->name = name; // note que para strings e para valores void criados (talvez seja necessário malloc)
+    
+    int s = strlen(name);
+    //printf("[createEntry] nome original : %s \n",name);
+    //printf("[createEntry] tamanho nome: %d \n",s);
+
+    char* newName = malloc(sizeof(char)*(s+1));
+    int i;
+
+    char* dest = newName; 
+    char* src = name;
+    for(i=0; i < s; i++)
+    {
+    	// enquanto não \0
+    	if(*src)
+    	{
+    		*dest = *src;
+    		dest++;
+    		src++;
+    	}
+
+    }
+    *dest = '\0';
+
+    printf("[createEntry] novo nome: %s \n",newName);
+    
+    newEntry->name = newName; 
+    
     newEntry->val = val;   // objects sempre vão ser alocados, string devemos ter tratativa! (a não ser que essa seja alocada pelo bison?)
     newEntry->methodParam = methodParam;
     newEntry->parentScope = parentScope;
@@ -34,15 +61,16 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
 
 void printEntry(TableEntry* e) {
 
-	if(e) 
+	int info = e == NULL ? 0 : 1;
+	
+	if(info) 
 	{
-		printf("\t %s :",e->name);
-		//printf("\t %s : ( ",e->name);
+
+		printf("\t %s : ( ",e->name);
 		printObject(e->val);
 		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
 
 	}
-
 }
 
 
@@ -83,6 +111,13 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 */
 	
 	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
+	
+	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
+	int i;
+	for (i = 0; i < MAX_TABLE; ++i)
+	{
+		newtable->tableData[i] = NULL;	
+	}
 
 	return newtable;
 
@@ -94,6 +129,7 @@ void printTable(STable* t){
 		if(t->lastEntryIndex != 0 && t->tableData){
 			printf("|--> Entries: \n");
 			int i;
+			//printf("(total) %d \n",t->lastEntryIndex);
 			for(i=0;i<= t->lastEntryIndex; i++){
 				printEntry(t->tableData[i]);
 			}
@@ -176,6 +212,25 @@ TableEntry* lookup(STable* t, const char* name) {
 		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
 		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
 		// primeiro eu vou testar usando valores literais 
+
+
+
+// refatorar os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
+void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
+{
+
+	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
+
+	// POR ENQUANTO:
+
+	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
+
+
+	Object* o = createObject(any_type, object_size, any);
+	addValueCurrentScope(name,o,methodParam,current);
+}
+
+
 
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current) {
 

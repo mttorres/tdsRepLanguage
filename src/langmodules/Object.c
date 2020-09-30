@@ -10,6 +10,7 @@ const char* mappingEnumObjectType[] =  {
     "LABEL",
     "TDS",
     "T_DIRECTIVE",
+    "SMV_POINTER",
 };
 
 
@@ -22,12 +23,13 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	if(OBJECT_SIZE)
 	{
+		// malloc para garantir que o objeto utilizado não "seja perdido" em chamadas
 		void** vo = (void**) malloc(sizeof(void*)*OBJECT_SIZE);
 		int i;
 		for(i = 0; i< OBJECT_SIZE; i++)
 		{
 			vo[i] = values[i];
-			//printf("[DEBUG] createObject valor: %d \n",*(int*) values[i]);
+			printf("[createObject] valor: %d \n",*(int*) values[i]);
 		}
 		newOb->values = vo;	
 	}
@@ -55,14 +57,18 @@ void printObject(Object* o)
 	if(!info)
 	{
 		int i;
-		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY)
+		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == SMV_POINTER)
 		{
-			//printf("[DEBUG] printObject: NUMBER \n ");
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
 				int deref = *(int*) o->values[i];
-				printf(" (%s, %d) \n",mappingEnumObjectType[o->type],deref);
-			}			
+				printf(" (%s, %d)",mappingEnumObjectType[o->type],deref);
+				if(i != o->OBJECT_SIZE-1)
+				{
+					printf(",");
+				}
+			}
+			printf("\n");			
 			
 		}
 
