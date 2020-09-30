@@ -57,7 +57,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv);
 void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
 
 // salva a linha do baseada no  header do módulo lido anteriormente
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readPortsModule);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable* portsSmv);
 
 // mudar nome dos evals
 //int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);
