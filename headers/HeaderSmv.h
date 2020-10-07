@@ -2,8 +2,6 @@
 
 #define HEADER_H
 
-#include "STable.h"
-
 enum headerPart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2};
 
 typedef struct headersmv
@@ -25,8 +23,6 @@ void letgoHeader(HeaderSmv* h);
 
 
 /*Controlador de Header(auxiliar)*/
-
-
 HeaderSmv** initHeadersStruct(int size);
 
 void letGoHeadersStruct(HeaderSmv** hs, int size);
@@ -45,23 +41,8 @@ HeaderController* createController(int size);
 void letGoHeaderControl(HeaderController* Hcontrol);
 
 /*Controlador de Header(auxiliar)*/
-
-
 void printHeaderBuffer(HeaderSmv* h, int type, char* typeString);
 
 void printHeader(HeaderSmv* h);
-
-void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv);
-
-// salva o header do módulo lido anteriormente
-void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
-
-// salva a linha do baseada no  header do módulo lido anteriormente
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable* portsSmv);
-
-// mudar nome dos evals
-//int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);
-
-//int computePhase2(int stage, char* buffer, char* assignString,HeaderSmv** ds, int readAutomata, char* transString);
 
 #endif

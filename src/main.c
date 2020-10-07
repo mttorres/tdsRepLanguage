@@ -6,6 +6,8 @@
   #include "../headers/Node.h"
   #include "../headers/Enum.h"	
   #include "../headers/HeaderSmv.h"
+  #include "../headers/PreProcess.h"
+  //#include "../headers/PosProcess.h"
   #include "../headers/STable.h" 	
 
   extern int yylex(void);
