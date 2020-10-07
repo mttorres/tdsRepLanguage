@@ -315,6 +315,8 @@ int main()
 	printTable(global);
 	
 	letgoTable(global);
+
+	letgoNode(root);
     
 	return 0;
 }
