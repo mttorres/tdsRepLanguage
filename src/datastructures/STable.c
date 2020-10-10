@@ -12,6 +12,7 @@ const char* mappingEnumTable[] =  {
     "IF_BLOCK",
     "ELSE_BLOCK",
     "SMV_PORTS",
+    "SIMPLE_HASH"
 };
 
 
@@ -68,6 +69,11 @@ void printEntry(TableEntry* e) {
 	{
 		printf("\t %s : ( ",e->name);
 		printObject(e->val);
+		if(e->val->type == TYPE_SET)
+		{
+			printf("\t");
+			printTable((STable*)e->val->values[2]);
+		}
 		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
 
 	}
@@ -112,6 +118,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 
 	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
 
+/*
 	if(type == SIMPLE_HASH)
 	{
 		printf("[createTable] criando simple hash \n\n");
@@ -120,17 +127,18 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	{
 		printf("[createTable] criando escopo \n\n");
 	}
+*/
 	
 	newtable->tableData = (TableEntry**) malloc(selectSize*sizeof(TableEntry*));
 	
-/*	
+	
 	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
 	int i;
 	for (i = 0; i < selectSize; ++i)
 	{
 		newtable->tableData[i] = NULL;	
 	}
-*/
+
 
 	return newtable;
 
@@ -298,6 +306,8 @@ void addValueCurrentScope(char* name, Object* val, int methodParam,STable* curre
 
 	//nome da variavel,   val vai ser literalmente o valor dela (problema, e quanto for uma lista?)
 	TableEntry* entry = createEntry(name,val,methodParam,current);
+	//printf("[addValueCurrentScope] DEBUG: \n\n");
+	//printEntry(entry);
 	insert(current,entry);
 }
 

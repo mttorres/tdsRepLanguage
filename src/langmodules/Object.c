@@ -10,7 +10,7 @@ const char* mappingEnumObjectType[] =  {
     "LABEL",
     "TDS",
     "T_DIRECTIVE",
-    "SMV_POINTER",
+    "TYPE_SET",
 };
 
 
@@ -78,7 +78,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 
 			if(type == TYPE_SET)
 			{
-				vo[i] == allocateTypeSetObjects(i,values[i]);
+				vo[i] = allocateTypeSetObjects(i,values[i]);
 			}
 			else
 			{
@@ -104,21 +104,24 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 
 void printObject(Object* o)
 {
-	printf("[DEBUG - createObject]  \n");
+
 	int info = o == NULL ?  1 : 0;
-	printf("[DEBUG - createObject] info: %d \n", info);
+	//printf("[DEBUG - printObject] info: %d \n", info);
 	
 
 	if(!info)
 	{
 		int i;
+		//printf("[DEBUG - printObject] tipoDetectado: %s \n", mappingEnumObjectType[o->type]);
 		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET)
 		{
+
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
 
 				if((o->type != TYPE_SET) || (o->type == TYPE_SET &&  i < o->OBJECT_SIZE-1) )
 				{
+					//printf("[printObject] index on deref: %d \n",i);
 					int deref = *(int*) o->values[i];
 					printf(" (%s, %d)",mappingEnumObjectType[o->type],deref);
 					if(i != o->OBJECT_SIZE-1)
