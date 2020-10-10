@@ -47,6 +47,8 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
 
 STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
+void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current);
+
 void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current); 
 
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current);
