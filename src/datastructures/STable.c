@@ -24,6 +24,8 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
     //printf("[createEntry] nome original : %s \n",name);
     //printf("[createEntry] tamanho nome: %d \n",s);
 
+
+    // agora ele sempre aloca um nome novo, deve-se dar free também!
     char* newName = malloc(sizeof(char)*(s+1));
     int i;
 
@@ -45,7 +47,6 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
     printf("[createEntry] novo nome: %s \n",newName);
     
     newEntry->name = newName; 
-    
     newEntry->val = val;   // objects sempre vão ser alocados, string devemos ter tratativa! (a não ser que essa seja alocada pelo bison?)
     newEntry->methodParam = methodParam;
     newEntry->parentScope = parentScope;
@@ -62,10 +63,9 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
 void printEntry(TableEntry* e) {
 
 	int info = e == NULL ? 0 : 1;
-	
+	//printf("teste : %d \n",info);
 	if(info) 
 	{
-
 		printf("\t %s : ( ",e->name);
 		printObject(e->val);
 		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
@@ -109,15 +109,28 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 		newtable->children = chillist;
 	}
 */
+
+	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
+
+	if(type == SIMPLE_HASH)
+	{
+		printf("[createTable] criando simple hash \n\n");
+	}
+	else
+	{
+		printf("[createTable] criando escopo \n\n");
+	}
 	
-	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
+	newtable->tableData = (TableEntry**) malloc(selectSize*sizeof(TableEntry*));
 	
+/*	
 	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
 	int i;
-	for (i = 0; i < MAX_TABLE; ++i)
+	for (i = 0; i < selectSize; ++i)
 	{
 		newtable->tableData[i] = NULL;	
 	}
+*/
 
 	return newtable;
 
@@ -131,7 +144,12 @@ void printTable(STable* t){
 			int i;
 			//printf("(total) %d \n",t->lastEntryIndex);
 			for(i=0;i<= t->lastEntryIndex; i++){
-				printEntry(t->tableData[i]);
+				if(t->tableData[i])
+				{
+					//printf("%d \n",i);
+					printEntry(t->tableData[i]);
+				}
+				
 			}
 		}
 	}
@@ -141,6 +159,10 @@ void printTable(STable* t){
 void letgoEntry(TableEntry* e) {
 	if(!e) {
 	    return;
+	}
+	if(e->name)
+	{
+		free(e->name);
 	}
 	free(e);
 }
@@ -215,7 +237,47 @@ TableEntry* lookup(STable* t, const char* name) {
 
 
 
-// refatorar os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
+
+
+// método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto)) 
+/*
+
+	Objeto:  vetor dinamico[inteirosDoConjunto], nullable, vetor dinamico[labelsDoConjunto]
+
+	Prós: Menos structs para alocar,não tem que alocar uma TABELA INTEIRA só para alguns valores, 
+	a linguagem possui poucos tipos (atualmente: int, label, boolean(FALSE E TRUE são só enums no nuXmv),
+	e tds (que na verdade retorna qualquer um dos tipos anteriores))
+
+	Cons:  Outro objeto (mais coisas para dar free), 
+		   "quebaria" o conceito de hashmap que é justamente não ter duplicata, ia ser um objeto só para checar algumas coisas
+		    Toda vez que adicionar um tipo novo necessita alterar essa estrutura
+
+	Hashmap: estrutura que já temos atualmente, teria pelo menos umas 5 entras (talvez mais ou menos)
+
+		Pŕos: Não necessita criar mais nada,  não precisa alocar vetores (indexa pela string em qualquer caso),
+			  aberto para novos tipos (indexa pela string)
+
+		Cons:  Vai ficar uma estrutura "recursiva" tabela --x entradas--> entradaSmv(porta ou main) --> Objeto(iHeader,size,
+																											tabela ---y entradas--->entradas --> Objeto(bool))
+				Mais coisas para centralizar e dar free
+ 
+
+*/
+void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current)
+{
+	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+
+	void* po[] = {any[0], any[1], hashset};
+
+	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+
+	printf("[addTypeSet] var-name: %s \n",name);
+
+	addValue(name,po,TYPE_SET,object_size+1,0,current);
+}
+
+
+// refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
 void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
 {
 
@@ -250,6 +312,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
 
 	if(!parent->nchild) {
+		
 		parent->children = (STable**) malloc(parent->nchild*sizeof(STable*));
 	}
 	parent->children[parent->nchild] = child;

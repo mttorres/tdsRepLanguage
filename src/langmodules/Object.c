@@ -16,10 +16,11 @@ const char* mappingEnumObjectType[] =  {
 
 void* allocatePtObjects(int type, void* value) 
 {
-	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == SMV_POINTER)
+	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
+		printf("[allocatePtObjects] valor: %d \n",*(int*) pt);
 		return pt;
 	}
 	
@@ -31,6 +32,24 @@ void* allocatePtObjects(int type, void* value)
 
 
 }	
+
+
+void* allocateTypeSetObjects(int index, void* value)
+{
+	// (0,1,2)
+	if(index < 2)
+	{
+		int* pt = malloc(sizeof(int));
+		*pt = *(int*) value;
+		printf("[allocateTypeSetObjects] [i=%d] valor: %d \n",index,*(int*) pt);
+		return pt;
+	}
+
+	printf("[allocateTypeSetObjects] [i=%d] Hashmap já alocada \n",index);
+	return value;
+	
+}
+
 
 
 Object* createObject(int type, int OBJECT_SIZE, void** values) 
@@ -49,11 +68,23 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 		{
 			//vo[i] = values[i];
 
-			// caso do int:  ele chega aqui como um ponteiro para um variavel local (essa região de memoria é perdida depois!)
+			// caso do int e tipos mais basicos:  ele chega aqui como um ponteiro para um variavel local (essa região de memoria é perdida depois!)
 			// por ser um ponteiro para void que estamos guardando temos duas opções, alocar o ponteiro associado e passar para vo[i]
 			// ou alocar antes e passar para esse já alocado! (acho melhor a primeira opção, para centralizar)
-			vo[i] = allocatePtObjects(type,values[i]);			
-			printf("[createObject] valor: %d \n",*(int*) values[i]);
+
+
+			// casos como por exemplo do conjunto de tipos: não precisa de malloc (já é um ponteiro de um objeto alocado a muito tempo )
+			//		-> tupla ponteiro smv (indiceHeader, tamanhoPalavra, Hashmap)
+
+			if(type == TYPE_SET)
+			{
+				vo[i] == allocateTypeSetObjects(i,values[i]);
+			}
+			else
+			{
+				vo[i] = allocatePtObjects(type,values[i]);
+			}
+
 		}
 		newOb->values = vo;	
 	}
@@ -73,23 +104,27 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 
 void printObject(Object* o)
 {
+	printf("[DEBUG - createObject]  \n");
 	int info = o == NULL ?  1 : 0;
-
-	//printf("[DEBUG - createObject] info: %d \n", info);
+	printf("[DEBUG - createObject] info: %d \n", info);
 	
 
 	if(!info)
 	{
 		int i;
-		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == SMV_POINTER)
+		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET)
 		{
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
-				int deref = *(int*) o->values[i];
-				printf(" (%s, %d)",mappingEnumObjectType[o->type],deref);
-				if(i != o->OBJECT_SIZE-1)
+
+				if((o->type != TYPE_SET) || (o->type == TYPE_SET &&  i < o->OBJECT_SIZE-1) )
 				{
-					printf(",");
+					int deref = *(int*) o->values[i];
+					printf(" (%s, %d)",mappingEnumObjectType[o->type],deref);
+					if(i != o->OBJECT_SIZE-1)
+					{
+						printf(",");
+					}
 				}
 			}
 			printf("\n");			
