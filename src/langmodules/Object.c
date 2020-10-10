@@ -59,6 +59,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 
 	newOb->type = type;
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
+	newOb->changedType = 0;
 	if(OBJECT_SIZE)
 	{
 		// malloc para garantir que o objeto utilizado não "seja perdido" em chamadas

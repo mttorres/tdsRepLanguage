@@ -24,7 +24,7 @@ void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol
 						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
 
 */
-void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable* portsSmv) { 
+void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable) { 
 	int pt;
 	int tam = strlen(line);
 	char* aloc = malloc((tam+1) * sizeof(char));
@@ -45,7 +45,7 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, in
 				char name[] = {line[1],'\0'};
 
 				//addValue(name,po,TYPE_SET,2,0,portsSmv);
-				addTypeSet(name,po,TYPE_SET,2,portsSmv);
+				addTypeSet(name,po,TYPE_SET,2,writeSmvTypeTable[1]);
 			}
 
 			header->VAR_POINTER += 1;	
@@ -86,15 +86,15 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, in
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 
 */
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable* portsSmv) {
-	selectBuffer(part,line,Hcontrol->headers[pos-1],controlRename,readVarsPortsModule,portsSmv);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable) {
+	selectBuffer(part,line,Hcontrol->headers[pos-1],controlRename,readVarsPortsModule,writeSmvTypeTable);
 }
 
 /* fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
  	as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
  	stages são os módulos 0(main), automato(2), ports(3)
 */
-void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readVarsPortsModule, STable* portsSmv) {
+void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable) {
 
 	// modulo
 	if(part == CREATE_MODULE) {
@@ -103,14 +103,14 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 	}
 	// VAR, ASSIGN, TRANS
 	else{
-		saveLineOnBuffer(Hcontrol->CURRENT_SIZE,part,line,Hcontrol,controlRename,readVarsPortsModule, portsSmv);	
+		saveLineOnBuffer(Hcontrol->CURRENT_SIZE,part,line,Hcontrol,controlRename,readVarsPortsModule, writeSmvTypeTable);	
 	}
 
 
 }
 
 
-void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv) {
+void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable) {
 	
 	/*Strings que são usadas para a busca no arquivo*/
 	char varString[] = "VAR";	
@@ -251,7 +251,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv) {
 
    		}
    		
-   		processPhase(stage,phase,Hcontrol,bufferAux,controlRename,readVarsPortsModule,portsSmv);
+   		processPhase(stage,phase,Hcontrol,bufferAux,controlRename,readVarsPortsModule,writeSmvTypeTable);
 
    		if(phase == CREATE_MODULE){
    			phase++;

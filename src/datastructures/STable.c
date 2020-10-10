@@ -246,6 +246,18 @@ TableEntry* lookup(STable* t, const char* name) {
 
 
 
+void addEntryToTypeSet(STable* current, char* name, char* typeid) 
+{
+	TableEntry* entry = lookup(current,name);
+	if(entry)
+	{
+		int present = 1;
+		void* po = {&present};	
+		addValue(typeid,po,NUMBER_ENTRY,1,0,current);
+	}
+}
+
+
 
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto)) 
 /*

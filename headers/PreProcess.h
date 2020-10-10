@@ -26,7 +26,7 @@ void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol
 						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
 
 */
-void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable* portsSmv);
+void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
 
 
 
@@ -35,7 +35,7 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, in
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 
 */
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable* portsSmv);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
 
 
 
@@ -43,10 +43,10 @@ void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, 
  	as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
  	stages são os módulos 0(main), automato(2), ports(3)
 */
-void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readVarsPortsModule, STable* portsSmv);
+void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
 
 
-void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable* portsSmv); 
+void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable); 
 
 
 #endif

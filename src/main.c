@@ -45,10 +45,13 @@ int main(int argc, char* argv[]) {
 
     //STable* global = createTable(GLOBAL,NULL,0,0);
 
-    STable* portsSmv = createTable(SMV_PORTS,NULL,0,0);
+	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
+	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
+  	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
+    
 
 	//pré processamento 
-	preProcessSmv(smvP,controller,portsSmv);
+	preProcessSmv(smvP,controller,writeSmvTypeTable);
   	
   	size_t bufsize = 300;
   	char *buffer = (char *) malloc(bufsize * sizeof(char));
@@ -80,7 +83,8 @@ int main(int argc, char* argv[]) {
 //    printHeader(controller->headers[3]);
 //    printHeader(controller->headers[4]);	
     
-    printTable(portsSmv);
+    printTable(writeSmvTypeTable[0]);
+    printTable(writeSmvTypeTable[1]);
 
     //letGoHeadersStruct(headers,5);	
   	fclose(smvP);
