@@ -244,8 +244,32 @@ TableEntry* lookup(STable* t, const char* name) {
 		// primeiro eu vou testar usando valores literais 
 
 
+/*
+
+	Verifica se é necessário chamar addEntryToTypeSet
+*/
+int checkTypeSet(STable* current, char* name,  char* typeid)
+{
+	TableEntry* entry = lookup(current,name);
+	if(entry)
+	{
+		if(lookup(entry->val[2],typeid))
+		{
+			printf("[checkTypeSet] %s encontrado no conjunto \n",typeid);
+			return 0;
+		}
+		printf("[checkTypeSet] %s não existe no conjunto \n",typeid);
+		// poderiamos chamar o método add aqui né ? (problemas: efeitos colaterais demais de uma só vez (atrapalha debug, lembre-se do print haha))
+		return 1;
+	}
+}
 
 
+/*
+	Adiciona um tipo para o "conjunto de tipos das variáveis" 
+	para otimizar a escrita no arquivo SMV.
+	
+*/
 void addEntryToTypeSet(STable* current, char* name, char* typeid) 
 {
 	TableEntry* entry = lookup(current,name);
@@ -253,7 +277,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	{
 		int present = 1;
 		void* po = {&present};	
-		addValue(typeid,po,NUMBER_ENTRY,1,0,current);
+		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val[2]);
 	}
 }
 

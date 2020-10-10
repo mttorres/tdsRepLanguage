@@ -47,6 +47,20 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
 
 STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
+
+
+/*
+  Verifica se é necessário chamar addEntryToTypeSet
+  Efeitos colaterais: chama lookup para a variavel na tabela de controle (current) e lookup para o tipo na tabela* da tupla (indice, tamanho, tabela*) 
+*/
+int checkTypeSet(STable* current, char* name,  char* typeid);
+
+/*
+  Adiciona um tipo para o "conjunto de tipos das variáveis" para otimizar a escrita no arquivo SMV.
+  Efeitos colaterais: chama addValue para a tabela* da tupla (indice, tamanho, tabela*)
+*/
+void addEntryToTypeSet(STable* current, char* name, char* typeid); 
+
 void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current);
 
 void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current); 
