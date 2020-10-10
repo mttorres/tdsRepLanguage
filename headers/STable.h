@@ -7,6 +7,8 @@
 
 #define  MAX_TABLE 950
 
+#define  MAX_CHILD 150
+
 struct S_TABLE;
 
 struct S_TABLE;
@@ -35,6 +37,7 @@ typedef struct S_TABLE
   SCOPE_TYPE type;
   TableEntry** tableData;
   int lastEntryIndex;
+  int backup;
     
 } STable;
 

@@ -105,6 +105,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->level = level;
 	newtable->order = order;
 	newtable->lastEntryIndex = 0;
+	newtable->backup = 0;
 	
 	if(parent){
 		newtable->parent = parent;
@@ -253,7 +254,7 @@ int checkTypeSet(STable* current, char* name,  char* typeid)
 	TableEntry* entry = lookup(current,name);
 	if(entry)
 	{
-		if(lookup(entry->val[2],typeid))
+		if(lookup(entry->val->values[2],typeid))
 		{
 			printf("[checkTypeSet] %s encontrado no conjunto \n",typeid);
 			return 0;
@@ -277,7 +278,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	{
 		int present = 1;
 		void* po = {&present};	
-		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val[2]);
+		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val->values[2]);
 	}
 }
 
@@ -355,13 +356,42 @@ void addValueCurrentScope(char* name, Object* val, int methodParam,STable* curre
 //void ou retorna o filho??? Retornar parece melhor, provavelmente ao adicionar um subscope eu vou querer operar sobre ele imediatamente
 STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
+	// LEMBRE-SE nchild usa a próxima posição para o escopo filho (inicia em 0, primeira pos)
 	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
-
 	if(!parent->nchild) {
-		
-		parent->children = (STable**) malloc(parent->nchild*sizeof(STable*));
+		parent->children = (STable**) malloc((parent->nchild+1)*sizeof(STable*));
 	}
-	parent->children[parent->nchild] = child;
+	else
+	{
+		if(!parent->backup)
+		{
+			STable** newbuffer = realloc(parent->children, (parent->nchild+1)*sizeof(STable*));
+		
+			if(newbuffer == NULL)
+			{
+				//back up em caso de falha de alocação de escopo
+				int i;
+				printf("[ALERT: addSubScope]  backup children \n");
+				newbuffer = (STable**) malloc(MAX_CHILD*sizeof(STable*));
+				for (i = 0; i < parent->nchild; i++)
+				{
+					newbuffer[i] = parent->children[i];
+				}
+				free(parent->children);
+				// copia com espaço máximo (para de realocar)
+				parent->children = newbuffer;
+				parent->backup = 1;
+			}
+			else
+			{
+				parent->children = newbuffer;
+				// realloc já da free na memória antiga !
+			}
+		}
+		// senão não necessita alocar indefinidamente
+	}
+	parent->children[parent->nchild] = child; // adiciona novo filho
+	// dita a próxima posição
 	parent->nchild++;
 
 	return child;
