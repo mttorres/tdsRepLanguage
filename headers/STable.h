@@ -85,11 +85,11 @@ void printTable(STable* t);
 
 void letgoTable(STable* t);
 
-int hash(const char * str, STable* t);
+int hash(char * str, STable* t);
 
 void insert(STable* t, TableEntry* e); 
 
-TableEntry* lookup(STable* t, const char* name);
+TableEntry* lookup(STable* t, char* name);
 
 void printEntry(TableEntry* e);
 

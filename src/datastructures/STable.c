@@ -220,14 +220,14 @@ void letgoTable(STable* t)
 
 
 
-int hash(const char * str, STable* t) {
+int hash(char * str, STable* t) {
 	int hash = 401;
 	int c;
 	int SIZE_FOR_HASH = t->collision ? t->collision : MAX_TABLE;
 	
 	if(t->collision)
 	{
-		printf("[hash] ALERT: SIZE = COLLISION \n");
+		printf("[hash] collision : (%d) \n",SIZE_FOR_HASH);
 	}
 
 	while (*str != '\0') {
@@ -262,6 +262,7 @@ void redistributeHashs(STable* t, TableEntry* e)
 		if(t->tableData[i])
 		{
 			int index = hash(t->tableData[i]->name,t);
+			printf("[redistributeHashs] new index (%s) %d \n",t->tableData[i]->name,index);
 			newTableData[index] = t->tableData[i];
 		}
 	}
@@ -296,7 +297,7 @@ void insert(STable* t, TableEntry* e) {
     
 }
 
-TableEntry* lookup(STable* t, const char* name) {
+TableEntry* lookup(STable* t, char* name) {
     
     int index = hash(name,t);
     return t->tableData[index];
