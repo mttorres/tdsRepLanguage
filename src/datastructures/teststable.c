@@ -261,7 +261,7 @@ int main()
 	//addSubScope(global,ELSE_BLOCK);
 	printTable(addSubScope(global,ELSE_BLOCK));
  
-*/    
+*/   
 
 
 
@@ -286,7 +286,7 @@ int main()
 	insert(global, C_TIME);
 	insert(global, F_TIME);
 
-
+/*
 	Node* expr = createNode(5,0,1,"RAWNUMBERDATA",DATA_NUM,"10");
 
 	Node* assignable = createNode(5,0,1,"ASSIGNABLE",ASSIGN_V,"v");	
@@ -300,6 +300,7 @@ int main()
 	
 	//printNode(root);
 
+*/
 
 	printf(" TABELA INICIADA : \n");
 
@@ -310,13 +311,13 @@ int main()
 	printf(" ----------------------------------- \n");
 
 
-	process(root, global);
+//	process(root, global);
 
-	printTable(global);
+//	printTable(global);
 	
 	letgoTable(global);
 
-	letgoNode(root);
+//	letgoNode(root);
     
 	return 0;
 }

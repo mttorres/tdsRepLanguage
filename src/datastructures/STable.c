@@ -106,6 +106,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->order = order;
 	newtable->lastEntryIndex = 0;
 	newtable->backup = 0;
+	newtable->collision = 0;
 	
 	if(parent){
 		newtable->parent = parent;
@@ -135,7 +136,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	
 	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
 	int i;
-	for (i = 0; i < selectSize; ++i)
+	for (i = 0; i < selectSize; i++)
 	{
 		newtable->tableData[i] = NULL;	
 	}
@@ -161,6 +162,15 @@ void printTable(STable* t){
 				
 			}
 		}
+		if(t->nchild)
+		{
+			int i;
+			for (i = 0; i < t->nchild; i++)
+			{
+				printf("child (%d): \n",i+1);
+				printTable(t->children[i]);
+			}
+		}
 	}
 }
 
@@ -172,6 +182,10 @@ void letgoEntry(TableEntry* e) {
 	if(e->name)
 	{
 		free(e->name);
+	}
+	if(e->val)
+	{
+		letgoObject(e->val);
 	}
 	free(e);
 }
@@ -206,30 +220,85 @@ void letgoTable(STable* t)
 
 
 
-int hash(const char * str) {
+int hash(const char * str, STable* t) {
 	int hash = 401;
 	int c;
+	int SIZE_FOR_HASH = t->collision ? t->collision : MAX_TABLE;
+	
+	if(t->collision)
+	{
+		printf("[hash] ALERT: SIZE = COLLISION \n");
+	}
 
 	while (*str != '\0') {
-		hash = ((hash << 4) + (int)(*str)) % MAX_TABLE;
+		hash = ((hash << 4) + (int)(*str)) % SIZE_FOR_HASH;
 		str++;
 	}
 
-	return hash % MAX_TABLE;
+	return hash % SIZE_FOR_HASH;
+}
+
+
+void redistributeHashs(STable* t, TableEntry* e)
+{
+	t->lastEntryIndex = 0;
+	int i;
+	int originalSize = t->collision? t->collision :  MAX_TABLE; // salvamos o indice de colisão original ou o MAX_TABLE para fazer a redistribuição
+
+	// atualizamos o novo indice de colisão (ou é o dobro ou é o dobro do original)
+	t->collision = t->collision?  t->collision*2 : MAX_TABLE*2;	
+	TableEntry** newTableData = (TableEntry**) malloc(t->collision*sizeof(TableEntry*));
+	
+	//"limpar"
+	for (i = 0; i < t->collision; i++)
+	{
+		newTableData[i] = NULL;	
+	}	
+
+	printf("[redistributeHashs] copiando valores anteriores \n");
+
+	for (i = 0; i < originalSize; i++)
+	{
+		if(t->tableData[i])
+		{
+			int index = hash(t->tableData[i]->name,t);
+			newTableData[index] = t->tableData[i];
+		}
+	}
+
+	//libera a região de memória antiga
+	free(t->tableData);
+
+	//registra a nova
+	t->tableData = newTableData;
+
+	// tenta inserir o membro novo novamente
+	insert(t,e);
+    	
 }
 
 void insert(STable* t, TableEntry* e) {
     
-    int index = hash(e->name);
-    printf("HASH CALCULADO para (%s) É: %d \n",e->name,index);
-   	t->tableData[index] = e;
-    t->lastEntryIndex = index > t->lastEntryIndex ? index : t->lastEntryIndex;
+    int index = hash(e->name,t);
+    printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
+    
+    if(lookup(t,e->name))
+    {
+    	printf("[insert] COLLISION! (%s) É: %d \n",e->name,index);
+    	redistributeHashs(t,e);
+    }
+    else
+    {
+    	t->tableData[index] = e;
+    	t->lastEntryIndex = index > t->lastEntryIndex ? index : t->lastEntryIndex;
+    }
+   	
     
 }
 
 TableEntry* lookup(STable* t, const char* name) {
     
-    int index = hash(name);
+    int index = hash(name,t);
     return t->tableData[index];
     
 }
@@ -350,14 +419,23 @@ void addValueCurrentScope(char* name, Object* val, int methodParam,STable* curre
 
 
 
+/*
+	Depois acho que vale a pena melhorar isso aqui e não usar realloc, 
+	justificativa: nem nos casos "mais extremos" teremos muitos filhos existindo "ao mesmo tempo" em um escopo, isto é,
+	desde que eu sempre destrua os escopos filhos depois que eles são usados o seguinte não vai precisar se preocupar 
 
+*/
 
 
 //void ou retorna o filho??? Retornar parece melhor, provavelmente ao adicionar um subscope eu vou querer operar sobre ele imediatamente
 STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
 	// LEMBRE-SE nchild usa a próxima posição para o escopo filho (inicia em 0, primeira pos)
+
 	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
+	
+	printf("[addSubScope] alocando filho: %d \n",parent->nchild);
+
 	if(!parent->nchild) {
 		parent->children = (STable**) malloc((parent->nchild+1)*sizeof(STable*));
 	}
@@ -365,6 +443,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	{
 		if(!parent->backup)
 		{
+			printf("[addSubScope] realocando filhos: %d \n",parent->nchild);
 			STable** newbuffer = realloc(parent->children, (parent->nchild+1)*sizeof(STable*));
 		
 			if(newbuffer == NULL)
@@ -395,6 +474,18 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	parent->nchild++;
 
 	return child;
+
+}
+
+// retorna o pai para a gente voltar a "ter como operar" nele (talvez não necessite porque a função de pós processamento é recursiva)
+// pode necessitar melhorias depois
+STable * letgoSubScope(STable* current)
+{
+	STable* parent = current->parent;
+	letgoTable(current);
+	parent->nchild --;
+
+	return parent;
 
 }
 

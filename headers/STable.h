@@ -38,6 +38,7 @@ typedef struct S_TABLE
   TableEntry** tableData;
   int lastEntryIndex;
   int backup;
+  int collision;
     
 } STable;
 
@@ -50,7 +51,17 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
 
 STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
+/*
+    Trtamento para colisões da tabela, 
+    copia os ponteiros de objetos (table entry) para um vetor de ponteiros maior
+    e os redistribui de acordo com a função que agora vai fazer uso do t->collision.
 
+    Após isso tenta novamente inserir  param :e
+
+    efeitos colaterais: muda comportamento da função hash e chama insert novamente para param :e
+
+*/
+void redistributeHashs(STable* t, TableEntry* e);
 
 /*
   Verifica se é necessário chamar addEntryToTypeSet
@@ -74,7 +85,7 @@ void printTable(STable* t);
 
 void letgoTable(STable* t);
 
-int hash(const char * str);
+int hash(const char * str, STable* t);
 
 void insert(STable* t, TableEntry* e); 
 
