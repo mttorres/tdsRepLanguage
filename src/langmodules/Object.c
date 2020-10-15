@@ -173,3 +173,31 @@ void printObject(Object* o)
     }
 }
 
+
+void letgoObject(Object* o)
+{
+	if(o)
+	{
+		int i;
+		for (i = 0; i < o->OBJECT_SIZE; i++)
+		{
+			if(o->type == TYPE_SET)
+			{
+				if(i < 2)
+				{
+					free(o->values[i]);
+				}
+				// usar o free da tabela de simbolos (em outra localidade anteriormente?)
+			}
+			else if(o->type == TDS_ENTRY)
+			{
+				// TODO PARA TDS
+			}
+			else
+			{
+				free(o->values[i]);
+			}
+		}
+	}
+}
+
