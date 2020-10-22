@@ -52,7 +52,7 @@
 %token <sval> RETURN
 %token <sval> FOR
 %token <sval> TO
-%token <sval> DO
+%token <sval> IN
 %token <sval> LBRACE
 %token <sval> RBRACE
 %token <sval> LBRACK
@@ -90,7 +90,8 @@
 %token <sval> FINALTIME
 %token <sval> ID
 %token <sval> PASS
-%token <sval> DPASS
+%token <sval> LDPASS
+%token <sval> RDPASS
 
 %type <ast> prog
 %type <ast> cmds
@@ -100,7 +101,6 @@
 %type <ast> functionbody 
 %type <ast> params  
 %type <ast> optionalreturn
-%type <ast> paramsOpcional
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> assignable
@@ -123,6 +123,7 @@
 %type <ast> timecomponent
 %type <ast> timedirective
 %type <ast> anonimtdsop
+%type <ast> interval
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
@@ -170,7 +171,7 @@ prog: functiondefs cmds  {
 
 cmds: cmds cmd {
 		
-	  	Node* cmds = createNode(6,2,0,"Cmds -  comando(s)", CMDS ,$1,$2);
+	  	Node* cmds = createNode(6,2,0,"Cmds -  comando(s)", CMD ,$1,$2);
 
 		//printf("%s (%s) (%s) (filhos: %d)\n \n \n",cmds->name,cmds->children[0]->name,cmds->children[1]->name,cmds->nchild);
 		$$ = cmds; 
@@ -232,11 +233,11 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 functionbody: cmds optionalreturn {
 	
 			if($2){
-				Node* functionbody = createNode(6,2,0,"Functionbody - função composta/programa ", BODY, $1,$2);
+				Node* functionbody = createNode(6,2,0,"Functionbody - função composta/programa ", F_BODY, $1,$2);
 				$$ = functionbody; 
 			}
 			else {
-				Node* functionbody = createNode(5,1,0,"Functionbody - função composta/programa ", BODY, $1);
+				Node* functionbody = createNode(5,1,0,"Functionbody - função composta/programa ", F_BODY, $1);
 				$$ = functionbody; 
 			}
 
@@ -309,19 +310,24 @@ anonimtdsop: PASS  {
 				Node* p = createNode(5,0,1,"CMD -  PASS", TDS_ANON_OP_PASS ,$1); 
 				$$ = p;
 		}
-		|   DPASS  {
-				Node* p = createNode(5,0,1,"CMD -  DPASS", TDS_ANON_OP_DPASS ,$1); 
+		| LDPASS interval RDPASS  {
+				Node* p = createNode(5,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
 				$$ = p;
 		} 
 
 
-paramsOpcional: paramsCall {
+interval:  ID {
 
-		Node* paramsCall = createNode(4,1,0,"ParamsOpcional -  parametros são utilizados", $1);
-		$$ = paramsCall; 
+				Node* i = createNode(5,0,1,"VARIAVEL", IDVAR ,$1); 
+				$$ = i;
+			
+		}
+		| RAWNUMBERDATA 
+		{
+				Node* i = createNode(5,0,1,"CMD -  PASS", NUMBER ,$1); 
+				$$ = i;
+		}
 
-	}
-	| /* empty */ {  $$ = NULL;}
 
 
 paramsCall: expr {
@@ -356,9 +362,9 @@ functioncall: ID LPAREN paramsCall RPAREN {
 
 
 
-otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
+otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 	
-		Node* otherstmt = createNode(13,3,6,"Otherstmt(for) -  comandos diferente de if e else ",  OTHER_LOOP,  $4,$6,$9,  $1,$2,$3,$5,$7,$8);
+		Node* otherstmt = createNode(11,2,5,"Otherstmt(for) -  comandos diferente de if e else ",  OTHER_LOOP,  $4,$6,  $1,$2,$3,$5,$7);
 
 		$$ = otherstmt; 
 		//printf("CMD - NAO IF/ELSE \n",otherstmt->name);
@@ -366,6 +372,8 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 
 
 	 }
+	 // depois adicionar sintaxe 2 de for e por um "iterable"
+
 	 // talvez remover esse nó e por expr (?)
 	 | functioncall {
 
@@ -389,14 +397,14 @@ otherstmt: FOR ID ASSIGN expr TO expr DO COLON cmds {
 assignable : ID extraaccesses {
 		
 		if($2){
-				Node* assignment = createNode(6,1,1," acesso a variavel atribuivel  ", ASSIGN_V,  $2, $1);
+				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
 				$$ = assignment;	
 
 				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 				//infoNode($$);
 		}
 		else {
-				Node* assignment = createNode(5,0,1," acesso a variavel atribuivel  ", ASSIGN_V, $1);
+				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR , $1);
 				$$ = assignment;	
 		}
 
@@ -404,8 +412,10 @@ assignable : ID extraaccesses {
 	 }
 	 | timedirective {
 		
-		Node* assignment = createNode(5,1,0,"Assignment(simples) -  atribuição diretiva ", ASSIGN_TDIRECTIVE, $1);
+		Node* assignment = createNode(5,1,0,"Acesso a diretiva ", ASSIGN_TDIRECTIVE, $1);
 		$$ = assignment;	
+
+		//diferencia do anterior por causa das features de MUDANÇA DE CONTEXTO
 
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 		//infoNode($$);
@@ -416,20 +426,20 @@ assignable : ID extraaccesses {
 
 expr: MINUS expr {
 	
-		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR_NEG, $2,  $1);
+		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
 		$$ = expr;		
 
 
 	 }
 	 | expr MINUS multiexp {
 		
-		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR_SUB ,$1,$3,  $2);
+		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
 		$$ = expr;			
 
 	 }
 	 | expr PLUS multiexp {
 
-		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR_ADD ,$1,$3,  $2);
+		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
 		$$ = expr;						
 		
 
@@ -444,28 +454,27 @@ expr: MINUS expr {
 
 multiexp: multiexp TIMES ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  MULTI_TIMES ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  EXPR ,$1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp DIVIDE ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", MULTI_DIV, $1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", EXPR, $1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp MOD ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", MULTI_MOD ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", EXPR ,$1,$3,  $2);
 			$$ = multiexp;
 
 		}
 		|ineqexp {
 
-			Node* multiexp = createNode(5,1,0,"Expressão Básica - inequações/lógicas ", INEQ ,$1);
-			$$ = multiexp;			
+			$$ = $1;		
 			
 		}
 		;
@@ -473,66 +482,64 @@ multiexp: multiexp TIMES ineqexp {
 ineqexp:  ineqexp LE logical {
 	
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", INEQ_LE, $1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", EXPR, $1,$3,  $2);
 			$$ = ineqexp;						
 		
 
 		}
 		| ineqexp GE logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", INEQ_GE ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", EXPR ,$1,$3,  $2);
 			$$ = ineqexp;				
 
 		}
 		| ineqexp LT logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  INEQ_LT ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
 
 		}
 		| ineqexp GT logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", INEQ_GT, $1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", EXPR, $1,$3,  $2);
 			$$ = ineqexp;			
 
 	
 		}
         | ineqexp EQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", INEQ_EQ ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EXPR ,$1,$3,  $2);
 			$$ = ineqexp;				
 		
         }
         | ineqexp NOTEQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", INEQ_NEQ ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", EXPR ,$1,$3,  $2);
 			$$ = ineqexp;	
 	
         }
         | logical {
 
-			Node* ineqexp = createNode(5,1,0,"Expressão Básica - Lógica", LOGICAL_EXP ,$1);
-			$$ = ineqexp;				
-			//printf("logical \n");
+			$$ = $1;
         }
         ;
 
 
 logical: NOT data {
 	
-			Node* logical = createNode(6,1,1,"Lógico  - Negação ", LOGICAL_NOT ,$2,  $1);
+			Node* logical = createNode(6,1,1,"Lógico  - Negação ", EXPR ,$2,  $1);
 			$$ = logical;					
 
 		 }
 		 | logical AND data {
 
-			Node* logical = createNode(7,2,1,"Lógico  - AND ", LOGICAL_AND ,$1,$3,  $2);
+			Node* logical = createNode(7,2,1,"Lógico  - AND ", EXPR ,$1,$3,  $2);
 			$$ = logical;	
 
 		 }
 		 | logical OR data {
 
-			Node* logical = createNode(7,2,1,"Lógico  - OR ", LOGICAL_OR ,$1,$3,  $2);
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", EXPR ,$1,$3,  $2);
 			$$ = logical;			
 
 		 }
@@ -545,26 +552,26 @@ logical: NOT data {
 		 
 data: RAWNUMBERDATA {
 	
-			Node* data = createNode(5,0,1,"Número", DATA_NUM ,$1);	
+			Node* data = createNode(5,0,1,"Número", NUMBER ,$1);	
 			$$ = data;	
 
 	  }
 	  | BOOLEAN {
 
-			Node* data = createNode(5,0,1,"Booleano", DATA_BOOL ,$1);	
+			Node* data = createNode(5,0,1,"Booleano", L_BOOL ,$1);	
 			$$ = data;	
 
 	  }
 	  | Null {
 
-			Node* data = createNode(4,0,1,"NULL", DATA_NULL ,$1);	
+			Node* data = createNode(4,0,1,"NULL", D_NULL ,$1);	
 			$$ = data;	
 
 	  }
 
 	  | INITTIME {
 		
-			Node* data = createNode(5,0,1,"INITTIME-DIRECTIVE", DATA_ITD , $1);	
+			Node* data = createNode(5,0,1,"INITTIME-DIRECTIVE", TIME_DIRECTIVE , $1);	
 			$$ = data;
 		
 	  }
@@ -572,14 +579,14 @@ data: RAWNUMBERDATA {
 
 	  | CURRENTTIME {
 
-			Node* data = createNode(5,0,1,"CURRENTTIME-DIRECTIVE", DATA_CTD ,$1);	
+			Node* data = createNode(5,0,1,"CURRENTTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
 			$$ = data;	
 
 	  }
 
 	  | FINALTIME {
 
-			Node* data = createNode(5,0,1,"FINALTIME-DIRECTIVE", DATA_FTD ,$1);	
+			Node* data = createNode(5,0,1,"FINALTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
 			$$ = data;	
 
 	  }
@@ -587,15 +594,14 @@ data: RAWNUMBERDATA {
 
 	  | LABEL {
 			
-			Node* data = createNode(5,0,1,"LABEL", DATA_LABEL ,$1);	
+			Node* data = createNode(5,0,1,"LABEL", STRING ,$1);	
 			$$ = data;	
 
 	  }
 
 	  | variabledata {
 
-	  	Node* data = createNode(5,1,0,"Dados de variáveis simples ou tds ou função", DATA_V ,$1);	
-		$$ = data;	
+	  	$$ = $1;	
 
 	  }
 	  ;
@@ -603,7 +609,7 @@ data: RAWNUMBERDATA {
 
 timedirective: INITTIME {
 		
-			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", CHANGE_ITD ,$1);	
+			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
 			$$ = data;
 		
 	  }
@@ -611,23 +617,32 @@ timedirective: INITTIME {
 
 	  | CURRENTTIME {
 
-			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", CHANGE_CTD ,$1);	
+			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
 			$$ = data;	
 
 	  }
 
 	  | FINALTIME {
 
-			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", CHANGE_FTD ,$1);	
+			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
 			$$ = data;
 
 	  }
-// diferenciar depoisnumber (index) e number data! (apesar de serem tokens "identicos em teoria")
+
+// diferenciar depoi snumber (index) e number data! (apesar de serem tokens "identicos em teoria")
 // vetores de tds?  avaliar
 extraaccesses : LBRACK expr RBRACK variableprop {
 	
-			  	 	Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", V_LIST ,$2,$4,  $1,$3);	
-					$$ = extraaccesses;		
+					if($4)
+					{
+			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", V_PROP ,$2,$4,  $1,$3);	
+						$$ = extraaccesses;
+					}
+					else
+					{
+			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", V_PROP ,$2, $1,$3);	
+						$$ = extraaccesses;						
+					}		
 
 			  }
 			  // esse nó por enquanto é "overhead" mas se as propriedades forem expandidas algum dia ele se torna util
@@ -659,31 +674,31 @@ variableprop: POINT tdsprop {
 
 tdsprop: functioncall {
 		
-		Node* prop = createNode(5,1,0,"Props TDS - function", PROP_TDS_FUNC ,$1);
+		Node* prop = createNode(5,1,0,"Props TDS - function", V_PROP_TDS ,$1);
 		$$ = prop; 	
 	  
 	  }
 	  | PORTNAME {
 
-		Node* prop = createNode(5,0,1,"Props TDS - portname", PROP_TDS_PORT ,$1);
+		Node* prop = createNode(5,0,1,"Props TDS - portname", V_PROP_TDS ,$1);
 		$$ = prop; 	
 
 	  }
 	  | DATATIME {
 
-		Node* prop = createNode(5,0,1,"Props TDS - datatime",  PROP_TDS_DATA , $1);
+		Node* prop = createNode(5,0,1,"Props TDS - datatime",  V_PROP_TDS , $1);
 		$$ = prop; 		  
 
 	  }
 	  | LINKED {
 
-		Node* prop = createNode(5,0,1,"Props TDS - linked", PROP_TDS_LINKED ,$1);
+		Node* prop = createNode(5,0,1,"Props TDS - linked", V_PROP_TDS ,$1);
 		$$ = prop; 		  
 
 	  }
 	  | DELAYED {
 
-		Node* prop = createNode(5,0,1,"Props TDS - delay", PROP_TDS_DELAYED ,$1);
+		Node* prop = createNode(5,0,1,"Props TDS - delay", V_PROP_TDS ,$1);
 		$$ = prop; 	
 
 	  }
@@ -705,9 +720,16 @@ variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow R
 
 		| ID extraaccesses {
 
-			Node* data = createNode(6,1,1,"variáveis simples ou propriedades da mesma", V_SIMPLE_OR_PROP ,$2, $1);	
+			Node* data = createNode(6,1,1,"variáveis simples ou propriedades da mesma", AC_V ,$2, $1);	
 			$$ = data;		
 
+	  	}
+
+	  	// VETOR
+	  	| LBRACE paramsCall RBRACE 
+	  	{
+	  		Node* data = createNode(7,1,2,"VETOR", DATA_V ,$2, $1,$3);	
+			$$ = data;	
 	  	}
 
 		// causa possível da redundancia? (podemos separar em procedure call e function call?)
@@ -735,16 +757,13 @@ matchornot: ELSE LBRACE cmds RBRACE {
 
 dataflow:  domain   {
 	
-	// evita conflitos (nó a mais porem evita)
-	Node* dataflow = createNode(5,1,0,"dataflow-TDS", DEF_DATA_FLOW, $1);
-	$$ = dataflow; 	
+	$$ = $1; 	
 }
 
 
 domain: timelist { 
 
-			Node* domain = createNode(5,1,0,"DOMAIN-TDS-non-func", DOMAIN_TIME_LIST ,$1);
-			$$ = domain;    
+			$$ = $1;    
 
 		}
 		| FUNCTIONDOMAIN COLON expr {
@@ -772,7 +791,7 @@ timelist: timecomponent {
 
 		  |timelist COMMA timecomponent {
 
-			Node* timelist = createNode(7,2,1,"TIME-LIST-TDS-loop", TIME_LIST_COMP_LOOP ,$1,$3,  $2 );
+			Node* timelist = createNode(7,2,1,"TIME-LIST-TDS-loop", TIME_LIST ,$1,$3,  $2 );
 			$$ = timelist;		  		  
 
 		  }
