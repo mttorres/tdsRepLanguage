@@ -16,8 +16,10 @@
   	
   Node* root;
  
+  extern int yylineno;
   extern void yyerror(const char *s);
 
+ 
   //typedef enum {false, true} BOOLEANO;
 
 %}
@@ -149,6 +151,9 @@ prog: functiondefs cmds  {
 		//printf("PROGRAMA (%s) (%s) (%d) (filhos : %d) \n \n",prog->name,prog->children[1]->name ,prog->children[1] == NULL,prog->nchild);
 
 		//printf("nome :(%s) (ref : %d) \n \n \n",$$->children[1]->name,$$->children[1]->children[0] != NULL); 
+
+
+		//printf(" teste lineno %d",yylineno);
 
 		$$ = prog; 
 		root = $$;
