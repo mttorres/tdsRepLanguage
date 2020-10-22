@@ -109,6 +109,21 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 
 }
 
+void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable)
+{
+	char nome[] = "time";
+	char* linhaLida = Hcontrol->headers[0]->varBuffer[1];
+	int pos = 1;
+	int tam = strlen(linhaLida);
+
+	printf("[setUpMainSmvTable] Salvando tabela variaveis mainSmv (%s) \n\n",linhaLida);
+
+	void* po[] = {&pos, &tam};
+
+	addValue(nome,po,POSxSIZE,2,0,writeSmvTypeTable[0]);
+	
+}
+
 
 void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable) {
 	

@@ -391,7 +391,7 @@ void addTypeSet(char* name, void** any, int any_type, int object_size, STable* c
 
 	printf("[addTypeSet] var-name: %s \n",name);
 
-	addValue(name,po,TYPE_SET,object_size+1,0,current);
+	addValue(name,po,any_type,object_size+1,0,current);
 }
 
 

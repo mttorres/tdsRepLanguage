@@ -6,10 +6,11 @@
 
 const char* mappingEnumObjectType[] =  {
     "NUMBER",
-    "LOGICAL",
-    "LABEL",
-    "TDS",
+    "BOOLEAN",
+    "STRING",
     "T_DIRECTIVE",
+    "TDS",
+    "POSxSIZE",
     "TYPE_SET",
 };
 
@@ -77,7 +78,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 			// casos como por exemplo do conjunto de tipos: não precisa de malloc (já é um ponteiro de um objeto alocado a muito tempo )
 			//		-> tupla ponteiro smv (indiceHeader, tamanhoPalavra, Hashmap)
 
-			if(type == TYPE_SET)
+			if(type == TYPE_SET || type == POSxSIZE)
 			{
 				vo[i] = allocateTypeSetObjects(i,values[i]);
 			}
@@ -114,7 +115,7 @@ void printObject(Object* o)
 	{
 		int i;
 		//printf("[DEBUG - printObject] tipoDetectado: %s \n", mappingEnumObjectType[o->type]);
-		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET)
+		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET || o->type == POSxSIZE)
 		{
 			printf("(");
 			printf("%s :: ", mappingEnumObjectType[o->type]);
