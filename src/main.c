@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
   		return -1;
   	} 
   	yyin = fp;
- 	yyparse();
+ 	  yyparse();
 
   	fprintf(astout,"--------------TREE--------------------\n");
   	filePrintNode(root,astout);
@@ -48,35 +48,12 @@ int main(int argc, char* argv[]) {
 	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
 	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
   STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
-    
-
 	//pré processamento 
 	preProcessSmv(smvP,controller,writeSmvTypeTable);
-  	
-  	size_t bufsize = 300;
-  	char *buffer = (char *) malloc(bufsize * sizeof(char));
-	
-	int i;
-  /*
-	for(i = 0; i < 5; i++) {
-	    	fseek(smvP,headers[i]->modulePointer,SEEK_SET);
-		fgets(buffer,bufsize,smvP);
-		printf("(%d) %s \n",i,buffer);
-	
-		fseek(smvP,headers[i]->varPointer,SEEK_SET);
-		fgets(buffer,bufsize,smvP);
-		printf("(%d) %s \n",i,buffer);
+  setUpMainSmvTable(controller,writeSmvTypeTable);
+  
 
-		fseek(smvP,headers[i]->assignPointer,SEEK_SET);
-		fgets(buffer,bufsize,smvP);
-		printf("(%d) %s \n",i,buffer);
 
-		fseek(smvP,headers[i]->transPointer,SEEK_SET);
-		fgets(buffer,bufsize,smvP);
-		printf("(%d) %s \n",i,buffer);
-
-    	} 
-    */
 //    printHeader(controller->headers[0]);
 //    printHeader(controller->headers[1]);
 //    printHeader(controller->headers[2]);

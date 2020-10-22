@@ -21,7 +21,7 @@ Node* createNode(int numArgs, ...){
    //printf("arg(2): %d \n",current_node->nleafs);   
    current_node->name = va_arg(args, char*); // 3
    //printf("arg(3): %s \n",current_node->name);
-   current_node->type = va_arg(args, NODE_TYPE); // 4
+   current_node->type = va_arg(args, EVAL_TYPE); // 4
   	
 
    

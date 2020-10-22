@@ -12,7 +12,7 @@ typedef struct astnode
   char* name;
   int nleafs;
   int nchild;
-  NODE_TYPE type;
+  EVAL_TYPE type;
   
 
 }Node;
