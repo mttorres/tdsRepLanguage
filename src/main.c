@@ -7,7 +7,7 @@
   #include "../headers/Enum.h"	
   #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
-  //#include "../headers/PosProcess.h"
+  #include "../headers/PostProcess.h"
   #include "../headers/STable.h" 	
 
   extern int yylex(void);
@@ -20,66 +20,78 @@
 int main(int argc, char* argv[]) {
   
   
-    FILE *fp; // .tds file
-    FILE *smvP; // .smv file;
-    fp = fopen(argv[1], "r");
-    astout = fopen("results/astOutput", "w");
-    smvP = fopen(argv[2], "r+");
-  	//printf("%s \n",argv[1]);
-  	//printf("%s \n",argv[2]);
+	FILE *fp; // .tds file
+	FILE *smvP; // .smv file;
+	fp = fopen(argv[1], "r");
+	astout = fopen("results/astOutput", "w");
+	smvP = fopen(argv[2], "r+");
+	//printf("%s \n",argv[1]);
+	//printf("%s \n",argv[2]);
 
-  	if(!fp){
-  		printf("CADE MEU CODIGO!?");
-  		return -1;
-  	} 
-  	yyin = fp;
- 	  yyparse();
+	if(!fp){
+		printf("CADE MEU CODIGO!?");
+		return -1;
+	} 
+	yyin = fp;
+	yyparse();
 
-  	fprintf(astout,"--------------TREE--------------------\n");
-  	filePrintNode(root,astout);
-  	fclose(astout);
-  	fclose(fp);
+	fprintf(astout,"--------------TREE--------------------\n");
+	filePrintNode(root,astout);
+	fclose(astout);
+	fclose(fp);
 
-    // tabelas e componentes globais
-  	HeaderController* controller = createController(5);  
+	// tabelas e componentes globais
+	HeaderController* controller = createController(5);  
 
-    //STable* global = createTable(GLOBAL,NULL,0,0);
+	STable* global = createTable(GLOBAL,NULL,0,0);
 
 	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
 	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
-  STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
+	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
 	//pré processamento 
 	preProcessSmv(smvP,controller,writeSmvTypeTable);
-  setUpMainSmvTable(controller,writeSmvTypeTable);
+	setUpMainSmvTable(controller,writeSmvTypeTable);
   
 
+	//pos processamento
+	eval(root,global,writeSmvTypeTable,controller);
 
-//    printHeader(controller->headers[0]);
-//    printHeader(controller->headers[1]);
-//    printHeader(controller->headers[2]);
-//    printHeader(controller->headers[3]);
-//    printHeader(controller->headers[4]);	
-    
-    printTable(writeSmvTypeTable[0]);
+ 	printf("\n");	
+ 	printf("\n");
+ 	printf("\n");
+ 	printf("\n");
+
+ 	printf("--------------------------------- TABLES ---------------------------------------------\n");
+
+	printTable(global);
     printf("\n");
+	printTable(writeSmvTypeTable[0]);
+	printf("\n");
     printTable(writeSmvTypeTable[1]);
-    printf("\n");
+	printf("\n");
 
-    //letGoHeadersStruct(headers,5);	
-  	fclose(smvP);
-
-  	//free(buffer);
-
-  	letgoNode(root);
-
-  	//letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
-  	
+	//letGoHeadersStruct(headers,5);
 
 
-  	//smvP = fopen(argv[1], "r");
+	printf("\n");	
+ 	printf("\n");
+ 	printf("\n");
+ 	printf("\n");
 
-  	// pós processamento 
+ 	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
+
+	//printHeader(controller->headers[0]);
+	//printHeader(controller->headers[1]);
+	//printHeader(controller->headers[2]);
+	//printHeader(controller->headers[3]);
+	//printHeader(controller->headers[4]);
+
+	fclose(smvP);
+	
+	letgoNode(root);
+
+//	letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
 
   	
 
