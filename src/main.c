@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
 	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
 	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
-  	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
+  STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
     
 
 	//pré processamento 
@@ -84,7 +84,9 @@ int main(int argc, char* argv[]) {
 //    printHeader(controller->headers[4]);	
     
     printTable(writeSmvTypeTable[0]);
+    printf("\n");
     printTable(writeSmvTypeTable[1]);
+    printf("\n");
 
     //letGoHeadersStruct(headers,5);	
   	fclose(smvP);

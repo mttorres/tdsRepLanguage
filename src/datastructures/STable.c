@@ -12,7 +12,9 @@ const char* mappingEnumTable[] =  {
     "IF_BLOCK",
     "ELSE_BLOCK",
     "SMV_PORTS",
-    "SIMPLE_HASH"
+    "SMV_V_MAIN",
+    "SIMPLE_HASH",
+    "TYPE_SET"
 };
 
 
@@ -68,12 +70,13 @@ void printEntry(TableEntry* e) {
 	if(info) 
 	{
 		printf("\t %s : ( ",e->name);
-		printObject(e->val);
+		printObject(e->val);	
 		if(e->val->type == TYPE_SET)
 		{
-			printf("\t");
 			printTable((STable*)e->val->values[2]);
 		}
+		printf(")");
+		printf("\n");
 		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
 
 	}
@@ -148,7 +151,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 
 void printTable(STable* t){
 	if(t){
-		printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+		printf("%s (%d,%d)",mappingEnumTable[t->type],t->level,t->order);
 		if(t->lastEntryIndex != 0 && t->tableData){
 			printf("|--> Entries: \n");
 			int i;

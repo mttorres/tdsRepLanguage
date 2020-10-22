@@ -116,7 +116,8 @@ void printObject(Object* o)
 		//printf("[DEBUG - printObject] tipoDetectado: %s \n", mappingEnumObjectType[o->type]);
 		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET)
 		{
-
+			printf("(");
+			printf("%s :: ", mappingEnumObjectType[o->type]);
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
 
@@ -124,14 +125,13 @@ void printObject(Object* o)
 				{
 					//printf("[printObject] index on deref: %d \n",i);
 					int deref = *(int*) o->values[i];
-					printf(" (%s, %d)",mappingEnumObjectType[o->type],deref);
+					printf("%d",deref);
 					if(i != o->OBJECT_SIZE-1)
 					{
-						printf(",");
+						printf(", ");
 					}
 				}
-			}
-			printf("\n");			
+			}		
 			
 		}
 
