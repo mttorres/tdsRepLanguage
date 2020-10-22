@@ -326,10 +326,10 @@ int checkTypeSet(STable* current, char* name,  char* typeid)
 	{
 		if(lookup(entry->val->values[2],typeid))
 		{
-			printf("[checkTypeSet] %s encontrado no conjunto \n",typeid);
+			printf("[checkTypeSet] %s encontrado no conjunto da variável %s \n",typeid,name);
 			return 0;
 		}
-		printf("[checkTypeSet] %s não existe no conjunto \n",typeid);
+		printf("[checkTypeSet] %s não existe no conjunto da variável %s \n",typeid,name);
 		// poderiamos chamar o método add aqui né ? (problemas: efeitos colaterais demais de uma só vez (atrapalha debug, lembre-se do print haha))
 		return 1;
 	}
