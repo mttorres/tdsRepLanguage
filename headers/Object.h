@@ -24,4 +24,7 @@ void printObject(Object* o);
 void letgoObject(Object* o);
 
 
+Object* copyObject(Object* o);
+
+
 #endif

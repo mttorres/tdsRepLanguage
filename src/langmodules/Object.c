@@ -14,7 +14,10 @@ const char* mappingEnumObjectType[] =  {
     "TYPE_SET",
 };
 
-
+// talvez esse método não seja mais necessário (seria melhor sempre alocar ANTES DE PASSAR UM INTEIRO (até porque esse inteiro vai ser um atributo sintetizado que vai ser retornado para uma chamada de cima))
+// e caso tenha ALGUMA OPERAÇÃO INTERMEDIARIA ENTRE ESSES VALORES (?) ... já que vamos sempre alocar .... acho MELHOR CENTRALIZAR , afinal para isso object foi criado!
+// 
+// MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...(?))
 void* allocatePtObjects(int type, void* value) 
 {
 	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
@@ -200,5 +203,11 @@ void letgoObject(Object* o)
 			}
 		}
 	}
+}
+
+
+Object* copyObject(Object* o) 
+{
+
 }
 
