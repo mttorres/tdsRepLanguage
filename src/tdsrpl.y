@@ -397,31 +397,43 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 assignable : ID extraaccesses {
 		
 		if($2){
-				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
+				Node* assignment = createNode(6,1,1,"Acesso a variavel", ASSIGN_AC_V,  $2, $1);
 				$$ = assignment;	
 
 				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 				//infoNode($$);
 		}
 		else {
-				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR , $1);
+				Node* assignment = createNode(5,0,1,"VARIAVEL", ASSIGN_IDVAR, $1);
 				$$ = assignment;	
 		}
 
 
 	 }
-	 | timedirective {
+
+	 | INITTIME {
 		
-		Node* assignment = createNode(5,1,0,"Acesso a diretiva ", ASSIGN_TDIRECTIVE, $1);
-		$$ = assignment;	
+			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
+			$$ = data;
+		
+	  }
 
-		//diferencia do anterior por causa das features de MUDANÇA DE CONTEXTO
 
-		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
-		//infoNode($$);
+	  | CURRENTTIME {
 
-	 }	 
-	 ;	 
+			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
+			$$ = data;	
+
+	  }
+
+	  | FINALTIME {
+
+			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
+			$$ = data;
+
+	  }
+
+	  ;	 
 
 
 expr: MINUS expr {
@@ -607,27 +619,7 @@ data: RAWNUMBERDATA {
 	  ;
 
 
-timedirective: INITTIME {
-		
-			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
-			$$ = data;
-		
-	  }
 
-
-	  | CURRENTTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
-			$$ = data;	
-
-	  }
-
-	  | FINALTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", TIME_DIRECTIVE ,$1);	
-			$$ = data;
-
-	  }
 
 // diferenciar depoi snumber (index) e number data! (apesar de serem tokens "identicos em teoria")
 // vetores de tds?  avaliar
@@ -635,12 +627,12 @@ extraaccesses : LBRACK expr RBRACK variableprop {
 	
 					if($4)
 					{
-			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", V_PROP ,$2,$4,  $1,$3);	
+			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", ADD_V_PROP ,$2,$4,  $1,$3);	
 						$$ = extraaccesses;
 					}
 					else
 					{
-			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", V_PROP ,$2, $1,$3);	
+			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", ADD_V ,$2, $1,$3);	
 						$$ = extraaccesses;						
 					}		
 
@@ -720,9 +712,18 @@ variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow R
 
 		| ID extraaccesses {
 
-			Node* data = createNode(6,1,1,"variáveis simples ou propriedades da mesma", AC_V ,$2, $1);	
-			$$ = data;		
+			if($2){
+				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
+				$$ = assignment;	
 
+				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+				//infoNode($$);
+			}
+			else {
+				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
+				$$ = assignment;
+
+	  		}
 	  	}
 
 	  	// VETOR
