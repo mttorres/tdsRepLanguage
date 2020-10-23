@@ -23,8 +23,6 @@ void letgoHeader(HeaderSmv* h);
 
 
 /*Controlador de Header(auxiliar)*/
-
-
 HeaderSmv** initHeadersStruct(int size);
 
 void letGoHeadersStruct(HeaderSmv** hs, int size);
@@ -43,25 +41,8 @@ HeaderController* createController(int size);
 void letGoHeaderControl(HeaderController* Hcontrol);
 
 /*Controlador de Header(auxiliar)*/
-
-
 void printHeaderBuffer(HeaderSmv* h, int type, char* typeString);
 
 void printHeader(HeaderSmv* h);
-
-void preProcessSmv(FILE* smvP, HeaderController* Hcontrol);
-
-void postProcessSmv(FILE* smvP, HeaderController* Hcontrol);
-
-// salva o header do módulo lido anteriormente
-void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol);
-
-// salva a linha do baseada no  header do módulo lido anteriormente
-void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename);
-
-// mudar nome dos evals
-//int computePhase1(int stage, char* buffer, char* varString, HeaderSmv** ds);
-
-//int computePhase2(int stage, char* buffer, char* assignString,HeaderSmv** ds, int readAutomata, char* transString);
 
 #endif

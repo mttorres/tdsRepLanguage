@@ -33,8 +33,7 @@ return		        	{yylval.sval = strdup(yytext); return RETURN;}
 function-domain         {yylval.sval = strdup(yytext); return FUNCTIONDOMAIN;}
 function        		{yylval.sval = strdup(yytext); return FUNCTION;}
 for						{yylval.sval = strdup(yytext); return FOR;}
-to 						{yylval.sval = strdup(yytext); return TO;}
-do						{yylval.sval = strdup(yytext); return DO;}
+in 						{yylval.sval = strdup(yytext); return IN;}
 [{]						{yylval.sval = strdup(yytext); return LBRACE;}
 [}]						{yylval.sval = strdup(yytext); return RBRACE;}
 [(]	                	{yylval.sval = strdup(yytext); return LPAREN;}
@@ -50,13 +49,14 @@ NULL					{yylval.sval = strdup(yytext); return Null;}
 and						{yylval.sval = strdup(yytext); return AND;}
 or						{yylval.sval = strdup(yytext); return OR;}
 not                   	{yylval.sval = strdup(yytext); return NOT;}
--\|\|>					{yylval.sval = strdup(yytext); return DPASS;}
+-\|						{yylval.sval = strdup(yytext); return LDPASS;}
+\|>						{yylval.sval = strdup(yytext); return RDPASS;}
 ->						{yylval.sval = strdup(yytext); return PASS;}
 xor						{yylval.sval = strdup(yytext); return XOR;}
 [<=]              		{yylval.sval = strdup(yytext); return LE;}
 [>=]              		{yylval.sval = strdup(yytext); return GE;}
-\<               		{yylval.sval = strdup(yytext); return LT;}
-\>               		{yylval.sval = strdup(yytext); return GT; }
+[<]               		{yylval.sval = strdup(yytext); return LT;}
+[>]               		{yylval.sval = strdup(yytext); return GT;}
 [+]                 	{yylval.sval = strdup(yytext); return PLUS;}
 [-]                 	{yylval.sval = strdup(yytext); return MINUS;}
 [*]                 	{yylval.sval = strdup(yytext); return TIMES;}
@@ -70,7 +70,7 @@ linked              	{yylval.sval = strdup(yytext); return LINKED;}
 data-time           	{yylval.sval = strdup(yytext); return DATATIME;}
 delayed             	{yylval.sval = strdup(yytext); return DELAYED;}
 portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
-[A-Za-z_]*		{yylval.sval = strdup(yytext); return ID;}
+[A-Za-z_]*				{yylval.sval = strdup(yytext); return ID;}
 
 
 %%

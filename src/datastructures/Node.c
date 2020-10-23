@@ -5,6 +5,39 @@
 #include "../../headers/Node.h"
 
 
+const char* mappingEnumNode[] =  {
+	
+	"NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE", "AC_V", "DATA_V", 
+
+	"ADD_V", "ADD_V_PROP", "V_PROP_TDS",	
+
+	"EXPR",
+
+	"TDS_DEF_COMPLETE", "TD_DEF_DEPEN",
+
+	"DOMAIN_FUNCTION", "TIME_LIST", "TIME_COMP",
+
+	"DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
+
+	"PROG", "FUNC_DEFS", "CMD", 
+
+	"FUNC_DEF", "PROC_DEF", "F_BODY", "OPT_RETURN", "PARAMS", "PARAM", 
+
+	"CMD_IF", "CMD_OTHER",
+	
+	"CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
+
+	"MATCH_IF", 
+
+	"OTHER_LOOP", "FUNC_CALL", "PROC_CALL", "OTHER_ASSIGN",
+
+	"PARAMS_OP","PARAMS_CALL", "PARAM_CALL",  
+
+	"ASSIGN_IDVAR", "ASSIGN_IDVAR", "ASSIGN_TDIRECTIVE",
+
+	"CHANGE_ITD", "CHANGE_CTD", "CHANGE_FTD", 
+};
+
 
 Node* createNode(int numArgs, ...){
 	
@@ -13,7 +46,7 @@ Node* createNode(int numArgs, ...){
    va_list args;
    va_start(args, numArgs); // (nada)
    int i;
-   int parametrosInicializacao = 4;
+   int parametrosInicializacao = 5;
    
    current_node->nchild = va_arg(args, int); // 1
    //printf("arg(1): %d \n",current_node->nchild); 
@@ -21,6 +54,9 @@ Node* createNode(int numArgs, ...){
    //printf("arg(2): %d \n",current_node->nleafs);   
    current_node->name = va_arg(args, char*); // 3
    //printf("arg(3): %s \n",current_node->name);
+   current_node->type = va_arg(args, EVAL_TYPE); // 4
+  	
+
    
    int parametrosFilhos = parametrosInicializacao + current_node->nchild;
    //printf("parametrosFilhosSTART : %d \n",parametrosFilhos);
@@ -62,7 +98,7 @@ void printNode(Node* n){
 	//printf("info: - %d \n",info);		
 	if(info) {
 		//printf("!! \n");			
-		printf("NODE: - %s \n\n",n->name);
+		printf("NODE: - %s \n\n",mappingEnumNode[n->type]);
 		int i = 0;
 		if(n->children){
 			printf("--------------CHILDREN: \n\n");
@@ -75,14 +111,14 @@ void printNode(Node* n){
 				}
 
 			}
-			printf("------------END CHILDREN--------------- \n");
+			printf("------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
 		}
 		if(n->leafs) {
 			printf("---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   printf(" --> %s \n",n->leafs[i]);
 			}
-			printf("------------END TERMINAL--------------- \n\n");
+			printf("------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
 		}
 		printf("-----------------------------------------------\n\n");
 	}
@@ -104,7 +140,7 @@ void filePrintNode(Node* n, FILE* fp){
 
 	int info = n != NULL;	
 	if(info) {		
-		fprintf(fp,"NODE: - %s \n\n",n->name);
+		fprintf(fp,"NODE: - %s \n\n",mappingEnumNode[n->type]);
 		int i = 0;
 		if(n->children){
 			fprintf(fp,"--------------CHILDREN: \n\n");
@@ -117,14 +153,14 @@ void filePrintNode(Node* n, FILE* fp){
 				}
 
 			}
-			fprintf(fp,"------------END CHILDREN--------------- \n");
+			fprintf(fp,"------------END CHILDREN(NODE: - %s)--------------- \n",n->name);
 		}
 		if(n->leafs) {
 			fprintf(fp,"---------------TERMINAL: \n\n");
 			for(i = 0; i< n->nleafs;i++){					
 			   fprintf(fp," --> %s \n",n->leafs[i]);
 			}
-			fprintf(fp,"------------END TERMINAL--------------- \n\n");
+			fprintf(fp,"------------END TERMINAL(NODE: - %s)--------------- \n\n",n->name);
 		}
 		fprintf(fp,"-----------------------------------------------\n\n");
 	}

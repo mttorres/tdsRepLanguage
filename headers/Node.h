@@ -2,6 +2,9 @@
 
 #define NODE_H
 
+#include "Enum.h"
+
+
 typedef struct astnode
 {
   struct astnode** children;
@@ -9,6 +12,8 @@ typedef struct astnode
   char* name;
   int nleafs;
   int nchild;
+  EVAL_TYPE type;
+  
 
 }Node;
 

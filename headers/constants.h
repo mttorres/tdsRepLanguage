@@ -2,18 +2,8 @@
 
 #define CTE_H
 
-const char* mappingEnumTable[] =  {
-    "GLOBAL",
-    "FUNC",
-    "LOOP",
-    "IF_BLOC",
-    "ELSE_BLOCK",
-};
+extern const char* mappingEnumObjectType[];
 
-const char* mappingEnumEntry[] =  {
-    "VAR",
-    "TDS",
-    "T_DIRECTIVE",
-};
+extern const char* mappingEnumTable[];
 
 #endif
