@@ -29,27 +29,27 @@ void* processFuncTest2(Node* node, STable* currentScope)
 void* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
-	int* sint = (int*) malloc(sizeof(int));
-	*sint= atoi(n->leafs[0]);
+	//int* sint = (int*) malloc(sizeof(int));
+	//int* sint= atoi(n->leafs[0]);
+
+	int* sint;
+	*sint = atoi(n->leafs[0]);
+
 
 	printf("[evalNUM] SINTH: %d \n",*sint);
 	
-	//void* ip[] = {&sint[0]};
+	void* ip[] = {sint};
 
-	// vai precisar alocar esse inteiro...
-	//Object* o = createObject(NUMBER_ENTRY, 1 , ip); 
-	
-	//printObject(o);
+	Object* o = createObject(NUMBER_ENTRY, 1, ip);
 
-	// LIBERAR A LEAF ? 
 
-	return sint;
+	return o;
 }
 
 void* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
-	int* sint = (int*) malloc(sizeof(int));
+	int* sint;
 
 	char* trueString = "true";
 
@@ -57,52 +57,48 @@ void* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControl
 
 	printf("[evalBOOL] SINTH: %d \n",*sint);
 	
-	//void* ip[] = {&sint[0]};
+	void* bp[] = {sint};
 
-	// vai precisar alocar esse inteiro...
-	//Object* o = createObject(NUMBER_ENTRY, 1 , ip); 
-	
-	//printObject(o);
+	Object* o = createObject(LOGICAL_ENTRY, 1, bp);
 
-	// LIBERAR A LEAF ? 
-
-	return sint;
+	return o;
 }
 
 
 void* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
-	char* str =  (char*) malloc(sizeof(char)*strlen(n->leafs[0])+1);
-	// não precisa de malloc (apesar que se mudarem essa string pode rolar efeito colateral nas demais que usam essa que veio da arvore "ponto de falha")
+	char* sint =  n->leafs[0];
 	
-	strcpy(str, n->leafs[0]);
+	void* sp[] = {sint};
 
 	printf("[evalSTRING] SINTH: %s \n",str);
 	
-	//void* ip[] = {&sint[0]};
+	Object* o = createObject(LABEL_ENTRY, 1, sp);
 
-	// vai precisar alocar esse inteiro...
-	//Object* o = createObject(NUMBER_ENTRY, 1 , ip); 
-	
-	//printObject(o);
-
-	// LIBERAR A LEAF ? 
-
-	return str;
+	return o;
 }
+
+
+/*
+	Pensar depois... encapsular NULL ?
+
+*/
+
 
 void* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
-	char* str; // não precisa de malloc (pegar a string NULL justamente para "facilitar" o reconhecimento)
 	// se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
+	char* sint =  n->leafs[0];
+	
+	void* np[] = {sint};
 
-	str= evalSTRING(n,  scope, writeSmvTypeTable, controllerSmv);
+	printf("[evalNULL] SINTH: %s \n",sint);
 
-	printf("[evalDataV] SINTH: %s \n",str);
+	Object* o = createObject(NULL_ENTRY, 1, np);
 
-	return str;
+	return o;
 }
 
 
@@ -126,29 +122,44 @@ void** evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 		//entry->val
 
 		// DEVE-SE TER UMA COPIA DO OBJETO INTEIRO JÁ QUE NÃO É SIMPLESMENTE ALGO ATOMICO, tipo um número que depois vai ser jogado para cima e terá passos intermediarios
-		// é um COPIA DE VARIAVEL , ou uma referencia a uma ED já existente (a ideia é fazer a mesma coisa com TDS ao invés de copiar por razões óbvias)
+		// é um COPIA DE VARIAVEL , 
+
+		// ou em casos de ED, uma referencia a uma ED já existente (a ideia é fazer a mesma coisa com TDS ao invés de copiar por razões óbvias)
 		
 		// precisamos alocar um vetor de ponteiros para void ou um ponteiro único (já que pode variar, o ideal é por que a função sempre retorne void**)
 
 		// criar MÉTODO DE COPIA DE OBJETO (variavel)
 
-		void** varVal = (void**) malloc(sizeof(void*)*entry->val->OBJECT_SIZE);
-		int i;
-		for (i = 0; i < entry->val->OBJECT_SIZE; i++)
+		if(entry->val->OBJECT_SIZE > 1)
 		{
-			//varVal[i] = (entry->val->values[i]);
-			// TEM QUE PRIMEIRO, castar para o tipo do ponteiro original, dereferencia E AI SIM COPIAR O VALOR
-
-			// por enquanto vamos pensar em vetores DE TIPO ÚNICO POR VEZ
-			if(entry->val->type == NUMBER_ENTRY || entry->val->type == T_DIRECTIVE_ENTRY)
-			{
-				int* val = (int*) entry->val->values[i];
-			}
-
-
+			// retorna a referência (ai pode sim ter colaterais)
+			return entry->val;
+		}
+		else
+		{
+			// copia o objeto atomico
+			return copyObject(entry->val);
 
 		}
-		return varVal;
+	}
+}
+
+
+void** evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+{
+
+	TableEntry* entry = lookup(scope,n->leafs[0]);
+
+	// teoricamente é impossível uma time Directive não estar na tabela mas é só um check
+	if(!entry)
+	{
+		fprintf(stderr, "%s NOT DECLARED!", n->leafs[0]);
+		exit(-1);
+	}
+	else
+	{
+		// retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
+		return createObject(NUMBER_ENTRY,1,entry->val->values);
 	}
 }
 
