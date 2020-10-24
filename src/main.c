@@ -52,9 +52,15 @@ int main(int argc, char* argv[]) {
 	preProcessSmv(smvP,controller,writeSmvTypeTable);
 	setUpMainSmvTable(controller,writeSmvTypeTable);
   
-
+  	printf("--------------------------------- EVAL ---------------------------------------------\n");
+  	printf("\n");
+  	printf("\n");
+  	
 	//pos processamento
 	eval(root,global,writeSmvTypeTable,controller);
+
+	printf("\n");
+	printf("------------------------------------------------------------------------------\n");
 
  	printf("\n");	
  	printf("\n");

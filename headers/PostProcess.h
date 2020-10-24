@@ -11,7 +11,7 @@
 
 
 
-void* eval(Node* node, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object* eval(Node* node, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
 
 #endif

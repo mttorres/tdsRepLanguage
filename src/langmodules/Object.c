@@ -169,7 +169,7 @@ void printObject(Object* o)
 
 		}
 
-		if(o->type == LABEL_ENTRY || O->type == NULL_ENTRY)
+		if(o->type == LABEL_ENTRY || o->type == NULL_ENTRY)
 		{
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{

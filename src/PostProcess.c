@@ -26,7 +26,7 @@ void* processFuncTest2(Node* node, STable* currentScope)
 }
 
 
-void* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	//int* sint = (int*) malloc(sizeof(int));
@@ -46,7 +46,7 @@ void* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControll
 	return o;
 }
 
-void* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	int* sint;
@@ -65,14 +65,14 @@ void* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControl
 }
 
 
-void* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	char* sint =  n->leafs[0];
 	
 	void* sp[] = {sint};
 
-	printf("[evalSTRING] SINTH: %s \n",str);
+	printf("[evalSTRING] SINTH: %s \n",sint);
 	
 	Object* o = createObject(LABEL_ENTRY, 1, sp);
 
@@ -86,7 +86,7 @@ void* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 */
 
 
-void* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	// se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
@@ -102,7 +102,7 @@ void* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControl
 }
 
 
-void** evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	// VAI RECUPERAR UM OBJETO NA TABELA DE SIMBOLOS e então SUBIR COM ELE  
@@ -145,7 +145,7 @@ void** evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 }
 
 
-void** evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 	TableEntry* entry = lookup(scope,n->leafs[0]);
@@ -165,7 +165,7 @@ void** evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, He
 
 
 
-void* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 
 
@@ -183,10 +183,15 @@ void* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContro
 
 
 // declarar com const ? (me parece "nada haver")
-void* (*executores[80]) (Node*, STable*) = {processFuncTest1, processFuncTest2};
+Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
+
+	evalNUM, evalBOOL, evalSTRING, evalNULL, evalTIME_DIRECTIVE, evalDataV
 
 
-void* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+};
+
+
+Object* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 	//printf("[PostProcess - eval] test compile \n");
 
@@ -201,7 +206,8 @@ void* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController*
 
 			if(executores[n->type])
 			{
-				printf("[PostProcess - eval] eval especifico \n");
+				printf("[PostProcess - eval] eval especifico \n\n");
+				return executores[n->type](n,scope,writeSmvTypeTable,controllerSmv);
 			}
 			else
 			{
@@ -213,11 +219,14 @@ void* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController*
 					{
 						if(n->children[i]) 
 						{
-							printf("(%d)    ",i);
+							printf("(%d) %s ",i,n->children[i]->name);
+							return eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
 							//SYNTH_O[i] =  process(n->children[i], currentScope); // se tiver filho (desce um nível e resolve as dependencias) 
 						}														 // (já criamos Object) resolver dependencias realmente necessário? Parando para pensar podemos acessar o filho imediatamente abaixo do nó em questão e já pegar os valores ! Evita criar mais structs! (pode ficar complexo para alguns casos por outro lado... e fora que inviabiliza tds e vetores)
 					}
 				}
+				// sintetizar as folhas? ou é do eval especifico?
+				return NULL;
 			}
 	}
 }
