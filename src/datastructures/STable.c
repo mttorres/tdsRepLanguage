@@ -324,9 +324,11 @@ TableEntry* lookup(STable* t, char* name) {
 */
 int checkTypeSet(STable* current, char* name,  char* typeid)
 {
+	// procura a variável em questão na tabela do SMV
 	TableEntry* entry = lookup(current,name);
 	if(entry)
 	{
+		// procura o tipo
 		if(lookup(entry->val->values[2],typeid))
 		{
 			printf("[checkTypeSet] %s encontrado no conjunto da variável %s \n",typeid,name);
@@ -407,6 +409,7 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 
 
 	Object* o = createObject(any_type, object_size, any);
+	o->binded = 1;
 	addValueCurrentScope(name,o,methodParam,current);
 }
 
