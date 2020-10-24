@@ -6,7 +6,7 @@
 
 typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK, SMV_PORTS, SMV_V_MAIN ,SIMPLE_HASH} SCOPE_TYPE;
 
-typedef enum ENTRY_TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, LABEL_ENTRY ,TDS_ENTRY, T_DIRECTIVE_ENTRY, POSxSIZE ,TYPE_SET } ENTRY_TYPE;
+typedef enum ENTRY_TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, LABEL_ENTRY ,TDS_ENTRY, T_DIRECTIVE_ENTRY, NULL_ENTRY , POSxSIZE ,TYPE_SET } ENTRY_TYPE;
 			 // permitir lista de tipos diferentes? permitir lista de TDS's?
 			 // comentado por enquanto, devemos decidir oque fazer sobre os enums do node
 

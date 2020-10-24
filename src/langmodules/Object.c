@@ -10,6 +10,7 @@ const char* mappingEnumObjectType[] =  {
     "STRING",
     "T_DIRECTIVE",
     "TDS",
+    "null*"
     "POSxSIZE",
     "TYPE_SET",
 };
@@ -17,10 +18,10 @@ const char* mappingEnumObjectType[] =  {
 // talvez esse método não seja mais necessário (seria melhor sempre alocar ANTES DE PASSAR UM INTEIRO (até porque esse inteiro vai ser um atributo sintetizado que vai ser retornado para uma chamada de cima))
 // e caso tenha ALGUMA OPERAÇÃO INTERMEDIARIA ENTRE ESSES VALORES (?) ... já que vamos sempre alocar .... acho MELHOR CENTRALIZAR , afinal para isso object foi criado!
 // 
-// MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...(?))
-void* allocatePtObjects(int type, void* value) 
+// MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...
+void* allocatePtObjects(int type, void* value, Object* newOb) 
 {
-	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
+	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -28,10 +29,14 @@ void* allocatePtObjects(int type, void* value)
 		return pt;
 	}
 	
-	// precisa alocar para strings ? (pode ser que já tenha sido alocado pelo parser)
-	if(type == LABEL_ENTRY) 
+	// precisa alocar para strings ? (pode ser que já tenha sido alocado pelo parser) Necessita alocar:  Pode gerar efeito colateral em alguns casos (string pode ser re-usada)
+	if(type == LABEL_ENTRY || type == NULL_ENTRY) 
 	{
-		//TODO (ao fazer o pós processamento)
+		char* deref = (char*) value;
+		char* pt = malloc(newOb->STR+1);
+		strcpy(pt, deref);
+		printf("[allocatePtObjects] valor: %s (%d)\n",pt,type);
+		return pt;
 	}
 
 
@@ -64,6 +69,13 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 	newOb->type = type;
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	newOb->changedType = 0;
+	newOb->binded = 0;
+	if(type == LABEL_ENTRY)
+	{
+		printf("[createObject] string: %s \n",(char*)values[0]);
+		newOb->STR = strlen((char*)values[0]);
+	}
+
 	if(OBJECT_SIZE)
 	{
 		// malloc para garantir que o objeto utilizado não "seja perdido" em chamadas
@@ -87,7 +99,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 			}
 			else
 			{
-				vo[i] = allocatePtObjects(type,values[i]);
+				vo[i] = allocatePtObjects(type,values[i],newOb);
 			}
 
 		}
@@ -157,7 +169,7 @@ void printObject(Object* o)
 
 		}
 
-		if(o->type == LABEL_ENTRY)
+		if(o->type == LABEL_ENTRY || O->type == NULL_ENTRY)
 		{
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
@@ -208,6 +220,7 @@ void letgoObject(Object* o)
 
 Object* copyObject(Object* o) 
 {
-
+	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values);
+	return newOb;
 }
 
