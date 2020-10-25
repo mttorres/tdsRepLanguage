@@ -311,7 +311,16 @@ anonimtdsop: PASS  {
 				$$ = p;
 		}
 		| LDPASS interval RDPASS  {
-				Node* p = createNode(5,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
+				
+				Node* p; 
+				if($2)
+				{
+					p = createNode(7,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
+				}
+				else
+				{
+					p = createNode(6,0,2,"CMD -  DPASS", TDS_ANON_OP_DPASS, $1,$3);
+				}
 				$$ = p;
 		} 
 
@@ -327,13 +336,13 @@ interval:  ID {
 				Node* i = createNode(5,0,1,"CMD -  PASS", NUMBER ,$1); 
 				$$ = i;
 		}
+		| /* empty */  {$$ = NULL;}
 
 
 
 paramsCall: expr {
 		
-			Node* paramsCall = createNode(5,1,0,"Params -  parametro da chamada de função ", PARAM_CALL, $1);
-			$$ = paramsCall; 		
+			$$ = $1; 		
 
 		}
 	    | paramsCall COMMA expr {
@@ -627,12 +636,12 @@ extraaccesses : LBRACK expr RBRACK variableprop {
 	
 					if($4)
 					{
-			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", ADD_V_PROP ,$2,$4,  $1,$3);	
+			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel(vetor)", ADD_V_PROP ,$2,$4,  $1,$3);	
 						$$ = extraaccesses;
 					}
 					else
 					{
-			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", ADD_V ,$2, $1,$3);	
+			  	 		Node* extraaccesses = createNode(7,1,2,"indice de variavel", ADD_V ,$2, $1,$3);	
 						$$ = extraaccesses;						
 					}		
 

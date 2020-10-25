@@ -181,11 +181,81 @@ Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
 	// vai chamar evalParams , e sintetizar um Object Vetor (ou um vetor void que será jogado em um object)
 }
 
+Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+{
+
+}
+
+Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+{
+	if(!n)
+	{
+		printf("[evalProp] VARIAVEL: \n");
+		// NÃO PRECISA RETORNAR NADA, já temos a referência no nó acima
+		// até porque não temos nada
+		return NULL;
+	}
+	if(n->type == V_PROP)
+	{
+
+		char* propName;
+
+		printf("[evalProp] PROP VARIAVEL: %s \n",propName);	
+		//return createObject();
+		return NULL;
+	}
+	if(n->type == ADD_V)
+	{	
+		Object* expr = evalEXPR(n->children[0],scope, writeSmvTypeTable, controllerSmv);
+		if(object->type != NUMBER_ENTRY)
+		{
+			fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
+			exit(-1);
+		}
+		printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
+		return expr;
+	}
+
+		char* propName;
+		printf("[evalProp] VARIAVEL pos prop %d \n",propName);
+		return NULL;
+	
+}
+
+
+Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+{
+	// recupera a variável e o nome do atributo dela logo após
+	TableEntry* entry = lookup(scope,n->leafs[0]);
+
+	if(!entry)
+	{
+		fprintf(stderr, "%s NOT DECLARED!", n->leafs[0]);
+		exit(-1);
+	}
+	else
+	{
+		Object* prop = evalProp(n,n->children[0], scope, writeSmvTypeTable, controllerSmv);
+
+		if(entry->val->OBJECT_SIZE > 1)
+		{
+			// retorna a referência (ai pode sim ter colaterais)
+			return entry->val;
+		}
+		else
+		{
+			// copia o objeto atomico
+			return copyObject(entry->val);
+
+		}
+	}
+}
+
 
 // declarar com const ? (me parece "nada haver")
 Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
 
-	evalNUM, evalBOOL, evalSTRING, evalNULL, evalTIME_DIRECTIVE, evalDataV
+	evalNUM, evalBOOL, evalSTRING, evalNULL, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL ,evalAC_V, 
 
 
 };
