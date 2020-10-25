@@ -4,33 +4,12 @@
 #include "../headers/PostProcess.h"
 
 
-void* processFuncTest1(Node* node, STable* currentScope)
-{
-	printf("TESTE 1 DISPARADO\n");
-	int* x = malloc(sizeof(int));
-	*x = 1;
-	printTable(currentScope);
-	printNode(node);
-	return x;
-}
-
-
-void* processFuncTest2(Node* node, STable* currentScope)
-{
-	printf("TESTE 2 DISPARADO\n");
-	int* x = malloc(sizeof(int));
-	*x = 2;
-	printTable(currentScope);
-	printNode(node);
-	return x;
-}
+typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94,
+						LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
 
 Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
-
-	//int* sint = (int*) malloc(sizeof(int));
-	//int* sint= atoi(n->leafs[0]);
 
 	int* sint;
 	*sint = atoi(n->leafs[0]);
@@ -186,6 +165,242 @@ Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, Head
 
 }
 
+
+
+
+Object* evalPLUS(Object* o1, Object* o2)
+{
+	int* r;
+	void* rp[1];	
+	if(o1->type == NUMBER_ENTRY)
+	{
+		*r = (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
+		rp[0] = r;
+		return createObject(NUMBER_ENTRY,1,rp);
+	}
+	if(o1->type == LABEL_ENTRY)
+	{
+		// concatena
+
+	}
+
+}
+
+Object* evalMINUS(Object* o1, Object* o2)
+{
+	int* r;
+	*r = (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
+	void* rp[] = {r};
+	return createObject(NUMBER_ENTRY,1,rp);
+}
+
+Object* evalTIMES(Object* o1, Object* o2)
+{
+	int* r;
+	*r = (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
+	void* rp[] = {r};
+	return createObject(NUMBER_ENTRY,1,rp);
+}
+
+Object* evalDIVIDE(Object* o1, Object* o2, int type)
+{
+	void* rp[1];
+	if(*(int*)o2->values[0] == 0)
+	{
+		fprintf(stderr, "CANNOT DIVIDE BY ZERO!");
+		exit(-1);		
+	}
+	int* r;
+	*r = type == DIVIDE? (*(int*)o1->values[0]) / (*(int*)o2->values[0]) : (*(int*)o1->values[0]) % (*(int*)o2->values[0]);
+	rp[0] = r;
+
+	return createObject(NUMBER_ENTRY,1,rp);	
+}
+
+Object* evalLESS(Object* o1, Object* o2, int opCode)
+{
+	void* rp[1];
+	int* r;
+	if(o1->OBJECT_SIZE > 1 || o2->OBJECT_SIZE > 1)
+	{	
+		*r = opCode == LT? o1->OBJECT_SIZE < o2->OBJECT_SIZE : o1->OBJECT_SIZE <= o2->OBJECT_SIZE;
+	}
+	else
+	{
+		if(o1->type == NUMBER_ENTRY)
+		{
+			*r = opCode == LT? (*(int*)o1->values[0]) < (*(int*)o2->values[0]) : (*(int*)o1->values[0]) <= (*(int*)o2->values[0]);
+		}	
+		if(o1->type == LABEL_ENTRY)
+		{
+			//teste o tamanho salvo no object 1 e object 2
+		}
+	}
+	rp[0] = r;
+	return createObject(LOGICAL_ENTRY,1,rp);	
+}
+
+Object* evalGREAT(Object* o1, Object* o2, int opCode)
+{
+	void* rp[1];
+	int* r;
+	if(o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1)
+	{
+		*r = opCode == GT? o1->OBJECT_SIZE > o2->OBJECT_SIZE : o1->OBJECT_SIZE >= o2->OBJECT_SIZE;
+	}
+	else
+	{
+		if(o1->type == NUMBER_ENTRY)
+		{
+			*r = opCode == GT? (*(int*)o1->values[0]) > (*(int*)o2->values[0]) : (*(int*)o1->values[0]) >= (*(int*)o2->values[0]);
+		}	
+		if(o1->type == LABEL_ENTRY)
+		{
+			//teste o tamanho salvo no object 1 e object 2
+		}
+	}
+	rp[0] = r;	
+	return createObject(LOGICAL_ENTRY,1,rp);
+
+}
+
+Object* evalEqual(Object* o1, Object* o2, int opCode)
+{
+	void* rp[1];	
+	int* r;
+	if(o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1)
+	{	
+		*r = opCode == EQUAL? o1->OBJECT_SIZE == o2->OBJECT_SIZE : o1->OBJECT_SIZE != o2->OBJECT_SIZE;
+	}
+	else
+	{
+		if(o1->type == NUMBER_ENTRY)
+		{
+			*r = opCode == EQUAL? (*(int*)o1->values[0]) == (*(int*)o2->values[0]) : (*(int*)o1->values[0]) != (*(int*)o2->values[0]);
+		}	
+		if(o1->type == LABEL_ENTRY)
+		{
+			//teste o tamanho salvo no object 1 e object 2
+		}
+	}
+	rp[0] = r;		
+}
+
+
+
+Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+{
+	// operação unária
+	if(n->nchild == 1)
+	{	
+
+	}
+	// operação binária
+	else
+	{
+		// CUIDADO (ordem avaliação)
+		Object* o1 = evalEXPR(n->children[0], scope, writeSmvTypeTable, controllerSmv);
+		Object* o2 = evalEXPR(n->children[1],scope, writeSmvTypeTable, controllerSmv);
+
+		int sOp = strlen(n->leafs[0]);
+		char ops[2];
+		ops[1] = '\0';
+
+		if(sOp > 1)
+		{
+			ops[1] = n->leafs[0][1];
+		}
+		ops[0] = n->leafs[0][0];
+
+
+		// validações (adicionar uma para vetores depois (não deixar fazer nenhuma operação com eles exceto comparação de tamanho))
+		if(o1->type == TDS_ENTRY || o2->type == TDS_ENTRY)
+		{
+				if(sOp < 1)
+				{
+						fprintf(stderr, "TDS INCOMPATIBLE FOR THE %c OPERATION! ", ops[0]);
+						exit(-1);
+				}
+				else
+				{
+						fprintf(stderr, "TDS INCOMPATIBLE FOR THE %c%c OPERATION!", ops[0],ops[1]);
+						exit(-1);
+				}	
+		}
+
+		if(o1->type == NULL_ENTRY || o2->type == TDS_ENTRY)
+		{
+			fprintf(stderr, "NULL REFERENCE FOR THE %c%c OPERATION! ", ops[0],ops[1]);
+			exit(-1);			
+		}
+
+		if(o1->type != o2->type)
+		{
+				if(sOp < 1)
+				{
+						fprintf(stderr, "INCOMPATIBLE TYPES FOR THE %c OPERATION!", ops[0]);
+						exit(-1);
+				}
+				else
+				{
+						fprintf(stderr, "INCOMPATIBLE TYPES FOR THE %c%c OPERATION!", ops[0],ops[1]);
+						exit(-1);
+				}
+		}
+
+		int vetOp = o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1;
+
+		if(!vetOp && ops[0] == PLUS)
+		{
+			return evalPLUS(o1,o2);
+		} 
+		if(!vetOp && ops[0] == MINUS && o1->type != LABEL_ENTRY)
+		{
+			return evalMINUS(o1,o2);
+		} 
+		if(!vetOp && ops[0] == TIMES && o1->type != LABEL_ENTRY)
+		{
+			return evalTIMES(o1,o2);
+		}
+		if(!vetOp && ops[0] == DIVIDE && o1->type != LABEL_ENTRY)
+		{
+			return evalDIVIDE(o1,o2,DIVIDE);
+		}
+		if(!vetOp && ops[0] == MOD && o1->type != LABEL_ENTRY)
+		{
+			return evalDIVIDE(o1,o2,MOD);
+		}
+		if(ops[0] == LT)
+		{
+			if(sOp > 1) 
+			{
+				return evalLESS(o1,o2,LE);				
+			}
+			else
+			{
+				evalLESS(o1,o2,LT);	
+			}
+		}
+		if(ops[0] == GT)
+		{
+			if(sOp > 1)
+			{
+				return evalGREAT(o1,o2,GE);
+			}
+			return evalGREAT(o1,o2,GT);
+		}
+		else
+		{
+			return(evalEqual(o1,o2,ops[0]+ops[2]));
+		}
+
+		fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c%c OPERATION!", ops[0],ops[1]);
+		exit(-1);								
+	}
+
+}
+
+
 Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
 	if(!n)
@@ -207,7 +422,7 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeT
 	if(n->type == ADD_V)
 	{	
 		Object* expr = evalEXPR(n->children[0],scope, writeSmvTypeTable, controllerSmv);
-		if(object->type != NUMBER_ENTRY)
+		if(expr->type != NUMBER_ENTRY)
 		{
 			fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
 			exit(-1);
