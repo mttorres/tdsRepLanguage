@@ -10,7 +10,8 @@ const char* mappingEnumObjectType[] =  {
     "STRING",
     "T_DIRECTIVE",
     "TDS",
-    "null*"
+    "null*",
+    "FUNCTION",
     "POSxSIZE",
     "TYPE_SET",
 };
@@ -192,7 +193,7 @@ void printObject(Object* o)
 
 void letgoObject(Object* o)
 {
-	if(o)
+	if(o && o->binded)
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
