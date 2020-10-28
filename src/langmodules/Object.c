@@ -231,6 +231,7 @@ void updateObject(Object* o, void** any, int any_type, int object_size, int inde
 
 
 	free(o->values[index]);
+	o->values[index] = NULL;
 	// free object em CASO DE VETORES (ainda temos que pensar um pouco mais nisso)
 	// caso para any sendo de valor único
 	if(object_size == 1)

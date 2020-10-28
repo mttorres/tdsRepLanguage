@@ -503,9 +503,16 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
 			exit(-1);
 		}
 
-		int* v;
-		*v = 5;
-		void* vp[] = {v};
+		// TOMAR NOTA: NUNCA MAIS FAZER ISSO
+		/*
+		 * 		int* v;
+		 *       v = 5;  (PODE LITERALMENTE ALOCAR QUALQUER, REPITO QUALQUER REGIÃO DE MEMÓRIA PARA MEU 5!
+		 *       void* vp[] = {v};
+		 * */
+		// só fazer isso se eu tiver dado malloc em v!
+        int v;
+        v = 5;
+        void* vp[] = {&v};
 		updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, 0, 0, scope);
 /*
 		char iniITIME = 'I';
@@ -543,9 +550,9 @@ void eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* 
 	if(n)
 	{
 			// sintetizado dos filhos
-			void** SYNTH_C[n->nchild];	
+			//void** SYNTH_C[n->nchild];
 			// sintetizado dos filhos
-			void** SYNTH_L[n->nleafs];
+			//void** SYNTH_L[n->nleafs];
 
 			if(executores[n->type])
 			{
@@ -566,7 +573,7 @@ void eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* 
 							printf("(%d) %s \n",i,toEval->name);
 							eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
 							printf("???\n");
-							printf("referencia!? %d \n",toEval);
+							printf("referencia!? %d \n",toEval == NULL);
 							printf("(saida?) %s \n",n->name);
 							printf("(saida) %s \n",toEval->name);
 						}
