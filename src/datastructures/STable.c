@@ -6,15 +6,7 @@
 
 
 const char* mappingEnumTable[] =  {
-    "GLOBAL",
-    "FUNC",
-    "LOOP",
-    "IF_BLOCK",
-    "ELSE_BLOCK",
-    "SMV_PORTS",
-    "SMV_V_MAIN",
-    "SIMPLE_HASH",
-    "TYPE_SET"
+  "GLOBAL", "FUNC", "LOOP", "IF_BLOCK", "ELSE_BLOCK", "SMV_PORTS", "SMV_V_MAIN" ,"SIMPLE_HASH"
 };
 
 
@@ -111,9 +103,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->backup = 0;
 	newtable->collision = 0;
 	
-	if(parent){
-		newtable->parent = parent;
-	}
+	newtable->parent = parent;
 
 /*
 	if(chillist){
@@ -309,11 +299,15 @@ TableEntry* lookup(STable* t, char* name) {
     	return e;
     }
     // não achou procura na hierarquia de escopos acima
-    STable parent = t->parent;
-    while(!e && parent)
+    printf("[lookup] WARNING %s not in scope : ",name);
+    printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+    STable* parent = t->parent;
+   	while(!e && parent)
     {
+    	//printf("[lookup] parent: %s (%d,%d)",mappingEnumTable[parent->type],parent->level,parent->order);
     	e = parent->tableData[index];
-    	parent = t->parent;
+    	//printTable(parent);
+    	parent = parent->parent;
     }
     
 }
@@ -396,13 +390,12 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 */
 void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current)
 {
+	printf("[addTypeSet] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
 
 	void* po[] = {any[0], any[1], hashset};
 
 	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
-
-	printf("[addTypeSet] var-name: %s \n",name);
 
 	addValue(name,po,any_type,object_size+1,0,current);
 }
