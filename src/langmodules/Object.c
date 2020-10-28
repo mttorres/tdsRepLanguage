@@ -26,7 +26,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
-		printf("[allocatePtObjects] valor: %d \n",*(int*) pt);
+		printf("[allocatePtObjects - numVariants] valor: %d \n",*(int*) pt);
 		return pt;
 	}
 	
@@ -36,7 +36,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb)
 		char* deref = (char*) value;
 		char* pt = malloc(newOb->STR+1);
 		strcpy(pt, deref);
-		printf("[allocatePtObjects] valor: %s (%d)\n",pt,type);
+		printf("[allocatePtObjects - labelVariants] valor: %s (%d)\n",pt,type);
 		return pt;
 	}
 
@@ -74,7 +74,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 	if(type == LABEL_ENTRY)
 	{
 		printf("[createObject] string: %s \n",(char*)values[0]);
-		newOb->STR = strlen((char*)values[0]);
+		newOb->STR = strlen((char*)values[0]); // já que o objeto encapsula arrays também, devemos salvar na verdade um vetor em STR (não é muito importante agora)
 	}
 
 	if(OBJECT_SIZE)
@@ -223,5 +223,28 @@ Object* copyObject(Object* o)
 {
 	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values);
 	return newOb;
+}
+
+void updateObject(Object* o, void** any, int any_type, int object_size, int index, int prop)
+{
+	// devemos também verificar se o tamanho mudou (agora é um vetor , etc ...)
+
+
+	free(o->values[index]);
+	// free object em CASO DE VETORES (ainda temos que pensar um pouco mais nisso)
+	// caso para any sendo de valor único
+	if(object_size == 1)
+	{
+		//printf("[updateObject] indexUpdate: %d \n",index);
+		void* newPt = allocatePtObjects(any_type,any[0],o);
+		o->values[index] = newPt;
+	}
+
+	if(o->type != any_type)
+	{
+		printf("[updateObject] type-> %s \n",mappingEnumObjectType[any_type]);
+		o->type = any_type;
+		o->changedType = 1;
+	}
 }
 

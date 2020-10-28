@@ -290,6 +290,7 @@ void insert(STable* t, TableEntry* e) {
     
 }
 
+
 TableEntry* lookup(STable* t, char* name) {
     
     int index = hash(name,t);
@@ -415,6 +416,16 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 	Object* o = createObject(any_type, object_size, any);
 	o->binded = 1;
 	addValueCurrentScope(name,o,methodParam,current);
+}
+
+
+void updateValue(char* name, void** any, int any_type, int object_size, int oIndex, int oProp, STable* current) 
+{
+
+	TableEntry* e = lookup(current,name);
+	printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
+	updateObject(e->val,any,any_type,object_size,oIndex,oProp);	 
+
 }
 
 
