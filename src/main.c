@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
 	//pré processamento 
 	preProcessSmv(smvP,controller,writeSmvTypeTable);
-	setUpMainSmvTable(controller,writeSmvTypeTable);
+	setUpMainSmvTable(controller,writeSmvTypeTable,global);
   
   	printf("--------------------------------- EVAL ---------------------------------------------\n");
   	printf("\n");

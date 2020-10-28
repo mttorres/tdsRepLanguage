@@ -109,8 +109,11 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 
 }
 
-void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable)
+void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, STable* global)
 {
+	// seta alguns pontos de interesse da diretiva temporal
+
+
 	char nome[] = "time";
 	char* linhaLida = Hcontrol->headers[0]->varBuffer[1];
 	int pos = 1;
@@ -121,7 +124,34 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable)
 	void* po[] = {&pos, &tam};
 
 	addValue(nome,po,POSxSIZE,2,0,writeSmvTypeTable[0]);
+
+
+	// remover depois (usado só para teste) (assim como a gente deve fazer o no pré processamento o "loop do time")
+	char* linhaLidaInit = Hcontrol->headers[0]->assignBuffer[1];
+	pos = 1;
+	tam = strlen(linhaLidaInit);
+	//po[] = {&pos, &tam};
+	addValue("init(time)",po,POSxSIZE,2,0,writeSmvTypeTable[0]);
+
+	char* linhaLidaNext = Hcontrol->headers[0]->assignBuffer[3];
+	tam = strlen(linhaLidaNext);
+	pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
+	addValue("next(time)",po,POSxSIZE,2,0,writeSmvTypeTable[0]);	
+	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
+		
+
+
+	// seta as diretivas temporais globais da linguagem
+	char* diretivas[] = {"I_TIME", "C_TIME","F_TIME"};
 	
+	int IC = 0;
+	int F = 3;
+
+	void* valIC[] = {&IC};
+	void* valF[] = {&F};
+	addValue(diretivas[0],valIC,T_DIRECTIVE_ENTRY,1,0,global);
+	addValue(diretivas[1],valIC,T_DIRECTIVE_ENTRY,1,0,global);
+	addValue(diretivas[2],valF,T_DIRECTIVE_ENTRY,1,0,global);
 }
 
 

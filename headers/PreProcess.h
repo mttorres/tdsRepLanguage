@@ -49,10 +49,10 @@ void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, 
 void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable); 
 
 /* 
-	configura a tabela de controle de escrita para as variáveis do Header Main
+	configura a tabela de controle de escrita para a diretiva temporal do Header Main
 	inicializando com a variável time (que não possui typeset, por so poder ser X..Y)
 */
-void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable);
+void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, STable* global);
 
 
 #endif
