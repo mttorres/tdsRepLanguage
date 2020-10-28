@@ -303,7 +303,18 @@ void insert(STable* t, TableEntry* e) {
 TableEntry* lookup(STable* t, char* name) {
     
     int index = hash(name,t);
-    return t->tableData[index];
+    TableEntry* e = t->tableData[index];
+    if(e)
+    {
+    	return e;
+    }
+    // não achou procura na hierarquia de escopos acima
+    STable parent = t->parent;
+    while(!e && parent)
+    {
+    	e = parent->tableData[index];
+    	parent = t->parent;
+    }
     
 }
 
