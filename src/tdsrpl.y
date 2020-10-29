@@ -467,8 +467,8 @@ expr: MINUS expr {
 	 }
 	 | multiexp {
 
-		$$ = $1;	
-
+       Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
+       $$ = expr;
 	 }
 	 ;
 
@@ -495,8 +495,8 @@ multiexp: multiexp TIMES ineqexp {
 		}
 		|ineqexp {
 
-			$$ = $1;		
-			
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 3", EXPR ,$1);
+            $$ = expr;
 		}
 		;
 
@@ -540,8 +540,8 @@ ineqexp:  ineqexp LE logical {
 	
         }
         | logical {
-
-			$$ = $1;
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 4", EXPR ,$1);
+            $$ = expr;
         }
         ;
 
