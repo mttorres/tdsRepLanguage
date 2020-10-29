@@ -22,7 +22,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values);
 
 void printObject(Object* o);
 
-void letgoObject(Object* o);
+void letgoObject(Object* o, int always);
 
 /*
 	Copia um objeto "o"

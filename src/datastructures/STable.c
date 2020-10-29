@@ -178,7 +178,7 @@ void letgoEntry(TableEntry* e) {
 	}
 	if(e->val)
 	{
-		letgoObject(e->val);
+		letgoObject(e->val,1);
 	}
 	free(e);
 }

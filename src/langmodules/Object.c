@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../../headers/constants.h"
 #include "../../headers/Object.h"
 
 const char* mappingEnumObjectType[] =  {
@@ -191,9 +190,9 @@ void printObject(Object* o)
 }
 
 
-void letgoObject(Object* o)
+void letgoObject(Object* o, int always)
 {
-	if(o && o->binded)
+	if(o && (o->binded || always))
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
