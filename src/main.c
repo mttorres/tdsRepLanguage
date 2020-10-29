@@ -5,7 +5,6 @@
   #include "../headers/Node.h"
   #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
-  #include "../headers/PostProcess.h"
   #include "../headers/Interpreter.h"
 
   extern int yylex(void);
@@ -85,7 +84,7 @@ int main(int argc, char* argv[]) {
  	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
 
-	//printHeader(controller->headers[0]);
+	printHeader(controller->headers[0]);
 	//printHeader(controller->headers[1]);
 	//printHeader(controller->headers[2]);
 	//printHeader(controller->headers[3]);

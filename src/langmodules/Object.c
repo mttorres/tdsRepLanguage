@@ -201,9 +201,8 @@ void letgoObject(Object* o, int always)
 			{
 				if(i < 2)
 				{
-					free(o->values[i]);
+					free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
 				}
-				// usar o free da tabela de simbolos (em outra localidade anteriormente?)
 			}
 			else if(o->type == TDS_ENTRY)
 			{
