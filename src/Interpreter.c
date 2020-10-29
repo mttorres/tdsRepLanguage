@@ -576,18 +576,13 @@ void eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* 
                     {
                         printf("(%d) %s \n",i,toEval->name);
                         eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
-                        printf("???\n");
-                        printf("referencia!? %d \n",toEval == NULL);
-                        printf("(saida?) %s \n",n->name);
-                        printf("(saida) %s \n",toEval->name);
                     }
-                    printf("exit if %d \n",i);
                     //printf("exit if %d \n",i);														 // (já criamos Object) resolver dependencias realmente necessário? Parando para pensar podemos acessar o filho imediatamente abaixo do nó em questão e já pegar os valores ! Evita criar mais structs! (pode ficar complexo para alguns casos por outro lado... e fora que inviabiliza tds e vetores)
                 }
             }
         }
     }
-    printf("[eval] POP \n");
+    //printf("[eval] POP \n");
 }
 
 

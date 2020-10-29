@@ -2,13 +2,11 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/STable.h"
-  #include "../headers/constants.h"
   #include "../headers/Node.h"
-  #include "../headers/Enum.h"	
   #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
   #include "../headers/PostProcess.h"
-  #include "../headers/STable.h" 	
+  #include "../headers/Interpreter.h"
 
   extern int yylex(void);
   extern int yyparse();
