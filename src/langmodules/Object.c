@@ -11,7 +11,7 @@ const char* mappingEnumObjectType[] =  {
     "TDS",
     "null*",
     "FUNCTION",
-    "POSxSIZE",
+    "WRITE_SMV_INFO",
     "TYPE_SET",
 };
 
@@ -21,7 +21,7 @@ const char* mappingEnumObjectType[] =  {
 // MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...
 void* allocatePtObjects(int type, void* value, Object* newOb) 
 {
-	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY)
+	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY || type == WRITE_SMV_INFO)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -46,7 +46,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb)
 void* allocateTypeSetObjects(int index, void* value)
 {
 	// (0,1,2)
-	if(index < 2)
+	if(index < 2 )
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -93,7 +93,7 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 			// casos como por exemplo do conjunto de tipos: não precisa de malloc (já é um ponteiro de um objeto alocado a muito tempo )
 			//		-> tupla ponteiro smv (indiceHeader, tamanhoPalavra, Hashmap)
 
-			if(type == TYPE_SET || type == POSxSIZE)
+			if(type == TYPE_SET )
 			{
 				vo[i] = allocateTypeSetObjects(i,values[i]);
 			}
@@ -130,7 +130,7 @@ void printObject(Object* o)
 	{
 		int i;
 		//printf("[DEBUG - printObject] tipoDetectado: %s \n", mappingEnumObjectType[o->type]);
-		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET || o->type == POSxSIZE)
+		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET || o->type == WRITE_SMV_INFO)
 		{
 			printf("(");
 			printf("%s :: ", mappingEnumObjectType[o->type]);
@@ -223,25 +223,45 @@ Object* copyObject(Object* o)
 	return newOb;
 }
 
+
+void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int index, int prop)
+{
+    //printf("[updateObject] indexUpdate: %d \n",index);
+    if(object_size == 1)
+    {
+        o->values[index] = NULL;
+        void* newPt = allocatePtObjects(any_type,any[0],o);
+        o->values[index] = newPt;
+    }
+
+}
+
+
 void updateObject(Object* o, void** any, int any_type, int object_size, int index, int prop)
 {
-	// devemos também verificar se o tamanho mudou (agora é um vetor , etc ...)
-
-
-	free(o->values[index]);
-	o->values[index] = NULL;
-	// free object em CASO DE VETORES (ainda temos que pensar um pouco mais nisso)
-	// caso para any sendo de valor único
-	if(object_size == 1)
+    // caso x = y (copia o valor, diferente de array com indice 0, isto é, x[0](unico) )
+	if(index == -1 && prop == -1)
 	{
-		//printf("[updateObject] indexUpdate: %d \n",index);
-		void* newPt = allocatePtObjects(any_type,any[0],o);
-		o->values[index] = newPt;
+            // vale para ambos os casos (mesmo que o seja um vetor sendo sobrescrito ou variavel comum)
+            int i;
+            for (i = 0; i < o->OBJECT_SIZE; i++)
+            {
+                free(o->values[i]);
+                o->values[i] = NULL;
+            }
+            updateObjectCell(o,any,any_type,object_size,0,-1);
+	}
+	// devemos também verificar se o tamanho mudou (agora é um vetor , etc ...) (se for para vetor nao necessita alocar de novo, permite efeito colateral)
+	// free object em CASO DE VETORES (ainda temos que pensar um pouco mais nisso)
+    else if(index != -1 ){
+        free(o->values[index]);
+        o->values[index] = NULL;
+        updateObjectCell(o,any,any_type,object_size,index,-1);
 	}
 
 	if(o->type != any_type)
 	{
-		printf("[updateObject] type-> %s \n",mappingEnumObjectType[any_type]);
+		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
 		o->changedType = 1;
 	}

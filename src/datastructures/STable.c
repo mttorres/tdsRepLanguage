@@ -401,6 +401,19 @@ void addTypeSet(char* name, void** any, int any_type, int object_size, STable* c
 	addValue(name,po,any_type,object_size+1,0,current);
 }
 
+/*
+void addWriteInfo(char* name, void** any, int any_type, int object_size, STable* current)
+{
+    printf("[addWriteInfo] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+    STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+
+    void* po[] = {any[0], any[1], hashset};
+
+    printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+
+    addValue(name,po,any_type,object_size+1,0,current);
+}
+*/
 
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
 void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
@@ -419,12 +432,12 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 }
 
 
-void updateValue(char* name, void** any, int any_type, int object_size, int oIndex, int oProp, STable* current) 
+void updateValue(char* name, void** any, int any_type, int object_size, int oIndex, int oProp, STable* current)
 {
 
 	TableEntry* e = lookup(current,name);
 	printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
-	updateObject(e->val,any,any_type,object_size,oIndex,oProp);	 
+	updateObject(e->val,any,any_type,object_size,oIndex,oProp);
 
 }
 
