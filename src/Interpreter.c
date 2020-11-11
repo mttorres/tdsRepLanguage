@@ -563,10 +563,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
          * */
         // só fazer isso se eu tiver dado malloc em v!
         void* vp[] = {expr->values[0]};
-        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, 0, 0, scope);
+        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1,-1, scope);
         char smvBind[300];
         if(expr->binded){
             printf("[evalOTHER_ASSIGN] variável");
+            // não faz sentido atribuir variavel em init não é mesmo?
         }
         else{
             sprintf(smvBind,"%d",*(int*) expr->values[0]);
