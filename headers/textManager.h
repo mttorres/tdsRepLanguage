@@ -4,7 +4,7 @@
 
 char * customCat(char* dest, char* src, char toIgnore, int ignoreMode);
 
-char* addParamModule(char* original, char* param);
+char *addParams(char *original, char *param, char *delim1, char *delim2);
 
 
 // o que vem antes tem que ser concatenado atrás!

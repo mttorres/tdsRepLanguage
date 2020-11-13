@@ -146,35 +146,47 @@ char* clearOldPortsRefs(char* oldConstraint) {
     
 }
 
-char* addParamModule(char* original, char* param) {
+char *addParams(char *original, char *param, char* delim1, char* delim2) {
  
 	char *newString;
 	int breakline=0;
+	int statementEnd = 0;
 	if(original[strlen(original)-1] == '\n'){
 	  breakline = 1;
 	}
+    printf("aaaa: %c \n",original[strlen(original)-2]);
+	if(original[strlen(original)-2]== ';'){
+        statementEnd = 1;
+    }
 
-	if(original[strlen(original)-1] == ')' || original[strlen(original)-2] == ')'){
-		newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
-		newString = customCat(newString,original,')',0);
+	if(statementEnd || original[strlen(original)-1] == delim2[0] || original[strlen(original)-2] == delim2[0]){
+	    newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
+		newString = customCat(newString,original,delim2[0],0);
+		printf("caso 1... %s \n",newString);
 		newString = customCat(newString,", ",0,0);
+        printf("caso 1... %s \n",newString);
 		newString = customCat(newString,param,0,0);
-		newString = customCat(newString,")",0,0);		
+        printf("caso 1... %s \n",newString);
+		newString = customCat(newString,delim2,0,0);
+        printf("caso 1... %s \n",newString);
 	}
 	else {
 		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
 		newString = (char*) malloc(sizeof(char)*(strlen(original)+1+strlen(param)+1+1)); // ( , ) e  \0	   	
 		newString = customCat(newString,original,'\n',0);
-		newString = customCat(newString,"(",0,0);
+		newString = customCat(newString,delim1,0,0);
 		newString = customCat(newString,param,0,0);
-		newString = customCat(newString,")",0,0); 
+		newString = customCat(newString,delim2,0,0);
 	}
+    if(statementEnd){
+        newString = customCat(newString,";",0,0);
+    }
+
 	if(breakline){
 	  newString = customCat(newString,"\n",0,0);
 	}
 	newString = newString - ((strlen(original)+strlen(param)+2)-1);	
-	//printf("%s\n",newString);
-	//printf("%lu\n",newString);
+
 	return newString;
 }
 

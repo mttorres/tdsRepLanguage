@@ -24,7 +24,7 @@ void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol
 						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
 
 */
-void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable) { 
+void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable) {
 	int pt;
 	int tam = strlen(line);
 	char* aloc = malloc((tam+1) * sizeof(char));
@@ -115,13 +115,16 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 	char nome[] = "time";
 	char* linhaLida = Hcontrol->headers[0]->varBuffer[1];
 	int pos = 1;
+	int point;
 	int tam = strlen(linhaLida)-1;
+
+
 
 	printf("[setUpMainSmvTable] Salvando tabela variaveis mainSmv (%s) \n\n",linhaLida);
 
 	void* po[] = {&pos, &tam};
 
-	addValue(nome,po,POSxSIZE,2,0,writeSmvTypeTable[0]);
+	addValue(nome, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 
 
 	// remover depois (usado só para teste) (assim como a gente deve fazer o no pré processamento o "loop do time")
@@ -129,12 +132,12 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 	pos = 1;
 	tam = strlen(linhaLidaInit)-1;
 	//po[] = {&pos, &tam};
-	addValue("init(time)",po,POSxSIZE,2,0,writeSmvTypeTable[0]);
+	addValue("init(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 
 	char* linhaLidaNext = Hcontrol->headers[0]->assignBuffer[3];
 	tam = strlen(linhaLidaNext)-1;
 	pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
-	addValue("next(time)",po,POSxSIZE,2,0,writeSmvTypeTable[0]);	
+	addValue("next(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
 		
 
@@ -153,7 +156,7 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable) {
 	
 	/*Strings que são usadas para a busca no arquivo*/
-	char varString[] = "VAR";	
+	char varString[] = "VAR \n";
 	char assignString[] = "ASSIGN";
 	char transString[] = "TRANS";
 	char fVarString[] = "FROZENVAR";
@@ -209,7 +212,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvType
    		if(stage != MAIN && !readPortsModule && !readAutomata){
    			if(strstr(buffer,portsModuleString)) {
    				stage = PORTS;
-   				bufferAux = addParamModule(buffer,timeString);
+   				bufferAux = addParams(buffer, timeString, "(", ")");
    				renamePortsParam = 1;
    				readPortsModule = 1;
    			}

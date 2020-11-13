@@ -11,7 +11,8 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
   
   char* name = malloc((strlen(moduleName)+1) * sizeof(char));
   strcpy(name, moduleName);
-  header->moduleName = name; 
+  header->moduleName = name;
+  header->declaredPorts = NULL;
 
   
   header->type = type;

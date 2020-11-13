@@ -14,7 +14,8 @@ typedef struct headersmv
   int VAR_POINTER;
   int TRANS_POINTER;
   int ASSIGN_POINTER;
-  
+  char** declaredPorts; // usar para impedir o usuário de se "sabotar" usando ports que não existem
+
 }HeaderSmv;
 
 HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP);
