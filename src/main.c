@@ -85,10 +85,10 @@ int main(int argc, char* argv[]) {
 
 
 	printHeader(controller->headers[0]);
-	//printHeader(controller->headers[1]);
-	//printHeader(controller->headers[2]);
-	//printHeader(controller->headers[3]);
-	//printHeader(controller->headers[4]);
+	printHeader(controller->headers[1]);
+	printHeader(controller->headers[2]);
+	printHeader(controller->headers[3]);
+	printHeader(controller->headers[4]);
 
 	fclose(smvP);
 	
@@ -96,9 +96,15 @@ int main(int argc, char* argv[]) {
 
 //	letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
 
-  	
 
-
+//    printf("teste TYPE SET !!! \n\n\n");
+//    char* temp = controller->headers[4]->varBuffer[1];
+//    char* result = addParams(temp,"BATATA","{","}");
+//    char* testAgain = addParams(temp,"JUDGEMENT AHS COME TO YOU","{","}");
+//    free(controller->headers[4]->varBuffer[1]);
+//    controller->headers[4]->varBuffer[1] = testAgain;
+//    printf("tada: %s",controller->headers[4]->varBuffer[1]);
+    // após verificar se pode escrever ou não..
 
 //TESTE PORTS REFS (aparentemente tudo funcionando)
 

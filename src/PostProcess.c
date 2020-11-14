@@ -8,11 +8,94 @@ int  ALOC_SIZE_LINE = 300;
 
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "{%s};" , "%s, ", "%s %s %s ", "redef%d%s", "%s \n", "init(%s)", "next(%s)",
-                          "init(%s) := %s; \n", "next(%s) := %s; \n" , "case \n\t\t%s \n\tesac; \n",
+                          " %s:= %s; ", "%s:= %s; \n" , "case \n\t\t%s \n\tesac; \n",
                           "init(%s) = %s : %s; \n ", "next(%s) = %s : %s; \n", "TRUE : NULL; \n", "%s = %s : %s; \n" };
 
 
-void updateTypeSet(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
+void updateMidSmvStm()
+{
+
+}
+// depois jogar essa função no textManager!
+/**
+ *  Genralização, escreve no meio do intervalo  intervalo início,fim de uma String qualquer.
+ *  Após isso atualiza os novos intervalos para uma próxima alteração
+ *
+ *  @param newValue o que será escrito
+ *  @param updated o ponteiro para a string que será alterada
+ *  @param sizeNew o tamanho do valor a ser escrito (subString)
+ *  @param pointIni o início do intervalo
+ *  @param paramEnd o fim do intervalo .
+ *  @param size o ponteiro do novo tamanho cálculado
+ *  @param newPointInit o ponteiro do novo ponto de partida do intervalo
+ *  @param newPointEnd o ponteiro do novo fim do intervalo
+ *
+ *  @sideEffects :  Atualiza o updated, seja lá de onde que essa string veio em primeiro lugar
+ *  (a responsabilidade de free ou realloc fica fora dessa função)
+ * */
+void updateFinSmvStm(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int *size, int *newPointInit, int *newPointEnd) {
+    char aux[(*size) - (pointEnd + 1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
+    int i;
+    // deve-se copiar os caracteres que vem após a zona de sobrescrita
+    //deve-se liberar sizeNew espaços empurrando os caras que vão ser salvos em aux
+    for (i = pointEnd+1; i < (*size); i++) {
+        //printf("copiando... %c \n",updated[i]);
+        aux[i-(pointEnd+1)] = updated[i];
+    }
+    // atualiza o tamanho
+    (*size) = -1*((pointEnd-pointIni+1) - sizeNew) + (*size);
+
+    // a zona de "sobrescrita" não aumentou
+    if(sizeNew <= (pointEnd - pointIni)+1)
+    {
+        // deve-se "destruir" o resto da string partindo de pointIni
+        updated[pointIni] = '\0';
+    }
+    // após isso, tanto para o caso de ter aumentado ou não deve-se recuperar a substring salva no
+    // buffer auxiliar (delimitador e tudo o que vem depois), e escrever logo após escrever a nova string.
+    for(i = pointIni; i < (*size); i++)
+    {
+        // i em indice medição sizeNew como tamanho (tirar -1)
+        if(i >= pointIni+sizeNew)
+        {
+            // ponto de sobrescrita do delimitador
+            updated[i] = aux[(i-(pointIni))-(sizeNew)];
+        }
+        // escrita do newValue
+        else{
+            updated[i] = newValue[i-(pointIni)];
+            // devemos salvar o novo intervalo de interesse
+            if(i+1 == pointIni+sizeNew)
+            {
+                //printf("salvando novo indice fim... \n");
+                (*newPointEnd) = i;
+            }
+        }
+    }
+    (*newPointInit) = pointIni; // invariante
+
+}
+
+
+
+void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type,int minmax)
+{
+    // começando com numérico x..y;
+    // criar enum mapeador ao decorrer...
+    if(type == 1)
+    {
+        if(!minmax)
+        {
+            // caso middle
+        }
+        else{
+            // caso fim
+        }
+    }
+}
+
+
+void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
 {
 
 }
@@ -37,7 +120,7 @@ void updateTypeSet(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, 
 void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr)
 {
     // checa o typeSet dessa variável para o atualizar ! (chamar aqui ou no interpretador ?)
-    updateTypeSet(varName,header,writeSmvTypeTable,newValue,type);
+    //updateType(varName,header,writeSmvTypeTable,newValue,type);
 
     char *updated = NULL; // ponteiro para referenciar a string que vamos tratar
     char *upVar = NULL; // ponteiro para localizar o assign na tabela
@@ -77,53 +160,15 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
     // é um simples next(x)/init(x):= yyyyyyy;  -> substituir y's por expressão nova em newValue antes do delmitador (;)
     // os delmitadores podem variar, ex: em caso de next(time) o delimitador é (:)
-    if(!condition)
-    {
-        char aux[size-(pointEnd+1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
-        int i;
-        // deve-se copiar os caracteres que vem após a zona de sobrescrita
-        //deve-se liberar sizeNew espaços empurrando os caras que vão ser salvos em aux
-        for (i = pointEnd+1; i < size; i++) {
-            //printf("copiando... %c \n",updated[i]);
-            aux[i-(pointEnd+1)] = updated[i];
-        }
-        // atualiza o tamanho
-        size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
+    updateFinSmvStm(newValue, updated, sizeNew, pointIni, pointEnd, &size, &newPointInit, &newPointEnd);
 
-        // a zona de "sobrescrita" não aumentou
-        if(sizeNew <= (pointEnd - pointIni)+1)
-        {
-            // deve-se "destruir" o resto da string partindo de pointIni
-            updated[pointIni] = '\0';
-        }
-        // após isso, tanto para o caso de ter aumentado ou não deve-se recuperar a substring salva no
-        // buffer auxiliar (delimitador e tudo o que vem depois), e escrever logo após escrever a nova string.
-        for(i = pointIni; i < size; i++)
-        {
-            if(i >= pointIni+sizeNew) // i em indice medição sizeNew como tamanho (tirar -1)
-            {
-                // ponto de sobrescrita do delimitador
-                updated[i] = aux[(i-(pointIni))-(sizeNew)];
-            }
-            // escrita do newValue
-            else{
-                updated[i] = newValue[i-(pointIni)];
-                // devemos salvar o novo intervalo de interesse
-                if(i+1 == pointIni+sizeNew)
-                {
-                    //printf("salvando novo indice fim... \n");
-                    newPointEnd = i;
-                }
-            }
-        }
-        newPointInit = pointIni;
-    }
-    else{
-        // tratamento de init/next(varName):= case ... TRUE : x; esac; , geralmente TRUE: NULL ou outra condição parecida
-        // é sempre o "delmitador final"
-    }
+    // tratamento de init/next(varName):= case ... TRUE : x; esac; , geralmente TRUE: NULL ou outra condição parecida
+    // é sempre o "delmitador final", vai ser um caso similar ao anterior porém entre ponto de interesse - condição default, já que condições não mudam!
+    // o que muda é que vamos er que concatenar esse default ? (NÃO, é criado naturalmente)
+
     // atualizar range de interesse e tamanho da string na tabela!
     // fazer duas chamadas por enquanto
+    size = -1*((newPointEnd-newPointInit+1) - sizeNew) + size;
     void* vpSize[] = {&size};  // evita ter que "reescrever" o vetor inteiro separando em varios vps
     // é como se a gente tivesse atualizando cada indice dos vetores menos o (0)
     updateValue(upVar,vpSize,WRITE_SMV_INFO,1,1,-1,writeSmvTypeTable);
@@ -132,6 +177,8 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     void* vpInEnd[] = {&newPointEnd};
     updateValue(upVar,vpInEnd,WRITE_SMV_INFO,1,3,-1,writeSmvTypeTable);
 }
+
+
 
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
@@ -154,22 +201,62 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int redef, int typeExpr ,int type)
 {
     char* exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
+    char exprInterL[300];
+    char exprInterR[300];
     char interRedef[300];
 
     if(!redef)
     {
-        sprintf(exprResultString,SmvConversions[typeExpr],varName);
+        sprintf(exprInterL, SmvConversions[typeExpr], varName);
     }
     else{
         sprintf(interRedef,SmvConversions[5],redef,varName);
-        sprintf(exprResultString,SmvConversions[typeExpr],interRedef);
+        sprintf(exprInterL, SmvConversions[typeExpr], interRedef);
     }
 
-    // atualiza o typeSet
-    // atualiza o init dessa função (init precisa de tabela de simbolos?) não é que nem um next !
+    // atualiza o typeSet (salvando ponto de interesse para mudança, e)
+    //TODO
+
+    int size;
+    int pointIni;
+    int pointEnd;
 
 
+    if(condition)
+    {
 
+    }
+    else{
+
+        // atualiza o init/next dessa função
+        // criar a expressão definitiva com sprintf?
+        // pros : é facil
+        // cons: não tenho controle sobre qual parte da string minha expressão começa ou termina...
+        // NA VERDADE EU TENHO, posIni:  até o = (posso salvar em um array mapeador também)
+        //  posEnd = posIni + tamanhoString(expressão)
+
+        sprintf(exprInterR,"%s",newValue);
+        sprintf(exprResultString,SmvConversions[8],exprInterL,exprInterR);
+
+        size = strlen(exprResultString)-1;
+        pointIni = (strlen(exprInterL) - 1) + 4; //  %s:= %s (+2 para pular ele mesmo e o : e depois = e espaço)
+        pointEnd = pointIni + strlen(exprInterR)-1;
+
+    }
+
+
+    // escreve atribuição no buffer
+    // encapsular em método(!)
+    header->assignBuffer[header->ASSIGN_POINTER] = exprResultString;
+    header->ASSIGN_POINTER += 1;
+    int pos = header->ASSIGN_POINTER;
+    // caso de next
+    if(typeExpr)
+    {
+        // atualiza tabela de simbolos dessa operação
+        void* po[] = {&pos, &size,&pointIni,&pointEnd};
+        addValue(exprInterL, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable);
+    }
 }
 
 

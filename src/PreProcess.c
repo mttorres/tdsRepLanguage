@@ -113,30 +113,47 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 {
 	// seta alguns pontos de interesse da diretiva temporal
 	char nome[] = "time";
+    char* auxDelim;
+    char* auxFim;
 	char* linhaLida = Hcontrol->headers[0]->varBuffer[1];
 	int pos = 1;
-	int point;
+	int pointIni;
+	int pointEnd;
 	int tam = strlen(linhaLida)-1;
 
+    auxDelim = strstr(linhaLida,":");
 
+    auxFim = strstr(auxDelim,"..");
 
-	printf("[setUpMainSmvTable] Salvando tabela variaveis mainSmv (%s) \n\n",linhaLida);
+    pointIni = (auxDelim-linhaLida+2);
+    pointEnd = ((auxFim-linhaLida)-1)+2;
 
-	void* po[] = {&pos, &tam};
-
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd};
 	addValue(nome, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 
 
-	// remover depois (usado só para teste) (assim como a gente deve fazer o no pré processamento o "loop do time")
+    // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")
 	char* linhaLidaInit = Hcontrol->headers[0]->assignBuffer[1];
 	pos = 1;
 	tam = strlen(linhaLidaInit)-1;
-	//po[] = {&pos, &tam};
+
+	auxDelim = strstr(linhaLidaInit, "=");
+	auxFim = strstr(auxDelim,";");
+    pointIni = auxDelim - linhaLidaInit;
+    pointEnd = auxFim - linhaLidaInit;
+
 	addValue("init(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 
+
 	char* linhaLidaNext = Hcontrol->headers[0]->assignBuffer[3];
+    pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
 	tam = strlen(linhaLidaNext)-1;
-	pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
+
+    auxDelim = strstr(linhaLidaInit, "<");
+    auxFim = strstr(auxDelim,":");
+    pointIni = auxDelim - linhaLidaInit;
+    pointEnd = auxFim - linhaLidaInit;
+
 	addValue("next(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
 		
