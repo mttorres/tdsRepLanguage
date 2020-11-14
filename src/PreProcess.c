@@ -119,42 +119,42 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 	int pos = 1;
 	int pointIni;
 	int pointEnd;
-	int tam = strlen(linhaLida)-1;
+	int tam = strlen(linhaLida);
 
     auxDelim = strstr(linhaLida,":");
 
     auxFim = strstr(auxDelim,"..");
 
     pointIni = (auxDelim-linhaLida+2);
-    pointEnd = ((auxFim-linhaLida)-1)+2;
+    pointEnd = ((auxFim-linhaLida))+2;
 
     void* po[] = {&pos, &tam, &pointIni, &pointEnd};
-	addValue(nome, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
+	addValue(nome, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
 
 
     // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")
 	char* linhaLidaInit = Hcontrol->headers[0]->assignBuffer[1];
 	pos = 1;
-	tam = strlen(linhaLidaInit)-1;
+	tam = strlen(linhaLidaInit);
 
 	auxDelim = strstr(linhaLidaInit, "=");
 	auxFim = strstr(auxDelim,";");
-    pointIni = auxDelim - linhaLidaInit;
-    pointEnd = auxFim - linhaLidaInit;
+    pointIni = auxDelim - linhaLidaInit+2; //
+    pointEnd = auxFim - linhaLidaInit-1; // entra no intervalo de sobrescrita
 
-	addValue("init(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
+	addValue("init(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
 
 
 	char* linhaLidaNext = Hcontrol->headers[0]->assignBuffer[3];
     pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
-	tam = strlen(linhaLidaNext)-1;
+	tam = strlen(linhaLidaNext);
 
-    auxDelim = strstr(linhaLidaInit, "<");
+    auxDelim = strstr(linhaLidaNext, "<");
     auxFim = strstr(auxDelim,":");
-    pointIni = auxDelim - linhaLidaInit;
-    pointEnd = auxFim - linhaLidaInit;
+    pointIni = auxDelim - linhaLidaNext+2;
+    pointEnd = auxFim - linhaLidaNext-1;
 
-	addValue("next(time)", po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable[0]);
+	addValue("next(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
 		
 

@@ -190,3 +190,47 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	return newString;
 }
 
+void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int *size, int *newPointInit, int *newPointEnd)
+{
+    char aux[(*size) - (pointEnd + 1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
+    int i;
+    // deve-se copiar os caracteres que vem após a zona de sobrescrita
+    //deve-se liberar sizeNew espaços empurrando os caras que vão ser salvos em aux
+    for (i = pointEnd+1; i < (*size); i++) {
+        //printf("copiando... %c \n",updated[i]);
+        aux[i-(pointEnd+1)] = updated[i];
+    }
+    // atualiza o tamanho
+    (*size) = -1*((pointEnd-pointIni+1) - sizeNew) + (*size);
+
+    // a zona de "sobrescrita" não aumentou
+    if(sizeNew <= (pointEnd - pointIni)+1)
+    {
+        // deve-se "destruir" o resto da string partindo de pointIni
+        updated[pointIni] = '\0';
+    }
+    // após isso, tanto para o caso de ter aumentado ou não deve-se recuperar a substring salva no
+    // buffer auxiliar (delimitador e tudo o que vem depois), e escrever logo após escrever a nova string.
+    for(i = pointIni; i < (*size); i++)
+    {
+        // i em indice medição sizeNew como tamanho (tirar -1)
+        if(i >= pointIni+sizeNew)
+        {
+            // ponto de sobrescrita do delimitador
+            updated[i] = aux[(i-(pointIni))-(sizeNew)];
+        }
+            // escrita do newValue
+        else{
+            updated[i] = newValue[i-(pointIni)];
+            // devemos salvar o novo intervalo de interesse
+            if(i+1 == pointIni+sizeNew)
+            {
+                //printf("salvando novo indice fim... \n");
+                (*newPointEnd) = i;
+            }
+        }
+    }
+//    (*newPointInit) = pointIni; // invariante
+
+}
+
