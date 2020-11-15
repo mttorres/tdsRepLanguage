@@ -49,8 +49,7 @@ NULL					{yylval.sval = strdup(yytext); return Null;}
 and						{yylval.sval = strdup(yytext); return AND;}
 or						{yylval.sval = strdup(yytext); return OR;}
 not                   	{yylval.sval = strdup(yytext); return NOT;}
--\|						{yylval.sval = strdup(yytext); return LDPASS;}
-\|>						{yylval.sval = strdup(yytext); return RDPASS;}
+-\|\|>					{yylval.sval = strdup(yytext); return DPASS;}
 ->						{yylval.sval = strdup(yytext); return PASS;}
 xor						{yylval.sval = strdup(yytext); return XOR;}
 [<=]              		{yylval.sval = strdup(yytext); return LE;}

@@ -90,20 +90,18 @@
 %token <sval> FINALTIME
 %token <sval> ID
 %token <sval> PASS
-%token <sval> LDPASS
-%token <sval> RDPASS
+%token <sval> DPASS
 
 %type <ast> prog
 %type <ast> cmds
 %type <ast> cmd
 %type <ast> functiondefs 
 %type <ast> functiondef
-%type <ast> functionbody 
-%type <ast> params  
-%type <ast> optionalreturn
+%type <ast> params
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> assignable
+%type <ast> exprEncap
 %type <ast> expr
 %type <ast> multiexp
 %type <ast> ineqexp
@@ -121,9 +119,7 @@
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
-%type <ast> timedirective
 %type <ast> anonimtdsop
-%type <ast> interval
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
@@ -211,7 +207,7 @@ functiondefs: functiondefs functiondef {
 	  }  
 	  ; 	
 
-functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
+functiondef: FUNCTION ID LPAREN params RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(12,2,6,"Functiondef -  definição de função ", FUNC_DEF,  $4,$7, $1,$2,$3,$5,$6,$8);
 			//printf("DEFINICAO DE FUNÇÃO \n");
@@ -219,44 +215,14 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 			//infoNode($$);
 		
 		}
-		| FUNCTION ID LPAREN RPAREN LBRACE functionbody  RBRACE  {
+		| FUNCTION ID LPAREN RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(11,1,6,"Functiondef -  definição de procedimento ", PROC_DEF, $6, $1,$2,$3,$4,$5,$7);
 			//printf("DEFINICAO DE FUNÇÃO \n");
 			$$ = functiondef; 
 			//infoNode($$);
-
 		}
 		;
-
-// MUDANÇA - NAO PERMITIR CHAMADA A TDS CREATE dentro de funções! (ou verificar em tempo de semantica?)
-functionbody: cmds optionalreturn {
-	
-			if($2){
-				Node* functionbody = createNode(6,2,0,"Functionbody - função composta/programa ", F_BODY, $1,$2);
-				$$ = functionbody; 
-			}
-			else {
-				Node* functionbody = createNode(5,1,0,"Functionbody - função composta/programa ", F_BODY, $1);
-				$$ = functionbody; 
-			}
-
-	  		
-			
-		}
-
-
-optionalreturn: RETURN expr {
-
-		Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
-		$$ = optionalreturn; 
-
-		//printf("RETORNO \n");
-		
-		}
-	    | /* empty */  {printf("nao teve mais(optionalreturn) \n \n"); $$ = NULL;}
-	    ;
-
 
 
 
@@ -310,34 +276,10 @@ anonimtdsop: PASS  {
 				Node* p = createNode(5,0,1,"CMD -  PASS", TDS_ANON_OP_PASS ,$1); 
 				$$ = p;
 		}
-		| LDPASS interval RDPASS  {
-				
-				Node* p; 
-				if($2)
-				{
-					p = createNode(7,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
-				}
-				else
-				{
-					p = createNode(6,0,2,"CMD -  DPASS", TDS_ANON_OP_DPASS, $1,$3);
-				}
-				$$ = p;
-		} 
-
-
-interval:  ID {
-
-				Node* i = createNode(5,0,1,"VARIAVEL", IDVAR ,$1); 
-				$$ = i;
-			
-		}
-		| RAWNUMBERDATA 
-		{
-				Node* i = createNode(5,0,1,"CMD -  PASS", NUMBER ,$1); 
-				$$ = i;
-		}
-		| /* empty */  {$$ = NULL;}
-
+		|   DPASS  {
+        		Node* p = createNode(5,0,1,"CMD -  DPASS", TDS_ANON_OP_DPASS ,$1);
+        		$$ = p;
+        }
 
 
 paramsCall: expr {
@@ -398,7 +340,11 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 		//infoNode($$);
 
-	 }	 
+	 }
+	 | RETURN expr {
+	    	Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
+        	$$ = optionalreturn;
+	 }
 	 ;
 
 
@@ -444,21 +390,31 @@ assignable : ID extraaccesses {
 
 	  ;	 
 
+exprEncap: LPAREN expr RPAREN {
 
-expr: MINUS expr {
+		        Node* expr = createNode(7,1,2,"Expressão Básica - encapsulada", EXPR, $2,  $1,$3);
+		        $$ = expr;
+
+           }
+           | expr {
+                $$ = $1;
+           }
+
+
+expr: MINUS exprEncap {
 	
 		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
 		$$ = expr;		
 
 
 	 }
-	 | expr MINUS multiexp {
+	 | exprEncap MINUS multiexp {
 		
 		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
 		$$ = expr;			
 
 	 }
-	 | expr PLUS multiexp {
+	 | exprEncap PLUS multiexp {
 
 		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
 		$$ = expr;						
