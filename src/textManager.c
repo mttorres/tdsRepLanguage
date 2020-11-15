@@ -162,13 +162,13 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	if(statementEnd || original[strlen(original)-1] == delim2[0] || original[strlen(original)-2] == delim2[0]){
 	    newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
 		newString = customCat(newString,original,delim2[0],0);
-		printf("caso 1... %s \n",newString);
+		//printf("caso 1... %s \n",newString);
 		newString = customCat(newString,", ",0,0);
-        printf("caso 1... %s \n",newString);
+        //printf("caso 1... %s \n",newString);
 		newString = customCat(newString,param,0,0);
-        printf("caso 1... %s \n",newString);
+        //printf("caso 1... %s \n",newString);
 		newString = customCat(newString,delim2,0,0);
-        printf("caso 1... %s \n",newString);
+        //printf("caso 1... %s \n",newString);
 	}
 	else {
 		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
@@ -190,18 +190,18 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	return newString;
 }
 
-void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int *size, int *newPointInit, int *newPointEnd)
+void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int size, int *newPointInit, int *newPointEnd)
 {
-    char aux[(*size) - (pointEnd + 1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
+    char aux[(size) - (pointEnd + 1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
     int i;
     // deve-se copiar os caracteres que vem após a zona de sobrescrita
     //deve-se liberar sizeNew espaços empurrando os caras que vão ser salvos em aux
-    for (i = pointEnd+1; i < (*size); i++) {
+    for (i = pointEnd+1; i < size; i++) {
         //printf("copiando... %c \n",updated[i]);
         aux[i-(pointEnd+1)] = updated[i];
     }
     // atualiza o tamanho
-    (*size) = -1*((pointEnd-pointIni+1) - sizeNew) + (*size);
+    size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
 
     // a zona de "sobrescrita" não aumentou
     if(sizeNew <= (pointEnd - pointIni)+1)
@@ -211,7 +211,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
     }
     // após isso, tanto para o caso de ter aumentado ou não deve-se recuperar a substring salva no
     // buffer auxiliar (delimitador e tudo o que vem depois), e escrever logo após escrever a nova string.
-    for(i = pointIni; i < (*size); i++)
+    for(i = pointIni; i < size; i++)
     {
         // i em indice medição sizeNew como tamanho (tirar -1)
         if(i >= pointIni+sizeNew)
@@ -230,7 +230,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
             }
         }
     }
-//    (*newPointInit) = pointIni; // invariante
+    (*newPointInit) = pointIni; // invariante (manter por enquanto)
 
 }
 

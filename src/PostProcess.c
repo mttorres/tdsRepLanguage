@@ -14,14 +14,42 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
-    if(type == 1)
+    if(type == 0)
     {
+        int pos;
+        int size;
+        int pointIni;
+        int pointEnd;
+        // recuperar da tabela
+        TableEntry* entryPosType;
+        entryPosType =  lookup(writeSmvTypeTable,varName);
+        pos = *(int*) entryPosType->val->values[0];
+        size = *(int*) entryPosType->val->values[1];
+        pointIni = *(int*) entryPosType->val->values[2];
+        pointEnd = *(int*) entryPosType->val->values[3];
+
+        int newPointIni = 0;
+        int newPointEnd = 0;
+        int sizeNew = strlen(newValue);
+
+        // min..max;
+        if(minmax)
+        {
+            pointIni = pointEnd+3; // n..max;
+            // nota! o size já está indexbased!
+            pointEnd = header->varBuffer[pos][size] == '\n' ? size-2  : size-1; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
+            size = header->varBuffer[pos][size] == '\n' ? size+1 : size;
+        }
+        updateSubStringInterval(newValue,header->varBuffer[pos],sizeNew,pointIni,pointEnd,size,&newPointIni,&newPointEnd);
+
+
+        void* vpSize[] = {&size};
+        updateValue(varName,vpSize,WRITE_SMV_INFO,1,1,-1,writeSmvTypeTable);
+        // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
         if(!minmax)
         {
-                   printf("soon...");
-        }
-        else{
-            printf("ainda...");
+            void* vpInEnd[] = {&newPointEnd};
+            updateValue(varName,vpInEnd,WRITE_SMV_INFO,1,3,-1,writeSmvTypeTable);
         }
     }
 }
@@ -39,7 +67,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     updateType(varName,header,writeSmvTypeTable,newValue,type,minmax);
 
     char *updated = NULL; // ponteiro para referenciar a string que vamos tratar
-    char *upVar = NULL; // ponteiro para localizar o assign na tabela
+    char upVar[300]; // ponteiro para localizar o assign na tabela
     sprintf(upVar,SmvConversions[typeExpr],varName); // recupera string default init/next
     int sizeNew = strlen(newValue);
 
@@ -86,7 +114,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
     // é um simples next(x)/init(x):= yyyyyyy;  -> substituir y's por expressão nova em newValue antes do delmitador (;)
     // os delmitadores podem variar, ex: em caso de next(time) o delimitador é (:)
-    updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, &size, &newPointInit, &newPointEnd);
+    updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd);
 
 
 
@@ -167,60 +195,7 @@ void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 */
 
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type)
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExpr, int minmax)
 {
-    int pos;
-    int size;
-    TableEntry* entryPosSizeInterval;
-    TableEntry* entryPosSizeAssing;
-
-    char* originalInterval;
-    char* originalAssign;
-    char delim;
-
-    entryPosSizeInterval =  lookup(writeSmvTypeTable,"time");
-    pos = *(int*) entryPosSizeInterval->val->values[0];
-    size = *(int*) entryPosSizeInterval->val->values[1];
-    originalInterval = main->varBuffer[pos];
-
-    // init
-    if(type)
-    {
-        delim = ' ';
-        // mudança da declaração (inicio)
-        //loop de 3 iterações no maximo (mas é melhor do que deixar hardcoded)
-        while(*originalInterval != delim)
-        {
-            originalInterval++;
-        }
-        originalInterval++;
-        *originalInterval = newValue[0];
-
-        entryPosSizeAssing =  lookup(writeSmvTypeTable,"init(time)");
-        // mudança init
-        pos = *(int*) entryPosSizeAssing->val->values[0];
-        size = *(int*) entryPosSizeAssing->val->values[1];
-        main->assignBuffer[pos][size-2] = newValue[0];
-
-    }
-    // final
-    else{
-        delim = '<';
-        // mudança da declaração (final)
-        size = *(int*) entryPosSizeInterval->val->values[1];
-        originalInterval[size-2] = newValue[0];
-
-        entryPosSizeAssing =  lookup(writeSmvTypeTable,"next(time)");
-        //mudança next
-        pos = *(int*) entryPosSizeAssing->val->values[0];
-
-        originalAssign = main->assignBuffer[pos];
-        while(*originalAssign != delim)
-        {
-            originalAssign++;
-        }
-        originalAssign++;
-        originalAssign++;
-        *originalAssign = newValue[0];
-    }
+    updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,typeExpr,minmax);
 }

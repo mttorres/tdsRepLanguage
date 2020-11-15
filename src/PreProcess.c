@@ -126,7 +126,7 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
     auxFim = strstr(auxDelim,"..");
 
     pointIni = (auxDelim-linhaLida+2);
-    pointEnd = ((auxFim-linhaLida))+2;
+    pointEnd = ((auxFim-linhaLida))-1;
 
     void* po[] = {&pos, &tam, &pointIni, &pointEnd};
 	addValue(nome, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);

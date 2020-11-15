@@ -28,14 +28,14 @@ char* clearOldPortsRefs(char* oldConstraint);
  *  @param sizeNew o tamanho do valor a ser escrito (subString)
  *  @param pointIni o início do intervalo
  *  @param paramEnd o fim do intervalo .
- *  @param size o ponteiro do novo tamanho cálculado
+ *  @param size o tamanho da string total original
  *  @param newPointInit o ponteiro do novo ponto de partida do intervalo
  *  @param newPointEnd o ponteiro do novo fim do intervalo
  *
  *  @sideEffects :  Atualiza o updated, seja lá de onde que essa string veio em primeiro lugar
  *  (a responsabilidade de free ou realloc fica fora dessa função)
  * */
-void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int *size, int *newPointInit, int *newPointEnd);
+void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int size, int *newPointInit, int *newPointEnd);
 
 
 #endif

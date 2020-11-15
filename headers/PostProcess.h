@@ -13,7 +13,7 @@
  * o init(time) ou next(time) dependendo se for I_TIME ou F_TIME
  * */
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type);
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExrp,int minmax);
 
 
 /**
