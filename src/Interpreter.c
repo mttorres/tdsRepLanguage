@@ -10,6 +10,7 @@
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
+Object ** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
@@ -20,16 +21,17 @@ Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
 Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-
-
+Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
 // declarar com const ? (me parece "nada haver")
 Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL ,evalAC_V,
-        evalOTHER_ASSIGN
-
-
+        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
 };
 
 
@@ -208,6 +210,11 @@ Object* evalPLUS(Object* o1, Object* o2)
 
 Object* evalMINUS(Object* o1, Object* o2)
 {
+    if(o1->type != NUMBER_ENTRY || (o2 && o2->type != NUMBER_ENTRY))
+    {
+        fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE (-) OPERATION!");
+        exit(-1);
+    }
     printf("[evalMINUS] \n");
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
@@ -217,6 +224,11 @@ Object* evalMINUS(Object* o1, Object* o2)
 
 Object* evalNOT(Object* o)
 {
+    if(o->type != LOGICAL_ENTRY)
+    {
+        fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE (not) OPERATION!");
+        exit(-1);
+    }
     printf("[evalNOT] \n");
     int r;
     r =  !(*(int*) o->values[0]);
@@ -334,28 +346,19 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
         if(n->nchild == 1 && n->nleafs == 1 )
         {
             ops[0] = n->leafs[0][0]; // recupera a operação
-            sintUni = evalEXPR(n->children[0],scope,writeSmvTypeTable,controllerSmv);
+            sintUni = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv)[0];
             if(ops[0] == MINUS  && sintUni->type == NUMBER_ENTRY)
             {
                 return evalMINUS(sintUni,NULL);
             }
             if(ops[0] == MINUS  && sintUni->type == LOGICAL_ENTRY)
             {
-               return evalNOT(sintUni);
+                return evalNOT(sintUni);
             }
             fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c OPERATION!", ops[0]);
             exit(-1);
         }
-        // devemos descer ou é folha
-        else{
-            if(n->nchild)
-            {
-                return evalEXPR(n->children[0],scope,writeSmvTypeTable,controllerSmv);
-            }
-            else{
-                return executores[n->type](n,scope,writeSmvTypeTable,controllerSmv);
-            }
-        }
+        return eval(n->children[0],scope,writeSmvTypeTable,controllerSmv)[0];
     }
     // operação binária
     else
@@ -531,6 +534,21 @@ Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
     }
 }
 
+Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+    printf("[evalV_PROP] \n");
+
+}
+Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+    printf("[evalADD_V] \n");
+}
+Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+    printf("[evalADD_V_PROP] \n");
+}
+
+Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+    printf("[evalV_PROP_TDS] \n");
+}
+
 
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
@@ -550,7 +568,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         //Mudou CONTEXTO (C_TIME) : seguir o caso default
 
         // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
-        expr = evalEXPR(n->children[1],scope,writeSmvTypeTable,controllerSmv);
+        expr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv)[0];
         if(expr && expr->type != NUMBER_ENTRY && expr->OBJECT_SIZE > 1)
         {
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->children[0]->leafs[0]);
@@ -565,22 +583,17 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1,-1, scope);
         char smvBind[300];
-        if(expr->binded){
-            printf("[evalOTHER_ASSIGN] variável");
-            // não faz sentido atribuir variavel em init não é mesmo?
-        }
-        else{
-            sprintf(smvBind,"%d",*(int*) expr->values[0]);
-        }
+        sprintf(smvBind,"%d",*(int*) expr->values[0]); // recupera o valor puro
+
         char caracterITIME = 'I';
         char caracterFTIME = 'F';
         if(n->children[0]->leafs[0][0] == caracterITIME)
         {
-            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,1);
+            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,6,0);
         }
         else if (n->children[0]->leafs[0][0] == caracterFTIME)
         {
-            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,0);
+            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,7,1);
         }
         letgoObject(expr,0);
     }
@@ -590,7 +603,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
     }
 }
 
-Object* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     printf("[eval] %s \n",n->name);
     if(n)
@@ -599,11 +612,12 @@ Object* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControlle
         //void** SYNTH_C[n->nchild];
         // sintetizado dos filhos
         //void** SYNTH_L[n->nleafs];
+        Object ** SYNTH_O = malloc(n->nchild*sizeof(Object*));
 
         if(executores[n->type])
         {
             printf("[PostProcess - eval] eval especifico \n\n");
-            executores[n->type](n,scope,writeSmvTypeTable,controllerSmv);
+            SYNTH_O[0] = executores[n->type](n,scope,writeSmvTypeTable,controllerSmv);
         }
         else
         {
@@ -617,12 +631,13 @@ Object* eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControlle
                     if(toEval)
                     {
                         printf("(%d) %s \n",i,toEval->name);
-                        eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
+                        SYNTH_O[i] = eval(n->children[i],scope,writeSmvTypeTable,controllerSmv)[0];
                     }
                     // (já criamos Object) resolver dependencias realmente necessário? Parando para pensar podemos acessar o filho imediatamente abaixo do nó em questão e já pegar os valores ! Evita criar mais structs! (pode ficar complexo para alguns casos por outro lado... e fora que inviabiliza tds e vetores)
                 }
             }
         }
+        return SYNTH_O;
     }
     return NULL;
 }
