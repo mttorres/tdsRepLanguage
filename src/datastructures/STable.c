@@ -432,12 +432,18 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 }
 
 
-void updateValue(char* name, void** any, int any_type, int object_size, int oIndex, int oProp, STable* current)
+void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current)
 {
 
 	TableEntry* e = lookup(current,name);
-	printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
-	updateObject(e->val,any,any_type,object_size,oIndex,oProp);
+	if(e){
+        printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
+        updateObject(e->val,any,any_type,object_size,oIndex,oProp);
+	}
+	else{
+	   // valor novo
+	   addValue(name,any,any_type,object_size,0,current);
+	}
 
 }
 

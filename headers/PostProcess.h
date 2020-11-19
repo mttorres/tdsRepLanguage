@@ -16,6 +16,8 @@
 void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExrp,int minmax);
 
 
+char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation);
+
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
  *  Onde varName pode ser varName ou redef{redef}VarName.

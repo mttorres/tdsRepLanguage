@@ -6,7 +6,6 @@
 #include <string.h>
 #include "../headers/PostProcess.h"
 
-
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
@@ -27,13 +26,11 @@ Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, Heade
 Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
-// declarar com const ? (me parece "nada haver")
 Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL ,evalAC_V,
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
 };
-
 
 Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
@@ -581,7 +578,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
          * */
         // só fazer isso se eu tiver dado malloc em v!
         void* vp[] = {expr->values[0]};
-        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1,-1, scope);
+        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope);
         char smvBind[300];
         sprintf(smvBind,"%d",*(int*) expr->values[0]); // recupera o valor puro
 
@@ -598,9 +595,85 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         letgoObject(expr,0);
     }
     else{
-        printf("[evalOTHER_ASSIGN] atribui variável \n");
+
+        //recupera valor
+        expr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv)[0];
+
+        // busca a variável
+        char* varName = n->children[0]->leafs[0];
+        TableEntry* varEntry = lookup(scope,varName);
+        Object* var = varEntry == NULL ?  NULL : varEntry->val;
+
+
+        if(n->children[0]->type == ASSIGN_IDVAR)
+        {
+            printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
+            if(!var)
+            {
+                addValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,scope->type == FUNC,scope);
+                TableEntry* itimeEntry = lookup(scope,"C_TIME");
+                int directive = *(int*) itimeEntry->val->values[0];
+                if(directive){
+                    char valueBind[300];
+                    char conditionBind[300];
+                    sprintf(valueBind,"%d",*(int*)expr->values[0]);
+                    sprintf(conditionBind,"%d",directive);
+                    char* condition = createConditionCube("next(time)", conditionBind, "<", valueBind);
+                }
+
+            }
+            else{
+                // reatribuição!
+
+            }
+        }
+        else{
+            if(var && expr->type != var->type){
+                fprintf(stderr, "TYPE ERROR: %s datastructure type is imutable \n",varName);
+                exit(-1);
+            }
+
+            printf("[evalOTHER_ASSIGN] atribui variável (atributo ou indice) \n");
+            if(!var)
+            {
+                fprintf(stderr, "ERROR: %s is not defined as datastruct \n",varName);
+                exit(-1);
+            }
+
+            Node* ref = n->children[0]->children[0];
+            Object* indexRef = ref->type == V_PROP ? NULL : eval(n,scope,writeSmvTypeTable,controllerSmv)[0];
+
+            if(ref->type == V_PROP || ref->type == ADD_V_PROP)
+            {
+                if(var->type != TDS_ENTRY)
+                {
+                    // TODO:  FUNÇÃO AVALIADORA DE TDS_PROP
+                    fprintf(stderr, "ERROR: %s does not contain the %s property \n",varName,ref->children[0]->leafs[0]);
+                    exit(-1);
+                }
+
+                else{
+                    // retorna a prop...
+                }
+            }
+            else{
+                if(indexRef->type != NUMBER_ENTRY || indexRef->OBJECT_SIZE > 1)
+                {
+                    fprintf(stderr, "ERROR: %s cannot be indexed by non numerical values! \n",varName);
+                    exit(-1);
+                }
+                int index = *(int*) indexRef->values[0];
+                if(index >= var->OBJECT_SIZE){
+                    fprintf(stderr, "ERROR: %s[%d] is out of bounds! \n",varName,index);
+                    exit(-1);
+                }
+                // ainda parcialmente incompleto
+                updateValue(varName, expr->values, var->type, var->OBJECT_SIZE, index, 0, scope);
+            }
+        }
 
     }
+    return NULL;
 }
 
 Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
