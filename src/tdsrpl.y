@@ -101,7 +101,6 @@
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> assignable
-%type <ast> exprEncap
 %type <ast> expr
 %type <ast> multiexp
 %type <ast> ineqexp
@@ -390,31 +389,22 @@ assignable : ID extraaccesses {
 
 	  ;	 
 
-exprEncap: LPAREN expr RPAREN {
-
-		        Node* expr = createNode(7,1,2,"Expressão Básica - encapsulada", EXPR, $2,  $1,$3);
-		        $$ = expr;
-
-           }
-           | expr {
-                $$ = $1;
-           }
 
 
-expr: MINUS exprEncap {
+expr: MINUS expr {
 	
 		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
 		$$ = expr;		
 
 
 	 }
-	 | exprEncap MINUS multiexp {
+	 | expr MINUS multiexp {
 		
 		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
 		$$ = expr;			
 
 	 }
-	 | exprEncap PLUS multiexp {
+	 | expr PLUS multiexp {
 
 		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
 		$$ = expr;						
@@ -520,6 +510,10 @@ logical: NOT data {
 			$$ = logical;			
 
 		 }
+		 | LPAREN expr RPAREN {
+                 Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", EXPR ,$1);
+                 $$ = expr;
+         }
 		 | data {
 
 		 	$$ = $1;
