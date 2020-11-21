@@ -36,7 +36,7 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
  *  além disso, cria uma na entrada da tabela de simbolos desse init e cria uma associada ao varName com o tipo (typeSet) associado.
  * */
 
-void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int redef, int typeExpr ,int type);
+void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue,  char* condition, int redef, int typeExpr ,int type);
 
 
 /**

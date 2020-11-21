@@ -69,7 +69,7 @@ void printEntry(TableEntry* e) {
 		}
 		printf(")");
 		printf("\n");
-		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
+		printf("\t (context: %d, methodParam: %d, level: %d, order: %d ) \n",e->val->timeContext,e->methodParam,e->level,e->order);
 
 	}
 }
@@ -358,8 +358,8 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	if(entry)
 	{
 		int present = 1;
-		void* po = {&present};	
-		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val->values[2]);
+		void* po = {&present};
+        addValue(typeid, po, NUMBER_ENTRY, 1, 0, entry->val->values[2], 0);
 	}
 }
 
@@ -398,7 +398,7 @@ void addTypeSet(char* name, void** any, int any_type, int object_size, STable* c
 
 	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
-	addValue(name,po,any_type,object_size+1,0,current);
+    addValue(name, po, any_type, object_size + 1, 0, current, 0);
 }
 
 /*
@@ -416,7 +416,7 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 */
 
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
-void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
+void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
 
 	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
@@ -426,23 +426,23 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any);
-	o->binded = 1;
+	Object* o = createObject(any_type, object_size, any, -1);
+	//o->binded = 1;
 	addValueCurrentScope(name,o,methodParam,current);
 }
 
 
-void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current)
+void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current, int contextChange)
 {
 
 	TableEntry* e = lookup(current,name);
 	if(e){
         printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
-        updateObject(e->val,any,any_type,object_size,oIndex,oProp);
+        updateObject(e->val, any, any_type, object_size, oIndex, oProp, contextChange);
 	}
 	else{
 	   // valor novo
-	   addValue(name,any,any_type,object_size,0,current);
+        addValue(name, any, any_type, object_size, 0, current, 0);
 	}
 
 }

@@ -129,7 +129,7 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
     pointEnd = ((auxFim-linhaLida))-1;
 
     void* po[] = {&pos, &tam, &pointIni, &pointEnd};
-	addValue(nome, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
+    addValue(nome, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0], 0);
 
 
     // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")
@@ -142,7 +142,7 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
     pointIni = auxDelim - linhaLidaInit+2; //
     pointEnd = auxFim - linhaLidaInit-1; // entra no intervalo de sobrescrita
 
-	addValue("init(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
+    addValue("init(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0], 0);
 
 
 	char* linhaLidaNext = Hcontrol->headers[0]->assignBuffer[3];
@@ -154,7 +154,7 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
     pointIni = auxDelim - linhaLidaNext+2;
     pointEnd = auxFim - linhaLidaNext-1;
 
-	addValue("next(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0]);
+    addValue("next(time)", po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0], 0);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
 		
 
@@ -164,9 +164,9 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 	int F = 3;
 	void* valIC[] = {&IC};
 	void* valF[] = {&F};
-	addValue(diretivas[0],valIC,T_DIRECTIVE_ENTRY,1,0,global);
-	addValue(diretivas[1],valIC,T_DIRECTIVE_ENTRY,1,0,global);
-	addValue(diretivas[2],valF,T_DIRECTIVE_ENTRY,1,0,global);
+    addValue(diretivas[0], valIC, T_DIRECTIVE_ENTRY, 1, 0, global, 0);
+    addValue(diretivas[1], valIC, T_DIRECTIVE_ENTRY, 1, 0, global, 0);
+    addValue(diretivas[2], valF, T_DIRECTIVE_ENTRY, 1, 0, global, 0);
 }
 
 

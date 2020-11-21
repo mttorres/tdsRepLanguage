@@ -10,15 +10,16 @@ typedef struct SYNTH_OBJECT
 {
   int type;
   int OBJECT_SIZE;
-  int STR; // tamanho strings mapeado
+  int* STR; // tamanho strings mapeado
   void ** values; // a pergunta é ... lista de valores ou valor único ?(em geral vai ser unico, pode ser também um ponteiro para uma lista)
-  int changedType; // serve para auxiliar na escrita no nuXmv (e talvez em um futuro se permitir lista de valores diferentes)
-  int binded; // serve para auxiliar a limpeza de memória
+  int redef; // serve para auxiliar na escrita no nuXmv (e talvez em um futuro se permitir lista de valores diferentes)
+  char* bind; // serve para auxiliar a limpeza de memória e escrever no nuXmv
+  int timeContext;
 
 } Object;
 
 									// mudar depois o tipo
-Object* createObject(int type, int OBJECT_SIZE, void** values);
+									Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext);
 
 void printObject(Object* o);
 
@@ -32,6 +33,6 @@ Object* copyObject(Object* o);
 /*
 	Atualiza as definições de um objeto "o"
 */
-void updateObject(Object* o, void** any, int any_type, int object_size, int index, int prop);
+void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange);
 
 #endif

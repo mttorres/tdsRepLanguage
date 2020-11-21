@@ -32,13 +32,42 @@ Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, H
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
 };
 
+void copyValueBind(Object* o, char* bind,int index)
+{
+    char* formatS = "%s";
+    char* formatN = "%d";
+    char* formatRef = "%s[%d]";
+
+    if(!index) {
+        if (o->bind) {
+            sprintf(bind, formatS, o->bind);
+        } else {
+            if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
+                sprintf(bind, formatN, *(int *) o->values[0]);
+            }
+            if (o->type == LOGICAL_ENTRY) {
+                sprintf(bind, formatS, *(int *) o->values[0] ? "TRUE" : "FALSE");
+            }
+            if (o->type == LABEL_ENTRY || o->type == NULL_ENTRY) {
+                sprintf(bind, formatS, (char *) o->values[0]);
+            }
+            if (o->type == TDS_ENTRY) {
+                // ...
+            }
+        }
+    }
+    else{
+
+    }
+}
+
 Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     int sint;
     sint = atoi(n->leafs[0]);
     printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip);
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1);
     return o;
 }
 
@@ -55,7 +84,7 @@ Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 
     void* bp[] = {sint};
 
-    Object* o = createObject(LOGICAL_ENTRY, 1, bp);
+    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1);
 
     return o;
 }
@@ -70,7 +99,7 @@ Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCon
 
     printf("[evalSTRING] SINTH: %s \n",sint);
 
-    Object* o = createObject(LABEL_ENTRY, 1, sp);
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1);
 
     return o;
 }
@@ -91,7 +120,7 @@ Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 
     printf("[evalNULL] SINTH: %s \n",sint);
 
-    Object* o = createObject(NULL_ENTRY, 1, np);
+    Object* o = createObject(NULL_ENTRY, 1, np, -1);
 
     return o;
 }
@@ -156,7 +185,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, H
     else
     {
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
-        return createObject(NUMBER_ENTRY,1,entry->val->values);
+        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1);
     }
 }
 
@@ -195,7 +224,7 @@ Object* evalPLUS(Object* o1, Object* o2)
     {
         *r = (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
         rp[0] = r;
-        return createObject(NUMBER_ENTRY,1,rp);
+        return createObject(NUMBER_ENTRY, 1, rp, -1);
     }
     if(o1->type == LABEL_ENTRY)
     {
@@ -216,7 +245,7 @@ Object* evalMINUS(Object* o1, Object* o2)
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
     void* rp[] = {&r};
-    return createObject(NUMBER_ENTRY,1,rp);
+    return createObject(NUMBER_ENTRY, 1, rp, -1);
 }
 
 Object* evalNOT(Object* o)
@@ -230,7 +259,7 @@ Object* evalNOT(Object* o)
     int r;
     r =  !(*(int*) o->values[0]);
     void* rp[] = {&r};
-    return createObject(LOGICAL_ENTRY,1,rp);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1);
 }
 
 Object* evalTIMES(Object* o1, Object* o2)
@@ -238,7 +267,7 @@ Object* evalTIMES(Object* o1, Object* o2)
     int* r;
     *r = (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
     void* rp[] = {r};
-    return createObject(NUMBER_ENTRY,1,rp);
+    return createObject(NUMBER_ENTRY, 1, rp, -1);
 }
 
 Object* evalDIVIDE(Object* o1, Object* o2, int type)
@@ -254,7 +283,7 @@ Object* evalDIVIDE(Object* o1, Object* o2, int type)
     *r = type == DIVIDE? (*(int*)o1->values[0]) / (*(int*)o2->values[0]) : (*(int*)o1->values[0]) % (*(int*)o2->values[0]);
     rp[0] = r;
 
-    return createObject(NUMBER_ENTRY,1,rp);
+    return createObject(NUMBER_ENTRY, 1, rp, -1);
 }
 
 Object* evalLESS(Object* o1, Object* o2, int opCode)
@@ -278,7 +307,7 @@ Object* evalLESS(Object* o1, Object* o2, int opCode)
         }
     }
     rp[0] = r;
-    return createObject(LOGICAL_ENTRY,1,rp);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1);
 }
 
 Object* evalGREAT(Object* o1, Object* o2, int opCode)
@@ -302,7 +331,7 @@ Object* evalGREAT(Object* o1, Object* o2, int opCode)
         }
     }
     rp[0] = r;
-    return createObject(LOGICAL_ENTRY,1,rp);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1);
 
 }
 
@@ -578,7 +607,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
          * */
         // só fazer isso se eu tiver dado malloc em v!
         void* vp[] = {expr->values[0]};
-        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope);
+        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         char smvBind[300];
         sprintf(smvBind,"%d",*(int*) expr->values[0]); // recupera o valor puro
 
@@ -608,23 +637,41 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         if(n->children[0]->type == ASSIGN_IDVAR)
         {
             printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
+
+            STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC];
+            HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC? controllerSmv->CURRENT_SIZE-1 : 0 ]; // ports ou main
+
+            TableEntry* ctimeEntry = lookup(scope, "C_TIME");
+            int directive = *(int*) ctimeEntry->val->values[0];
+            TableEntry* itimeEntry = lookup(scope,"I_TIME");
+            int itime = *(int*)itimeEntry->val->values[0];
+
+            char valueBind[300];
+            char exprconditionBind[300];
+            copyValueBind(expr,valueBind,0);
+            char* condition = NULL;
+
+            if(directive > itime){
+                // mudança de contexto
+                sprintf(exprconditionBind,"%d",directive);
+                condition = createConditionCube("next(time)", exprconditionBind, "=", valueBind);
+            }
+
             if(!var)
             {
-                addValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,scope->type == FUNC,scope);
-                TableEntry* itimeEntry = lookup(scope,"C_TIME");
-                int directive = *(int*) itimeEntry->val->values[0];
-                if(directive){
-                    char valueBind[300];
-                    char conditionBind[300];
-                    sprintf(valueBind,"%d",*(int*)expr->values[0]);
-                    sprintf(conditionBind,"%d",directive);
-                    char* condition = createConditionCube("next(time)", conditionBind, "<", valueBind);
-                }
-
+                addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, scope->type == FUNC, scope, directive);
+                createAssign(varName,refHeader,refAuxTable,valueBind,condition,0,6,expr->type);
             }
             else{
-                // reatribuição!
-
+                // reatribuição ou redefinição
+                int prevContext = var->timeContext;
+                updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
+                if(var-> timeContext > itime && prevContext != var->timeContext){
+                        createAssign(varName,refHeader,refAuxTable,valueBind,condition,var->redef,7,expr->type); // next
+                }
+                else{
+                    createAssign(varName,refHeader,refAuxTable,valueBind,condition,var->redef,6,expr->type); // init
+                }
             }
         }
         else{
@@ -668,7 +715,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                     exit(-1);
                 }
                 // ainda parcialmente incompleto
-                updateValue(varName, expr->values, var->type, var->OBJECT_SIZE, index, 0, scope);
+                updateValue(varName, expr->values, var->type, var->OBJECT_SIZE, index, -1, scope, 0);
             }
         }
 

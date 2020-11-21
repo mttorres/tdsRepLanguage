@@ -19,7 +19,7 @@ const char* mappingEnumObjectType[] =  {
 // e caso tenha ALGUMA OPERAÇÃO INTERMEDIARIA ENTRE ESSES VALORES (?) ... já que vamos sempre alocar .... acho MELHOR CENTRALIZAR , afinal para isso object foi criado!
 // 
 // MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...
-void* allocatePtObjects(int type, void* value, Object* newOb) 
+void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 {
 	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY || type == WRITE_SMV_INFO)
 	{
@@ -33,7 +33,8 @@ void* allocatePtObjects(int type, void* value, Object* newOb)
 	if(type == LABEL_ENTRY || type == NULL_ENTRY) 
 	{
 		char* deref = (char*) value;
-		char* pt = malloc(newOb->STR+1);
+		newOb->STR[index] = strlen(value);
+		char* pt = malloc(sizeof(char)*newOb->STR[index]+1);
 		strcpy(pt, deref);
 		printf("[allocatePtObjects - labelVariants] valor: %s (%d)\n",pt,type);
 		return pt;
@@ -61,19 +62,19 @@ void* allocateTypeSetObjects(int index, void* value)
 
 
 
-Object* createObject(int type, int OBJECT_SIZE, void** values) 
+Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext)
 {
 
 	Object* newOb = (Object*) malloc(sizeof(Object));
 
 	newOb->type = type;
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
-	newOb->changedType = 0;
-	newOb->binded = 0;
+	newOb->redef = 0;
+	newOb->timeContext = 0;
+	newOb->bind = NULL;
 	if(type == LABEL_ENTRY)
 	{
-		printf("[createObject] string: %s \n",(char*)values[0]);
-		newOb->STR = strlen((char*)values[0]); // já que o objeto encapsula arrays também, devemos salvar na verdade um vetor em STR (não é muito importante agora)
+		newOb->STR = malloc(sizeof(int)*OBJECT_SIZE);
 	}
 
 	if(OBJECT_SIZE)
@@ -93,13 +94,13 @@ Object* createObject(int type, int OBJECT_SIZE, void** values)
 			// casos como por exemplo do conjunto de tipos: não precisa de malloc (já é um ponteiro de um objeto alocado a muito tempo )
 			//		-> tupla ponteiro smv (indiceHeader, tamanhoPalavra, Hashmap)
 
-			if(type == TYPE_SET )
+			if(type == TYPE_SET)
 			{
 				vo[i] = allocateTypeSetObjects(i,values[i]);
 			}
 			else
 			{
-				vo[i] = allocatePtObjects(type,values[i],newOb);
+				vo[i] = allocatePtObjects(type,values[i],newOb,i);
 			}
 
 		}
@@ -192,7 +193,7 @@ void printObject(Object* o)
 
 void letgoObject(Object* o, int always)
 {
-	if(o && (o->binded || always))
+	if(o && (o->bind || always))
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
@@ -219,7 +220,7 @@ void letgoObject(Object* o, int always)
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values);
+	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, -1);
 	return newOb;
 }
 
@@ -230,14 +231,14 @@ void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int 
     if(object_size == 1)
     {
         o->values[index] = NULL;
-        void* newPt = allocatePtObjects(any_type,any[0],o);
+        void* newPt = allocatePtObjects(any_type,any[0],o,index);
         o->values[index] = newPt;
     }
 
 }
 
 
-void updateObject(Object* o, void** any, int any_type, int object_size, int index, int prop)
+void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange)
 {
     // caso x = y (copia o valor, diferente de array com indice 0, isto é, x[0](unico) )
 	if(index == -1 && prop == -1)
@@ -249,11 +250,16 @@ void updateObject(Object* o, void** any, int any_type, int object_size, int inde
                 free(o->values[i]);
                 o->values[i] = NULL;
             }
+            if(object_size > 1)
+            {
+                // passa referencia
+                o->values = any;
+                o->OBJECT_SIZE = object_size;
+            }
             updateObjectCell(o,any,any_type,object_size,0,-1);
 	}
-	// devemos também verificar se o tamanho mudou (agora é um vetor , etc ...) (se for para vetor nao necessita alocar de novo, permite efeito colateral)
-	// free object em CASO DE VETORES (ainda temos que pensar um pouco mais nisso)
-    else if(index != -1 ){
+    // caso x[i] = y
+	else if(index != -1 ){
         free(o->values[index]);
         o->values[index] = NULL;
         updateObjectCell(o,any,any_type,object_size,index,-1);
@@ -263,7 +269,8 @@ void updateObject(Object* o, void** any, int any_type, int object_size, int inde
 	{
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
-		o->changedType = 1;
 	}
+    o->redef = contextChange != o->timeContext? o->redef : o->redef+1;
+	o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

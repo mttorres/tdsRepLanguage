@@ -77,7 +77,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid);
 
 void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current);
 
-void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current); 
+void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current);
 
@@ -85,7 +85,8 @@ void addValueCurrentScope(char* name, Object* val, int methodParam,STable* curre
   Atualiza um objeto de uma entrada da tabela de simbolos com novo tipo, novo tamanho, e elementos
   Efeitos colaterais: chama updateObject, que muda completamente o objeto anterior e elimnando os dados antigos
 */
-void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current);
+void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current,
+                 int contextChange);
 
 void printTable(STable* t);
 

@@ -4,8 +4,8 @@
 #include "../headers/PostProcess.h"
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "{%s};",  "%s, ",  "%s %s %s ", "redef%d%s", "%s \n", "init(%s)", "next(%s)",
-                          "%s:= %s; ",  "%s:= %s; \n",  "case \n\t\t%s \n\tesac; \n",
+char* SmvConversions[] = {"%s", "{%s};",  "%s, ",  "%s %s %s ", "%s_redef%d%", "%s \n", "init(%s)", "next(%s)",
+                          "%s:= %s;",  "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : NULL; \n\tesac",
                           "%s : %s" , "TRUE : NULL; \n", "%s = %s : %s; \n" };
 
 int  ALOC_SIZE_LINE = 300;
@@ -34,9 +34,12 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 
 }
 
-/*
-void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int redef, int typeExpr ,int type)
+
+void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, char* condition, int redef, int typeExpr ,int type)
 {
+    // atualiza o typeSet (salvando ponto de interesse para mudança, e)
+    //TODO (createType)
+
     char* exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
     char exprInterL[300];
     char exprInterR[300];
@@ -47,13 +50,11 @@ void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
         sprintf(exprInterL, SmvConversions[typeExpr], varName);
     }
     else{
-        sprintf(interRedef,SmvConversions[5],redef,varName);
+        sprintf(interRedef,SmvConversions[4],varName,redef);
         sprintf(exprInterL, SmvConversions[typeExpr], interRedef);
     }
 
-    // atualiza o typeSet (salvando ponto de interesse para mudança, e)
-    //TODO
-
+    // parâmetros a ser salvo na tabela auxiliar SMV
     int size;
     int pointIni;
     int pointEnd;
@@ -61,10 +62,16 @@ void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
     if(condition)
     {
-        printf("ainda...");
+        sprintf(exprInterR,SmvConversions[10],condition);
+        sprintf(exprResultString,SmvConversions[9],exprInterL,exprInterR);
+
+        size = strlen(exprResultString);
+        pointIni = (strlen(exprInterL) - 1) + 5; //  %s:= %s (+2 para pular ele mesmo e o : e depois = e espaço, e fora o \t no inicio)
+        pointEnd = pointIni + strlen(exprInterR)-1;
+
+        free(condition);
     }
     else{
-
         // atualiza o init/next dessa função
         // criar a expressão definitiva com sprintf?
         // pros : é facil
@@ -72,30 +79,24 @@ void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
         // NA VERDADE EU TENHO, posIni:  até o = (posso salvar em um array mapeador também)
         //  posEnd = posIni + tamanhoString(expressão)
 
-        sprintf(exprInterR,"%s",newValue);
-        sprintf(exprResultString,SmvConversions[8],exprInterL,exprInterR);
+        sprintf(exprInterR,SmvConversions[0],newValue);
+        sprintf(exprResultString,SmvConversions[9],exprInterL,exprInterR);
 
-        size = strlen(exprResultString)-1;
-        pointIni = (strlen(exprInterL) - 1) + 4; //  %s:= %s (+2 para pular ele mesmo e o : e depois = e espaço)
+        size = strlen(exprResultString);
+        pointIni = (strlen(exprInterL) - 1) + 5; //  %s:= %s (+2 para pular ele mesmo e o : e depois = e espaço, e fora o \t no inicio)
         pointEnd = pointIni + strlen(exprInterR)-1;
 
     }
-
-
     // escreve atribuição no buffer
     // encapsular em método(!)
     header->assignBuffer[header->ASSIGN_POINTER] = exprResultString;
-    header->ASSIGN_POINTER += 1;
     int pos = header->ASSIGN_POINTER;
-    // caso de next
-    if(typeExpr)
-    {
-        // atualiza tabela de simbolos dessa operação
-        void* po[] = {&pos, &size,&pointIni,&pointEnd};
-        addValue(exprInterL, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable);
-    }
+    header->ASSIGN_POINTER += 1;
+    //atualiza tabela auxiliar para init/next(var)
+    void* po[] = {&pos, &size,&pointIni,&pointEnd};
+    addValue(exprInterL, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
 }
-*/
+
 
 
 
@@ -133,12 +134,12 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 
 
         void* vpSize[] = {&size};
-        updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, 0, writeSmvTypeTable);
+        updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
         // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
         if(!minmax)
         {
             void* vpInEnd[] = {&newPointEnd};
-            updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, 0, writeSmvTypeTable);
+            updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
         }
     }
 }
@@ -205,11 +206,11 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     size = -1*((newPointEnd-newPointInit+1) - sizeNew) + size;
     void* vpSize[] = {&size};  // evita ter que "reescrever" o vetor inteiro separando em varios vps
     // é como se a gente tivesse atualizando cada indice dos vetores menos o (0)
-    updateValue(upVar, vpSize, WRITE_SMV_INFO, 1, 1, 0, writeSmvTypeTable);
+    updateValue(upVar, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
     void* vpIni[] = {&newPointInit};
-    updateValue(upVar, vpIni, WRITE_SMV_INFO, 1, 2, 0, writeSmvTypeTable);
+    updateValue(upVar, vpIni, WRITE_SMV_INFO, 1, 2, -1, writeSmvTypeTable, 0);
     void* vpInEnd[] = {&newPointEnd};
-    updateValue(upVar, vpInEnd, WRITE_SMV_INFO, 1, 3, 0, writeSmvTypeTable);
+    updateValue(upVar, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
 }
 
 
