@@ -91,6 +91,8 @@
 %token <sval> ID
 %token <sval> PASS
 %token <sval> DPASS
+%token <sval> INTERVAL
+%token <sval> BETWEEN
 
 %type <ast> prog
 %type <ast> cmds
@@ -119,11 +121,13 @@
 %type <ast> timelist
 %type <ast> timecomponent
 %type <ast> anonimtdsop
+%type <ast> intervaldefs
+%type <ast> main
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
 
-%start prog
+%start main
 
 
 %%
@@ -131,6 +135,37 @@
 /*
 	Gramatica para o parser 
 */
+
+
+intervaldefs: RAWNUMBERDATA BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(7,0,3,"OBSERVATION-INTERVAL-COMPLETE", DEFINE_INTERVAL,$1,$2,$3);
+			$$ = data;
+
+	  }
+	  | BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-END-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+
+	  }
+	  | RAWNUMBERDATA BETWEEN {
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-BEGIN-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+	  }
+
+main: INTERVAL COLON intervaldefs prog {
+
+        Node* main = createNode(6,2,2,"Headers + program", HEADERS_E_PROG, $3,$4, $1,$2);
+        $$ = main;
+        root = $$;
+    }
+    |
+    prog {
+        $$ = $1;
+        root = $$;
+    }
+    ;
 
 prog: functiondefs cmds  {
 		
@@ -151,15 +186,13 @@ prog: functiondefs cmds  {
 
 		//printf(" teste lineno %d",yylineno);
 
-		$$ = prog; 
-		root = $$;
+		$$ = prog;
 
 	  }
 	  | cmds {
 
 		Node* prog = createNode(5,1,0,"Prog -  comandos ", PROG, $1);	  
-	  	$$ = prog; 
-	  	root = $$;
+	  	$$ = prog;
 	  } 
       ; 
 
@@ -361,33 +394,14 @@ assignable : ID extraaccesses {
 				Node* assignment = createNode(5,0,1,"VARIAVEL", ASSIGN_IDVAR, $1);
 				$$ = assignment;	
 		}
-
-
 	 }
-
-	 | INITTIME {
-		
-			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-		
-	  }
-
-
-	  | CURRENTTIME {
+	 | CURRENTTIME {
 
 			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
 			$$ = data;	
 
 	  }
-
-	  | FINALTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-
-	  }
-
-	  ;	 
+	  ;
 
 
 
