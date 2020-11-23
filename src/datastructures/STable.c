@@ -426,7 +426,7 @@ void addValue(char *name, void **any, int any_type, int object_size, int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any, -1);
+	Object* o = createObject(any_type, object_size, any, timeContext);
 	//o->binded = 1;
 	addValueCurrentScope(name,o,methodParam,current);
 }

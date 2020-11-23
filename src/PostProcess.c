@@ -6,7 +6,7 @@
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "{%s};",  "%s, ",  "%s %s %s ", "%s_redef%d%", "%s \n", "init(%s)", "next(%s)",
                           "%s:= %s;",  "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : NULL; \n\tesac",
-                          "%s : %s" , "TRUE : NULL; \n", "%s = %s : %s; \n" };
+                          "%s : %s;" , "TRUE : NULL; \n", "%s = %s : %s; \n" };
 
 int  ALOC_SIZE_LINE = 300;
 

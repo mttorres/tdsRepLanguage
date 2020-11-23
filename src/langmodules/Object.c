@@ -70,7 +70,7 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext)
 	newOb->type = type;
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	newOb->redef = 0;
-	newOb->timeContext = 0;
+	newOb->timeContext = timeContext;
 	newOb->bind = NULL;
 	if(type == LABEL_ENTRY)
 	{
@@ -270,7 +270,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
 	}
-    o->redef = contextChange != o->timeContext? o->redef : o->redef+1;
+    o->redef = contextChange != o->timeContext && contextChange != 0 ? o->redef : o->redef+1;
 	o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

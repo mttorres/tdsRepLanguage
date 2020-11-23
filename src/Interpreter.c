@@ -25,14 +25,15 @@ Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
 Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
 Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
 
-        evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL ,evalAC_V,
+        evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
 };
 
-void copyValueBind(Object* o, char* bind,int index)
+void copyValueBind(Object* o, char* bind,int index,int defaultValue)
 {
     char* formatS = "%s";
     char* formatN = "%d";
@@ -43,13 +44,13 @@ void copyValueBind(Object* o, char* bind,int index)
             sprintf(bind, formatS, o->bind);
         } else {
             if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
-                sprintf(bind, formatN, *(int *) o->values[0]);
+                    sprintf(bind, formatN, defaultValue? 0 : *(int *) o->values[0]);
             }
             if (o->type == LOGICAL_ENTRY) {
-                sprintf(bind, formatS, *(int *) o->values[0] ? "TRUE" : "FALSE");
+                sprintf(bind, formatS, *(int *) o->values[0] && !defaultValue ? "TRUE" : "FALSE");
             }
             if (o->type == LABEL_ENTRY || o->type == NULL_ENTRY) {
-                sprintf(bind, formatS, (char *) o->values[0]);
+                sprintf(bind, formatS, defaultValue? "NULL" : (char *) o->values[0]);
             }
             if (o->type == TDS_ENTRY) {
                 // ...
@@ -575,11 +576,58 @@ Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, Heade
     printf("[evalV_PROP_TDS] \n");
 }
 
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+
+    int I_TIME;
+    int* ptitime = NULL;
+    int F_TIME;
+    int* ptftime = NULL;
+    // definiu inicio e fim
+    if(n->nleafs == 3)
+    {
+        I_TIME = atoi(n->leafs[0]);
+        F_TIME = atoi(n->leafs[2]);
+        ptitime = &I_TIME;
+        ptftime = &F_TIME;
+    }
+    else{
+        char betSeparator = '~';
+        if(n->leafs[0][0] == betSeparator){
+            F_TIME = atoi(n->leafs[1]);
+            ptftime = &F_TIME;
+        }
+        else{
+            I_TIME = atoi(n->leafs[0]);
+            ptitime = &I_TIME;
+        }
+    }
+    if(  (ptitime != NULL && ptftime != NULL && I_TIME > F_TIME)  ||
+        ( ptitime != NULL && I_TIME >= 3 ) || ( ptftime != NULL && F_TIME <= 0 )  ) {
+        fprintf(stderr, "ERROR: BAD USE OF INTERVAL TIME DIRECTIVE, INVALID INTERVAL! \n");
+        exit(-1);
+    }
+    char smvBind[300];
+
+    if(ptitime){
+        void* vp[] = {ptitime};
+        updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
+        sprintf(smvBind,"%d",I_TIME);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,6,0);
+        // necessita atualizar C_TIME
+        updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
+    }
+    if(ptftime){
+        void* vp[] = {ptftime};
+        updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
+        sprintf(smvBind,"%d",F_TIME);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,7,1);
+    }
+    return NULL;
+}
 
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     Object* expr = NULL;
-
     // caso de atribuição de diretiva
     if(n->children[0]->type == ASSIGN_TDIRECTIVE)
     {
@@ -608,24 +656,9 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         // só fazer isso se eu tiver dado malloc em v!
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
-        char smvBind[300];
-        sprintf(smvBind,"%d",*(int*) expr->values[0]); // recupera o valor puro
-
-        char caracterITIME = 'I';
-        char caracterFTIME = 'F';
-        if(n->children[0]->leafs[0][0] == caracterITIME)
-        {
-            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,6,0);
-        }
-        else if (n->children[0]->leafs[0][0] == caracterFTIME)
-        {
-            updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,7,1);
-        }
         letgoObject(expr,0);
     }
     else{
-
-        //recupera valor
         expr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv)[0];
 
         // busca a variável
@@ -633,13 +666,13 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
-
         if(n->children[0]->type == ASSIGN_IDVAR)
         {
             printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
 
-            STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC];
-            HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC? controllerSmv->CURRENT_SIZE-1 : 0 ]; // ports ou main
+            STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && var->type == TDS_ENTRY];
+            // ports ou main
+            HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
 
             TableEntry* ctimeEntry = lookup(scope, "C_TIME");
             int directive = *(int*) ctimeEntry->val->values[0];
@@ -648,7 +681,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
 
             char valueBind[300];
             char exprconditionBind[300];
-            copyValueBind(expr,valueBind,0);
+            copyValueBind(expr,valueBind,0,0);
             char* condition = NULL;
 
             if(directive > itime){
@@ -659,14 +692,22 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
 
             if(!var)
             {
-                addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, scope->type == FUNC, scope, directive);
-                createAssign(varName,refHeader,refAuxTable,valueBind,condition,0,6,expr->type);
+                addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, directive);
+                if(condition){
+                    char initialValueBind[300];
+                    copyValueBind(expr,initialValueBind,0,1);
+                    createAssign(varName,refHeader,refAuxTable,initialValueBind,NULL,0,6,expr->type);
+                    createAssign(varName,refHeader,refAuxTable,valueBind,condition,0,7,expr->type); // next
+                }
+                else{
+                    createAssign(varName,refHeader,refAuxTable,valueBind,NULL,0,6,expr->type);
+                }
             }
             else{
-                // reatribuição ou redefinição
+                // reatribuição ou reinicialização
                 int prevContext = var->timeContext;
                 updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
-                if(var-> timeContext > itime && prevContext != var->timeContext){
+                if(var-> timeContext > itime){
                         createAssign(varName,refHeader,refAuxTable,valueBind,condition,var->redef,7,expr->type); // next
                 }
                 else{
