@@ -102,6 +102,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->lastEntryIndex = 0;
 	newtable->backup = 0;
 	newtable->collision = 0;
+	newtable->conditionBind == NULL;
 	
 	newtable->parent = parent;
 

@@ -36,7 +36,8 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
  *  além disso, cria uma na entrada da tabela de simbolos desse init e cria uma associada ao varName com o tipo (typeSet) associado.
  * */
 
-void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue,  char* condition, int redef, int typeExpr ,int type);
+void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
+                  int redef, int typeExpr, int type, char *defaultEvalCond);
 
 
 /**
@@ -57,6 +58,13 @@ void createAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
  * */
 void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr, int minmax);
 
+/**
+ * Escolhe entre update create Assign, tratando casos de redefinição e condições
+ * @param
+ * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
+ * */
+void specNext(char*varName, HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition,
+              int redef, int type ,int typeExpr, int minmax);
 
 #endif
 

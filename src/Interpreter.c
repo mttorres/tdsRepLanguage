@@ -368,12 +368,15 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
     if(n->nchild <= 1)
     {
         Object * sintUni;
+        Object** sint = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv);
+        sintUni = sint[0];
+
         char ops[1];
         // caso de operação unária (tem folhas e filhos)
         if(n->nchild == 1 && n->nleafs == 1 )
         {
             ops[0] = n->leafs[0][0]; // recupera a operação
-            sintUni = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv)[0];
+
             if(ops[0] == MINUS  && sintUni->type == NUMBER_ENTRY)
             {
                 return evalMINUS(sintUni,NULL);
@@ -385,7 +388,8 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
             fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c OPERATION!", ops[0]);
             exit(-1);
         }
-        return eval(n->children[0],scope,writeSmvTypeTable,controllerSmv)[0];
+        free(sint);
+        return sintUni;
     }
     // operação binária
     else
@@ -628,6 +632,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     Object* expr = NULL;
+    Object** sintExpr = NULL;
     // caso de atribuição de diretiva
     if(n->children[0]->type == ASSIGN_TDIRECTIVE)
     {
@@ -642,7 +647,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         //Mudou CONTEXTO (C_TIME) : seguir o caso default
 
         // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
-        expr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv)[0];
+        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
+        expr = sintExpr[0];
         if(expr && expr->type != NUMBER_ENTRY && expr->OBJECT_SIZE > 1)
         {
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->children[0]->leafs[0]);
@@ -659,59 +665,63 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         letgoObject(expr,0);
     }
     else{
-        expr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv)[0];
+        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
+        expr = sintExpr[0];
 
         // busca a variável
         char* varName = n->children[0]->leafs[0];
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
+        //busca o contexto
+        STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        // ports ou main
+        HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        TableEntry* ctimeEntry = lookup(scope, "C_TIME");
+        int directive = *(int*) ctimeEntry->val->values[0];
+        TableEntry* itimeEntry = lookup(scope,"I_TIME");
+        int itime = *(int*)itimeEntry->val->values[0];
+        char directiveValueBind[300];
+        int changeContext = directive > itime;
+        sprintf(directiveValueBind, "%d", directive);
+
+        // bind condicional
+        char valueBind[300];
+        copyValueBind(expr,valueBind,0,0);
+        char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL;
+        char* temporalCondition = changeContext ? createConditionCube("next(time)", directiveValueBind, "=", valueBind) : NULL;
+
         if(n->children[0]->type == ASSIGN_IDVAR)
         {
-            printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
-
-            STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && var->type == TDS_ENTRY];
-            // ports ou main
-            HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
-
-            TableEntry* ctimeEntry = lookup(scope, "C_TIME");
-            int directive = *(int*) ctimeEntry->val->values[0];
-            TableEntry* itimeEntry = lookup(scope,"I_TIME");
-            int itime = *(int*)itimeEntry->val->values[0];
-
-            char valueBind[300];
-            char exprconditionBind[300];
-            copyValueBind(expr,valueBind,0,0);
-            char* condition = NULL;
-
-            if(directive > itime){
-                // mudança de contexto
-                sprintf(exprconditionBind,"%d",directive);
-                condition = createConditionCube("next(time)", exprconditionBind, "=", valueBind);
-            }
-
+            //printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
             if(!var)
             {
                 addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, directive);
-                if(condition){
-                    char initialValueBind[300];
-                    copyValueBind(expr,initialValueBind,0,1);
-                    createAssign(varName,refHeader,refAuxTable,initialValueBind,NULL,0,6,expr->type);
-                    createAssign(varName,refHeader,refAuxTable,valueBind,condition,0,7,expr->type); // next
+                char defaultValueBind[300];
+                if(condition || temporalCondition){
+                    copyValueBind(expr,defaultValueBind,0,1); // "otimização"
+                }
+                //inicialização "com next"
+                if(changeContext){
+                    // melhorar função de cubo
+                    createAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, 0, 6, expr->type, defaultValueBind);
+                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, 0, 7, expr->type, defaultValueBind); // next
                 }
                 else{
-                    createAssign(varName,refHeader,refAuxTable,valueBind,NULL,0,6,expr->type);
+                    // condition em INIT?
+                    createAssign(varName, refHeader, refAuxTable, valueBind, condition, 0, 6, expr->type, defaultValueBind);
                 }
             }
             else{
+                condition = createConditionCube("next(time)", directiveValueBind, "=", valueBind);
                 // reatribuição ou reinicialização
-                int prevContext = var->timeContext;
                 updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
                 if(var-> timeContext > itime){
-                        createAssign(varName,refHeader,refAuxTable,valueBind,condition,var->redef,7,expr->type); // next
+                    specNext(varName,refHeader,refAuxTable,valueBind,temporalCondition,var->redef,expr->type,7,0);
                 }
                 else{
-                    createAssign(varName,refHeader,refAuxTable,valueBind,condition,var->redef,6,expr->type); // init
+                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, var->redef, 6, expr->type,
+                                 NULL); // init
                 }
             }
         }
@@ -761,6 +771,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         }
 
     }
+    free(sintExpr);
     return NULL;
 }
 

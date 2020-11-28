@@ -35,6 +35,7 @@ typedef struct S_TABLE
   int level;
   int order;
   SCOPE_TYPE type;
+  char* conditionBind;
   TableEntry** tableData;
   int lastEntryIndex;
   int backup;
