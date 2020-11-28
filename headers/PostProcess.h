@@ -37,7 +37,7 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
  * */
 
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int redef, int typeExpr, int type, char *defaultEvalCond);
+                  int redef, int typeExpr, int type, char *defaultEvalCond, int minmax);
 
 
 /**

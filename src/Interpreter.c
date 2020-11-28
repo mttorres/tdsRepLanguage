@@ -665,6 +665,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         letgoObject(expr,0);
     }
     else{
+        // busca expressão
         sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
         expr = sintExpr[0];
 
@@ -672,6 +673,14 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         char* varName = n->children[0]->leafs[0];
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
+
+        int minmax = 0;
+        // tratamento do intervalo nuXmv de inteiros
+        if(var && expr->type == NUMBER_ENTRY){
+            int old = *(int*)var->values[0];
+            int new = *(int*)expr->values[0];
+            minmax = new > old;
+        }
 
         //busca o contexto
         STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
@@ -704,12 +713,15 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                 //inicialização "com next"
                 if(changeContext){
                     // melhorar função de cubo
-                    createAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, 0, 6, expr->type, defaultValueBind);
-                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, 0, 7, expr->type, defaultValueBind); // next
+                    createAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, 0, 6, expr->type,
+                                 defaultValueBind, 0);
+                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, 0, 7, expr->type,
+                                 defaultValueBind, 1); // next
                 }
                 else{
                     // condition em INIT?
-                    createAssign(varName, refHeader, refAuxTable, valueBind, condition, 0, 6, expr->type, defaultValueBind);
+                    createAssign(varName, refHeader, refAuxTable, valueBind, condition, 0, 6, expr->type,
+                                 defaultValueBind, 0);
                 }
             }
             else{
@@ -717,11 +729,12 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                 // reatribuição ou reinicialização
                 updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
                 if(var-> timeContext > itime){
-                    specNext(varName,refHeader,refAuxTable,valueBind,temporalCondition,var->redef,expr->type,7,0);
+                    specNext(varName,refHeader,refAuxTable,valueBind,temporalCondition,var->redef,expr->type,7,minmax);
                 }
                 else{
-                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, var->redef, 6, expr->type,
-                                 NULL); // init
+                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, var->redef, 6,
+                                 expr->type,
+                                 NULL, 0); // init
                 }
             }
         }
