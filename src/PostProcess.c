@@ -3,12 +3,23 @@
 #include <string.h>
 #include "../headers/PostProcess.h"
 
+
+typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_BY_FUNC_SCOPE, NAME_BY_FUNC_SSCOPE,
+                               INIT, NEXT, ASSIGN_TO,
+                               ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
+                               INTERVAL_DEC, SET, PAR } MAP_CONVERSIONS;
+
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "{%s};",  "%s, ",  "%s %s %s ", "%s_redef%d%", "%s \n", "init(%s)", "next(%s)",
-                          "%s:= %s;",  "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
-                          "%s : %s;" , "TRUE : NULL; \n", "%s = %s : %s; \n", "\t%s: %s..%s;\n" };
+char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s %s %s ", "%s_redef%d%", "%s_scope%d%%d", "%s_scope%s","%s_scope%s%d%d",
+                          "init(%s)", "next(%s)", "%s:= %s;",
+                          "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
+                          "%s : %s;" , "TRUE : %s; \n", "%s = %s : %s; \n",
+                          "\t%s: %s..%s;\n","{%s};", "%s, %s" };
 
 int  ALOC_SIZE_LINE = 300;
+
+
+
 
 char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation)
 {
@@ -17,18 +28,17 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
 
         char* cube = malloc(sizeof(strlen(opBind1)+strlen(opBind2)+strlen(operation)+1));
         if(opBind2){
-            sprintf(inter,SmvConversions[3],opBind1,operation,opBind2);
+            sprintf(inter,SmvConversions[OP],opBind1,operation,opBind2);
         }
         else{
-            sprintf(inter,SmvConversions[3],opBind1,operation,"");
+            sprintf(inter,SmvConversions[OP],operation,opBind1,"");
         }
         if(evaluation){
-            sprintf(cube,SmvConversions[11],inter,evaluation);
+            sprintf(cube,SmvConversions[CASE_EVAL],inter,evaluation);
         }
         else{
-            sprintf(cube,SmvConversions[1],inter,evaluation);
-        }
-
+            sprintf(cube,SmvConversions[ANY],inter,evaluation);
+        } // criar caso similar em que se concatena condições
         return cube;
 }
 
@@ -37,7 +47,7 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     if(type == 0){
-        sprintf(newType,SmvConversions[14],varName,newValue,newValue);
+        sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
         char* auxDelim = strstr(newType,":");
         int pointIni = (auxDelim-newType+2);
         int pointEnd = pointIni;
@@ -47,7 +57,6 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         addValue(varName, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
         header->varBuffer[header->VAR_POINTER] = newType;
         header->VAR_POINTER += 1;
-
     }
 }
 
@@ -100,51 +109,27 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 }
 // quebrar em spec next e spec init
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int redef, int typeExpr, int type, char *defaultEvalCond, int minmax)
+                  int typeExpr, char *defaultEvalCond)
 {
 
     char* exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
     char exprInterL[300];
     char exprInterR[300];
-    char interRedef[300];
-
-    char* usedName;
-
-    if(!redef)
-    {
-        sprintf(exprInterL, SmvConversions[typeExpr], varName);
-        usedName = varName;
-    }
-    else{
-        sprintf(interRedef,SmvConversions[4],varName,redef);
-        sprintf(exprInterL, SmvConversions[typeExpr], interRedef);
-        usedName = interRedef;
-    }
-
-    // cria ou atualiza o typeSet (salvando ponto de interesse para mudança, e)
-    if(typeExpr == 6)
-    {
-        createType(usedName,header,writeSmvTypeTable,newValue,type);
-    }
-    else{
-        updateType(usedName,header,writeSmvTypeTable,newValue,type,minmax);
-    }
-
+    sprintf(exprInterL, SmvConversions[typeExpr], varName);
     // parâmetros a ser salvo na tabela auxiliar SMV
     int size;
     int pointIni;
     int pointEnd;
 
-
     if(condition)
     {
-        if(typeExpr == 6){
-            sprintf(exprInterR,SmvConversions[10],condition,defaultEvalCond);
+        if(typeExpr == INIT){
+            sprintf(exprInterR,SmvConversions[CASE],condition,defaultEvalCond);
         }
         else{
-            sprintf(exprInterR,SmvConversions[10],condition,varName);
+            sprintf(exprInterR,SmvConversions[CASE],condition,varName);
         }
-        sprintf(exprResultString,SmvConversions[9],exprInterL,exprInterR);
+        sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
         char* auxChPoint;
         auxChPoint = strstr(exprResultString,";\n");
@@ -163,8 +148,8 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
         // NA VERDADE EU TENHO, posIni:  até o = (posso salvar em um array mapeador também)
         //  posEnd = posIni + tamanhoString(expressão)
 
-        sprintf(exprInterR,SmvConversions[0],newValue);
-        sprintf(exprResultString,SmvConversions[9],exprInterL,exprInterR);
+        sprintf(exprInterR,SmvConversions[ANY],newValue);
+        sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
         size = strlen(exprResultString);
         pointIni = (strlen(exprInterL) - 1) + 5; //  %s:= %s (+2 para pular ele mesmo e o : e depois = e espaço, e fora o \t no inicio)
@@ -187,8 +172,6 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
 
 void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr, int minmax)
 {
-    // checa o typeSet dessa variável para o atualizar!
-    updateType(varName,header,writeSmvTypeTable,newValue,type,minmax);
 
     char *updated = NULL; // ponteiro para referenciar a string que vamos tratar
     char upVar[300]; // ponteiro para localizar o assign na tabela
@@ -240,8 +223,6 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     // os delmitadores podem variar, ex: em caso de next(time) o delimitador é (:)
     updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd);
 
-
-
     // atualizar range de interesse e tamanho da string na tabela!
     // fazer duas chamadas por enquanto
     size = -1*((newPointEnd-newPointInit+1) - sizeNew) + size;
@@ -254,30 +235,68 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     updateValue(upVar, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
 }
 
-void specNext(char*varName, HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition,
-              int redef, int type ,int typeExpr, int minmax)
-{
-    char* useVar = varName;
+char* processActiveName(char* varName, char* funcRef, int redef, int level, int order, char* interScope, char* interRedef){
 
-    char interRedef[ALOC_SIZE_LINE];
-    char statevarname[ALOC_SIZE_LINE];
-
-    if(redef){
-        sprintf(interRedef,SmvConversions[4],varName,redef);
-        sprintf(statevarname, SmvConversions[typeExpr], interRedef);
-        useVar = interRedef;
-    }
-    //verifica se existe next(statevarname)
-    if(lookup(writeSmvTypeTable,statevarname)){
-        updateAssign(useVar,header,writeSmvTypeTable,newValue,condition,type,typeExpr,minmax);
+    char* useVar = NULL;
+    // qualquer escopo diferente de GLOBAL/MAIN
+    if(order || level){
+        //(função)
+        if(funcRef){
+            if(!level){
+                sprintf(interScope,SmvConversions[NAME_BY_FUNC_SCOPE],varName,funcRef);
+            }
+            else{
+                sprintf(interScope,SmvConversions[NAME_BY_FUNC_SSCOPE],varName,funcRef,level,order);
+            }
+        }
+        // if, else, fors ....
+        else{
+            sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,level,order);
+        }
+        useVar = interScope;
     }
     else{
-        createAssign(varName, header, writeSmvTypeTable, newValue, condition, redef, typeExpr, type, NULL, 0);
+        useVar = varName;
+    }
+    if(redef){
+        sprintf(interRedef,SmvConversions[REDEF_NAME],useVar,redef);
+        useVar = interRedef;
+    }
+    return useVar;
+}
+
+void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
+                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax)
+{
+    char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
+    char interScope[ALOC_SIZE_LINE];  //nome com info de scope
+    char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
+    char statevarname[ALOC_SIZE_LINE]; // init ou next
+    useVar = processActiveName(varName,funcRef,redef,level,order,interScope,interRedef);
+
+    // next
+    if(typeExpr){
+        // criar init/next(useVar)
+        sprintf(statevarname,SmvConversions[NEXT],useVar);
+        //verifica se existe next(statevarname)
+        updateType(useVar,header,writeSmvTypeTable,newValue,type,minmax);
+        if(lookup(writeSmvTypeTable,statevarname)){
+            updateAssign(useVar,header,writeSmvTypeTable,newValue,condition,type,NEXT,minmax);
+        }
+        else{
+            createAssign(useVar, header, writeSmvTypeTable, newValue, condition, NEXT, NULL);
+        }
+    }
+    // init
+    else{
+        createType(useVar,header,writeSmvTypeTable,newValue,type);
+        createAssign(useVar, header, writeSmvTypeTable, newValue, condition, INIT, NULL);
     }
 }
 
-
 void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExpr, int minmax)
 {
-    updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,typeExpr,minmax);
+    updateType("time",main,writeSmvTypeTable,newValue,type,minmax);
+    typeExpr ? updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,NEXT,minmax) :
+    updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,INIT,minmax);
 }

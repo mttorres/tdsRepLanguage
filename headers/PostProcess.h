@@ -37,7 +37,7 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
  * */
 
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int redef, int typeExpr, int type, char *defaultEvalCond, int minmax);
+                  int typeExpr, char *defaultEvalCond);
 
 
 /**
@@ -59,12 +59,12 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
 void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr, int minmax);
 
 /**
- * Escolhe entre update create Assign, tratando casos de redefinição e condições
+ * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições
  * @param
  * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void specNext(char*varName, HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition,
-              int redef, int type ,int typeExpr, int minmax);
+void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
+                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax);
 
 #endif
 

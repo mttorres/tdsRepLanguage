@@ -616,7 +616,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,6,0);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,0,0);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -624,7 +624,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,7,1);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,1,1);
     }
     return NULL;
 }
@@ -633,6 +633,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
 {
     Object* expr = NULL;
     Object** sintExpr = NULL;
+
+    // recuperação de diretiva temporal principal para uso
+    TableEntry* ctimeEntry = lookup(scope, "C_TIME");
+    int directive = *(int*) ctimeEntry->val->values[0];
+
     // caso de atribuição de diretiva
     if(n->children[0]->type == ASSIGN_TDIRECTIVE)
     {
@@ -654,6 +659,16 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->children[0]->leafs[0]);
             exit(-1);
         }
+        if(*(int*)expr->values[0] < directive ){
+            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, IMPOSSIBLE TO RETURN TO PAST CONTEXTS  \n", n->children[0]->leafs[0]);
+            exit(-1);
+        }
+        // validaçao de intervalo
+        TableEntry* itimeEntry = lookup(scope,"F_TIME");
+        int ftime = *(int*)itimeEntry->val->values[0];
+        if(directive > ftime){
+            fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL \n", n->children[0]->leafs[0]);
+        }
         /* TOMAR NOTA: NUNCA MAIS FAZER ISSO
          * 		int* v;
          *       v = 5;  (PODE LITERALMENTE ALOCAR QUALQUER, REPITO QUALQUER REGIÃO DE MEMÓRIA PARA MEU 5!
@@ -668,12 +683,10 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         // busca expressão
         sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
         expr = sintExpr[0];
-
         // busca a variável
         char* varName = n->children[0]->leafs[0];
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
-
         int minmax = 0;
         // tratamento do intervalo nuXmv de inteiros
         if(var && expr->type == NUMBER_ENTRY){
@@ -681,60 +694,60 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             int new = *(int*)expr->values[0];
             minmax = new > old;
         }
-
         //busca o contexto
-        STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
         // ports ou main
-        HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && var->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
-        TableEntry* ctimeEntry = lookup(scope, "C_TIME");
-        int directive = *(int*) ctimeEntry->val->values[0];
+        HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
         TableEntry* itimeEntry = lookup(scope,"I_TIME");
         int itime = *(int*)itimeEntry->val->values[0];
-        char directiveValueBind[300];
-        int changeContext = directive > itime;
-        sprintf(directiveValueBind, "%d", directive);
+        int changeContext = directive > itime; // verifica se mudou o contexto
 
-        // bind condicional
+        //binds
+        char directiveValueBind[300]; // tempo corrente
+        sprintf(directiveValueBind, "%d", directive);
+        // bind do valor da expressão (ou com o valor dela ou com o smv bind)
         char valueBind[300];
-        copyValueBind(expr,valueBind,0,0);
+        copyValueBind(expr,valueBind,0,0); // pode variar para vetores e estruturas complexas
+        char defaultValueBind[300];
+
         char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL;
         char* temporalCondition = changeContext ? createConditionCube("next(time)", directiveValueBind, "=", valueBind) : NULL;
 
+        // atribuição simples
         if(n->children[0]->type == ASSIGN_IDVAR)
         {
-            //printf("[evalOTHER_ASSIGN] atribui variável (simples) \n");
+            //primeira vez da variavel
             if(!var)
             {
                 addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, directive);
-                char defaultValueBind[300];
                 if(condition || temporalCondition){
-                    copyValueBind(expr,defaultValueBind,0,1); // "otimização"
+                    copyValueBind(expr,defaultValueBind,0,1); // "otimização" para criar o case default
                 }
-                //inicialização "com next"
+                //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
+                // note que temporal condition tem que ser um cubo de condição e tempo
                 if(changeContext){
-                    // melhorar função de cubo
-                    createAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, 0, 6, expr->type,
-                                 defaultValueBind, 0);
-                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, 0, 7, expr->type,
-                                 defaultValueBind, 1); // next
+                    specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, defaultValueBind,
+                               0, NULL, scope->order, scope->level, expr->type, 0, minmax);
+                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, defaultValueBind,
+                               0, NULL, scope->order, scope->level, expr->type, 1, 1);
                 }
                 else{
-                    // condition em INIT?
-                    createAssign(varName, refHeader, refAuxTable, valueBind, condition, 0, 6, expr->type,
-                                 defaultValueBind, 0);
+                    // condition em INIT? e default, deve-se criar default tmb
+                    specAssign(varName, refHeader, refAuxTable, valueBind, condition, defaultValueBind,
+                               0, NULL, scope->order, scope->level, expr->type, 0, 0);
                 }
             }
             else{
-                condition = createConditionCube("next(time)", directiveValueBind, "=", valueBind);
+                //condition = createConditionCube("next(time)", directiveValueBind, "=", valueBind);
                 // reatribuição ou reinicialização
                 updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
                 if(var-> timeContext > itime){
-                    specNext(varName,refHeader,refAuxTable,valueBind,temporalCondition,var->redef,expr->type,7,minmax);
+                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, NULL,
+                               var->redef, NULL, scope->order, scope->level, expr->type, 1, minmax);
                 }
                 else{
-                    createAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, var->redef, 6,
-                                 expr->type,
-                                 NULL, 0); // init
+                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, NULL,
+                               var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
                 }
             }
         }
