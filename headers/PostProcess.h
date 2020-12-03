@@ -15,8 +15,16 @@
 
 void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExrp,int minmax);
 
-
-char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation);
+/**
+ *
+ *
+ * @params
+ *
+ *
+ * @SideEffects
+ *
+ * */
+char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube);
 
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
@@ -56,7 +64,7 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
  *  além disso, atualiza na entrada da tabela da simbolos o tipo (typeSet) associada a varName,
  *  se o tipo mudar (caso de next após mudança de contexto).
  * */
-void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr, int minmax);
+void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax);
 
 /**
  * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições

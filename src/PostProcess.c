@@ -4,16 +4,16 @@
 #include "../headers/PostProcess.h"
 
 
-typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_BY_FUNC_SCOPE, NAME_BY_FUNC_SSCOPE,
+typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_BY_FUNC_SCOPE, NAME_BY_FUNC_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
-                               ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
+                               ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
                                INTERVAL_DEC, SET, PAR } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s %s %s ", "%s_redef%d%", "%s_scope%d%%d", "%s_scope%s","%s_scope%s%d%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d%%d", "%s_scope%s","%s_scope%s%d%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
-                          "%s : %s;" , "TRUE : %s; \n", "%s = %s : %s; \n",
+                          "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
                           "\t%s: %s..%s;\n","{%s};", "%s, %s" };
 
 int  ALOC_SIZE_LINE = 300;
@@ -21,24 +21,34 @@ int  ALOC_SIZE_LINE = 300;
 
 
 
-char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation)
+char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube)
 {
-        // por enquanto...
         char inter[ALOC_SIZE_LINE];
-
+        char* interPt = inter;
         char* cube = malloc(sizeof(strlen(opBind1)+strlen(opBind2)+strlen(operation)+1));
-        if(opBind2){
-            sprintf(inter,SmvConversions[OP],opBind1,operation,opBind2);
+
+        if(concCube){
+            interPt = customCat(interPt,opBind1,0,0);
+            interPt = customCat(interPt,operation,0,0);
+            interPt = customCat(interPt,opBind2,0,0);
+            // resulta em cond1 op cond2
         }
         else{
-            sprintf(inter,SmvConversions[OP],operation,opBind1,"");
+            // gera cond ( bind1 op bind2) ou opbind1
+            if(opBind2[0] != '\0'){
+                sprintf(inter,SmvConversions[OP],opBind1,operation,opBind2);
+            }
+            else{
+                sprintf(inter,SmvConversions[UN_OP],operation,opBind1);
+            }
         }
         if(evaluation){
-            sprintf(cube,SmvConversions[CASE_EVAL],inter,evaluation);
+            int indexConversion = firstCond? CASE_EVAL : N_CASE_EVAL;
+            sprintf(cube,SmvConversions[indexConversion],inter,evaluation);
         }
         else{
             sprintf(cube,SmvConversions[ANY],inter,evaluation);
-        } // criar caso similar em que se concatena condições
+        }
         return cube;
 }
 
@@ -49,8 +59,9 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
     if(type == 0){
         sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
         char* auxDelim = strstr(newType,":");
+        char* auxFim = strstr(auxDelim,"..");
         int pointIni = (auxDelim-newType+2);
-        int pointEnd = pointIni;
+        int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
         void* po[] = {&pos, &tam, &pointIni, &pointEnd};
@@ -87,12 +98,11 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
             {
                 pointIni = pointEnd+3; // n..max;
                 // nota! o size já está indexbased!
-                pointEnd = header->varBuffer[pos][size] == '\n' ? size-2  : size-1; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
-                size = header->varBuffer[pos][size] == '\n' ? size+1 : size;
+                pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
+                //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
             }
             updateSubStringInterval(newValue,header->varBuffer[pos],sizeNew,pointIni,pointEnd,size,&newPointIni,&newPointEnd);
-
-
+            size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
             void* vpSize[] = {&size};
             updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
             // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
@@ -132,10 +142,10 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
         sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
         char* auxChPoint;
-        auxChPoint = strstr(exprResultString,";\n");
+        auxChPoint = strstr(exprResultString,";\n"); // devolve exatamente o ponto, devemos ir para o \n
         long dif = auxChPoint-exprResultString;
         size = strlen(exprResultString);
-        pointIni = dif;
+        pointIni = dif+1;
         pointEnd = pointIni;
 
         free(condition);
@@ -170,22 +180,20 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
 
 
 
-void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, const char* condition, int type ,int typeExpr, int minmax)
+void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax)
 {
-
-    char *updated = NULL; // ponteiro para referenciar a string que vamos tratar
-    char upVar[300]; // ponteiro para localizar o assign na tabela
-    sprintf(upVar,SmvConversions[typeExpr],varName); // recupera string default init/next
-    int sizeNew = strlen(newValue);
-
     // tratamento de init/next(varName):= case ... TRUE : x; esac; , geralmente TRUE: NULL ou outra condição parecida
     // é sempre o "delmitador final", vai ser um caso similar ao anterior porém entre ponto de interesse - condição default, já que condições não mudam!
     // o que muda é que vamos er que concatenar esse default ? (NÃO, é criado naturalmente)
     // ou seja devemos pegar o que está sendo adicionado a sizenew e jogar uma condição se (ela existir)
     if(condition)
     {
-        printf("ainda...");
+        newValue = condition;
     }
+    char *updated = NULL; // ponteiro para referenciar a string que vamos tratar
+    char upVar[300]; // ponteiro para localizar o assign na tabela
+    sprintf(upVar,SmvConversions[typeExpr],varName); // recupera string default init/next
+    int sizeNew = strlen(newValue);
 
     int pos;
     int size;
@@ -225,7 +233,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
     // atualizar range de interesse e tamanho da string na tabela!
     // fazer duas chamadas por enquanto
-    size = -1*((newPointEnd-newPointInit+1) - sizeNew) + size;
+    size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
     void* vpSize[] = {&size};  // evita ter que "reescrever" o vetor inteiro separando em varios vps
     // é como se a gente tivesse atualizando cada indice dos vetores menos o (0)
     updateValue(upVar, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);

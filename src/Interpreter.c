@@ -606,7 +606,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         }
     }
     if(  (ptitime != NULL && ptftime != NULL && I_TIME > F_TIME)  ||
-        ( ptitime != NULL && I_TIME >= 3 ) || ( ptftime != NULL && F_TIME <= 0 )  ) {
+        ( ptitime != NULL && I_TIME < 0 ) || ( ptftime != NULL && F_TIME <= 0 )  ) {
         fprintf(stderr, "ERROR: BAD USE OF INTERVAL TIME DIRECTIVE, INVALID INTERVAL! \n");
         exit(-1);
     }
@@ -711,7 +711,24 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         char defaultValueBind[300];
 
         char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL;
-        char* temporalCondition = changeContext ? createConditionCube("next(time)", directiveValueBind, "=", valueBind) : NULL;
+        char* temporalCondition = changeContext?
+                createConditionCube("next(time)",directiveValueBind, "=", NULL,1,0) : NULL;
+        char* auxReftemporalCondition = temporalCondition;
+        int firstCondition = !var? 1 :
+                             var->timeContext? 0 : 1;
+
+        char* conditionCube = temporalCondition && condition?
+                createConditionCube(auxReftemporalCondition,condition,"&",valueBind,firstCondition,1) :
+                auxReftemporalCondition? createConditionCube(auxReftemporalCondition,"", "", valueBind,firstCondition,0):
+                condition? createConditionCube(condition,"", "", valueBind,firstCondition,0) : NULL;
+
+        if(temporalCondition){
+            free(temporalCondition);
+        }
+
+        if(conditionCube){
+            copyValueBind(expr,defaultValueBind,0,1); // "otimização" para criar o case default
+        }
 
         // atribuição simples
         if(n->children[0]->type == ASSIGN_IDVAR)
@@ -720,15 +737,12 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             if(!var)
             {
                 addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, directive);
-                if(condition || temporalCondition){
-                    copyValueBind(expr,defaultValueBind,0,1); // "otimização" para criar o case default
-                }
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
                 // note que temporal condition tem que ser um cubo de condição e tempo
                 if(changeContext){
                     specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, defaultValueBind,
                                0, NULL, scope->order, scope->level, expr->type, 0, minmax);
-                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, defaultValueBind,
+                    specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, defaultValueBind,
                                0, NULL, scope->order, scope->level, expr->type, 1, 1);
                 }
                 else{
@@ -740,14 +754,23 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             else{
                 //condition = createConditionCube("next(time)", directiveValueBind, "=", valueBind);
                 // reatribuição ou reinicialização
+                int prevDef = var->redef;
                 updateValue(varName,expr->values,expr->type,expr->OBJECT_SIZE,-1,-1,scope,directive);
-                if(var-> timeContext > itime){
-                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, NULL,
+                if(changeContext && var->redef == prevDef){
+                    specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
                                var->redef, NULL, scope->order, scope->level, expr->type, 1, minmax);
                 }
                 else{
-                    specAssign(varName, refHeader, refAuxTable, valueBind, temporalCondition, NULL,
-                               var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
+                    if(!changeContext){
+                        specAssign(varName, refHeader, refAuxTable, valueBind, NULL, NULL,
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
+                    }
+                    else{
+                        specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, NULL,
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
+                        specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 1, minmax);
+                    }
                 }
             }
         }

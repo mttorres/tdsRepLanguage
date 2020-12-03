@@ -192,7 +192,7 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 
 void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int size, int *newPointInit, int *newPointEnd)
 {
-    char aux[(size) - (pointEnd + 1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
+    char aux[size - (pointEnd+1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
     int i;
     // deve-se copiar os caracteres que vem após a zona de sobrescrita
     //deve-se liberar sizeNew espaços empurrando os caras que vão ser salvos em aux
@@ -201,6 +201,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
         aux[i-(pointEnd+1)] = updated[i];
     }
     // atualiza o tamanho
+    int oldSize = size;
     size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
 
     // a zona de "sobrescrita" não aumentou
@@ -208,6 +209,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
     {
         // deve-se "destruir" o resto da string partindo de pointIni
         updated[pointIni] = '\0';
+        updated[oldSize-1] = '\0';
     }
     // após isso, tanto para o caso de ter aumentado ou não deve-se recuperar a substring salva no
     // buffer auxiliar (delimitador e tudo o que vem depois), e escrever logo após escrever a nova string.
