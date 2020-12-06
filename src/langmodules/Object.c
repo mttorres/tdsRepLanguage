@@ -260,7 +260,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 	}
     // caso x[i] = y
 	else if(index != -1 ){
-        free(o->values[index]);
+//        free(o->values[index]); (ERRO ACONTECENDO AQUI)
         o->values[index] = NULL;
         updateObjectCell(o,any,any_type,object_size,index,-1);
 	}
@@ -270,7 +270,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
 	}
-    o->redef = contextChange != o->timeContext && contextChange != 0 ? o->redef : o->redef+1;
+    o->redef = contextChange != o->timeContext? o->redef : o->redef+1;
 	o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

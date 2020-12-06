@@ -717,6 +717,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         int firstCondition = !var? 1 :
                              var->timeContext? 0 : 1;
 
+        // refatorar em método que tem que ser chamado mais a frente
         char* conditionCube = temporalCondition && condition?
                 createConditionCube(auxReftemporalCondition,condition,"&",valueBind,firstCondition,1) :
                 auxReftemporalCondition? createConditionCube(auxReftemporalCondition,"", "", valueBind,firstCondition,0):
