@@ -52,6 +52,40 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
         return cube;
 }
 
+char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* valueBind, char* defaultValueBind,
+                  Object* expr, STable* scope, int firstCondition){
+
+    sprintf(directiveValueBind, "%d", ctime); // bind da diretiva temporal corrente
+    copyValueBind(expr,valueBind,0,0); // bind da expressão, pode variar para vetores e estruturas complexas
+
+    char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL; // bind do escopo
+    // bind da condição temporal, ex: "next(time) = 2"
+    char* temporalCondition = changeContext?
+                              createConditionCube("next(time)",directiveValueBind, "=", NULL,1,0)
+                                           : NULL;
+
+    // ponteiro auxiliar que referencia a condição temporal criada
+    char* auxReftemporalCondition = temporalCondition;
+
+    // se existe alguma condição vinda do escopo e uma condição temporal, as concatena, senão usa apenas uma delas ou nenhuma delas
+    char* conditionCube = temporalCondition && condition?
+                          createConditionCube(auxReftemporalCondition,condition,"&",valueBind,firstCondition,1) :
+                          auxReftemporalCondition? createConditionCube(auxReftemporalCondition,"", "", valueBind,firstCondition,0) :
+                          condition? createConditionCube(condition,"", "", valueBind,firstCondition,0) : NULL;
+
+    // libera o cubo sem avaliação utilizado anteriormente para o passo anterior
+    if(temporalCondition){
+        free(temporalCondition);
+    }
+
+    // "otimização" para criar o caso default, se necessário
+    if(conditionCube){
+        copyValueBind(expr,defaultValueBind,0,1);
+    }
+
+    return conditionCube;
+}
+
 
 void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
 {
@@ -134,10 +168,10 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
     if(condition)
     {
         if(typeExpr == INIT){
-            sprintf(exprInterR,SmvConversions[CASE],condition,defaultEvalCond);
+            sprintf(exprInterR,SmvConversions[CASE],condition,defaultEvalCond); // default
         }
         else{
-            sprintf(exprInterR,SmvConversions[CASE],condition,varName);
+            sprintf(exprInterR,SmvConversions[CASE],condition,varName); // default sendo o inicial
         }
         sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
@@ -298,7 +332,7 @@ void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     // init
     else{
         createType(useVar,header,writeSmvTypeTable,newValue,type);
-        createAssign(useVar, header, writeSmvTypeTable, newValue, condition, INIT, NULL);
+        createAssign(useVar, header, writeSmvTypeTable, newValue, condition, INIT, defaultValue);
     }
 }
 
