@@ -275,6 +275,11 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     updateValue(upVar, vpIni, WRITE_SMV_INFO, 1, 2, -1, writeSmvTypeTable, 0);
     void* vpInEnd[] = {&newPointEnd};
     updateValue(upVar, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
+
+    if(condition){
+        free(condition);
+    }
+
 }
 
 char* processActiveName(char* varName, char* funcRef, int redef, int level, int order, char* interScope, char* interRedef){
