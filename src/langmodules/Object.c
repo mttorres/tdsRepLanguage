@@ -260,7 +260,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 	}
     // caso x[i] = y
 	else if(index != -1 ){
-//        free(o->values[index]); (ERRO ACONTECENDO AQUI)
+        free(o->values[index]);
         o->values[index] = NULL;
         updateObjectCell(o,any,any_type,object_size,index,-1);
 	}
