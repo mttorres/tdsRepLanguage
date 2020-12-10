@@ -100,7 +100,7 @@ int main(int argc, char* argv[]) {
 	
 	letgoNode(root);
 
-//	letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
+	letGoHeaderControl(controller);
 
 
 //    printf("teste TYPE SET !!! \n\n\n");

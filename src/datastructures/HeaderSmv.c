@@ -26,6 +26,9 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
   	//printf("[createHeader] DEBUG: alocando transicoes tipo (%d) \n",type);
   	header->transBuffer = malloc(sizeof(char*)*300); // tamanho default
   }
+  else{
+  	header->transBuffer = NULL;
+  }
 
   return header; 
 }
@@ -35,6 +38,7 @@ void letgoHeader(HeaderSmv* h){
 	if(!h){
 		return;
 	}
+  	//printf("[letgoHeader] DEBUG: liberando %s \n",h->moduleName);
 	free(h->moduleName);
 	int i;
  	
@@ -48,7 +52,7 @@ void letgoHeader(HeaderSmv* h){
 	// not really... STRINGS SÃO PERDIDAS A NÃO SER QUE SEJAM LITERAIS ou alocadas dentro de função!
   	// ou alocar todo mundo ou tornar todas literal (provavelmente alocar todo mundo)	
 
-  	printf("[letgoHeader] DEBUG: liberando buffer VAR! \n");
+  	//rintf("[letgoHeader] DEBUG: liberando buffer VAR! \n");
   	free(h->varBuffer);
 	
  	for(i = 0; i< h->ASSIGN_POINTER; i++) {
@@ -56,17 +60,17 @@ void letgoHeader(HeaderSmv* h){
 			free(h->assignBuffer[i]); 
 		}					 
   	}
-  	printf("[letgoHeader] DEBUG: liberando buffer ASSIGN! \n");
+  	//printf("[letgoHeader] DEBUG: liberando buffer ASSIGN! \n");
   	free(h->assignBuffer);		
 
   	if(h->transBuffer) {
 		for(i = 0; i< h->TRANS_POINTER; i++) {
-			printf("???\n");
+			//printf("???\n");
 			if(h->transBuffer[i]){
 				free(h->transBuffer[i]); 
 			}					 
   		}
-  		printf("[letgoHeader] DEBUG: liberando buffer TRANS! \n");
+  		//printf("[letgoHeader] DEBUG: liberando buffer TRANS! \n");
   		free(h->transBuffer);
   	}
   		
@@ -197,6 +201,7 @@ void writeHeader(HeaderSmv* header, FILE* smvoutput){
 	for(i = 0; i< tamanho; i++){
 		writeHeaderBuffer(header,i,smvoutput);
 	}
+	fprintf(smvoutput,"%s","\n");
 }
 
 
