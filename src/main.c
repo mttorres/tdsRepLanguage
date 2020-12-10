@@ -6,6 +6,7 @@
   #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
   #include "../headers/Interpreter.h"
+  #include "../headers/PostProcess.h"
 
   extern int yylex(void);
   extern int yyparse();
@@ -22,6 +23,7 @@ int main(int argc, char* argv[]) {
 	fp = fopen(argv[1], "r");
 	astout = fopen("results/astOutput", "w");
 	smvP = fopen(argv[2], "r+");
+	
 	//printf("%s \n",argv[1]);
 	//printf("%s \n",argv[2]);
 
@@ -84,11 +86,15 @@ int main(int argc, char* argv[]) {
  	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
 
-	printHeader(controller->headers[0]);
-	printHeader(controller->headers[1]);
-	printHeader(controller->headers[2]);
-	printHeader(controller->headers[3]);
-	printHeader(controller->headers[4]);
+	//printHeader(controller->headers[0]);
+	//printHeader(controller->headers[1]);
+	//printHeader(controller->headers[2]);
+	//printHeader(controller->headers[3]);
+	//printHeader(controller->headers[4]);
+
+
+ 	writeResultantHeaders(controller,"results/newSmvfile.smv");
+
 
 	fclose(smvP);
 	

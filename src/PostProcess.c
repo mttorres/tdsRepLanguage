@@ -19,6 +19,35 @@ char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%
 int  ALOC_SIZE_LINE = 300;
 
 
+void copyValueBind(Object* o, char* bind,int index,int defaultValue)
+{
+    char* formatS = "%s";
+    char* formatN = "%d";
+    char* formatRef = "%s[%d]";
+
+    if(!index) {
+        if (o->bind) {
+            sprintf(bind, formatS, o->bind);
+        } else {
+            if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
+                    sprintf(bind, formatN, defaultValue? 0 : *(int *) o->values[0]);
+            }
+            if (o->type == LOGICAL_ENTRY) {
+                sprintf(bind, formatS, *(int *) o->values[0] && !defaultValue ? "TRUE" : "FALSE");
+            }
+            if (o->type == LABEL_ENTRY || o->type == NULL_ENTRY) {
+                sprintf(bind, formatS, defaultValue? "NULL" : (char *) o->values[0]);
+            }
+            if (o->type == TDS_ENTRY) {
+                // ...
+            }
+        }
+    }
+    else{
+
+    }
+}
+
 
 
 char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube)
@@ -341,9 +370,23 @@ void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     }
 }
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExpr, int minmax)
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExpr, int minmax)
 {
     updateType("time",main,writeSmvTypeTable,newValue,type,minmax);
     typeExpr ? updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,NEXT,minmax) :
     updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,INIT,minmax);
 }
+
+
+void writeResultantHeaders(HeaderController* controller, const char* path){
+  
+  int i;
+  FILE* smvoutput = fopen(path, "w");
+  for(i = 0; i< controller->CURRENT_SIZE; i++){
+		writeHeader(controller->headers[i],smvoutput);
+  }
+  fclose(smvoutput);
+
+}
+
+

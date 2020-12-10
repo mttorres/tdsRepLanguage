@@ -163,5 +163,41 @@ void printHeader(HeaderSmv* h) {
 
 }
 
+void writeHeaderBuffer(HeaderSmv* h, int part, FILE* smvoutput){
+	int i;
+	int offsetBuffer;
+	if(part == VAR){
+		offsetBuffer = h->VAR_POINTER;
+	}
+	if(part == ASSIGN){
+		offsetBuffer = h->ASSIGN_POINTER;
+	}
+	if(part == TRANS){
+		offsetBuffer = h->TRANS_POINTER;
+	}
+	for(i = 0; i< offsetBuffer; i++){
+		if(part == VAR && h->varBuffer[i]) {
+			fprintf(smvoutput,"%s",h->varBuffer[i]);
+		}
+		if(part == ASSIGN && h->assignBuffer[i]) {
+			fprintf(smvoutput,"%s",h->assignBuffer[i]);
+		}
+		if(part == TRANS && h->transBuffer[i]) {
+			fprintf(smvoutput,"%s",h->transBuffer[i]);
+		}	
+	}
+}
+
+
+void writeHeader(HeaderSmv* header, FILE* smvoutput){
+	int sizeBuffers[] = {header->VAR_POINTER, header->ASSIGN_POINTER,header->TRANS_POINTER};
+	int tamanho = sizeof(sizeBuffers)/sizeof(sizeBuffers[0]);
+	int i; 
+	fprintf(smvoutput,"%s",header->moduleName);
+	for(i = 0; i< tamanho; i++){
+		writeHeaderBuffer(header,i,smvoutput);
+	}
+}
+
 
 

@@ -46,4 +46,8 @@ void printHeaderBuffer(HeaderSmv* h, int type, char* typeString);
 
 void printHeader(HeaderSmv* h);
 
+void writeHeaderBuffer(HeaderSmv* h, int part, FILE* smvoutput);
+
+void writeHeader(HeaderSmv* header, FILE* smvoutput);
+
 #endif

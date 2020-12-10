@@ -33,34 +33,6 @@ Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, H
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
 };
 
-void copyValueBind(Object* o, char* bind,int index,int defaultValue)
-{
-    char* formatS = "%s";
-    char* formatN = "%d";
-    char* formatRef = "%s[%d]";
-
-    if(!index) {
-        if (o->bind) {
-            sprintf(bind, formatS, o->bind);
-        } else {
-            if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
-                    sprintf(bind, formatN, defaultValue? 0 : *(int *) o->values[0]);
-            }
-            if (o->type == LOGICAL_ENTRY) {
-                sprintf(bind, formatS, *(int *) o->values[0] && !defaultValue ? "TRUE" : "FALSE");
-            }
-            if (o->type == LABEL_ENTRY || o->type == NULL_ENTRY) {
-                sprintf(bind, formatS, defaultValue? "NULL" : (char *) o->values[0]);
-            }
-            if (o->type == TDS_ENTRY) {
-                // ...
-            }
-        }
-    }
-    else{
-
-    }
-}
 
 Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
