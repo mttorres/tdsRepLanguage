@@ -26,6 +26,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
 		printf("[allocatePtObjects - numVariants] valor: %d \n",*(int*) pt);
+		printf("[allocatePtObjects - numVariants] success \n");
 		return pt;
 	}
 	
@@ -108,9 +109,9 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext)
 	}
 
 
-	//int info = newOb == NULL ?  1 : 0;
+	int info = newOb == NULL ?  1 : 0;
 
-	//printf("[DEBUG - createObject] info: %d \n", info);
+	printf("[DEBUG - createObject] info: %d \n", info);
 
 	//printObject(newOb);
 

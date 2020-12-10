@@ -7,14 +7,14 @@
 typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_BY_FUNC_SCOPE, NAME_BY_FUNC_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
-                               INTERVAL_DEC, SET, PAR } MAP_CONVERSIONS;
+                               INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d%%d", "%s_scope%s","%s_scope%s%d%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s: %s..%s;\n","{%s};", "%s, %s" };
+                          "\t%s : %s..%s;\n", "\t%s : boolean;" "\t%s : {%s};", "%s, %s" };
 
 int  ALOC_SIZE_LINE = 300;
 
@@ -119,7 +119,7 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
 void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
-    if(type == 0){
+    if(type == NUMBER_ENTRY || T_DIRECTIVE_ENTRY){
         sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
         char* auxDelim = strstr(newType,":");
         char* auxFim = strstr(auxDelim,"..");
@@ -132,13 +132,26 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         header->varBuffer[header->VAR_POINTER] = newType;
         header->VAR_POINTER += 1;
     }
+    if(type == LOGICAL_ENTRY){
+        sprintf(newType,SmvConversions[BOOLEAN_DEC],varName,newValue,newValue);
+        int pos = header->VAR_POINTER;
+        int tam = strlen(newType);
+        void* po[] = {&pos, &tam};
+        addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
+
+    }
+    if(type == TDS_ENTRY || LABEL_ENTRY)
+    {
+        //void* po[] = {&pos, &tam};
+        //addTypeSet(varName,po,TYPE_SET,2,writeSmvTypeTable);
+    }
 }
 
 void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type,int minmax)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
-    if(type == 0)
+    if(type == NUMBER_ENTRY || T_DIRECTIVE_ENTRY)
     {
         int pos;
         int size;
@@ -178,6 +191,9 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         else{
             printf("[updateType] WARNING: type of %s not declared on headers \n",varName);
         }
+    }
+    if(type == LOGICAL_ENTRY){
+        // não faz nada
     }
 }
 // quebrar em spec next e spec init

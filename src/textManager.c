@@ -89,7 +89,7 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	if(original[strlen(original)-1] == '\n'){
 	  breakline = 1;
 	}
-    printf("aaaa: %c \n",original[strlen(original)-2]);
+    //printf("aaaa: %c \n",original[strlen(original)-2]);
 	if(original[strlen(original)-2]== ';'){
         statementEnd = 1;
     }
