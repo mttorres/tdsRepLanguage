@@ -14,7 +14,7 @@ typedef struct headersmv
   int VAR_POINTER;
   int TRANS_POINTER;
   int ASSIGN_POINTER;
-  char** declaredPorts; // usar para impedir o usuário de se "sabotar" usando ports que não existem
+  //char** declaredPorts; // usar para impedir o usuário de se "sabotar" usando ports que não existem
 
 }HeaderSmv;
 
@@ -32,6 +32,7 @@ void letGoHeadersStruct(HeaderSmv** hs, int size);
 typedef struct headerController
 {
   HeaderSmv ** headers;
+  int declaredPorts;
   int CURRENT_SIZE; // usar current size com -1 (se vc está processando o indice atual(ultimo) é porque ele já alocou para o seguinte!)
                     // ex:  sétimo membro(6) (CURRENT_SIZE = 7) (ou seja para referenciar o último é só pegar CURRENT-1)
   

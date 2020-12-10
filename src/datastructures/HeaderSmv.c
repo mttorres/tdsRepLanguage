@@ -12,7 +12,6 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
   char* name = malloc((strlen(moduleName)+1) * sizeof(char));
   strcpy(name, moduleName);
   header->moduleName = name;
-  header->declaredPorts = NULL;
 
   
   header->type = type;
@@ -99,6 +98,7 @@ HeaderController* createController(int size) {
 	HeaderController* Hcontrol = malloc(sizeof(HeaderController));
 	Hcontrol->CURRENT_SIZE = 0;
 	Hcontrol->headers = initHeadersStruct(size);
+	Hcontrol->declaredPorts=0;
 
 	return Hcontrol;
 }
@@ -154,6 +154,11 @@ void printHeader(HeaderSmv* h) {
 
  	
  	}
+
+// 	if(h->type == PORTS){
+// 		printf("ports: %s\n",h->declaredPorts[0]);
+// 	}
+
 	char* tiposBuffers[] = {
     	"VAR",
     	"ASSIGN",

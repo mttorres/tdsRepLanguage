@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
     printTable(writeSmvTypeTable[1]);
 	printf("\n");
 
-	//letGoHeadersStruct(headers,5);
+
 
 
 	printf("\n");	
@@ -90,7 +90,11 @@ int main(int argc, char* argv[]) {
 	//printHeader(controller->headers[1]);
 	//printHeader(controller->headers[2]);
 	//printHeader(controller->headers[3]);
-	//printHeader(controller->headers[4]);
+//	printHeader(controller->headers[4]);
+
+ 	if(!controller->declaredPorts){
+ 		fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMENDED THAT YOU REVIEW YOUR .tds FILE \n");
+ 	}
 
 
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
