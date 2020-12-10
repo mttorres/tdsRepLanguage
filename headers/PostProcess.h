@@ -8,12 +8,30 @@
 #include "Node.h"
 #include "Object.h"
 
+
+/**
+ * Recebe um objeto  (que representa expressão ou valor qualquer) e uma String (bind), e o converte para o seu 
+ * a String apropriada. Caso seja passado defaultValue como 1, o bind é o default do tipo daquele valor
+ *
+ * @param o o valor em objeto da linguagem
+ * @param bind a string onde o bind será copiado para 
+ * @param index usado para tratar binds em indices de string
+ * @param defaultValue uma flag que define se o default daquele tipo deve ser o bind
+ *
+ * @SideEffects Aletra o conteúdo em memória vindo de bind
+ *
+ * */
+
+
+void copyValueBind(Object* o, char* bind,int index,int defaultValue);
+
+
 /*
  * Atualiza o intervalo de tempo  -> "time: 0..3;" e
  * o init(time) ou next(time) dependendo se for I_TIME ou F_TIME
  * */
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, const char* newValue, int type, int typeExrp,int minmax);
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExrp,int minmax);
 
 /**
  * Cria um cubo de condições da forma:
@@ -114,6 +132,11 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
  * */
 void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
                 char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax);
+
+
+
+
+void writeResultantHeaders(HeaderController* controller, const char* path);
 
 #endif
 

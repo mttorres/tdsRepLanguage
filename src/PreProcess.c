@@ -68,10 +68,11 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, in
 		else
 		{
 			//char** bufferAux = clearOldPortsRefs(line); 
-			printf("[selectBuffer] tratamento de rename refs a portsModule ANTES:%s\n\n",line);
+			//printf("[selectBuffer] tratamento de rename refs a portsModule ANTES:%s\n\n",line);
 			//strcpy(aloc,bufferAux);
-			header->transBuffer[pt] = clearOldPortsRefs(line);
-			printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS:%s\n\n",header->transBuffer[pt]);			
+			clearOldPortsRefs(line,aloc);
+			header->transBuffer[pt] = aloc;
+			//printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS:%s\n\n",header->transBuffer[pt]);			
 			//if(bufferAux){
 			//	free(bufferAux);	
 			//}
@@ -246,7 +247,7 @@ void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvType
    			{
    				//printf("[preProcessSmv] Buffer pré compute Phase 3 %s \n\n",buffer);
    				readTrans = (buffer[0] != 'I')? readTrans : 0;
-   				controlRename = readTrans? 0 : 0; // usado para debugar o nosso renomeador de refs
+   				controlRename = readTrans? 1 : 0; // usado para debugar o nosso renomeador de refs
    			}
 
    			if(phase == ASSIGN)
