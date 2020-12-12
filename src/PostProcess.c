@@ -14,7 +14,7 @@ char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s : %s..%s;\n", "\t%s : boolean;" "\t%s : {%s};", "%s, %s" };
+                          "\t%s : %s..%s;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s" };
 
 int  ALOC_SIZE_LINE = 300;
 
@@ -119,7 +119,7 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
 void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
-    if(type == NUMBER_ENTRY || T_DIRECTIVE_ENTRY){
+    if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
         sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
         char* auxDelim = strstr(newType,":");
         char* auxFim = strstr(auxDelim,"..");
@@ -129,8 +129,6 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         int tam = strlen(newType);
         void* po[] = {&pos, &tam, &pointIni, &pointEnd};
         addValue(varName, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
-        header->varBuffer[header->VAR_POINTER] = newType;
-        header->VAR_POINTER += 1;
     }
     if(type == LOGICAL_ENTRY){
         sprintf(newType,SmvConversions[BOOLEAN_DEC],varName,newValue,newValue);
@@ -145,13 +143,15 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         //void* po[] = {&pos, &tam};
         //addTypeSet(varName,po,TYPE_SET,2,writeSmvTypeTable);
     }
+    header->varBuffer[header->VAR_POINTER] = newType;
+    header->VAR_POINTER += 1;
 }
 
 void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type,int minmax)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
-    if(type == NUMBER_ENTRY || T_DIRECTIVE_ENTRY)
+    if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
     {
         int pos;
         int size;

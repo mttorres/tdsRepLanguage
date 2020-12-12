@@ -26,11 +26,13 @@ Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, Heade
 Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
 Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
-        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
+        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF, evalMATCH_IF
 };
 
 
@@ -47,15 +49,15 @@ Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContro
 Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     printf("[evalBOOL] \n");
-    int* sint;
+    int sint;
 
     char* trueString = "true";
 
-    *sint= strstr(n->leafs[0],trueString)? 1 : 0;
+    sint= strstr(n->leafs[0],trueString)? 1 : 0;
 
-    printf("[evalBOOL] SINTH: %d \n",*sint);
+    printf("[evalBOOL] SINTH: %d \n",sint);
 
-    void* bp[] = {sint};
+    void* bp[] = {&sint};
 
     Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1);
 
@@ -783,6 +785,26 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
     return NULL;
 }
 
+Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+
+    Object* conditionalExpr = NULL;
+    Object** sintExpr = NULL;
+
+    STable* IF_SCOPE = addSubScope(scope,IF_BLOCK);
+    sintExpr = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv);
+    conditionalExpr = sintExpr[0];
+    printObject(conditionalExpr);
+    exit(-1);
+
+
+    return NULL;
+}
+
+Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+
+}
+
+
 Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
 {
     printf("[eval] %s \n",n->name);
@@ -811,7 +833,9 @@ Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControll
                     if(toEval)
                     {
                         printf("(%d) %s \n",i,toEval->name);
-                        SYNTH_O[i] = eval(n->children[i],scope,writeSmvTypeTable,controllerSmv)[0];
+                        Object** SYNTH_SET =  eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
+                        SYNTH_O[i] = SYNTH_SET[0];
+                        free(SYNTH_SET);
                     }
                     // (já criamos Object) resolver dependencias realmente necessário? Parando para pensar podemos acessar o filho imediatamente abaixo do nó em questão e já pegar os valores ! Evita criar mais structs! (pode ficar complexo para alguns casos por outro lado... e fora que inviabiliza tds e vetores)
                 }

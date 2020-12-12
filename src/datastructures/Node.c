@@ -13,7 +13,7 @@ const char* mappingEnumNode[] =  {
 
         "AC_V", "OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
 
-        "EXPR",
+        "EXPR", "CMD_IF", "MATCH_IF",
 
         "ASSIGN_IDVAR", "ASSIGN_AC_V", "ASSIGN_TDIRECTIVE",
 
@@ -27,11 +27,9 @@ const char* mappingEnumNode[] =  {
 
         "FUNC_DEF", "PROC_DEF", "F_BODY", "OPT_RETURN", "PARAMS", "PARAM",
 
-        "CMD_IF", "CMD_OTHER",
+         "CMD_OTHER",
 
         "CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
-
-        "MATCH_IF",
 
         "OTHER_LOOP", "FUNC_CALL", "PROC_CALL"
 };
