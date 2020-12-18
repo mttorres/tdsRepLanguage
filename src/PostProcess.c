@@ -26,8 +26,8 @@ void copyValueBind(Object* o, char* bind,int index,int defaultValue)
     char* formatRef = "%s[%d]";
 
     if(!index) {
-        if (o->bind) {
-            sprintf(bind, formatS, o->bind);
+        if (o->SINTH_BIND) {
+            sprintf(bind, formatS, o->SINTH_BIND);
         } else {
             if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
                     sprintf(bind, formatN, defaultValue? 0 : *(int *) o->values[0]);
@@ -48,6 +48,15 @@ void copyValueBind(Object* o, char* bind,int index,int defaultValue)
     }
 }
 
+void createExprBind(char *result, Object *o1, Object *o2, char *op) {
+    if(!o2){
+        sprintf(result,SmvConversions[UN_OP],op,o1->SINTH_BIND);
+    }
+    else{
+        sprintf(result,SmvConversions[OP],o1->SINTH_BIND,o2->SINTH_BIND);
+    }
+}
+
 
 
 char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube)
@@ -56,22 +65,14 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
         char* interPt = inter;
         char* cube = malloc(sizeof(strlen(opBind1)+strlen(opBind2)+strlen(operation)+1));
 
-        if(concCube){
-            interPt = customCat(interPt,opBind1,0,0);
-            interPt = customCat(interPt,operation,0,0);
-            interPt = customCat(interPt,opBind2,0,0);
-            // resulta em cond1 op cond2
-        }
-        else{
-            // gera cond ( bind1 op bind2) ou opbind1
-            if(opBind2[0] != '\0'){
+        // gera cond ( bind1 op bind2) ou opbind1
+        if(opBind2[0] != '\0'){
                 sprintf(inter,SmvConversions[OP],opBind1,operation,opBind2);
-            }
-            else{
-                sprintf(inter,SmvConversions[UN_OP],operation,opBind1);
-            }
         }
-        if(evaluation){
+//        else{
+//                sprintf(inter,SmvConversions[UN_OP],operation,opBind1);
+//        }
+        if(evaluation && !concCube){
             int indexConversion = firstCond? CASE_EVAL : N_CASE_EVAL;
             sprintf(cube,SmvConversions[indexConversion],inter,evaluation);
         }
@@ -81,14 +82,24 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
         return cube;
 }
 
+
+void bindCondition(STable* scope, Object* conditionExpr){
+    if(scope->type != IF_BLOCK && scope->type != ELSE_BLOCK){
+        fprintf(stderr, "[bindCondition]: %d scope cannot be binded to %s! \n",scope->type,conditionExpr->SINTH_BIND);
+        exit(-1);
+    }
+    scope->conditionBind = malloc(strlen(conditionExpr->SINTH_BIND)+1);
+    strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
+}
+
 char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* valueBind, char* defaultValueBind,
                   Object* expr, STable* scope, int firstCondition){
 
-    sprintf(directiveValueBind, "%d", ctime); // bind da diretiva temporal corrente
-    copyValueBind(expr,valueBind,0,0); // bind da expressão, pode variar para vetores e estruturas complexas
+    sprintf(directiveValueBind, "%d", ctime); // SINTH_BIND da diretiva temporal corrente
+    copyValueBind(expr,valueBind,0,0); // SINTH_BIND da expressão, pode variar para vetores e estruturas complexas
 
-    char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL; // bind do escopo
-    // bind da condição temporal, ex: "next(time) = 2"
+    char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL; // SINTH_BIND do escopo
+    // SINTH_BIND da condição temporal, ex: "next(time) = 2"
     char* temporalCondition = changeContext?
                               createConditionCube("next(time)",directiveValueBind, "=", NULL,1,0)
                                            : NULL;

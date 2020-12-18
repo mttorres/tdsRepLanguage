@@ -10,15 +10,15 @@
 
 
 /**
- * Recebe um objeto  (que representa expressão ou valor qualquer) e uma String (bind), e o converte para o seu 
- * a String apropriada. Caso seja passado defaultValue como 1, o bind é o default do tipo daquele valor
+ * Recebe um objeto  (que representa expressão ou valor qualquer) e uma String (SINTH_BIND), e o converte para o seu
+ * a String apropriada. Caso seja passado defaultValue como 1, o SINTH_BIND é o default do tipo daquele valor
  *
  * @param o o valor em objeto da linguagem
- * @param bind a string onde o bind será copiado para 
+ * @param bind a string onde o SINTH_BIND será copiado para
  * @param index usado para tratar binds em indices de string
- * @param defaultValue uma flag que define se o default daquele tipo deve ser o bind
+ * @param defaultValue uma flag que define se o default daquele tipo deve ser o SINTH_BIND
  *
- * @SideEffects Aletra o conteúdo em memória vindo de bind
+ * @SideEffects Aletra o conteúdo em memória vindo de SINTH_BIND
  *
  * */
 
@@ -59,6 +59,10 @@ void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, in
  * */
 char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube);
 
+/***/
+void createExprBind(char *result, Object *o1, Object *o2, char *op);
+/***/
+void bindCondition(STable* scope, Object* conditionExpr);
 
 /**
  * Formata a expressões usada na atribuição de uma variável qualquer, utilizando condicionais ou não.
@@ -67,10 +71,10 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
  *
  * @param ctime a diretiva do tempo corrente
  * @param changeContext uma flag que define se o contexto temporal foi mudado
- * @param directiveValueBind  string de bind da diretiva C_TIME vinda do interpretador
- * @param valueBind  string de bind do valor da expressão vinda do interpretador
+ * @param directiveValueBind  string de SINTH_BIND da diretiva C_TIME vinda do interpretador
+ * @param valueBind  string de SINTH_BIND do valor da expressão vinda do interpretador
  * @param firstCondition define se essa é a primeira condição aplicada ao assigin
- * @param defaultValueBind string de bind do valor default para aquela variável
+ * @param defaultValueBind string de SINTH_BIND do valor default para aquela variável
  * @param expr a expressão recuperada pelo interpretador
  * @param scope o escopo de execução
  *

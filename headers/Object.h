@@ -13,13 +13,13 @@ typedef struct SYNTH_OBJECT
   int* STR; // tamanho strings mapeado
   void ** values; // a pergunta é ... lista de valores ou valor único ?(em geral vai ser unico, pode ser também um ponteiro para uma lista)
   int redef; // serve para auxiliar na escrita no nuXmv (e talvez em um futuro se permitir lista de valores diferentes)
-  char* bind; // serve para auxiliar a limpeza de memória e escrever no nuXmv
+  char* SINTH_BIND; // serve para auxiliar a limpeza de memória e escrever no nuXmv
   int timeContext;
 
 } Object;
 
-									// mudar depois o tipo
-									Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext);
+// mudar depois o tipo
+Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *SYNTH_BIND);
 
 void printObject(Object* o);
 

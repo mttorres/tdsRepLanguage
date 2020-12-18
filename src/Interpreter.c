@@ -6,7 +6,7 @@
 #include <string.h>
 #include "../headers/PostProcess.h"
 
-typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94,
+typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
 Object ** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
@@ -42,7 +42,7 @@ Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContro
     sint = atoi(n->leafs[0]);
     printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1);
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, NULL);
     return o;
 }
 
@@ -59,7 +59,7 @@ Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 
     void* bp[] = {&sint};
 
-    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1);
+    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, NULL);
 
     return o;
 }
@@ -74,7 +74,7 @@ Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCon
 
     printf("[evalSTRING] SINTH: %s \n",sint);
 
-    Object* o = createObject(LABEL_ENTRY, 1, sp, -1);
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, NULL);
 
     return o;
 }
@@ -95,7 +95,7 @@ Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 
     printf("[evalNULL] SINTH: %s \n",sint);
 
-    Object* o = createObject(NULL_ENTRY, 1, np, -1);
+    Object* o = createObject(NULL_ENTRY, 1, np, -1, NULL);
 
     return o;
 }
@@ -160,7 +160,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, H
     else
     {
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
-        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1);
+        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, NULL);
     }
 }
 
@@ -199,7 +199,7 @@ Object* evalPLUS(Object* o1, Object* o2)
     {
         *r = (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
         rp[0] = r;
-        return createObject(NUMBER_ENTRY, 1, rp, -1);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
     }
     if(o1->type == LABEL_ENTRY)
     {
@@ -220,7 +220,7 @@ Object* evalMINUS(Object* o1, Object* o2)
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
     void* rp[] = {&r};
-    return createObject(NUMBER_ENTRY, 1, rp, -1);
+    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
 }
 
 Object* evalNOT(Object* o)
@@ -234,7 +234,9 @@ Object* evalNOT(Object* o)
     int r;
     r =  !(*(int*) o->values[0]);
     void* rp[] = {&r};
-    return createObject(LOGICAL_ENTRY, 1, rp, -1);
+    char resultingBind[strlen(o->SINTH_BIND)+2];
+    createExprBind(resultingBind, o, NULL, "!");
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
 Object* evalTIMES(Object* o1, Object* o2)
@@ -242,7 +244,7 @@ Object* evalTIMES(Object* o1, Object* o2)
     int* r;
     *r = (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
     void* rp[] = {r};
-    return createObject(NUMBER_ENTRY, 1, rp, -1);
+    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
 }
 
 Object* evalDIVIDE(Object* o1, Object* o2, int type)
@@ -258,7 +260,7 @@ Object* evalDIVIDE(Object* o1, Object* o2, int type)
     *r = type == DIVIDE? (*(int*)o1->values[0]) / (*(int*)o2->values[0]) : (*(int*)o1->values[0]) % (*(int*)o2->values[0]);
     rp[0] = r;
 
-    return createObject(NUMBER_ENTRY, 1, rp, -1);
+    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
 }
 
 Object* evalLESS(Object* o1, Object* o2, int opCode)
@@ -282,7 +284,7 @@ Object* evalLESS(Object* o1, Object* o2, int opCode)
         }
     }
     rp[0] = r;
-    return createObject(LOGICAL_ENTRY, 1, rp, -1);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, NULL);
 }
 
 Object* evalGREAT(Object* o1, Object* o2, int opCode)
@@ -306,7 +308,7 @@ Object* evalGREAT(Object* o1, Object* o2, int opCode)
         }
     }
     rp[0] = r;
-    return createObject(LOGICAL_ENTRY, 1, rp, -1);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, NULL);
 
 }
 
@@ -355,7 +357,7 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
             {
                 return evalMINUS(sintUni,NULL);
             }
-            if(ops[0] == MINUS  && sintUni->type == LOGICAL_ENTRY)
+            if(ops[0] == NOT_PREFIX  && sintUni->type == LOGICAL_ENTRY)
             {
                 return evalNOT(sintUni);
             }
@@ -678,9 +680,9 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
 
         //binds da expressão
         char directiveValueBind[300]; // tempo corrente
-        // bind do valor da expressão (ou com o valor dela ou com o smv bind)
+        // SINTH_BIND do valor da expressão (ou com o valor dela ou com o smv SINTH_BIND)
         char valueBind[300];
-        // bind do valor default caso a atribuição venha a necessitar criar um init e next juntos
+        // SINTH_BIND do valor default caso a atribuição venha a necessitar criar um init e next juntos
         char defaultValueBind[300];
         char* conditionCube = NULL ;
 
@@ -794,9 +796,16 @@ Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCo
     sintExpr = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv);
     conditionalExpr = sintExpr[0];
     printObject(conditionalExpr);
-    exit(-1);
+    bindCondition(IF_SCOPE,conditionalExpr);
+    if(*(int*)conditionalExpr->values[0]){
 
-
+        eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv); // tenho que passar um parâmetro que define se avaliou
+    }
+    else{
+        if(n->children[1]){
+            // cria else
+        }
+    }
     return NULL;
 }
 

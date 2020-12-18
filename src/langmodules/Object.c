@@ -62,8 +62,7 @@ void* allocateTypeSetObjects(int index, void* value)
 }
 
 
-
-Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext)
+Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *SYNTH_BIND)
 {
 
 	Object* newOb = (Object*) malloc(sizeof(Object));
@@ -72,8 +71,15 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext)
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	newOb->redef = 0;
 	newOb->timeContext = timeContext;
-	newOb->bind = NULL;
-	if(type == LABEL_ENTRY)
+    if(SYNTH_BIND){
+        newOb->SINTH_BIND = malloc(strlen(SYNTH_BIND)+1);
+        strcpy(newOb->SINTH_BIND,SYNTH_BIND);
+    }
+    else{
+        newOb->SINTH_BIND = NULL;
+    }
+
+    if(type == LABEL_ENTRY)
 	{
 		newOb->STR = malloc(sizeof(int)*OBJECT_SIZE);
 	}
@@ -194,7 +200,7 @@ void printObject(Object* o)
 
 void letgoObject(Object* o, int always)
 {
-	if(o && (o->bind || always))
+	if(o && (o->SINTH_BIND || always))
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
@@ -221,7 +227,7 @@ void letgoObject(Object* o, int always)
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, -1);
+	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, -1, o->SINTH_BIND);
 	return newOb;
 }
 
