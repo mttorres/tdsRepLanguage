@@ -10,7 +10,7 @@ typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_N
                                INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d%%d", "%s_scope%s","%s_scope%s%d%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d", "%s_scope%s","%s_scope%s_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
@@ -69,9 +69,9 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
         if(opBind2[0] != '\0'){
                 sprintf(inter,SmvConversions[OP],opBind1,operation,opBind2);
         }
-//        else{
-//                sprintf(inter,SmvConversions[UN_OP],operation,opBind1);
-//        }
+        else{
+                sprintf(inter,SmvConversions[ANY],opBind1);
+        }
         if(evaluation && !concCube){
             int indexConversion = firstCond? CASE_EVAL : N_CASE_EVAL;
             sprintf(cube,SmvConversions[indexConversion],inter,evaluation);
