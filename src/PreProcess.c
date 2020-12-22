@@ -45,7 +45,7 @@ void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, in
 				char name[] = {line[1],'\0'};
 
 				//addValue(name,po,TYPE_SET,2,0,portsSmv);
-				addTypeSet(name,po,TYPE_SET,2,writeSmvTypeTable[1]);
+                addTypeSetSmv(name, po, TYPE_SET, 2, writeSmvTypeTable[1]);
 			}
 
 			header->VAR_POINTER += 1;	

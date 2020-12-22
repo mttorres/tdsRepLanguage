@@ -390,14 +390,14 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
  
 
 */
-void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current)
+void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current)
 {
-	printf("[addTypeSet] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
 
 	void* po[] = {any[0], any[1], hashset};
 
-	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+	printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
     addValue(name, po, any_type, object_size + 1, 0, current, 0);
 }
@@ -410,7 +410,7 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 
     void* po[] = {any[0], any[1], hashset};
 
-    printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+    printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
     addValue(name,po,any_type,object_size+1,0,current);
 }
@@ -530,4 +530,7 @@ STable * letgoSubScope(STable* current)
 	return parent;
 
 }
+
+
+void addNumericalIntervalSmv()
 

@@ -153,7 +153,7 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
     if(type == TDS_ENTRY || LABEL_ENTRY)
     {
         //void* po[] = {&pos, &tam};
-        //addTypeSet(varName,po,TYPE_SET,2,writeSmvTypeTable);
+        //addTypeSetSmv(varName,po,TYPE_SET,2,writeSmvTypeTable);
     }
     header->varBuffer[header->VAR_POINTER] = newType;
     header->VAR_POINTER += 1;

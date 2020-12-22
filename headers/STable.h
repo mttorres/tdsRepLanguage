@@ -76,7 +76,7 @@ int checkTypeSet(STable* current, char* name,  char* typeid);
 */
 void addEntryToTypeSet(STable* current, char* name, char* typeid); 
 
-void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current);
+void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current);
 
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
