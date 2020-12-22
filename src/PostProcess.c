@@ -72,12 +72,12 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
         else{
                 sprintf(inter,SmvConversions[ANY],opBind1);
         }
-        if(evaluation && !concCube){
+        if(evaluation){
             int indexConversion = firstCond? CASE_EVAL : N_CASE_EVAL;
             sprintf(cube,SmvConversions[indexConversion],inter,evaluation);
         }
         else{
-            sprintf(cube,SmvConversions[ANY],inter,evaluation);
+            sprintf(cube,SmvConversions[ANY],inter);
         }
         return cube;
 }
