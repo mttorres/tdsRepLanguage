@@ -52,12 +52,11 @@ void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, in
  * @param evaluation o resultado da avaliação no nuXmv, se for necessário criar um cubo com avaliação
  * @param firstCond define se o cubo retornado é terá um \n na frente,
  * dependendo diretamente do contexto da variável que irá receber essa condição
- * @param concCube retorna uma concatenação de outros cubos já definidos anteriormente que não tenha avaliações associadas
  *
  * @SideEffects  Aloca uma string em memória, delegando a responsabilidade do seu free
  *
  * */
-char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube);
+char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond);
 
 /***/
 void createExprBind(char *result, Object *o1, Object *o2, char *op);

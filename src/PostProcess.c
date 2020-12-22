@@ -59,7 +59,7 @@ void createExprBind(char *result, Object *o1, Object *o2, char *op) {
 
 
 
-char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond, int concCube)
+char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond)
 {
         char inter[ALOC_SIZE_LINE];
         char* interPt = inter;
@@ -101,17 +101,18 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
     char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL; // SINTH_BIND do escopo
     // SINTH_BIND da condição temporal, ex: "next(time) = 2"
     char* temporalCondition = changeContext?
-                              createConditionCube("next(time)",directiveValueBind, "=", NULL,1,0)
+                              createConditionCube("next(time)", directiveValueBind, "=", NULL, 1)
                                            : NULL;
 
     // ponteiro auxiliar que referencia a condição temporal criada
     char* auxReftemporalCondition = temporalCondition;
 
     // se existe alguma condição vinda do escopo e uma condição temporal, as concatena, senão usa apenas uma delas ou nenhuma delas
-    char* conditionCube = temporalCondition && condition?
-                          createConditionCube(auxReftemporalCondition,condition,"&",valueBind,firstCondition,1) :
-                          auxReftemporalCondition? createConditionCube(auxReftemporalCondition,"", "", valueBind,firstCondition,0) :
-                          condition? createConditionCube(condition,"", "", valueBind,firstCondition,0) : NULL;
+    char* conditionCube = temporalCondition && condition ?
+                          createConditionCube(auxReftemporalCondition, condition, "&", valueBind, firstCondition) :
+                          auxReftemporalCondition ? createConditionCube(auxReftemporalCondition, "", "", valueBind,
+                                                                        firstCondition) :
+                          condition ? createConditionCube(condition, "", "", valueBind, firstCondition) : NULL;
 
     // libera o cubo sem avaliação utilizado anteriormente para o passo anterior
     if(temporalCondition){
