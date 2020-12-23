@@ -318,20 +318,6 @@ TableEntry* lookup(STable* t, char* name) {
 }
 
 
-
-// op's novas que funcionam
-
-// note que ! eu poderia muito bem por que os valores FOLHA dos nós da arvore são os mesmos que ENTRY_TYPE, existe ligeira redundância...
-// QUE POR SINAL.... meu entry_type vai ser o meu "proxy" para valores? 
-		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
-		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
-		// primeiro eu vou testar usando valores literais 
-
-
-/*
-
-	Verifica se é necessário chamar addEntryToTypeSet
-*/
 int checkTypeSet(STable* current, char* name,  char* typeid)
 {
 	// procura a variável em questão na tabela do SMV
