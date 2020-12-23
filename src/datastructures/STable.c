@@ -169,7 +169,7 @@ void printTable(STable* t){
 }
 
 
-void letgoEntry(TableEntry* e) {
+void letgoEntry(TableEntry *e) {
 	if(!e) {
 	    return;
 	}
@@ -179,13 +179,16 @@ void letgoEntry(TableEntry* e) {
 	}
 	if(e->val)
 	{
+	    if(e->val->type == TYPE_SET){
+            letgoTable((STable *) e->val->values[2]);
+	    }
 		letgoObject(e->val,1);
 	}
 	free(e);
 }
 
 
-void letgoTable(STable* t)
+void letgoTable(STable *t)
 {
 	if(!t) {
 	    return;
@@ -193,15 +196,15 @@ void letgoTable(STable* t)
 	int i;
 	if(t->children){
 		for(i=0; i < t->nchild; i++){
-			letgoTable(t->children[i]);
+            letgoTable(t->children[i]);
 		}
 		free(t->children);
 	}
 	if(t->tableData){
 		for(i=0; i < MAX_TABLE; i++)
 		{
-				if(t->tableData[i]) {
-			 	letgoEntry(t->tableData[i]);   
+		    if(t->tableData[i]) {
+                letgoEntry(t->tableData[i]);
 			}
 		}
 	    free(t->tableData);
@@ -402,6 +405,17 @@ void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable
     addValue(name, po, any_type, object_size + 1, 0, current, 0);
 }
 
+void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
+
+    printf("[addNumericalIntervalSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+
+    max = newValue > max && newValue > min ? newValue : max;
+    max = newValue < max && newValue < min ? newValue : min;
+
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
+    addValue(name, po, WRITE_SMV_INFO, 4, 0, current, 0);
+}
+
 /*
 void addWriteInfo(char* name, void** any, int any_type, int object_size, STable* current)
 {
@@ -524,13 +538,10 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 STable * letgoSubScope(STable* current)
 {
 	STable* parent = current->parent;
-	letgoTable(current);
+    letgoTable(current);
 	parent->nchild --;
 
 	return parent;
 
 }
-
-
-void addNumericalIntervalSmv()
 

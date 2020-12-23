@@ -91,7 +91,7 @@ void updateValue(char *name, void **any, int any_type, int object_size, int oInd
 
 void printTable(STable* t);
 
-void letgoTable(STable* t);
+void letgoTable(STable *t);
 
 int hash(char * str, STable* t);
 
@@ -101,8 +101,16 @@ TableEntry* lookup(STable* t, char* name);
 
 void printEntry(TableEntry* e);
 
-void letgoEntry(TableEntry* e);
-
+/**
+ * Libera as entradas da tabela de simbolos, seguindo diferentes esquemas dependendo do type.
+ *      tupla-objeto-linguagem: n objetos de mesmo tipo (inteiro, timedirective, booleano, label, null, tds)
+ *      tupla-inteiros : pos, tamanho, pointIni, pointEnd, min, max
+ *      tupla-booleano:  pos, tamanho
+ *      tupla-set:   pos, tamanho, SIMPLE_HASH
+ *
+ * @param e a entrada a ser liberada
+ * */
+void letgoEntry(TableEntry *e);
 
 
 
