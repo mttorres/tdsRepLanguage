@@ -11,7 +11,8 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
     //printf("\t[customCat] source:  %s \n\n\n",src);
     
 	while(*dest){
-		//printf("\t[customCat] %s \n",dest);				
+		//printf("\t[customCat] %s \n",dest);
+		//*dest = '\0';
 		dest++; // vai para a "proxima posição disponivel" (no caso de strings usadas anteriormente por essa função só roda "uma vez")
 	}
 	while(*src){
@@ -86,16 +87,16 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	char *newString;
 	int breakline=0;
 	int statementEnd = 0;
-	if(original[strlen(original)-1] == '\n'){
+	int tamOriginal = strlen(original);
+	if(original[tamOriginal-1] == '\n'){
 	  breakline = 1;
 	}
     //printf("aaaa: %c \n",original[strlen(original)-2]);
-	if(original[strlen(original)-2]== ';'){
+	if(original[tamOriginal-2]== ';'){
         statementEnd = 1;
     }
-
-	if(statementEnd || original[strlen(original)-1] == delim2[0] || original[strlen(original)-2] == delim2[0]){
-	    newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
+	if(original[tamOriginal-3] == delim2[0]  || original[tamOriginal-1] == delim2[0] || original[tamOriginal-2] == delim2[0]){
+	    newString = (char*) malloc(sizeof(char)*(strlen(original) +2+ strlen(param) +1)); // original + param + ',' + ' ' +  '\0'
 		newString = customCat(newString,original,delim2[0],0);
 		//printf("caso 1... %s \n",newString);
 		newString = customCat(newString,", ",0,0);
@@ -107,8 +108,13 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	}
 	else {
 		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
-		newString = (char*) malloc(sizeof(char)*(strlen(original)+1+strlen(param)+1+1)); // ( , ) e  \0	   	
-		newString = customCat(newString,original,'\n',0);
+		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+        if(statementEnd){
+            newString = customCat(newString,original,';',0);
+        }
+        else{
+            newString = customCat(newString,original,'\n',0);
+        }
 		newString = customCat(newString,delim1,0,0);
 		newString = customCat(newString,param,0,0);
 		newString = customCat(newString,delim2,0,0);
@@ -120,7 +126,7 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	if(breakline){
 	  newString = customCat(newString,"\n",0,0);
 	}
-	newString = newString - ((strlen(original)+strlen(param)+2)-1);	
+	newString = newString - ((strlen(original)+strlen(param)+2)-breakline);
 
 	return newString;
 }
