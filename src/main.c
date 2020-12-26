@@ -40,23 +40,19 @@ int main(int argc, char* argv[]) {
 	fclose(fp);
 
 	// tabelas e componentes globais
-	HeaderController* controller = createController(5);  
-
+	HeaderController* controller = createController();
 	STable* global = createTable(GLOBAL,NULL,0,0);
 
-	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
-	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
-	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
 	//pré processamento 
-	preProcessSmv(smvP,controller,writeSmvTypeTable);
-	setUpMainSmvTable(controller,writeSmvTypeTable,global);
+    preProcessSmv(smvP, controller);
+//    setUpMainSmvTable(controller, NULL);
   
   	printf("--------------------------------- EVAL ---------------------------------------------\n");
   	printf("\n");
   	printf("\n");
   	
 	//pos processamento
-	eval(root,global,writeSmvTypeTable,controller);
+	//eval(root,global,writeSmvTypeTable,controller);
 
 	printf("\n");
 	printf("------------------------------------------------------------------------------\n");
@@ -66,17 +62,17 @@ int main(int argc, char* argv[]) {
  	printf("\n");
  	printf("\n");
 
- 	printf("--------------------------------- TABLES ---------------------------------------------\n");
+ 	printf("--------------------------------- PROGRAM TABLES ---------------------------------------------\n");
 
 	printTable(global);
     printf("\n");
-	printTable(writeSmvTypeTable[0]);
+
+    printf("--------------------------------- smv-INFO TABLES ---------------------------------------------\n");
+
+	printTable(controller->mainInfo);
 	printf("\n");
-    printTable(writeSmvTypeTable[1]);
+    printTable(controller->portsInfo);
 	printf("\n");
-
-
-
 
 	printf("\n");	
  	printf("\n");
@@ -85,17 +81,11 @@ int main(int argc, char* argv[]) {
 
  	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
-
-	//printHeader(controller->headers[0]);
-	//printHeader(controller->headers[1]);
-	//printHeader(controller->headers[2]);
-	//printHeader(controller->headers[3]);
-//	printHeader(controller->headers[4]);
+    printAllHeaders(controller);
 
  	if(!controller->declaredPorts){
  		fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMENDED THAT YOU REVIEW YOUR .tds FILE \n");
  	}
-
 
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
 
@@ -108,12 +98,11 @@ int main(int argc, char* argv[]) {
 
 
 //    printf("teste TYPE SET !!! \n\n\n");
-//    char* temp = controller->headers[4]->varBuffer[1];
+//    char* temp = controller->PORTS_RELATED[0]->varBuffer[1];
 //    char* result = addParams(temp,"BATATA","{","}");
-//	printf("%s\n",result);
-//	char* testAgain = addParams(temp,"JUDGEMENT AHS COME TO YOU","{","}");
-
-//	printf("%s\n",testAgain);
+//    printf("%s\n",result);
+//    char* testAgain = addParams(result,"JUDGEMENT AHS COME TO YOU","{","}");
+//    printf("%s\n",testAgain);
 
 	letGoHeaderControl(controller);
 
