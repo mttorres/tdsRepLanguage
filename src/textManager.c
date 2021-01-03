@@ -3,11 +3,9 @@
 #include <stdlib.h>
 #include "../headers/textManager.h"
 
-// nota: ignore mode = 0 só o caracter especifico e tudo DEPOIS
-//  =  1 tudo ANTES DO CARACTER e o caracter especifico
+
 char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 
-    int ignoredExtra = 0;
     //printf("\t[customCat] source:  %s \n\n\n",src);
     
 	while(*dest){
@@ -16,17 +14,12 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 		dest++; // vai para a "proxima posição disponivel" (no caso de strings usadas anteriormente por essa função só roda "uma vez")
 	}
 	while(*src){
-		
 		//printf("\t[customCat] source atual: %s \n",src);
 		if(!ignoreMode){
 		    *dest = *src;
 		    //printf("\t[customCat] nova string atual:  %s \n",dest);
 		    dest++;
 		}
-		else {
-		   ignoredExtra++; 
-		}
-
 		src++;
 		if(*src == toIgnore){
 			//printf("\t[customCat] delimiter detected\n");			
@@ -36,16 +29,9 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 	
 	if(!ignoreMode){
 	  *dest = '\0';
-	  --dest;   
+	  --dest;
 	  //printf("\t[customCat - ignoreMode = 0] ponteiro fim : %s \n",dest);	  
 	}
-	else {
-	        *dest = ignoredExtra;
-	        //printf("\t[customCat - ignoreMode = 1] caracteres ignorados : %d \n",ignoredExtra);
-	       	//printf("\t[customCat - ignoreMode = 1] equivalencia ascii: %c \n",ignoredExtra);
-	        // salva quantos foram ignorados!    
-	}
-	//printf("\t[customCat] ponteiro 'final' string: %s \n\n\n\n",dest);		
 	return dest;
 
 }
@@ -85,48 +71,56 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
 char *addParams(char *original, char *param, char* delim1, char* delim2) {
  
 	char *newString;
-	int breakline=0;
-	int statementEnd = 0;
+	char *auxNewAdd;
+	int breakline=0; // verifica se o final da string é \n
+	int statementEnd = 0; // verifica se o final da string é ; (não é nome de módulo)
 	int tamOriginal = strlen(original);
 	if(original[tamOriginal-1] == '\n'){
 	  breakline = 1;
 	}
-    //printf("aaaa: %c \n",original[strlen(original)-2]);
+
 	if(original[tamOriginal-2]== ';'){
         statementEnd = 1;
     }
-	if(original[tamOriginal-3] == delim2[0]  || original[tamOriginal-1] == delim2[0] || original[tamOriginal-2] == delim2[0]){
-	    newString = (char*) malloc(sizeof(char)*(strlen(original) +2+ strlen(param) +1)); // original + param + ',' + ' ' +  '\0'
-		newString = customCat(newString,original,delim2[0],0);
+	// qualquer string passada (original) são das seguintes formas:  xxxxxxxxx  ,  xxxxxxxxx;  , xxxxxxxxx(...)\n  , xxxxxxxxx(...);\n
+
+	// caso possua o delmitador de fechamento ) ou qualquer outro...
+	if(original[tamOriginal-3] == delim2[0]  || original[tamOriginal-2] == delim2[0]){
+	    newString = (char*) calloc(strlen(original) + strlen(param) + 2 + 1, sizeof(char)); // original + param + ',' + ' ' +  '\0'
+        auxNewAdd = newString;
+        auxNewAdd = customCat(auxNewAdd,original,delim2[0],0);
 		//printf("caso 1... %s \n",newString);
-		newString = customCat(newString,", ",0,0);
+        auxNewAdd = customCat(auxNewAdd,", ",0,0);
         //printf("caso 1... %s \n",newString);
-		newString = customCat(newString,param,0,0);
+        auxNewAdd = customCat(auxNewAdd,param,0,0);
         //printf("caso 1... %s \n",newString);
-		newString = customCat(newString,delim2,0,0);
+        auxNewAdd = customCat(auxNewAdd,delim2,0,0);
         //printf("caso 1... %s \n",newString);
 	}
 	else {
-		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
-		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+		//printf("%ld %ld \n",strlen(original),strlen(param));
+		newString = (char*) calloc(strlen(original) + 1 + strlen(param) + 1 + 1, sizeof(char));
+//		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+        auxNewAdd = newString;
+
         if(statementEnd){
-            newString = customCat(newString,original,';',0);
+            auxNewAdd = customCat(auxNewAdd,original,';',0);
         }
         else{
-            newString = customCat(newString,original,'\n',0);
+            auxNewAdd = customCat(auxNewAdd,original,'\n',0);
         }
-		newString = customCat(newString,delim1,0,0);
-		newString = customCat(newString,param,0,0);
-		newString = customCat(newString,delim2,0,0);
+        auxNewAdd = customCat(auxNewAdd,delim1,0,0);
+        auxNewAdd = customCat(auxNewAdd,param,0,0);
+        auxNewAdd = customCat(auxNewAdd,delim2,0,0);
 	}
     if(statementEnd){
-        newString = customCat(newString,";",0,0);
+        auxNewAdd = customCat(auxNewAdd,";",0,0);
     }
 
 	if(breakline){
-	  newString = customCat(newString,"\n",0,0);
+        auxNewAdd = customCat(auxNewAdd,"\n",0,0);
 	}
-	newString = newString - ((strlen(original)+strlen(param)+2)-breakline);
+//	newString = newString - ((strlen(original)+strlen(param)+2)-breakline);
 
 	return newString;
 }
