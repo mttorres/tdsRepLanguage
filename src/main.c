@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
 
 	//pré processamento 
     preProcessSmv(smvP, controller);
-//    setUpMainSmvTable(controller, NULL);
+    setUpMainSmvTable(controller, controller->mainInfo);
   
   	printf("--------------------------------- EVAL ---------------------------------------------\n");
   	printf("\n");
