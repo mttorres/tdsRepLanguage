@@ -338,7 +338,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	{
 		int present = 1;
 		void* po = {&present};
-        addValue(typeid, po, NUMBER_ENTRY, 1, 0, entry->val->values[2], 0);
+        addValue(typeid, po, LOGICAL_ENTRY, 1, 0, entry->val->values[2], 0);
 	}
 }
 
@@ -368,7 +368,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
  
 
 */
-void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current)
+void addTypeSetSmv(char *name, void **any, int object_size, STable *current)
 {
 	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
@@ -377,7 +377,7 @@ void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable
 
 	printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
-    addValue(name, po, any_type, object_size + 1, 0, current, 0);
+    addValue(name, po, TYPE_SET, object_size + 1, 0, current, 0);
 }
 
 void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
@@ -408,14 +408,9 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
-
-	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
-
+	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ?
 	// POR ENQUANTO:
-
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
-
-
 	Object* o = createObject(any_type, object_size, any, timeContext, NULL);
 	o->SINTH_BIND = o->SINTH_BIND? o->SINTH_BIND : name;
 	addValueCurrentScope(name,o,methodParam,current);
