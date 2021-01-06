@@ -76,7 +76,6 @@ void printEntry(TableEntry* e) {
 
 
 
-/// table
 
 STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 
@@ -102,9 +101,10 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->lastEntryIndex = 0;
 	newtable->backup = 0;
 	newtable->collision = 0;
-	newtable->conditionBind == NULL;
+	newtable->conditionBind = NULL;
 	newtable->children = NULL;
 	newtable->parent = parent;
+	newtable->childOfFunction = parent->type == FUNC || parent->childOfFunction;
 
 /*
 	if(chillist){

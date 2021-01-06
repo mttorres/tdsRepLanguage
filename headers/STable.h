@@ -37,7 +37,9 @@ typedef struct S_TABLE
   int order;
   SCOPE_TYPE type;
   char* conditionBind;
+  int childOfFunction;
   TableEntry** tableData;
+  // info relacionada a inclusão
   int lastEntryIndex;
   int backup;
   int collision;
