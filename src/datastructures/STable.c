@@ -198,6 +198,9 @@ void letgoTable(STable *t)
 		}
 	    free(t->tableData);
 	}
+	if(t->conditionBind){
+	    free(t->conditionBind);
+	}
 	free(t);
 }
 

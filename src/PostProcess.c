@@ -128,22 +128,24 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
 }
 
 
-void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
+void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind,
+                const char *defaultValueBind, int type, void *newValue)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
-        sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
+        sprintf(newType, SmvConversions[INTERVAL_DEC], varName, newValueBind,newValueBind);
         char* auxDelim = strstr(newType,":");
         char* auxFim = strstr(auxDelim,"..");
         int pointIni = (auxDelim-newType+2);
         int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
-        void* po[] = {&pos, &tam, &pointIni, &pointEnd};
-        addValue(varName, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
+        int minmax = !defaultValueBind? *(int*) newValue : 0;
+        void* po[] = {&pos, &tam, &pointIni, &pointEnd,&minmax,&minmax};
+        addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
     if(type == LOGICAL_ENTRY){
-        sprintf(newType,SmvConversions[BOOLEAN_DEC],varName,newValue,newValue);
+        sprintf(newType, SmvConversions[BOOLEAN_DEC], varName);
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
@@ -159,7 +161,8 @@ void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
     header->VAR_POINTER += 1;
 }
 
-void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type,int minmax)
+void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type,
+                void *newValue)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
@@ -169,35 +172,52 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
         int size;
         int pointIni;
         int pointEnd;
+        int min;
+        int max;
+        int minmax = -1;
         // recuperar da tabela
         TableEntry* entryPosType;
         entryPosType =  lookup(writeSmvTypeTable,varName);
         if(entryPosType){
-            pos = *(int*) entryPosType->val->values[0];
-            size = *(int*) entryPosType->val->values[1];
-            pointIni = *(int*) entryPosType->val->values[2];
-            pointEnd = *(int*) entryPosType->val->values[3];
+            min = *(int*) entryPosType->val->values[4];
+            max = *(int*) entryPosType->val->values[5];
+            minmax = *(int*) newValue < min ? 0 :
+                     *(int*) newValue > max ? 1 : minmax;
+            if(minmax != -1){
+                pos = *(int*) entryPosType->val->values[0];
+                size = *(int*) entryPosType->val->values[1];
+                pointIni = *(int*) entryPosType->val->values[2];
+                pointEnd = *(int*) entryPosType->val->values[3];
 
-            int newPointIni = 0;
-            int newPointEnd = 0;
-            int sizeNew = strlen(newValue);
-            // min..max;
-            if(minmax)
-            {
-                pointIni = pointEnd+3; // n..max;
-                // nota! o size já está indexbased!
-                pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
-                //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
-            }
-            updateSubStringInterval(newValue,header->varBuffer[pos],sizeNew,pointIni,pointEnd,size,&newPointIni,&newPointEnd);
-            size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
-            void* vpSize[] = {&size};
-            updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
-            // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
-            if(!minmax)
-            {
-                void* vpInEnd[] = {&newPointEnd};
-                updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
+                int newPointIni = 0;
+                int newPointEnd = 0;
+                int sizeNew = strlen(newValueBind);
+                // min..max;
+                if(minmax)
+                {
+                    pointIni = pointEnd+3; // n..max;
+                    // nota! o size já está indexbased!
+                    pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
+                    //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
+                }
+                updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni, &newPointEnd);
+                size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
+                void* vpSize[] = {&size};
+                updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
+                // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
+                if(!minmax)
+                {
+                    void* vpInEnd[] = {&newPointEnd};
+                    updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
+                    min = *(int*) newValue;
+                    void* vpmin[] = {&min};
+                    updateValue(varName, vpmin, WRITE_SMV_INFO, 1, 4, -1, writeSmvTypeTable, 0);
+                }
+                else{
+                    max = *(int*) newValue;
+                    void* vpmax[] = {&max};
+                    updateValue(varName, vpmax, WRITE_SMV_INFO, 1, 5, -1, writeSmvTypeTable, 0);
+                }
             }
         }
         else{
@@ -271,7 +291,7 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
 
 
 
-void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax)
+void updateAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition, int type, int typeExpr)
 {
     // tratamento de init/next(varName):= case ... TRUE : x; esac; , geralmente TRUE: NULL ou outra condição parecida
     // é sempre o "delmitador final", vai ser um caso similar ao anterior porém entre ponto de interesse - condição default, já que condições não mudam!
@@ -368,43 +388,46 @@ char* processActiveName(char* varName, char* funcRef, int redef, int level, int 
     }
     return useVar;
 }
-
-void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
-                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax)
+// passar o processo de bind aqui para dentro
+void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValueBind, char *condition,
+                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr,
+                void *newValue)
 {
     char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
     char interScope[ALOC_SIZE_LINE];  //nome com info de scope
     char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
     char statevarname[ALOC_SIZE_LINE]; // init ou next
     useVar = processActiveName(varName,funcRef,redef,level,order,interScope,interRedef);
-
     // next
     if(typeExpr){
         // criar init/next(useVar)
         sprintf(statevarname,SmvConversions[NEXT],useVar);
         //verifica se existe next(statevarname)
-        updateType(useVar,header,writeSmvTypeTable,newValue,type,minmax);
+        updateType(useVar, header, writeSmvTypeTable, newValueBind, type, newValue);
         if(lookup(writeSmvTypeTable,statevarname)){
-            updateAssign(useVar,header,writeSmvTypeTable,newValue,condition,type,NEXT,minmax);
+            updateAssign(useVar, header, writeSmvTypeTable, newValueBind, condition, type, NEXT);
         }
         else{
-            createAssign(useVar, header, writeSmvTypeTable, newValue, condition, NEXT, NULL);
+            createAssign(useVar, header, writeSmvTypeTable, newValueBind, condition, NEXT, NULL);
         }
     }
     // init
     else{
-        createType(useVar,header,writeSmvTypeTable,newValue,type);
-        createAssign(useVar, header, writeSmvTypeTable, newValue, condition, INIT, defaultValue);
+        createType(useVar, header, writeSmvTypeTable, newValueBind, defaultValue, type, newValue);
+        createAssign(useVar, header, writeSmvTypeTable, newValueBind, condition, INIT, defaultValue);
     }
 }
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExpr, int minmax)
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValueBind, int type, int typeExpr, int *newValue)
 {
-    updateType("time",main,writeSmvTypeTable,newValue,type,minmax);
-    typeExpr ? updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,NEXT,minmax) :
-    updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,INIT,minmax);
+    TableEntry* timeSmvInfo = lookup(writeSmvTypeTable,"time");
+    updateType("time", main, writeSmvTypeTable, newValueBind, type, newValue);
+    typeExpr ? updateAssign("time", main, writeSmvTypeTable, newValueBind, NULL, type, NEXT) :
+    updateAssign("time", main, writeSmvTypeTable, newValueBind, NULL, type, INIT);
 }
 
+// criar reset para variáveis
+void createVarReset(char* varName, HeaderController* controller);
 
 void writeResultantHeaders(HeaderController* controller, const char* path){
   
