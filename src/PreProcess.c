@@ -121,6 +121,8 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
 	int pointIni;
 	int pointEnd;
 	int tam = strlen(linhaLida);
+    int min = 0;
+    int max = 3;
 
     auxDelim = strstr(linhaLida,":");
 
@@ -129,8 +131,8 @@ void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable, S
     pointIni = (auxDelim-linhaLida+2);
     pointEnd = ((auxFim-linhaLida))-1;
 
-    void* po[] = {&pos, &tam, &pointIni, &pointEnd};
-    addValue(nome, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable[0], 0);
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min,&max};
+    addValue(nome, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable[0], 0);
 
 
     // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")

@@ -86,7 +86,8 @@ void bindCondition(STable* scope, Object* conditionExpr);
  * @Return "cubo : expressão;"
  * */
 
-char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* valueBind, char* defaultValueBind, Object* expr, STable* scope, int firstCondition);
+char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *valueBind, char *defaultValueBind,
+                  Object *expr, STable *scope, int firstCondition, int initVar);
 
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
@@ -133,8 +134,9 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
  * @param
  * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
-                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax);
+void
+specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
+           Object *newValue, int redef, int typeExpr, int C_TIME);
 
 
 

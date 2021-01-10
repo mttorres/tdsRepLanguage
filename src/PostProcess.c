@@ -92,15 +92,15 @@ void bindCondition(STable* scope, Object* conditionExpr){
     strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
 }
 
-char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* valueBind, char* defaultValueBind,
-                  Object* expr, STable* scope, int firstCondition){
+char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *valueBind, char *defaultValueBind,
+                  Object *expr, STable *scope, int firstCondition, int initVar) {
 
     sprintf(directiveValueBind, "%d", ctime); // SINTH_BIND da diretiva temporal corrente
     copyValueBind(expr,valueBind,0,0); // SINTH_BIND da expressão, pode variar para vetores e estruturas complexas
 
-    char* condition = scope->type == IF_BLOCK || ELSE_BLOCK? scope->conditionBind : NULL; // SINTH_BIND do escopo
+    char* condition = (scope->type == IF_BLOCK || scope->type == ELSE_BLOCK) && !initVar ? scope->conditionBind : NULL; // SINTH_BIND do escopo
     // SINTH_BIND da condição temporal, ex: "next(time) = 2"
-    char* temporalCondition = changeContext?
+    char* temporalCondition = changeContext && !initVar?
                               createConditionCube("next(time)", directiveValueBind, "=", NULL, 1)
                                            : NULL;
 
@@ -120,7 +120,7 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
     }
 
     // "otimização" para criar o caso default, se necessário
-    if(conditionCube){
+    if(conditionCube || initVar){
         copyValueBind(expr,defaultValueBind,0,1);
     }
 
@@ -128,22 +128,24 @@ char* formatBinds(int ctime, int changeContext, char* directiveValueBind, char* 
 }
 
 
-void createType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, const char* newValue, int type)
+void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, Object *newValue,
+                int type)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
-        sprintf(newType,SmvConversions[INTERVAL_DEC],varName,newValue,newValue);
+        sprintf(newType, SmvConversions[INTERVAL_DEC], varName, newValueBind, newValueBind);
         char* auxDelim = strstr(newType,":");
         char* auxFim = strstr(auxDelim,"..");
         int pointIni = (auxDelim-newType+2);
         int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
-        void* po[] = {&pos, &tam, &pointIni, &pointEnd};
-        addValue(varName, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
+        int minmax = newValue? *(int*) newValue : 0;
+        void* po[] = {&pos, &tam, &pointIni, &pointEnd, &minmax, &minmax};
+        addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
     if(type == LOGICAL_ENTRY){
-        sprintf(newType,SmvConversions[BOOLEAN_DEC],varName,newValue,newValue);
+        sprintf(newType, SmvConversions[BOOLEAN_DEC], varName, newValueBind, newValueBind);
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
@@ -163,7 +165,7 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
-    if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
+    if(minmax != -1 && type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
     {
         int pos;
         int size;
@@ -193,11 +195,20 @@ void updateType(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, con
             size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
             void* vpSize[] = {&size};
             updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
+
             // atualizar o fim do intervalo não mudar a nossa variável pointEnd também! Só atualiza o tamanho
             if(!minmax)
             {
                 void* vpInEnd[] = {&newPointEnd};
                 updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
+                int min = *(int*) newValue;
+                void* vpmin[] = {&min};
+                updateValue(varName, vpmin, WRITE_SMV_INFO, 1, 4, -1, writeSmvTypeTable, 0);
+            }
+            else{
+                int max = *(int*) newValue;
+                void* vpmax[] = {&max};
+                updateValue(varName, vpmax, WRITE_SMV_INFO, 1, 5, -1, writeSmvTypeTable, 0);
             }
         }
         else{
@@ -339,24 +350,14 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
 }
 
-char* processActiveName(char* varName, char* funcRef, int redef, int level, int order, char* interScope, char* interRedef){
+char *processActiveName(char *varName, int redef, int level, int order, int notExistsOutScope, char *interScope,
+                        char *interRedef) {
 
     char* useVar = NULL;
     // qualquer escopo diferente de GLOBAL/MAIN
-    if(order || level){
-        //(função)
-        if(funcRef){
-            if(!level){
-                sprintf(interScope,SmvConversions[NAME_BY_FUNC_SCOPE],varName,funcRef);
-            }
-            else{
-                sprintf(interScope,SmvConversions[NAME_BY_FUNC_SSCOPE],varName,funcRef,level,order);
-            }
-        }
+    if(notExistsOutScope && (order || level) ){
         // if, else, fors ....
-        else{
-            sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,level,order);
-        }
+        sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,level,order);
         useVar = interScope;
     }
     else{
@@ -369,32 +370,70 @@ char* processActiveName(char* varName, char* funcRef, int redef, int level, int 
     return useVar;
 }
 
-void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
-                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax)
+void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
+           Object *newValue, int redef, int typeExpr, int C_TIME)
 {
+    // strings para binds
+    //binds da expressão
+    char directiveValueBind[300]; //vai ser usado para o tempo corrente
+    char newValueBind[300]; //vai ser usado para o valor passado para o assign
+    char defaultValueBind[300]; //valor default para expressões next que necessitem inicialização (ex: init = 0, para inteiros)
+    char* conditionCube = NULL ; // cubo de condições (mudança de contexto ou escopo if/else)
+
+    // decide o nome apropriado para a variável
     char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
     char interScope[ALOC_SIZE_LINE];  //nome com info de scope
     char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
     char statevarname[ALOC_SIZE_LINE]; // init ou next
-    useVar = processActiveName(varName,funcRef,redef,level,order,interScope,interRedef);
+    useVar = processActiveName(var->name, redef, scope->level, scope->order, varInit, interScope, interRedef);
 
+    int minmax = -1;
+    if(!varInit && newValue->type == NUMBER_ENTRY) {
+        TableEntry* info = lookup(writeSmvTypeTable,useVar);
+        if(info){
+            int min = *(int*) info->val->values[4];
+            int max = *(int*) info->val->values[5];
+            int new = *(int *) newValue->values[0];
+
+            minmax = new < min ? 0 :
+                     new > max ? 1 : minmax;
+        }
+    }
     // next
     if(typeExpr){
         // criar init/next(useVar)
         sprintf(statevarname,SmvConversions[NEXT],useVar);
         //verifica se existe next(statevarname)
-        updateType(useVar,header,writeSmvTypeTable,newValue,type,minmax);
+        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax);
         if(lookup(writeSmvTypeTable,statevarname)){
-            updateAssign(useVar,header,writeSmvTypeTable,newValue,condition,type,NEXT,minmax);
+            conditionCube = formatBinds(C_TIME, contextChange, defaultValueBind, newValueBind, defaultValueBind,
+                                        newValue, scope, 0, 0);
+            updateAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, newValue->type, NEXT, minmax);
         }
         else{
-            createAssign(useVar, header, writeSmvTypeTable, newValue, condition, NEXT, NULL);
+            conditionCube = formatBinds(C_TIME, contextChange, defaultValueBind, newValueBind, defaultValueBind,
+                                        newValue, scope, 1, 0);
+            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL);
         }
     }
-    // init
+    // init casos
+    // caso 1 :  init default + next ( seja de variável que só existe em t>0(pode também ser uma redefinição) (devem ignorar condições nesse init)
+    // caso 2 : init unico, seja para variáveis que foram redefinidas em t = 0 ou declarações comuns
     else{
-        createType(useVar,header,writeSmvTypeTable,newValue,type);
-        createAssign(useVar, header, writeSmvTypeTable, newValue, condition, INIT, defaultValue);
+        if((C_TIME && redef) || contextChange){
+            conditionCube = formatBinds(C_TIME, contextChange, defaultValueBind, newValueBind, defaultValueBind, newValue,
+                                        scope, 1, 1);
+
+            createType(useVar, header, writeSmvTypeTable, defaultValueBind, NULL, newValue->type);
+            createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind);
+        }
+        else{
+            // senão é uma inicialização dentro de um escopo if/else da mesma forma, poderia cair no caso de antes o initVar só faz ignorar condições temporais
+            conditionCube = formatBinds(C_TIME, contextChange, defaultValueBind, newValueBind, defaultValueBind, newValue,
+                                            scope, 1, 0);
+            createType(useVar, header, writeSmvTypeTable, newValueBind, newValue, newValue->type);
+            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, INIT, defaultValueBind);
+        }
     }
 }
 

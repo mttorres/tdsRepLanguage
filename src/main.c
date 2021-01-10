@@ -95,13 +95,8 @@ int main(int argc, char* argv[]) {
  	if(!controller->declaredPorts){
  		fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMENDED THAT YOU REVIEW YOUR .tds FILE \n");
  	}
-
-
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
-
-
 	fclose(smvP);
-	
 	letgoNode(root);
 
 	
