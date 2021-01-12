@@ -120,7 +120,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
     }
 
     // "otimização" para criar o caso default, se necessário
-    if(conditionCube || initVar){
+    if(initVar){
         copyValueBind(expr,defaultValueBind,0,1);
     }
 
@@ -140,7 +140,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
         int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
         int tam = strlen(newType);
-        int minmax = newValue? *(int*) newValue : 0;
+        int minmax = newValue? *(int*) newValue->values[0] : 0;
         void* po[] = {&pos, &tam, &pointIni, &pointEnd, &minmax, &minmax};
         addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
@@ -224,7 +224,7 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
                   int typeExpr, char *defaultEvalCond)
 {
 
-    char* exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
+    char* exprResultString;
     char exprInterL[300];
     char exprInterR[300];
     sprintf(exprInterL, SmvConversions[typeExpr], varName);
@@ -241,6 +241,8 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
         else{
             sprintf(exprInterR,SmvConversions[CASE],condition,varName); // default sendo o inicial
         }
+        free(condition);
+        exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
         sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
         char* auxChPoint;
@@ -249,8 +251,6 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
         size = strlen(exprResultString);
         pointIni = dif+1;
         pointEnd = pointIni;
-
-        free(condition);
     }
     else{
         // atualiza o init/next dessa função
@@ -259,6 +259,8 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
         // cons: não tenho controle sobre qual parte da string minha expressão começa ou termina...
         // NA VERDADE EU TENHO, posIni:  até o = (posso salvar em um array mapeador também)
         //  posEnd = posIni + tamanhoString(expressão)
+
+        exprResultString = malloc(sizeof(char)*ALOC_SIZE_LINE);
 
         sprintf(exprInterR,SmvConversions[ANY],newValue);
         sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
@@ -388,7 +390,7 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
     useVar = processActiveName(var->name, redef, scope->level, scope->order, varInit, interScope, interRedef);
 
     int minmax = -1;
-    if(!varInit && newValue->type == NUMBER_ENTRY) {
+    if(typeExpr  && newValue->type == NUMBER_ENTRY) {
         TableEntry* info = lookup(writeSmvTypeTable,useVar);
         if(info){
             int min = *(int*) info->val->values[4];
@@ -404,7 +406,6 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
         // criar init/next(useVar)
         sprintf(statevarname,SmvConversions[NEXT],useVar);
         //verifica se existe next(statevarname)
-        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax);
         if(lookup(writeSmvTypeTable,statevarname)){
             conditionCube = formatBinds(C_TIME, contextChange, defaultValueBind, newValueBind, defaultValueBind,
                                         newValue, scope, 0, 0);
@@ -415,6 +416,7 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
                                         newValue, scope, 1, 0);
             createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL);
         }
+        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax);
     }
     // init casos
     // caso 1 :  init default + next ( seja de variável que só existe em t>0(pode também ser uma redefinição) (devem ignorar condições nesse init)
