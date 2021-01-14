@@ -74,14 +74,12 @@ int main(int argc, char* argv[]) {
 	printf("\n");
     printTable(writeSmvTypeTable[1]);
 	printf("\n");
-
-
-
-
 	printf("\n");	
  	printf("\n");
  	printf("\n");
  	printf("\n");
+
+    letgoTable(global);
 
  	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
