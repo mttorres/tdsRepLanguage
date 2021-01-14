@@ -62,7 +62,7 @@ void* allocateTypeSetObjects(int index, void* value)
 }
 
 
-Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *SYNTH_BIND)
+Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *BIND)
 {
 
 	Object* newOb = (Object*) malloc(sizeof(Object));
@@ -71,11 +71,14 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	newOb->redef = 0;
 	newOb->timeContext = timeContext;
-    if(SYNTH_BIND){
-        newOb->SINTH_BIND = malloc(strlen(SYNTH_BIND)+1);
-        strcpy(newOb->SINTH_BIND,SYNTH_BIND);
+    if(BIND){
+        newOb->ORIGINAL_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
+        strcpy(newOb->ORIGINAL_BIND, BIND);
+        newOb->SINTH_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
+        strcpy(newOb->SINTH_BIND, BIND);
     }
     else{
+        newOb->ORIGINAL_BIND = NULL;
         newOb->SINTH_BIND = NULL;
     }
 
@@ -198,9 +201,9 @@ void printObject(Object* o)
 }
 
 
-void letgoObject(Object* o, int always)
+void letgoObject(Object *o)
 {
-	if(o && (o->SINTH_BIND || always))
+	if(o)
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
@@ -244,6 +247,14 @@ void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int 
 
 }
 
+void updateCurrentBind(Object* o){
+    int oldSize = strlen(o->SINTH_BIND);
+    free(o->SINTH_BIND);
+    int newSize = o->redef == 1? oldSize + 1 + 5 + 1 + 1 : oldSize + o->redef + 1;
+    o->SINTH_BIND = malloc(sizeof(char)*newSize);
+    sprintf(o->SINTH_BIND,"%s_redef%d",o->ORIGINAL_BIND,o->redef);
+}
+
 
 void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange)
 {
@@ -272,12 +283,18 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
         updateObjectCell(o,any,any_type,object_size,index,-1);
 	}
 
-	if(o->type != any_type)
+	int typeChanged = 0;
+	if(o->type != any_type && o->type != any_type)
 	{
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
+		typeChanged = 1;
 	}
-    o->redef = contextChange != o->timeContext? o->redef : o->redef+1;
-	o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
+	int oldRedef = o->redef;
+    o->redef = typeChanged || (contextChange != o->timeContext)? o->redef : o->redef+1;
+	if(oldRedef != o->redef){
+	    updateCurrentBind(o);
+	}
+    o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

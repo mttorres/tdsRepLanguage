@@ -182,7 +182,7 @@ void letgoEntry(TableEntry *e) {
 	    if(e->val->type == TYPE_SET){
             letgoTable((STable *) e->val->values[2]);
 	    }
-		letgoObject(e->val,1);
+        letgoObject(e->val);
 	}
 	free(e);
 }
@@ -430,8 +430,7 @@ void addValue(char *name, void **any, int any_type, int object_size, int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any, timeContext, NULL);
-	o->SINTH_BIND = o->SINTH_BIND? o->SINTH_BIND : name;
+	Object* o = createObject(any_type, object_size, any, timeContext, name);
 	addValueCurrentScope(name,o,methodParam,current);
 }
 

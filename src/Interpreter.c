@@ -650,7 +650,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         // só fazer isso se eu tiver dado malloc em v!
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
-        letgoObject(expr,0);
+        letgoObject(expr);
     }
     else{
         // busca expressão
@@ -708,6 +708,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                     }
                 }
             }
+            letgoObject(expr);
         }
         else{
             if(var && expr->type != var->type){
