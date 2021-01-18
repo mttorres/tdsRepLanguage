@@ -168,6 +168,11 @@ void printTable(STable* t){
 	}
 }
 
+void letGoEntryByName(STable* table, char* name){
+    int index = hash(name,table);
+    letgoEntry(table->tableData[index]);
+    table->tableData[index] = NULL;
+}
 
 void letgoEntry(TableEntry *e) {
 	if(!e) {
@@ -286,7 +291,8 @@ void insert(STable* t, TableEntry* e) {
     if(lookup(t,e->name))
     {
     	printf("[insert] COLLISION! (%s) É: %d \n",e->name,index);
-    	redistributeHashs(t,e);
+    	exit(-1);
+    	//redistributeHashs(t,e);
     }
     else
     {

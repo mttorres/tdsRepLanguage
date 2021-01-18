@@ -87,7 +87,7 @@ void bindCondition(STable* scope, Object* conditionExpr);
  * */
 
 char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *valueBind, char *defaultValueBind,
-                  Object *expr, STable *scope, int firstCondition, int initVar);
+                  Object *expr, STable *scope, int firstCondition, int initVar, int ignoreTemporal, int ignoreCond);
 
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
@@ -130,15 +130,28 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
 void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax);
 
 /**
+ * Devolve uma referência a um objeto, considerando seu bind com redefinições e escopo original onde foi criado
+ * @param a entrada original na tabela de simbolos da linguagem
+ * @sideEffects:  Todos os criar uma copia do Object referênciado por var, e passa uma string do nome referênciado para o seu SYNTH_OBJECT
+ * */
+Object* refCopyOfVariable(TableEntry* var);
+
+/**
  * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições
  * @param
  * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void
-specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
+void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
            Object *newValue, int redef, int typeExpr, int C_TIME);
 
 
+/**
+ * Para casos de redefinição, libera a entrada anterior dessa variável já que a mesma não será mais referênciada
+ * @param a entrada com o nome da variável
+ * @param a tabela de  simbolos auxiliar
+ * @sideEffects:  Computa uma string para o nome referência e depois o libera da tabela de simbolos auxiliar
+ * */
+void letGoOldEntry(TableEntry* var, STable* auxTable);
 
 
 void writeResultantHeaders(HeaderController* controller, const char* path);

@@ -112,6 +112,13 @@ void printEntry(TableEntry* e);
  * */
 void letgoEntry(TableEntry *e);
 
-
+/**
+ * Libera as entradas da tabela de simbolos, usando o nome de uma variável dessa tabela (chama o método anterior)
+ * Porque desse método? Caso seja necessário "economizar entradas" antes do fim da execução, ele limpa os valores da tabela (NULL)
+ * @param a tabela a liberar os dados
+ * @param name o nome da variável
+ * @SideEffects chama o letGoEntry original e seta o table->data[hash] = NULL
+ * */
+void letGoEntryByName(STable* table, char* name);
 
 #endif
