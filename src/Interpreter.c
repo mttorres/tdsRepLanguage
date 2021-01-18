@@ -137,9 +137,9 @@ Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
         }
         else
         {
-            // copia o objeto atomico
-            return copyObject(entry->val);
-
+            // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
+            return refCopyOfVariable(entry);
+            //return copyObject(entry->val);
         }
     }
 }
@@ -220,6 +220,10 @@ Object* evalMINUS(Object* o1, Object* o2)
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
     void* rp[] = {&r};
+    letgoObject(o1);
+    if(o2){
+        letgoObject(o2);
+    }
     return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
 }
 
@@ -236,6 +240,7 @@ Object* evalNOT(Object* o)
     void* rp[] = {&r};
     char resultingBind[strlen(o->SINTH_BIND)+2];
     createExprBind(resultingBind, o, NULL, "!");
+    letgoObject(o);
     return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
@@ -535,8 +540,7 @@ Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
         else
         {
             // copia o objeto atomico
-            return copyObject(entry->val);
-
+            return refCopyOfVariable(entry);
         }
     }
 }
@@ -697,6 +701,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                     specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,1,C_TIME);
                 }
                 else{
+                    // casos de redefinição (devemos dar free na entrada anterior (otimização)
+                    letGoOldEntry(varEntry,refAuxTable);
                     // tempo = 0, redefinição
                     if(!changeContext){
                         specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,0,C_TIME);
@@ -770,13 +776,16 @@ Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCo
     conditionalExpr = sintExpr[0];
     printObject(conditionalExpr);
     bindCondition(IF_SCOPE,conditionalExpr);
+    free(sintExpr);
     if(*(int*)conditionalExpr->values[0]){
-
+        letgoObject(conditionalExpr); // note que devemos avaliar tanto o if e o else...
         eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv); // tenho que passar um parâmetro que define se avaliou
     }
     else{
         if(n->children[1]){
             // cria else
+            // e após extrair a condição. não é a causa do memory leak
+            letgoObject(conditionalExpr);
         }
     }
     return NULL;

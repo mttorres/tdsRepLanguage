@@ -72,13 +72,11 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	newOb->redef = 0;
 	newOb->timeContext = timeContext;
     if(BIND){
-        newOb->ORIGINAL_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
-        strcpy(newOb->ORIGINAL_BIND, BIND);
         newOb->SINTH_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
         strcpy(newOb->SINTH_BIND, BIND);
     }
     else{
-        newOb->ORIGINAL_BIND = NULL;
+//      newOb->ORIGINAL_BIND = NULL;
         newOb->SINTH_BIND = NULL;
     }
 
@@ -230,7 +228,7 @@ void letgoObject(Object *o)
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, -1, o->SINTH_BIND);
+	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
 	return newOb;
 }
 
@@ -247,13 +245,7 @@ void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int 
 
 }
 
-void updateCurrentBind(Object* o){
-    int oldSize = strlen(o->SINTH_BIND);
-    free(o->SINTH_BIND);
-    int newSize = o->redef == 1? oldSize + 1 + 5 + 1 + 1 : oldSize + o->redef + 1;
-    o->SINTH_BIND = malloc(sizeof(char)*newSize);
-    sprintf(o->SINTH_BIND,"%s_redef%d",o->ORIGINAL_BIND,o->redef);
-}
+
 
 
 void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange)
@@ -292,9 +284,6 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 	}
 	int oldRedef = o->redef;
     o->redef = typeChanged || (contextChange != o->timeContext)? o->redef : o->redef+1;
-	if(oldRedef != o->redef){
-	    updateCurrentBind(o);
-	}
     o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 
