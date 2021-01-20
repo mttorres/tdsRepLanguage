@@ -167,6 +167,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
             }
         }
     }
+    updated[size] = '\0';
     (*newPointInit) = pointIni; // invariante (manter por enquanto)
 
 }
