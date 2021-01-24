@@ -4,9 +4,12 @@ VAR
 	finalAutomata: finalAutomata(time);
 	x : 2..2;
 	x_redef1 : 4..30;
+	r : boolean;
 	z : boolean;
+	z_redef1 : boolean;
 	w_scope1_0 : 1..1;
-	x_redef2 : 80..90;
+	r_redef1 : boolean;
+	x_redef2 : 0..90;
 	y : 0..1;
 	w_scope1_1 : 0..1;
 ASSIGN
@@ -17,10 +20,16 @@ ASSIGN
 esac;
 	init(x):= 2;
 	init(x_redef1):= 30;
-	init(z):= FALSE;
+	init(r):= TRUE;
+	init(z):= TRUE;
+	init(z_redef1):= FALSE;
 	init(w_scope1_0):= case 
-		!z : 1;
+		!z_redef1 : 1;
 		TRUE : 0; 
+	esac;
+	init(r_redef1):= case 
+		!z_redef1 : FALSE;
+		TRUE : FALSE; 
 	esac;
 	next(x_redef1):= case 
 		next(time) = 2  : 4;
@@ -37,13 +46,13 @@ esac;
 		next(time) = 2  : 1;
 		TRUE : y; 
 	esac;
-	next(z):= case 
+	next(z_redef1):= case 
 		next(time) = 3  : FALSE;
-		TRUE : z; 
+		TRUE : z_redef1; 
 	esac;
 	init(w_scope1_1):= 0;
 	next(w_scope1_1):= case 
-		next(time) = 3  & !z  : 1;
+		next(time) = 3  & !z_redef1  : 1;
 		TRUE : w_scope1_1; 
 	esac;
 
