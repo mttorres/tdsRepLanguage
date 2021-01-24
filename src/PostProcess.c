@@ -14,7 +14,7 @@ char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s : %s..%s;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s" };
+                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s" };
 
 int  ALOC_SIZE_LINE = 300;
 
@@ -172,15 +172,25 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
-        sprintf(newType, SmvConversions[INTERVAL_DEC], varName, newValueBind, newValueBind);
+        int tam = strlen(newType);
+        int valSin = newValue? *(int*) newValue->values[0] : 0;
+        int min = 0;
+        int max = 1;
+        if(valSin <= 0){
+            min = valSin;
+            sprintf(newType, SmvConversions[INTERVAL_DEC], varName, valSin, max);
+        }
+        if(valSin > 0){
+            max = valSin;
+            sprintf(newType, SmvConversions[INTERVAL_DEC], varName, min, valSin);
+        }
         char* auxDelim = strstr(newType,":");
         char* auxFim = strstr(auxDelim,"..");
         int pointIni = (auxDelim-newType+2);
         int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
-        int tam = strlen(newType);
-        int minmax = newValue? *(int*) newValue->values[0] : 0;
-        void* po[] = {&pos, &tam, &pointIni, &pointEnd, &minmax, &minmax};
+
+        void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
         addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
     if(type == LOGICAL_ENTRY){
@@ -506,7 +516,7 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
 
             conditionCube = formatCondtion(scope,1,1,newValueBind,directiveValueBind,1);
 
-            createType(useVar, header, writeSmvTypeTable, defaultValueBind, NULL, newValue->type);
+            createType(useVar, header, writeSmvTypeTable, defaultValueBind, newValue, newValue->type);
             createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind);
         }
         else{
