@@ -63,7 +63,7 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
 {
         char inter[ALOC_SIZE_LINE];
         char* interPt = inter;
-        char* cube = malloc(sizeof(strlen(opBind1)+strlen(opBind2)+strlen(operation)+1));
+        char* cube = malloc(ALOC_SIZE_LINE/2);
 
         // gera cond ( bind1 op bind2) ou opbind1
         if(opBind2[0] != '\0'){
@@ -88,8 +88,10 @@ void bindCondition(STable* scope, Object* conditionExpr){
         fprintf(stderr, "[bindCondition]: %d scope cannot be binded to %s! \n",scope->type,conditionExpr->SINTH_BIND);
         exit(-1);
     }
-    scope->conditionBind = malloc(strlen(conditionExpr->SINTH_BIND)+1);
-    strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
+    if(!scope->conditionBind){
+        scope->conditionBind = malloc(sizeof(char)*(strlen(conditionExpr->SINTH_BIND)+1));
+        strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
+    }
 }
 
 char* formatValueBind(Object* expr, int index, int isDefault){
@@ -429,7 +431,7 @@ Object* refCopyOfVariable(TableEntry* var){
     if(useVar){
         free(copyRef->SINTH_BIND);
 //      copyRef->SINTH_BIND[0] = '\0';
-        copyRef->SINTH_BIND =  malloc(sizeof(char)*strlen(useVar) + 1);
+        copyRef->SINTH_BIND =  malloc(sizeof(char)*(strlen(useVar)+ 1));
         strcpy(copyRef->SINTH_BIND,useVar);
     }
     free(useVar);
