@@ -94,11 +94,7 @@ void bindCondition(STable* scope, Object* conditionExpr){
     }
 }
 
-char* formatValueBind(Object* expr, int index, int isDefault){
-    char* valueBind = malloc(sizeof(char)*ALOC_SIZE_LINE);
-    copyValueBind(expr,valueBind,index,isDefault);
-    return valueBind;
-}
+
 
 char* formatDirective(int ctime){
     char* directiveValueBind = malloc(sizeof(char)*ALOC_SIZE_LINE/10);
@@ -422,6 +418,19 @@ char *processActiveName(char *varName, int redef, int level, int order, int notE
     return activeName;
 }
 
+char* formatValueBind(TableEntry* var, Object* expr, int index, int isDefault, int isSelf){
+    if(isSelf){
+        int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
+        char* useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1);
+        return useVar;
+    }
+    else{
+        char* valueBind = malloc(sizeof(char)*ALOC_SIZE_LINE);
+        copyValueBind(expr,valueBind,index,isDefault);
+        return valueBind;
+    }
+}
+
 Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
@@ -464,14 +473,16 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
                      new > max ? 1 : minmax;
         }
     }
+    int defaultSelf = !varInit && scope->type == IF_BLOCK || scope->type == ELSE_BLOCK;
+    defaultValueBind = formatValueBind(var,newValue,0,1,defaultSelf);
+    newValueBind = formatValueBind(var,newValue,0,0,0);
+
     // next
     if(typeExpr){
         // criar next(useVar)
         char statevarname[ALOC_SIZE_LINE];
         sprintf(statevarname,SmvConversions[NEXT],useVar);
         //verifica se existe next(statevarname)
-
-        newValueBind = formatValueBind(newValue,0,0);
         directiveValueBind = formatDirective(C_TIME);
         //defaultValueBind = formatValueBind(newValue,0,1); // vai ser só para o caso de ref de uma variável que foi atualizada dentro de um if (já existe fora do escopo atual)
 
@@ -493,23 +504,19 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
     else{
         if((C_TIME && redef) || contextChange){
 
-            defaultValueBind = formatValueBind(newValue,0,1);
-            newValueBind = formatValueBind(newValue,0,0);
             conditionCube = formatCondtion(scope,1,1,newValueBind,directiveValueBind,1);
 
             createType(useVar, header, writeSmvTypeTable, defaultValueBind, NULL, newValue->type);
             createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind);
         }
         else{
-            defaultValueBind = formatValueBind(newValue,0,1);
-            newValueBind = formatValueBind(newValue,0,0);
             conditionCube = formatCondtion(scope,0,1,newValueBind,directiveValueBind,1);
 
             createType(useVar, header, writeSmvTypeTable, newValueBind, newValue, newValue->type);
             createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, INIT, defaultValueBind);
         }
-        free(defaultValueBind);
     }
+    free(defaultValueBind);
     free(newValueBind);
     free(useVar);
 }
