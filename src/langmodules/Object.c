@@ -221,8 +221,20 @@ void letgoObject(Object *o)
 			{
 				free(o->values[i]);
 			}
+            o->values[i] = NULL;
 		}
 	}
+    free(o->values);
+    o->values = NULL;
+	if(o->STR){
+	    free(o->STR);
+	}
+    o->STR = NULL;
+	if(o->SINTH_BIND){
+	    free(o->SINTH_BIND);
+	}
+    o->SINTH_BIND = NULL;
+	free(o);
 }
 
 
