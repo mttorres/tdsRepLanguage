@@ -2,16 +2,16 @@ MODULE main
 VAR
 	time: 0..20;
 	finalAutomata: finalAutomata(time);
-	x : 2..2;
-	x_redef1 : 4..30;
+	x : 0..2;
+	x_redef1 : 0..30;
 	r : boolean;
 	z : boolean;
 	z_redef1 : boolean;
-	w_scope1_0 : 1..1;
+	w_scope1_0 : 0..1;
 	r_redef1 : boolean;
 	x_redef2 : 0..90;
 	y : 0..1;
-	w_scope1_1 : 0..1;
+	w_scope1_2 : 0..1;
 ASSIGN
 	init(time) := 0;
 	next(time) := case
@@ -29,7 +29,7 @@ esac;
 	esac;
 	init(r_redef1):= case 
 		!z_redef1 : FALSE;
-		TRUE : FALSE; 
+		TRUE : r; 
 	esac;
 	next(x_redef1):= case 
 		next(time) = 2  : 4;
@@ -50,10 +50,10 @@ esac;
 		next(time) = 3  : FALSE;
 		TRUE : z_redef1; 
 	esac;
-	init(w_scope1_1):= 0;
-	next(w_scope1_1):= case 
+	init(w_scope1_2):= 0;
+	next(w_scope1_2):= case 
 		next(time) = 3  & !z_redef1  : 1;
-		TRUE : w_scope1_1; 
+		TRUE : w_scope1_2; 
 	esac;
 
 MODULE merger1(time)
