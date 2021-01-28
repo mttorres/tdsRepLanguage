@@ -21,8 +21,6 @@
  * @SideEffects Aletra o conteúdo em memória vindo de SINTH_BIND
  *
  * */
-
-
 void copyValueBind(Object* o, char* bind,int index,int defaultValue);
 
 
@@ -60,7 +58,15 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
 
 /***/
 void createExprBind(char *result, Object *o1, Object *o2, char *op);
-/***/
+
+/**
+ * Cria uma condição para um escopo if/else. Caso esse seja filho de outro escopo if/else, cria uma condição composta
+ * em um "cubo".
+ * @param scope o escopo atual sendo criado (if/else)
+ * @param conditionExpr a condição a ser associada a esse escopo ou ao cubo de "condições herdadas"
+ *
+ * @sideEffects: Aloca string de condição para o escopo e intermediária para o cubo.
+ * */
 void bindCondition(STable* scope, Object* conditionExpr);
 
 /**

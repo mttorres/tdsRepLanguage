@@ -781,6 +781,7 @@ Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCo
     printObject(conditionalExpr);
     bindCondition(IF_SCOPE,conditionalExpr);
     free(sintExpr);
+
     if(*(int*)conditionalExpr->values[0]){
         letgoObject(conditionalExpr);
         eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv,0); // tenho que passar um parâmetro que define se avaliou
@@ -794,6 +795,7 @@ Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCo
     if(n->children[1]){
         // criar condiçao com o !cond do IF_BLOC
     }
+    // adicionar free aos escopos alocados aqui
     return NULL;
 }
 

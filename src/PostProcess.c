@@ -4,13 +4,13 @@
 #include "../headers/PostProcess.h"
 
 
-typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_BY_FUNC_SCOPE, NAME_BY_FUNC_SSCOPE,
+typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
                                INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d", "%s_scope%s","%s_scope%s_%d_%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
@@ -63,7 +63,7 @@ char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *e
 {
         char inter[ALOC_SIZE_LINE];
         char* interPt = inter;
-        char* cube = malloc(ALOC_SIZE_LINE/2);
+        char* cube = malloc(ALOC_SIZE_LINE);
 
         // gera cond ( bind1 op bind2) ou opbind1
         if(opBind2[0] != '\0'){
@@ -89,8 +89,34 @@ void bindCondition(STable* scope, Object* conditionExpr){
         exit(-1);
     }
     if(!scope->conditionBind){
-        scope->conditionBind = malloc(sizeof(char)*(strlen(conditionExpr->SINTH_BIND)+1));
-        strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
+        // usa condição
+        if(scope->parent->type != GLOBAL){
+            STable * parent = scope->parent;
+            char* childCond = conditionExpr->SINTH_BIND; // atual
+            char* parentCond = parent->conditionBind; // primeiro pai
+            char* interResult = NULL;
+            char* auxChildCond = NULL;
+            while(parent && parent->type != GLOBAL){
+                interResult = createConditionCube(parentCond,childCond,"&",NULL,1);
+                parent = parent->parent;
+                if(parent){
+                    parentCond = parent->conditionBind; // proximo pai
+                }
+                if(auxChildCond){
+                    free(auxChildCond);
+                }
+                childCond = interResult; // o filho é o cubo atual
+                auxChildCond = childCond; // temos uma referência para ser liberada na proxima passada
+            }
+            scope->conditionBind = malloc(sizeof(char)*(strlen(interResult)+1));
+            strcpy(scope->conditionBind,interResult);
+            free(interResult);
+        }
+        // usa a condição da expressão
+        else{
+            scope->conditionBind = malloc(sizeof(char)*(strlen(conditionExpr->SINTH_BIND)+1));
+            strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
+        }
     }
 }
 
@@ -172,7 +198,6 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
-        int tam = strlen(newType);
         int valSin = newValue? *(int*) newValue->values[0] : 0;
         int min = 0;
         int max = 1;
@@ -189,6 +214,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
         int pointIni = (auxDelim-newType+2);
         int pointEnd = ((auxFim-newType))-1;
         int pos = header->VAR_POINTER;
+        int tam = strlen(newType);
 
         void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
         addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
@@ -405,15 +431,20 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
 }
 
-char *processActiveName(char *varName, int redef, int level, int order, int notExistsOutScope, int isOnNextContext) {
+char *processActiveName(char *varName, int redef, STable* currentScope, int notExistsOutScope, int isOnNextContext) {
 
     char* useVar = NULL;
     char interScope[ALOC_SIZE_LINE];  //nome com info de scope
     char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
     // qualquer escopo diferente de GLOBAL/MAIN
-    if(notExistsOutScope && (order || level) ){
+    if(notExistsOutScope && (currentScope->order || currentScope->level) ){
         // if, else, fors ....
-        sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,level,order);
+        if(currentScope->parent->type != GLOBAL){
+            sprintf(interScope,SmvConversions[NAME_SSCOPE],varName,currentScope->parent->order,currentScope->level,currentScope->order);
+        }
+        else{
+            sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,currentScope->level,currentScope->order);
+        }
         useVar = interScope;
     }
     else{
@@ -435,7 +466,7 @@ char *processActiveName(char *varName, int redef, int level, int order, int notE
 char* formatValueBind(TableEntry* var, Object* expr, int index, int isDefault, int isSelf){
     if(isSelf){
         int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
-        char* useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1, 0);
+        char* useVar = processActiveName(var->name, redefNum, var->parentScope, 1, 0);
         return useVar;
     }
     else{
@@ -449,7 +480,7 @@ Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
-    useVar = processActiveName(var->name, var->val->redef, var->parentScope->level, var->parentScope->order, 1, var->val->timeContext);
+    useVar = processActiveName(var->name, var->val->redef, var->parentScope, 1, var->val->timeContext);
     Object* copyRef = copyObject(var->val);
     if(useVar){
         free(copyRef->SINTH_BIND);
@@ -473,7 +504,7 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
 
     // decide o nome apropriado para a variável
     char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
-    useVar = processActiveName(var->name, redef, var->level, var->order, varInit, 0);
+    useVar = processActiveName(var->name, redef, var->parentScope, varInit, 0);
 
     int minmax = -1;
     if(typeExpr  && newValue->type == NUMBER_ENTRY) {
@@ -548,7 +579,7 @@ void letGoOldEntry(TableEntry* var, STable* refAuxTable){
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
 
     int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
-    useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1, 0);
+    useVar = processActiveName(var->name, redefNum, var->parentScope, 1, 0);
     char varInit[ALOC_SIZE_LINE/2];
     char varNext[ALOC_SIZE_LINE/2];
     sprintf(varInit,SmvConversions[INIT],useVar);
