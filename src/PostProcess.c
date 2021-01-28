@@ -405,7 +405,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
 }
 
-char *processActiveName(char *varName, int redef, int level, int order, int notExistsOutScope) {
+char *processActiveName(char *varName, int redef, int level, int order, int notExistsOutScope, int isOnNextContext) {
 
     char* useVar = NULL;
     char interScope[ALOC_SIZE_LINE];  //nome com info de scope
@@ -423,6 +423,10 @@ char *processActiveName(char *varName, int redef, int level, int order, int notE
         sprintf(interRedef,SmvConversions[REDEF_NAME],useVar,redef);
         useVar = interRedef;
     }
+    if(isOnNextContext){
+        sprintf(interRedef,SmvConversions[NEXT],useVar);
+        useVar = interRedef;
+    }
     char* activeName = malloc(sizeof(ALOC_SIZE_LINE));
     strcpy(activeName,useVar);
     return activeName;
@@ -431,7 +435,7 @@ char *processActiveName(char *varName, int redef, int level, int order, int notE
 char* formatValueBind(TableEntry* var, Object* expr, int index, int isDefault, int isSelf){
     if(isSelf){
         int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
-        char* useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1);
+        char* useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1, 0);
         return useVar;
     }
     else{
@@ -445,7 +449,7 @@ Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
-    useVar = processActiveName(var->name, var->val->redef, var->parentScope->level, var->parentScope->order, 1);
+    useVar = processActiveName(var->name, var->val->redef, var->parentScope->level, var->parentScope->order, 1, var->val->timeContext);
     Object* copyRef = copyObject(var->val);
     if(useVar){
         free(copyRef->SINTH_BIND);
@@ -469,7 +473,7 @@ void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *head
 
     // decide o nome apropriado para a variável
     char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
-    useVar = processActiveName(var->name, redef, var->level, var->order, varInit);
+    useVar = processActiveName(var->name, redef, var->level, var->order, varInit, 0);
 
     int minmax = -1;
     if(typeExpr  && newValue->type == NUMBER_ENTRY) {
@@ -544,7 +548,7 @@ void letGoOldEntry(TableEntry* var, STable* refAuxTable){
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
 
     int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
-    useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1);
+    useVar = processActiveName(var->name, redefNum, var->parentScope->level, var->parentScope->order, 1, 0);
     char varInit[ALOC_SIZE_LINE/2];
     char varNext[ALOC_SIZE_LINE/2];
     sprintf(varInit,SmvConversions[INIT],useVar);

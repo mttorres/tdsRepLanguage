@@ -9,34 +9,34 @@
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
-Object ** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
-Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
+Object ** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object * evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
+Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate);
 
-Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv) = {
+Object* (*executores[80]) (Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF, evalMATCH_IF
 };
 
 
-Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     int sint;
     sint = atoi(n->leafs[0]);
@@ -46,7 +46,7 @@ Object* evalNUM(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContro
     return o;
 }
 
-Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalBOOL] \n");
     int sint;
@@ -65,7 +65,7 @@ Object* evalBOOL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 }
 
 
-Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalSTRING] \n");
     char* sint =  n->leafs[0];
@@ -85,7 +85,7 @@ Object* evalSTRING(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCon
 
 */
 
-Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalNULL] \n");
     // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
@@ -101,7 +101,7 @@ Object* evalNULL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 }
 
 
-Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalIDVAR] \n");
 
@@ -145,7 +145,7 @@ Object* evalIDVAR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
 }
 
 
-Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalTIME_DIRECTIVE] \n");
 
@@ -166,7 +166,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, STable** writeSmvTypeTable, H
 
 
 
-Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalDataV] \n");
 
@@ -182,7 +182,7 @@ Object* evalDataV(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCont
     // vai chamar evalParams , e sintetizar um Object Vetor (ou um vetor void que será jogado em um object)
 }
 
-Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalPARAMS_CALL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalPARAMS_CALL] \n");
 }
@@ -342,14 +342,14 @@ Object* evalEqual(Object* o1, Object* o2, int opCode)
 
 
 
-Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalEXPR] \n");
     // operação unária ou simplesmente FOLHA
     if(n->nchild <= 1)
     {
         Object * sintUni;
-        Object** sint = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv);
+        Object** sint = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv,notEvaluate);
         sintUni = sint[0];
 
         char ops[1];
@@ -376,8 +376,8 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
     else
     {
         // CUIDADO (ordem avaliação)
-        Object* o1 = evalEXPR(n->children[0], scope, writeSmvTypeTable, controllerSmv);
-        Object* o2 = evalEXPR(n->children[1],scope, writeSmvTypeTable, controllerSmv);
+        Object* o1 = evalEXPR(n->children[0], scope, writeSmvTypeTable, controllerSmv,notEvaluate);
+        Object* o2 = evalEXPR(n->children[1],scope, writeSmvTypeTable, controllerSmv,notEvaluate);
 
         int sOp = strlen(n->leafs[0]);
         char ops[2];
@@ -478,7 +478,7 @@ Object* evalEXPR(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
 }
 
 
-Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalProp] \n");
     if(!n)
@@ -499,7 +499,7 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeT
     }
     if(n->type == ADD_V)
     {
-        Object* expr = evalEXPR(n->children[0],scope, writeSmvTypeTable, controllerSmv);
+        Object* expr = evalEXPR(n->children[0],scope, writeSmvTypeTable, controllerSmv,notEvaluate);
         if(expr->type != NUMBER_ENTRY)
         {
             fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
@@ -516,7 +516,7 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope, STable** writeSmvTypeT
 }
 
 
-Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[evalAC_V] \n");
 
@@ -530,7 +530,7 @@ Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
     }
     else
     {
-        Object* prop = evalProp(n,n->children[0], scope, writeSmvTypeTable, controllerSmv);
+        Object* prop = evalProp(n,n->children[0], scope, writeSmvTypeTable, controllerSmv,notEvaluate);
 
         if(entry->val->OBJECT_SIZE > 1)
         {
@@ -545,22 +545,22 @@ Object* evalAC_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderContr
     }
 }
 
-Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object* evalV_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
     printf("[evalV_PROP] \n");
 
 }
-Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object* evalADD_V(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
     printf("[evalADD_V] \n");
 }
-Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object* evalADD_V_PROP(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
     printf("[evalADD_V_PROP] \n");
 }
 
-Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object* evalV_PROP_TDS(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
     printf("[evalV_PROP_TDS] \n");
 }
 
-Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
 
     int I_TIME;
     int* ptitime = NULL;
@@ -609,7 +609,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
     return NULL;
 }
 
-Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     Object* expr = NULL;
     Object** sintExpr = NULL;
@@ -620,7 +620,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
     if(n->children[0]->type == ASSIGN_TDIRECTIVE)
     {
         // verificação semântica (se pode atribuir)(essas atribuições só são válidas no programa principal) ? seria uma boa tratar na gramática (?)
-        if(scope->type == FUNC)
+        if(scope->type != GLOBAL)
         {
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, THE CONTEXT IS LOCKED! \n", n->children[0]->leafs[0]);
             exit(-1);
@@ -629,7 +629,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         //Mudou intervalos: alterar intervalo no main do SMV e mudar o init ou next (dependendo da diretiva)
         //Mudou CONTEXTO (C_TIME) : seguir o caso default
         // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
-        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
+        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv,notEvaluate);
         expr = sintExpr[0];
         if(expr && expr->type != NUMBER_ENTRY && expr->OBJECT_SIZE > 1)
         {
@@ -658,7 +658,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
     }
     else{
         // busca expressão
-        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv);
+        sintExpr = eval(n->children[1],scope,writeSmvTypeTable,controllerSmv,notEvaluate);
         expr = sintExpr[0];
 
         // busca a variável e seu contexto
@@ -692,7 +692,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                 }
             }
             else{
-
+                // VALIDAÇÃO DE TIPOS
+                if(var->type != expr->type){
+                    fprintf(stderr, "ASSIGN ERROR: incompatible type for  %s \n", varEntry->name);
+                    exit(-1);
+                }
                 int prevDef = var->redef;
                 int prevContext = var->timeContext;
                 updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, -1, -1, scope, C_TIME);
@@ -730,7 +734,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             }
 
             Node* ref = n->children[0]->children[0];
-            Object* indexRef = ref->type == V_PROP ? NULL : eval(n,scope,writeSmvTypeTable,controllerSmv)[0];
+            Object* indexRef = ref->type == V_PROP ? NULL : eval(n,scope,writeSmvTypeTable,controllerSmv,notEvaluate)[0];
 
             if(ref->type == V_PROP || ref->type == ADD_V_PROP)
             {
@@ -766,37 +770,39 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
     return NULL;
 }
 
-Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
 
     Object* conditionalExpr = NULL;
     Object** sintExpr = NULL;
 
     STable* IF_SCOPE = addSubScope(scope,IF_BLOCK);
-    sintExpr = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv);
+    sintExpr = eval(n->children[0],scope,writeSmvTypeTable,controllerSmv,notEvaluate);
     conditionalExpr = sintExpr[0];
     printObject(conditionalExpr);
     bindCondition(IF_SCOPE,conditionalExpr);
     free(sintExpr);
     if(*(int*)conditionalExpr->values[0]){
-        letgoObject(conditionalExpr); // note que devemos avaliar tanto o if e o else...
-        eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv); // tenho que passar um parâmetro que define se avaliou
+        letgoObject(conditionalExpr);
+        eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv,0); // tenho que passar um parâmetro que define se avaliou
     }
     else{
-        if(n->children[1]){
-            // cria else
-            // e após extrair a condição. não é a causa do memory leak
-            letgoObject(conditionalExpr);
-        }
+        letgoObject(conditionalExpr);
+        eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv,1);
+    }
+    // cria else
+    // e após extrair a condição.
+    if(n->children[1]){
+        // criar condiçao com o !cond do IF_BLOC
     }
     return NULL;
 }
 
-Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv){
+Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate){
 
 }
 
 
-Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv)
+Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
     printf("[eval] %s \n",n->name);
     if(n)
@@ -810,7 +816,7 @@ Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControll
         if(executores[n->type])
         {
             printf("[PostProcess - eval] eval especifico \n\n");
-            SYNTH_O[0] = executores[n->type](n,scope,writeSmvTypeTable,controllerSmv);
+            SYNTH_O[0] = executores[n->type](n,scope,writeSmvTypeTable,controllerSmv,notEvaluate);
         }
         else
         {
@@ -824,7 +830,7 @@ Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderControll
                     if(toEval)
                     {
                         printf("(%d) %s \n",i,toEval->name);
-                        Object** SYNTH_SET =  eval(n->children[i],scope,writeSmvTypeTable,controllerSmv);
+                        Object** SYNTH_SET =  eval(n->children[i],scope,writeSmvTypeTable,controllerSmv,notEvaluate);
                         SYNTH_O[i] = SYNTH_SET[0];
                         free(SYNTH_SET);
                     }
