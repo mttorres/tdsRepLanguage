@@ -10,7 +10,7 @@ typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_N
                                INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
@@ -267,7 +267,8 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
                 pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
                 //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
             }
-            updateSubStringInterval(newValue,header->varBuffer[pos],sizeNew,pointIni,pointEnd,size,&newPointIni,&newPointEnd);
+            updateSubStringInterval(newValue, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
+                                    &newPointEnd, 0);
             size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
             void* vpSize[] = {&size};
             updateValue(varName, vpSize, WRITE_SMV_INFO, 1, 1, -1, writeSmvTypeTable, 0);
@@ -412,7 +413,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
     // é um simples next(x)/init(x):= yyyyyyy;  -> substituir y's por expressão nova em newValue antes do delmitador (;)
     // os delmitadores podem variar, ex: em caso de next(time) o delimitador é (:)
-    updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd);
+    updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd, 1);
 
     // atualizar range de interesse e tamanho da string na tabela!
     // fazer duas chamadas por enquanto
@@ -440,7 +441,8 @@ char *processActiveName(STable *currentScope, char *varName, int notExistsOutSco
     if(notExistsOutScope && (currentScope->order || currentScope->level) ){
         // if, else, fors ....
         if(currentScope->parent->type != GLOBAL){
-            sprintf(interScope,SmvConversions[NAME_SSCOPE],varName,currentScope->parent->order,currentScope->level,currentScope->order);
+            sprintf(interScope,SmvConversions[NAME_SSCOPE],varName,currentScope->parent->level,
+                    currentScope->parent->order,currentScope->level,currentScope->order);
         }
         else{
             sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,currentScope->level,currentScope->order);

@@ -125,7 +125,8 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
 	return newString;
 }
 
-void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int size, int *newPointInit, int *newPointEnd)
+void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
+                             int *newPointInit, int *newPointEnd, int variantPointIni)
 {
     char aux[size - (pointEnd+1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
     int i;
@@ -168,7 +169,7 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
         }
     }
     updated[size] = '\0';
-    (*newPointInit) = pointIni; // invariante (manter por enquanto)
+    (*newPointInit) = variantPointIni? (*newPointEnd) : pointIni;
 
 }
 
