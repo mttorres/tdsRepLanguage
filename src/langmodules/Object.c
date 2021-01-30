@@ -84,6 +84,9 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	{
 		newOb->STR = malloc(sizeof(int)*OBJECT_SIZE);
 	}
+    else{
+        newOb->STR = NULL;
+    }
 
 	if(OBJECT_SIZE)
 	{

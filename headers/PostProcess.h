@@ -147,7 +147,7 @@ Object* refCopyOfVariable(TableEntry* var);
  * @param
  * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void specAssign(int varInit, int contextChange, TableEntry *var, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
+void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
            Object *newValue, int redef, int typeExpr, int C_TIME);
 
 

@@ -103,6 +103,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->backup = 0;
 	newtable->collision = 0;
 	newtable->conditionBind = NULL;
+	newtable->notEvaluated = 0;
 	
 	newtable->parent = parent;
 
@@ -156,12 +157,16 @@ void printTable(STable* t){
 				
 			}
 		}
+		else{
+            printf("|--> Entries: {NONE} \n");
+		}
 		if(t->nchild)
 		{
 			int i;
 			for (i = 0; i < t->nchild; i++)
 			{
-				printf("child (%d): \n",i+1);
+				printf("\tchild (%d): \n",i+1);
+				printf("\t\t");
 				printTable(t->children[i]);
 			}
 		}
@@ -197,6 +202,9 @@ void letgoTable(STable *t)
 {
 	if(!t) {
 	    return;
+	}
+	if(t->parent){
+	    t->parent->children[t->order] = NULL;
 	}
 	int i;
 	if(t->children){

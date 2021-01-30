@@ -40,6 +40,7 @@ typedef struct S_TABLE
   int lastEntryIndex;
   int backup;
   int collision;
+  int notEvaluated;
     
 } STable;
 

@@ -679,16 +679,17 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             //primeira vez da variavel (ou não inicializada, mudança para depois
             if(!var)
             {
-                addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
-                varEntry = lookup(scope,varName);
+                if(!notEvaluate){
+                    addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
+                }
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
                 // note que temporal condition tem que ser um cubo de condição e tempo
                 if(changeContext){
-                    specAssign(1,changeContext,varEntry,refHeader,scope,refAuxTable,expr,0,0,C_TIME);
-                    specAssign(1,changeContext,varEntry,refHeader,scope,refAuxTable,expr,0,1,C_TIME);
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME);
                 }
                 else{
-                    specAssign(1,changeContext,varEntry,refHeader,scope,refAuxTable,expr,0,0,C_TIME);
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
                 }
             }
             else{
@@ -699,22 +700,29 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
                 }
                 int prevDef = var->redef;
                 int prevContext = var->timeContext;
-                updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, -1, -1, scope, C_TIME);
+                if(!notEvaluate){
+                    updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, -1, -1, scope, C_TIME);
+                }
                 // tempo > 0 e não ocorreu redefinição
                 if(changeContext && var->redef == prevDef){
-                    specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,1,C_TIME);
+                    specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
                 }
                 else{
+                    fprintf(stderr, "ASSIGN ERROR: redefinition of %s in same time interval \n", varEntry->name);
+                    exit(-1);
                     // casos de redefinição (devemos dar free na entrada anterior (otimização)
                     letGoOldEntry(varEntry,refAuxTable);
                     // tempo = 0, redefinição
                     if(!changeContext){
-                        specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,0,C_TIME);
+                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
+                                   C_TIME);
                     }
                     // tempo > 0 e redefinição
                     else{
-                        specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,0,C_TIME);
-                        specAssign(0,changeContext,varEntry,refHeader,scope,refAuxTable,expr,var->redef,1,C_TIME);
+                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
+                                   C_TIME);
+                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
+                                   C_TIME);
                     }
                 }
             }
@@ -783,19 +791,29 @@ Object * evalCMD_IF(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderCo
     free(sintExpr);
 
     if(*(int*)conditionalExpr->values[0]){
-        letgoObject(conditionalExpr);
         eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv,0); // tenho que passar um parâmetro que define se avaliou
     }
+    // tem que na verdade não fazer nada. (mesmo que a condição não entre ele deve alocar o escopo para o número de filhos.
     else{
-        letgoObject(conditionalExpr);
+        IF_SCOPE->notEvaluated = 1;
         eval(n->children[1],IF_SCOPE,writeSmvTypeTable,controllerSmv,1);
     }
     // cria else
     // e após extrair a condição.
-    if(n->children[1]){
-        // criar condiçao com o !cond do IF_BLOC
+    if(n->children[2]){
+        STable* ELSE_SCOPE = addSubScope(scope,ELSE_BLOCK);
+        if(!*(int*)conditionalExpr->values[0]){
+            ELSE_SCOPE->notEvaluated = 1;
+        }
+        Object* notExpr =  evalNOT(conditionalExpr);
+        bindCondition(ELSE_SCOPE,notExpr);
+        eval(n->children[2]->children[0],ELSE_SCOPE,writeSmvTypeTable,controllerSmv,1);
+//      letgoTable(ELSE_SCOPE);
     }
-    // adicionar free aos escopos alocados aqui
+    else{
+        letgoObject(conditionalExpr);
+    }
+//  letgoTable(IF_SCOPE);
     return NULL;
 }
 
@@ -806,7 +824,7 @@ Object * evalMATCH_IF(Node* n, STable* scope, STable** writeSmvTypeTable, Header
 
 Object** eval(Node* n, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv, int notEvaluate)
 {
-    printf("[eval] %s \n",n->name);
+    //printf("[eval] %s \n",n->name);
     if(n)
     {
         // sintetizado dos filhos
