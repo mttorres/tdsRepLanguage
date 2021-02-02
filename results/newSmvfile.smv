@@ -2,16 +2,15 @@ MODULE main
 VAR
 	time: 0..20;
 	finalAutomata: finalAutomata(time);
-	x : 0..2;
-	x_redef1 : 0..30;
-	r : boolean;
+	x : -1..4;
 	z : boolean;
-	z_redef1 : boolean;
+	zelda : boolean;
 	w_scope1_0 : 0..1;
-	r_redef1 : boolean;
-	x_redef2 : 0..90;
-	y : 0..1;
+	r_scope1_1 : boolean;
+	u_scope1_1_2_0 : boolean;
+	y : 0..5;
 	w_scope1_2 : 0..1;
+	u_scope1_2_2_0 : boolean;
 ASSIGN
 	init(time) := 0;
 	next(time) := case
@@ -19,41 +18,49 @@ ASSIGN
 		TRUE: time;
 esac;
 	init(x):= 2;
-	init(x_redef1):= 30;
-	init(r):= TRUE;
 	init(z):= TRUE;
-	init(z_redef1):= FALSE;
+	init(zelda):= FALSE;
 	init(w_scope1_0):= case 
-		!z_redef1 : 1;
+		!z : 1;
 		TRUE : 0; 
 	esac;
-	init(r_redef1):= case 
-		!z_redef1 : FALSE;
-		TRUE : r; 
+	init(r_scope1_1):= case 
+		zelda : FALSE;
+		TRUE : FALSE; 
 	esac;
-	next(x_redef1):= case 
+	init(u_scope1_1_2_0):= case 
+		zelda & z  : FALSE;
+		TRUE : FALSE; 
+	esac;
+	next(x):= case 
 		next(time) = 2  : 4;
-		TRUE : x_redef1; 
-	esac;
-	init(x_redef2):= 0;
-	next(x_redef2):= case 
-		next(time) = 2  : 90;
-		next(time) = 3  : 80;
-		TRUE : x_redef2; 
+		next(time) = 3  : -1;
+		TRUE : x; 
 	esac;
 	init(y):= 0;
 	next(y):= case 
-		next(time) = 2  : 1;
+		next(time) = 2  : 5;
+		next(time) = 4  & !next(zelda)  : 2;
+		next(time) = 4  & !!next(zelda)  : 1;
 		TRUE : y; 
 	esac;
-	next(z_redef1):= case 
-		next(time) = 3  : FALSE;
-		TRUE : z_redef1; 
+	next(zelda):= case 
+		next(time) = 4  : FALSE;
+		TRUE : zelda; 
+	esac;
+	next(z):= case 
+		next(time) = 4  : TRUE;
+		TRUE : z; 
 	esac;
 	init(w_scope1_2):= 0;
 	next(w_scope1_2):= case 
-		next(time) = 3  & !z_redef1  : 1;
+		next(time) = 4  & !next(zelda)  : 1;
 		TRUE : w_scope1_2; 
+	esac;
+	init(u_scope1_2_2_0):= FALSE;
+	next(u_scope1_2_2_0):= case 
+		next(time) = 4  & !next(zelda) & next(z)   : FALSE;
+		TRUE : u_scope1_2_2_0; 
 	esac;
 
 MODULE merger1(time)
