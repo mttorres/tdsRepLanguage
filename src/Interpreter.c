@@ -595,7 +595,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,0,0);
+        updateTime(controllerSmv->MAIN,writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,0,0);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -603,7 +603,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,1,1);
+        updateTime(controllerSmv->MAIN,writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,1,1);
     }
     return NULL;
 }
@@ -665,9 +665,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
-        STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        STable* refAuxTable = accessSmvInfo(controllerSmv,scope->type == FUNC? FUNCTION_SMV : MAIN,
+                                            scope->type == FUNC? 0 : -1);
         // ports ou main
-        HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        HeaderSmv* refHeader = accessHeader(controllerSmv,scope->type == FUNC? FUNCTION_SMV : MAIN,
+                                            scope->type == FUNC? 0 : -1 );
         TableEntry* itimeEntry = lookup(scope,"I_TIME");
         int I_TIME = *(int*)itimeEntry->val->values[0];
         int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto

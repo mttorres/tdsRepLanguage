@@ -4,14 +4,14 @@
 
 //typedef enum {false, true} bool;
 
-typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK, SMV_PORTS, SMV_V_MAIN ,SIMPLE_HASH} SCOPE_TYPE;
+typedef enum SCOPE_TYPE { GLOBAL, FUNC, LOOP, IF_BLOCK, ELSE_BLOCK, SMV_PORTS, SMV_V_MAIN, SIMPLE_HASH} SCOPE_TYPE;
 
 typedef enum ENTRY_TYPE {NUMBER_ENTRY, LOGICAL_ENTRY, LABEL_ENTRY ,T_DIRECTIVE_ENTRY, TDS_ENTRY, NULL_ENTRY, FUNCTION_ENTRY, WRITE_SMV_INFO ,TYPE_SET } ENTRY_TYPE;
 			 // permitir lista de tipos diferentes? permitir lista de TDS's?
 			 // comentado por enquanto, devemos decidir oque fazer sobre os enums do node
 
 
-typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3} smvtype;
+typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3, FUNCTION_SMV = 4} smvtype;
 
 
 
