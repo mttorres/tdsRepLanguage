@@ -209,20 +209,14 @@ void letgoObject(Object *o)
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
 		{
-			if(o->type == TYPE_SET)
+			if(o->type != TYPE_SET || i < 2)
 			{
-				if(i < 2)
-				{
-					free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
-				}
+			    free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
+			                         // na chamada anterior
 			}
 			else if(o->type == TDS_ENTRY)
 			{
 				// TODO PARA TDS
-			}
-			else
-			{
-				free(o->values[i]);
 			}
             o->values[i] = NULL;
 		}

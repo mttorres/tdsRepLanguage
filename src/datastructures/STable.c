@@ -104,6 +104,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->collision = 0;
 	newtable->conditionBind = NULL;
 	newtable->notEvaluated = 0;
+	newtable->children = NULL;
 	
 	newtable->parent = parent;
 
@@ -113,7 +114,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	}
 */
 
-	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
+	int selectSize =  type == SIMPLE_HASH || type == SMV_PORTS ?  MAX_SIMPLE : MAX_TABLE;
 
 /*
 	if(type == SIMPLE_HASH)
@@ -214,7 +215,8 @@ void letgoTable(STable *t)
 		free(t->children);
 	}
 	if(t->tableData){
-		for(i=0; i < MAX_TABLE; i++)
+		int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
+		for(i=0; i < size; i++)
 		{
 		    if(t->tableData[i]) {
                 letgoEntry(t->tableData[i]);

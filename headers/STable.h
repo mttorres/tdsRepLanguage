@@ -7,6 +7,8 @@
 
 #define  MAX_TABLE 950
 
+#define MAX_SIMPLE 100
+
 #define  MAX_CHILD 150
 
 struct S_TABLE;
