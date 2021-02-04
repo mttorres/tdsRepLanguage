@@ -8,25 +8,24 @@
 HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP) {
 
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
-  char* name = malloc((strlen(moduleName)+1) * sizeof(char));
 
-  if(type == AUTOMATA || type == PORTS){
+  if(type == PORTS){
       char* refOldPt;
-      if(type == AUTOMATA){
-            refOldPt = strstr(moduleName,"(");
-            *refOldPt = '\0';
-      }
-      else{
-          // só adiciona parâmetro se for portsModule
-          refOldPt = moduleName;
-          char* newDeclaration = addParams(refOldPt,"time","(",")");
-          strcpy(name, newDeclaration);
-      }
+      // só adiciona parâmetro se for portsModule
+      refOldPt = moduleName;
+      char* newDeclaration = addParams(refOldPt,"time","(",")");
+      header->moduleName = newDeclaration;
   }
   else{
-      strcpy(name, moduleName);
+      if(type == AUTOMATA){
+          header->moduleName = overwriteParam(moduleName,"ports");
+      }
+      else{
+          char* name = malloc((strlen(moduleName)+1) * sizeof(char));
+          strcpy(name, moduleName);
+          header->moduleName = name;
+      }
   }
-  header->moduleName = name;
   
   header->type = type;
   header->VAR_POINTER = varP;

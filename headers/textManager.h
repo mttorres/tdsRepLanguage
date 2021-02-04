@@ -30,5 +30,17 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult);
 void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
                              int *newPointInit, int *newPointEnd, int variantPointIni);
 
+/**
+ *  Retorna uma declaração de módulo/função sem nenhum dos parâmetros originais e com um novo parâmetro.
+ *  Ex: module(time) ->  module(ports)
+ *
+ *  @param moduleName a declaração original do módulo (ou função)
+ *  @param param o novo parâmetro que irá sobrescrever todos os demais
+ *
+ *  @returns a nova declaração.
+ *  @SideEffects :  Aloca string como retorno
+ *  (a responsabilidade de free ou realloc fica fora dessa função)
+ * */
+char* overwriteParam(char* moduleName, char* param);
 
 #endif

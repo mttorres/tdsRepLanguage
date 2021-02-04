@@ -179,3 +179,11 @@ void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, i
 
 }
 
+
+char* overwriteParam(char* moduleName, char* param){
+    char* refOldPt;
+    refOldPt = strstr(moduleName,"(");
+    memset(refOldPt, '\0', strlen(refOldPt));
+    return addParams(refOldPt,param,"(",")");
+}
+
