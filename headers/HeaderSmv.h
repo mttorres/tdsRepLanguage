@@ -43,7 +43,7 @@ typedef struct headerController
     STable** functionsInfo; // para cada função
 
     STable* originalPorts; // tabela de simbolos auxiliar para ports (necessária?) (só vai ter o módulo de cada porta) (pode ser na verdade para as portas declaradas)
-    int totalOriginalPorts;
+    int expectedPorts;
     // ai ele verifica se foram usadas (não tem declarações de funções)
     int declaredPorts;
 

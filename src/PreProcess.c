@@ -4,7 +4,7 @@
 #include "../headers/PreProcess.h"
 
 
-/* 
+/*
 	salva o headerSMV do módulo lido anteriormente. 
 	se for um automato o ponteiro de transição não é vázio.
 	efeito colateral: * ao criar ao salvar o header incrementa o tamanho de headers do HeaderController
@@ -24,37 +24,28 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
 	char* aloc = malloc((tam+1) * sizeof(char));
 	if(part != TRANS)
 	{
-		strcpy(aloc,line);
 		if(part == VAR) 
 		{
-			pt = header->VAR_POINTER;
-			header->varBuffer[pt] = aloc;
 
-			  // deve fazer fora desse método a criação da declaração de portsModule
-//            if(currentHeader == MAIN && strstr(line,"(time)")) {
-//                header->VAR_RENAME_POINTER = pt;
-//            }
+            if(header->type == AUTOMATA){
 
-			// deve ignorar a referência e passar ports como parâmetro para automato agora
-//            if(currentHeader == AUTOMATA && line[0] == '\t' && line[1] == 'p'){
-//			}
-
-            // deve ser feito fora desse if (não vamos alocar strings nos buffers para eles mais (só salvar para ver se
-//			if(currentHeader == PORTS && (line[0] == '\t' || strstr(line,":")))
-//			{
-//				printf("[saveLineOnBuffer] Salvando tabela de portas (%s) \n\n",line);
-//				printf("[saveLineOnBuffer] Salvando tabela de portas (%c) \n\n",line[1]);
-
-//				void* po[] = {&pt, &tam};
-//				char name[] = {line[1],'\0'};
-
-				//addValue(name,po,TYPE_SET,2,0,portsSmv);
-//                addTypeSetSmv(name, po, TYPE_SET, 2, writeSmvTypeTable);
-//			}
-			header->VAR_POINTER += 1;	
+                char* ref = strstr(line,"(");
+                if(ref){
+                    ref = overwriteParam(line,"ports");
+                    strcpy(aloc,ref);
+                    free(ref);
+                }
+                else{
+                    strcpy(aloc,line);
+                }
+            }
+            pt = header->VAR_POINTER;
+            header->varBuffer[pt] = aloc;
+            header->VAR_POINTER += 1;
 		}
 		if(part == ASSIGN) 
 		{
+            strcpy(aloc,line);
 			pt = header->ASSIGN_POINTER;
 			header->assignBuffer[pt] = aloc;
 			header->ASSIGN_POINTER += 1;
@@ -173,6 +164,24 @@ void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
 }
 
 
+void processPorts(char* buffer, char* varString, char *fVarString, int stage, HeaderController *Hcontrol) {
+    HeaderSmv* portsHeader = accessHeader(Hcontrol, stage, -1);
+    int iniVar = portsHeader->VAR_POINTER == 0;
+    if(iniVar &&  strstr(buffer,fVarString)) {
+        // tratamento de FROZEN VAR
+        selectBuffer(VAR,varString,portsHeader,0);
+    }
+    // é porque estamos em uma porta
+    else{
+//        printf("[processPorts] Salvando tabela de portas (%s) \n\n",buffer);
+//        printf("[processPorts] Salvando tabela de portas (%c) \n\n",buffer[1]);
+        int used = 0;
+        void* po[] = {&used};
+        char name[] = {buffer[1],'\0'};
+        addValue(name,po,LOGICAL_ENTRY,1,0,Hcontrol->originalPorts,-1);
+    }
+}
+
 void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
 	/*Strings que são usadas para a busca no arquivo*/
 	char varString[] = "VAR \n";
@@ -279,21 +288,21 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
 
                 if(!(readAssign || readTrans))
                 {
-                    int iniVar = accessHeader(Hcontrol, stage, -1)->VAR_POINTER == 0;
-                    if(readPortsModule && iniVar &&  strstr(buffer,fVarString)) {
-                        //printf("[preProcessSmv] Trocou FVAR %s\n",buffer);
-                        bufferAux = varString; // tratamento de FROZEN VAR
+                    if(readPortsModule){
+                        processPorts(buffer,varString,fVarString,stage,Hcontrol);
                     }
                 }
                 else
                 {
-                    //printf("[preProcessSmv] terminou VAR \n\n");
                     phase = readAssign ? ASSIGN : TRANS;
                     readAssign = 0;
                 }
 
             }
-            processPhase(stage, phase, Hcontrol, bufferAux, controlRename);
+            // ignora referência a portsModule nos automatos (centralizar em main) e não salva em headers as portas originais
+            if(!(bufferAux[0] == 'p' && buffer[1] =='o' && bufferAux[2] == 'r' && readAutomata) && !(phase == VAR && readPortsModule)) {
+                processPhase(stage, phase, Hcontrol, bufferAux, controlRename);
+            }
             if(phase == CREATE_MODULE){
                 phase++;
             }
@@ -317,5 +326,5 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
    	}
    	free(buffer);
     //printf("terminou! \n");
-    addParamToPortsModule(Hcontrol, "time", 1);
+//    addParamToPortsModule(Hcontrol, "time", 1);
 }

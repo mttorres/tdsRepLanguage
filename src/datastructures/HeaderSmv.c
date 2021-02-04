@@ -150,7 +150,7 @@ HeaderController *createController() {
     Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
     Hcontrol->FUNCTIONS = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
 
-    Hcontrol->totalOriginalPorts = 0;
+    Hcontrol->expectedPorts = 0;
     Hcontrol->declaredPorts= 0;
     return Hcontrol;
 }
