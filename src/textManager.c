@@ -40,6 +40,8 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
 
     int removedCharacters = 0;
     int removing = 0;
+    char* resultProperty = ".value";
+    char* refProp = resultProperty;
 
     char* oldConstraintRef = oldConstraint;
     char* startResultRef = toCopyResult;
@@ -57,12 +59,17 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
 
         if(removing){
             removedCharacters++;
+            while(*refProp){
+                *startResultRef = *refProp;
+                refProp++;
+                startResultRef++;
+            }
         }
 
-        if(*oldConstraintRef == ']'){
+        if(*oldConstraintRef == ']' && !*refProp){
             removing = 0;
+            refProp = resultProperty;
         }
-
         oldConstraintRef++;
         //printf("[clearOldPortsRefs] copiando e filtrando... %c \n",*oldConstraintRef);
     }
