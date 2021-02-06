@@ -44,6 +44,7 @@ typedef struct S_TABLE
   int collision;
   int notEvaluated;
   int usedSize;
+  int childOfFunction;
 } STable;
 
 

@@ -107,7 +107,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->children = NULL;
 	
 	newtable->parent = parent;
-
+    newtable->childOfFunction = parent && (parent->type == FUNC || parent->childOfFunction);
 
 /*
 	if(chillist){

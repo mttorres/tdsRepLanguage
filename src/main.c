@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
   	printf("\n");
   	
 	//pos processamento
-//    eval(root, global, writeSmvTypeTable, controller);
+    eval(root, global, controller);
 
 	printf("\n");
 	printf("------------------------------------------------------------------------------\n");
