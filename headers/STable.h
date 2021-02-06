@@ -45,13 +45,14 @@ typedef struct S_TABLE
   int notEvaluated;
   int usedSize;
   int childOfFunction;
+  int indexRef;
 } STable;
 
 
 TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
+STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int indexRef);
 
 
 STable* addSubScope(STable* parent, SCOPE_TYPE type);

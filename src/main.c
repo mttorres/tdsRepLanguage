@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 
 	// tabelas e componentes globais
     HeaderController* controller = createController();
-	STable* global = createTable(GLOBAL,NULL,0,0);
+	STable* global = createTable(GLOBAL, NULL, 0, 0, -1);
 
 	//pré processamento
 	preProcessSmv(smvP,controller);

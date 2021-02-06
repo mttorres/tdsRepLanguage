@@ -12,7 +12,7 @@
 #include "Node.h"
 #include "Object.h"
 
-Object *eval(Node *n, STable *scope, STable **writeSmvTypeTable, HeaderController *controllerSmv);
+Object *eval(Node *n, STable *scope, HeaderController *controllerSmv);
 
 // usar depois para criar executores genericos
 // caso a gente queira simplificar os parâmetros (note que muitos são desnecessários em alguns evals (MELHORIA))

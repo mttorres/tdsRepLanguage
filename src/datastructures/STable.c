@@ -78,7 +78,7 @@ void printEntry(TableEntry* e) {
 
 /// table
 
-STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
+STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int indexRef) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
 	
@@ -108,6 +108,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	
 	newtable->parent = parent;
     newtable->childOfFunction = parent && (parent->type == FUNC || parent->childOfFunction);
+    newtable->indexRef = newtable->type == FUNC? indexRef : newtable->childOfFunction? parent->indexRef : -1;
 
 /*
 	if(chillist){
@@ -403,7 +404,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 void addTypeSetSmv(char *name, void **any, int object_size, STable *current)
 {
 	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
-	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+	STable* hashset = createTable(SIMPLE_HASH, NULL, 0, 0, -1);
 
 	void* po[] = {any[0], any[1], hashset};
 
@@ -494,7 +495,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
 	// LEMBRE-SE nchild usa a próxima posição para o escopo filho (inicia em 0, primeira pos)
 
-	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
+	STable* child = createTable(type, parent, parent->level + 1, parent->nchild, -1);
 	
 	printf("[addSubScope] alocando filho: %d \n",parent->nchild);
 
