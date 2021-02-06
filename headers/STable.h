@@ -79,7 +79,7 @@ int checkTypeSet(STable* current, char* name,  char* typeid);
 */
 void addEntryToTypeSet(STable* current, char* name, char* typeid); 
 
-void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current);
+void addTypeSetSmv(char *name, void **any, int object_size, STable *current);
 
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
@@ -104,9 +104,11 @@ TableEntry* lookup(STable* t, char* name);
 
 void printEntry(TableEntry* e);
 
+
 /**
  * Libera as entradas da tabela de simbolos, seguindo diferentes esquemas dependendo do type.
  *      tupla-objeto-linguagem: n objetos de mesmo tipo (inteiro, timedirective, booleano, label, null, tds)
+ *      tupla-init/next: pos, tamanho, pointIni, pointEnd
  *      tupla-inteiros : pos, tamanho, pointIni, pointEnd, min, max
  *      tupla-booleano:  pos, tamanho
  *      tupla-set:   pos, tamanho, SIMPLE_HASH

@@ -368,7 +368,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	{
 		int present = 1;
 		void* po = {&present};
-        addValue(typeid, po, NUMBER_ENTRY, 1, 0, entry->val->values[2], 0);
+        addValue(typeid, po, LOGICAL_ENTRY, 1, 0, entry->val->values[2], 0);
 	}
 }
 
@@ -398,7 +398,7 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
  
 
 */
-void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current)
+void addTypeSetSmv(char *name, void **any, int object_size, STable *current)
 {
 	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
@@ -407,7 +407,7 @@ void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable
 
 	printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
-    addValue(name, po, any_type, object_size + 1, 0, current, 0);
+    addValue(name, po, TYPE_SET, object_size + 1, 0, current, 0);
 }
 
 void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
