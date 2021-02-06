@@ -356,11 +356,13 @@ void addParamToPortsModule(HeaderController *controller, char *param, int first)
     // agora deve propagar as alterações para todos os demais módulos
     // OU SEJA JÁ QUE ESTÁ CENTRALIZADO NO MAIN (posição 3 do buffer de VAR), deve-se substituir esse
 
+    HeaderSmv* mainUpdate = accessHeader(controller,MAIN,-1);
+
     char* refOldPt;
-    refOldPt = updated->varBuffer[updated->VAR_RENAME_POINTER];
+    refOldPt = mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER];
     char* newDeclaration = addParams(refOldPt,param,"(",")");
     free(refOldPt);
-    updated->varBuffer[updated->VAR_RENAME_POINTER] = newDeclaration;
+    mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER] = newDeclaration;
 
 //    if(!first){
 //        propagParamDependence(controller->MAIN_RELATED,param,controller->H_MAIN_CURRENT_SIZE);
