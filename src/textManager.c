@@ -100,6 +100,7 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
     else {
         newString = (char*) calloc(strlen(original) + 1 + strlen(param) + 1 + 1, sizeof(char));
 //		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+        auxNewAdd = newString;
         if(statementEnd){
             auxNewAdd = customCat(auxNewAdd,original,';',0);
         }
@@ -173,7 +174,9 @@ void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, i
 char* overwriteParam(char* moduleName, char* param){
     char* refOldPt;
     refOldPt = strstr(moduleName,"(");
+    memset(refOldPt, '\n', 1);
+    refOldPt++;
     memset(refOldPt, '\0', strlen(refOldPt));
-    return addParams(refOldPt,param,"(",")");
+    return addParams(moduleName,param,"(",")");
 }
 

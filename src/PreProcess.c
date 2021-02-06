@@ -27,7 +27,7 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
 		if(part == VAR) 
 		{
 
-            if(header->type == AUTOMATA){
+            if(header->type == AUTOMATA || (header->type == MAIN && header->VAR_POINTER != header->VAR_RENAME_POINTER) ){
 
                 char* ref = strstr(line,"(");
                 if(ref){
@@ -38,6 +38,8 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
                 else{
                     strcpy(aloc,line);
                 }
+            }else{
+                strcpy(aloc,line);
             }
             pt = header->VAR_POINTER;
             header->varBuffer[pt] = aloc;
@@ -300,7 +302,7 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
 
             }
             // ignora referência a portsModule nos automatos (centralizar em main) e não salva em headers as portas originais
-            if(!(bufferAux[0] == 'p' && buffer[1] =='o' && bufferAux[2] == 'r' && readAutomata) && !(phase == VAR && readPortsModule)) {
+            if(!(bufferAux[1] == 'p' && buffer[2] =='o' && bufferAux[3] == 'r' && readAutomata) && !(phase == VAR && readPortsModule)) {
                 processPhase(stage, phase, Hcontrol, bufferAux, controlRename);
             }
             if(phase == CREATE_MODULE){
@@ -313,9 +315,9 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
    		{
    		    if(stage == MAIN){
                 HeaderSmv* current = accessHeader(Hcontrol,MAIN,-1);
-                char* portCenter = "\tports: portsModule(time);";
+                char* portCenter = "\tports: portsModule(time);\n";
                 current->VAR_RENAME_POINTER = current->VAR_POINTER;
-   		        selectBuffer(phase,portCenter,current,controlRename);
+   		        selectBuffer(VAR,portCenter,current,controlRename);
    		    }
    			// reinicio
    			phase = CREATE_MODULE;

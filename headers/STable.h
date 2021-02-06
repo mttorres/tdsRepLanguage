@@ -43,7 +43,7 @@ typedef struct S_TABLE
   int backup;
   int collision;
   int notEvaluated;
-    
+  int usedSize;
 } STable;
 
 

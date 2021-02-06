@@ -108,6 +108,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	
 	newtable->parent = parent;
 
+
 /*
 	if(chillist){
 		newtable->children = chillist;
@@ -115,6 +116,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 */
 
 	int selectSize =  type == SIMPLE_HASH || type == SMV_PORTS ?  MAX_SIMPLE : MAX_TABLE;
+    newtable->usedSize = selectSize;
 
 /*
 	if(type == SIMPLE_HASH)
@@ -238,7 +240,7 @@ void letgoTable(STable *t)
 int hash(char * str, STable* t) {
 	int hash = 401;
 	int c;
-	int SIZE_FOR_HASH = t->collision ? t->collision : MAX_TABLE;
+	int SIZE_FOR_HASH = t->collision ? t->collision : t->usedSize;
 	
 	if(t->collision)
 	{
