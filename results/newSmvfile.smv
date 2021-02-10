@@ -1,16 +1,18 @@
 MODULE main
 VAR
 	time: 0..20;
-	finalAutomata: finalAutomata(time);
+	finalAutomata: finalAutomata(ports)
+	ports: portsModule(time);
 	x : -1..4;
 	z : boolean;
 	zelda : boolean;
 	w_scope1_0 : 0..1;
 	r_scope1_1 : boolean;
 	u_scope1_1_2_0 : boolean;
-	y : 0..5;
+	y : 0..6;
 	w_scope1_2 : 0..1;
 	u_scope1_2_2_0 : boolean;
+	tdsA : 0..1;
 ASSIGN
 	init(time) := 0;
 	next(time) := case
@@ -41,7 +43,7 @@ esac;
 	next(y):= case 
 		next(time) = 2  : 5;
 		next(time) = 4  & !next(zelda)  : 2;
-		next(time) = 4  & !!next(zelda)  : 1;
+		next(time) = 4  & !!next(zelda)  : 6;
 		TRUE : y; 
 	esac;
 	next(zelda):= case 
@@ -62,42 +64,44 @@ esac;
 		next(time) = 4  & !next(zelda) & next(z)   : FALSE;
 		TRUE : u_scope1_2_2_0; 
 	esac;
+	init(tdsA):= 0;
+	next(tdsA):= case 
+		next(time) = 4  : 0;
+		TRUE : tdsA; 
+	esac;
 
-MODULE merger1(time)
+MODULE merger1(ports)
 VAR
-	ports: portsModule;
 	cs: {q0};
 TRANS
-	((cs = q0 & ports.b = NULL & ports.d = NULL & ports.c != NULL & ports.a = ports.c & FALSE) -> next(cs) = q0) &
-	((cs = q0 & ports.a = NULL & ports.d = NULL & ports.c != NULL & ports.b = ports.c & FALSE) -> next(cs) = q0);
+	((cs = q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & FALSE) -> next(cs) = q0) &
+	((cs = q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & FALSE) -> next(cs) = q0);
 
-MODULE fifo2(time)
+MODULE fifo2(ports)
 VAR
-	ports: portsModule;
 	cs: {q0,p0,p1};
 ASSIGN
 	init(cs) := {q0};
 TRANS
-	((cs = q0 & ports.a = NULL & ports.b = NULL & ports.d = NULL & ports.c = 0 & FALSE) -> next(cs) = p0) &
-	((cs = q0 & ports.a = NULL & ports.b = NULL & ports.d = NULL & ports.c = 1 & FALSE) -> next(cs) = p1) &
-	((cs = p0 & ports.a = NULL & ports.c = NULL & ports.b = NULL & ports.d = 0) -> next(cs) = q0) &
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 0 & FALSE) -> next(cs) = p0) &
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 1 & FALSE) -> next(cs) = p1) &
+	((cs = p0 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 0) -> next(cs) = q0) &
 	((cs = p0) -> ((next(cs) != p1))) &
-	((cs = p1 & ports.a = NULL & ports.c = NULL & ports.b = NULL & ports.d = 1) -> next(cs) = q0) &
+	((cs = p1 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 1) -> next(cs) = q0) &
 	((cs = p1) -> ((next(cs) != p0)));
 
-MODULE finalAutomata(time)
+MODULE finalAutomata(ports)
 VAR
-	prod1: merger1(time);
-	prod2: fifo2(time);
-	ports: portsModule;
+	prod1: merger1(ports)
+	prod2: fifo2(ports)
 	cs: {q0q0,q0p0,q0p1};
 ASSIGN
 	init(cs) := {q0q0};
 TRANS
-	((cs = q0q0 & ports.b = NULL & ports.d = NULL & ports.c != NULL & ports.a = ports.c & ports.c = 0) -> next(cs) = q0p0) &
-	((cs = q0q0 & ports.b = NULL & ports.d = NULL & ports.c != NULL & ports.a = ports.c & ports.c = 1) -> next(cs) = q0p1) &
-	((cs = q0q0 & ports.a = NULL & ports.d = NULL & ports.c != NULL & ports.b = ports.c & ports.c = 0) -> next(cs) = q0p0) &
-	((cs = q0q0 & ports.a = NULL & ports.d = NULL & ports.c != NULL & ports.b = ports.c & ports.c = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
 	((cs = q0p0) -> ((next(cs) != q0p1))) &
 	((cs = q0p1) -> ((next(cs) != q0p0)));
 INVAR
@@ -107,9 +111,5 @@ INVAR
 
 MODULE portsModule(time)
 VAR 
-	a : array 0..5 of {NULL, 0, 1};
-	c : array 0..5 of {NULL, 0, 1};
-	b : array 0..5 of {NULL, 0, 1};
-	d : array 0..5 of {NULL, 0, 1};
 ASSIGN
 
