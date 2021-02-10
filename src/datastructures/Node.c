@@ -71,11 +71,13 @@ Node* createNode(int numArgs, ...){
 
 	if(current_node->nleafs > 0){
 		//printf("CRIANDO FOLHAS \n");
+		char* ptLeaf = NULL;
 		char** leafs = (char**) malloc(current_node->nleafs*sizeof(char*));
 		int pos = 0;
 		for(i = parametrosFilhos; i <= numArgs; i++){
-		    
-		    leafs[pos] = va_arg(args, char*); 
+		    ptLeaf = va_arg(args, char*);
+		    leafs[pos] = malloc(sizeof(char)*strlen(ptLeaf)+1);
+		    strcpy(leafs[pos],ptLeaf);
 		    pos++;
 		}		
 		current_node->leafs = leafs;
@@ -175,6 +177,9 @@ void letgoNode(Node* n){
 		free(n->children);
 	}
 	if(n->leafs){
+        for(i=0; i < n->nleafs; i++){
+            free(n->leafs[i]);
+        }
 		free(n->leafs);
 	}	
 	free(n);
