@@ -51,7 +51,7 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
 				char name[] = {line[1],'\0'};
 
 				//addValue(name,po,TYPE_SET,2,0,portsSmv);
-                addTypeSetSmv(name, po, 2, writeSmvTypeTable);
+                addTypeSetSmv(name, po, TYPE_SET, 2, writeSmvTypeTable);
 			}
 			header->VAR_POINTER += 1;	
 		}
@@ -126,18 +126,14 @@ void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
 	int pointIni;
 	int pointEnd;
 	int tam = strlen(linhaLida);
-    int min;
-    int max;
 
     auxDelim = strstr(linhaLida,":");
     auxFim = strstr(auxDelim,"..");
     pointIni = (auxDelim-linhaLida+2);
     pointEnd = ((auxFim-linhaLida))-1;
-    min = 0;
-    max = 3;
 
-    void* po[] = {&pos, &tam, &pointIni, &pointEnd,&min,&max}; // poderia generalizar isso aqui para evitar grandes erros
-    addValue(nome, po, WRITE_SMV_INFO, 6, 0, Hcontrol->mainInfo, 0);
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd};
+    addValue(nome, po, WRITE_SMV_INFO, 4, 0, Hcontrol->mainInfo, 0);
 
 
     // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")
@@ -152,6 +148,7 @@ void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
 
     addValue("init(time)", po, WRITE_SMV_INFO, 4, 0, Hcontrol->mainInfo, 0);
 
+
 	char* linhaLidaNext = Hcontrol->MAIN_RELATED[0]->assignBuffer[3];
     pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
 	tam = strlen(linhaLidaNext);
@@ -163,6 +160,7 @@ void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
 
     addValue("next(time)", po, WRITE_SMV_INFO, 4, 0, Hcontrol->mainInfo, 0);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
+		
 
 	// seta as diretivas temporais globais da linguagem
 	char* diretivas[] = {"I_TIME", "C_TIME","F_TIME"};
