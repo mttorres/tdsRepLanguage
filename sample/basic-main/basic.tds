@@ -1,25 +1,59 @@
 INTERVAL: 0 ~ 20
 
+x = 2  //redef =0 , context =0
+// usei aqui o x
 
-x = 1
 
-y = 30
+//r = true // só deve alterar para o false logo depois se a condição for verdadeira (not evaluate) (mas deve escrever correto)
 
-x = 20
+z = true
+
+zelda = false
+
+if(not z){
+   w = 1
+}
+
+if(zelda){
+   r = false
+   if(z){
+        u = false
+   }
+}
+
+C_TIME = 2
+
+x = 4 //redef =1 , context =2
 
 
 C_TIME = 2
 
-x = 3
+y = 5
 
-x= 4
 
 C_TIME = 3
 
-y = 0
+x = -1 // corrigido
 
-x = 80
+C_TIME = 4
 
-//condicaoTeste = true
+zelda = false
+
+z = true
+
+if(not zelda){
+   w = 1
+   y = 2
+   if(z){
+      u = false
+   }
+}
+else{
+    y = 6
+}
 
 
+//tdsA = {
+//	portname : 'a',
+//	data-time: {0: 0, 1: 1, 2: 0}
+//}
