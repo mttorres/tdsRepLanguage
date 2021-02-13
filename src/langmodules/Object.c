@@ -10,6 +10,8 @@ const char* mappingEnumObjectType[] =  {
     "T_DIRECTIVE",
     "TDS",
     "null*",
+    "TIME_COMPONENT",
+    "GEN_LIST",
     "FUNCTION",
     "WRITE_SMV_INFO",
     "TYPE_SET",
@@ -21,7 +23,7 @@ const char* mappingEnumObjectType[] =  {
 // MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...
 void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 {
-	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY || type == WRITE_SMV_INFO)
+	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY || type == WRITE_SMV_INFO || type == TIME_COMPONENT && index != 1)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -40,7 +42,10 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 		printf("[allocatePtObjects - labelVariants] valor: %s (%d)\n",pt,type);
 		return pt;
 	}
-
+	// listas provavelmente também vão apenas referenciar os vários objetos (assim como a time component)
+    if(type == TIME_COMPONENT && index == 1){
+        return value;
+    }
 
 }	
 

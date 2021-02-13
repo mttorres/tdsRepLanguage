@@ -27,7 +27,11 @@ Object* evalV_PROP_TDS(Node* n, STable* scope,  HeaderController* controllerSmv)
 Object * evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalDEFINE_INTERVAL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv);
-//Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv);
+
+Object* eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv);
 
 STable* selectSMV_SCOPE(STable* scope, HeaderController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
@@ -62,7 +66,8 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
 Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
-        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF
+        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF,
+        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT
 };
 
 
@@ -700,7 +705,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto
 
         // atribuição simples
-        if(n->children[0]->type == ASSIGN_IDVAR)
+        if(expr && n->children[0]->type == ASSIGN_IDVAR)
         {
             //primeira vez da variavel (ou não inicializada, mudança para depois
             if(!var)
@@ -755,7 +760,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
             }
             letgoObject(expr);
         }
-        else{
+        else if(expr){
             if(var && expr->type != var->type){
                 fprintf(stderr, "TYPE ERROR: %s datastructure type is imutable \n",varName);
                 exit(-1);
@@ -830,39 +835,51 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
     return NULL;
 }
 
-/*
+
 Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
     int x = 1;
     // leaf 4 (3)
+    return  NULL;
     // filho 1 (0) -> fazer via eval -> -> é loop que termina em eval expr
     // filho 2 (1) -> via eval também  -> são os extras
     char* portName = n->leafs[3];
-    Object ** domainInfo = eval(n->children[0],scope,controllerSmv);
-    Object** extraInfo = eval(n->children[1],scope,controllerSmv);
+    Object * domainInfo = eval(n->children[0],scope,controllerSmv);
+    Object* extraInfo = eval(n->children[1],scope,controllerSmv);
 
 
 
     return NULL;
 }
 
-Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){
-
-    Object** SYNTH =  eval(n->children[0],scope,controllerSmv);
-    Object* TIME_COMPONENT = SYNTH[0];
-    free(SYNTH);
-    return TIME_COMPONENT; // retona uma "time component" (mas essa sempre vai ser um "vetor" quando subir o nível
+Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){
+    return NULL;
 }
 
-Object * evalTDS_DATA_LIST_DOMAIN(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){
+
+    Object* SYNTH =  eval(n->children[0],scope,controllerSmv);
+    if(SYNTH->OBJECT_SIZE > 1){
+        fprintf(stderr, "TDS data per time not compatible with lists. Please reffer to the documentation for further info. \n");
+        exit(-1);
+    }
+    int TIME = atoi(n->leafs[0]);
+    void* TC[] = {&TIME,SYNTH};
+    Object* SYNTH_TIME_COMPONENT = createObject(TIME_COMPONENT,2,TC,-1,NULL);
+    return SYNTH_TIME_COMPONENT;
+}
+
+
+Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv){
 
     if(n->nchild > 1){
         // deve retornar uma lista com ambos
-        Object ** list = eval(n->children[0],scope,controllerSmv); // vai ter sempre uma outra lista (que possui uma lista e 1 componente)
+        Object * LEFT_COMPONENT = eval(n->children[0],scope,controllerSmv); // vai ter sempre uma outra lista (que possui uma lista e 1 componente)
         // onde a lista possui uma lista e uma componente ...
         // essa lista tem tamanho: n
-        Object ** SYNTH_TIME_COMPONENT = eval(n->children[1],scope,controllerSmv);
-        Object* TIME_COMPONENTE = SYNTH_TIME_COMPONENT[0];
-        free(SYNTH_TIME_COMPONENT);
+        Object * RIGHT_COMPONENT = eval(n->children[1],scope,controllerSmv);
+        // ao terminar temos os membros da lista MAIS A ESQUERDA e MAIS A DIREITA
+
+//        Object* MERGED = mergeGenericList(LEFT_COMPONENT,RIGHT_COMPONENT);
 
         // juntando a lista com a componente ->  n + 1 (a chamada de cima vai sintetizar uma lista com n+1 membros e outra componnete)
         // mas como saber o tamanho quando ele subir o nível?
@@ -885,25 +902,6 @@ Object * evalTDS_DATA_LIST_DOMAIN(Node* n, STable* scope,  HeaderController* con
 
     return NULL;
 }
-
-Object* eval_ITERATOR(Node* STARTING_NODE, STable* scope, HeaderController* controllerSmv, int LIST_TYPE){
-
-    Object* SYNTH_LIST = NULL;
-    if(STARTING_NODE){
-        if(STARTING_NODE->nchild == 1){
-            // deixar assim por enquanto;
-            // é igual ao eval
-            SYNTH_LIST = eval(STARTING_NODE->children[0],scope,controllerSmv)[0];
-        }
-        else{
-            // join list (pega dois objects e "junta" suas listas.
-            // vai sintetizar primeiro a lista mais a esquerda (contem os primeiros membros ("mais fundo")
-            // depois vai sintetizar o ultimo membro da lista atual
-        }
-    }
-    return  SYNTH_LIST;
-}
-*/
 
 Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
 {
