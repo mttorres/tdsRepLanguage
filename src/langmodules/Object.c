@@ -62,7 +62,7 @@ void* allocateTypeSetObjects(int index, void* value)
 }
 
 
-Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *SYNTH_BIND)
+Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *BIND)
 {
 
 	Object* newOb = (Object*) malloc(sizeof(Object));
@@ -71,11 +71,12 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
 	newOb->redef = 0;
 	newOb->timeContext = timeContext;
-    if(SYNTH_BIND){
-        newOb->SINTH_BIND = malloc(strlen(SYNTH_BIND)+1);
-        strcpy(newOb->SINTH_BIND,SYNTH_BIND);
+    if(BIND){
+        newOb->SINTH_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
+        strcpy(newOb->SINTH_BIND, BIND);
     }
     else{
+//      newOb->ORIGINAL_BIND = NULL;
         newOb->SINTH_BIND = NULL;
     }
 
@@ -83,6 +84,9 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	{
 		newOb->STR = malloc(sizeof(int)*OBJECT_SIZE);
 	}
+    else{
+        newOb->STR = NULL;
+    }
 
 	if(OBJECT_SIZE)
 	{
@@ -198,36 +202,42 @@ void printObject(Object* o)
 }
 
 
-void letgoObject(Object* o, int always)
+void letgoObject(Object *o)
 {
-	if(o && (o->SINTH_BIND || always))
+	if(o)
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
 		{
-			if(o->type == TYPE_SET)
+			if(o->type != TYPE_SET || i < 2)
 			{
-				if(i < 2)
-				{
-					free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
-				}
+			    free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
+			                         // na chamada anterior
 			}
 			else if(o->type == TDS_ENTRY)
 			{
 				// TODO PARA TDS
 			}
-			else
-			{
-				free(o->values[i]);
-			}
+            o->values[i] = NULL;
 		}
 	}
+    free(o->values);
+    o->values = NULL;
+	if(o->STR){
+	    free(o->STR);
+	}
+    o->STR = NULL;
+	if(o->SINTH_BIND){
+	    free(o->SINTH_BIND);
+	}
+    o->SINTH_BIND = NULL;
+	free(o);
 }
 
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, -1, o->SINTH_BIND);
+	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
 	return newOb;
 }
 
@@ -243,6 +253,8 @@ void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int 
     }
 
 }
+
+
 
 
 void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange)
@@ -272,12 +284,15 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
         updateObjectCell(o,any,any_type,object_size,index,-1);
 	}
 
-	if(o->type != any_type)
+	int typeChanged = 0;
+	if(o->type != any_type && o->type != any_type)
 	{
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		o->type = any_type;
+		typeChanged = 1;
 	}
-    o->redef = contextChange != o->timeContext? o->redef : o->redef+1;
-	o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
+	int oldRedef = o->redef;
+    o->redef = typeChanged || (contextChange != o->timeContext)? o->redef : o->redef+1;
+    o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

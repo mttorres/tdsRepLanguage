@@ -759,8 +759,8 @@ timecomponent: RAWNUMBERDATA COLON expr {
 
 timelist: timecomponent { 
 
-			Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", TIME_LIST ,$1);
-			$$ = timelist;    			 		  
+			//Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", TIME_LIST ,$1);
+			$$ = $1;
 		  }
 
 		  |timelist COMMA timecomponent {

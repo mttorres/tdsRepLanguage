@@ -3,129 +3,134 @@
 #include <stdlib.h>
 #include "../headers/textManager.h"
 
-// nota: ignore mode = 0 só o caracter especifico e tudo DEPOIS
-//  =  1 tudo ANTES DO CARACTER e o caracter especifico
+
 char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 
-    int ignoredExtra = 0;
     //printf("\t[customCat] source:  %s \n\n\n",src);
-    
-	while(*dest){
-		//printf("\t[customCat] %s \n",dest);				
-		dest++; // vai para a "proxima posição disponivel" (no caso de strings usadas anteriormente por essa função só roda "uma vez")
-	}
-	while(*src){
-		
-		//printf("\t[customCat] source atual: %s \n",src);
-		if(!ignoreMode){
-		    *dest = *src;
-		    //printf("\t[customCat] nova string atual:  %s \n",dest);
-		    dest++;
-		}
-		else {
-		   ignoredExtra++; 
-		}
 
-		src++;
-		if(*src == toIgnore){
-			//printf("\t[customCat] delimiter detected\n");			
-			break;
-		}
-	}
-	
-	if(!ignoreMode){
-	  *dest = '\0';
-	  --dest;   
-	  //printf("\t[customCat - ignoreMode = 0] ponteiro fim : %s \n",dest);	  
-	}
-	else {
-	        *dest = ignoredExtra;
-	        //printf("\t[customCat - ignoreMode = 1] caracteres ignorados : %d \n",ignoredExtra);
-	       	//printf("\t[customCat - ignoreMode = 1] equivalencia ascii: %c \n",ignoredExtra);
-	        // salva quantos foram ignorados!    
-	}
-	//printf("\t[customCat] ponteiro 'final' string: %s \n\n\n\n",dest);		
-	return dest;
+    while(*dest){
+        //printf("\t[customCat] %s \n",dest);
+        //*dest = '\0';
+        dest++; // vai para a "proxima posição disponivel" (no caso de strings usadas anteriormente por essa função só roda "uma vez")
+    }
+    while(*src){
+        //printf("\t[customCat] source atual: %s \n",src);
+        if(!ignoreMode){
+            *dest = *src;
+            //printf("\t[customCat] nova string atual:  %s \n",dest);
+            dest++;
+        }
+        src++;
+        if(*src == toIgnore){
+            //printf("\t[customCat] delimiter detected\n");
+            break;
+        }
+    }
+
+    if(!ignoreMode){
+        *dest = '\0';
+        --dest;
+        //printf("\t[customCat - ignoreMode = 0] ponteiro fim : %s \n",dest);
+    }
+    return dest;
 
 }
 
 void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
-    
+
     int removedCharacters = 0;
     int removing = 0;
+    char* resultProperty = ".value";
+    char* refProp = resultProperty;
 
     char* oldConstraintRef = oldConstraint;
     char* startResultRef = toCopyResult;
     while(*oldConstraintRef){
-        
+
 
         if(*oldConstraintRef == '['){
             removing = 1;
         }
 
         if(!removing){
-            *startResultRef = *oldConstraintRef; 
+            *startResultRef = *oldConstraintRef;
             startResultRef++;
         }
 
         if(removing){
             removedCharacters++;
+            while(*refProp){
+                *startResultRef = *refProp;
+                refProp++;
+                startResultRef++;
+            }
         }
 
-        if(*oldConstraintRef == ']'){
+        if(*oldConstraintRef == ']' && !*refProp){
             removing = 0;
+            refProp = resultProperty;
         }
-
         oldConstraintRef++;
         //printf("[clearOldPortsRefs] copiando e filtrando... %c \n",*oldConstraintRef);
     }
 }
 
 char *addParams(char *original, char *param, char* delim1, char* delim2) {
- 
-	char *newString;
-	int breakline=0;
-	int statementEnd = 0;
-	if(original[strlen(original)-1] == '\n'){
-	  breakline = 1;
-	}
-    //printf("aaaa: %c \n",original[strlen(original)-2]);
-	if(original[strlen(original)-2]== ';'){
+
+    char *newString;
+    char *auxNewAdd;
+    int breakline=0; // verifica se o final da string é \n
+    int statementEnd = 0; // verifica se o final da string é ; (não é nome de módulo)
+
+    int tamOriginal = strlen(original);
+    if(original[tamOriginal-1] == '\n'){
+        breakline = 1;
+    }
+
+    if(original[tamOriginal-2]== ';'){
         statementEnd = 1;
     }
-
-	if(statementEnd || original[strlen(original)-1] == delim2[0] || original[strlen(original)-2] == delim2[0]){
-	    newString = (char*) malloc(sizeof(char)*(strlen(original)+2+strlen(param)+1)); // original + param + ',' + ' ' +  '\0'
-		newString = customCat(newString,original,delim2[0],0);
-		//printf("caso 1... %s \n",newString);
-		newString = customCat(newString,", ",0,0);
+    // qualquer string passada (original) são das seguintes formas:  xxxxxxxxx  ,  xxxxxxxxx;  , xxxxxxxxx(...)\n  , xxxxxxxxx(...);\n
+    // caso possua o delmitador de fechamento ) ou qualquer outro...
+    if(original[tamOriginal-3] == delim2[0]  || original[tamOriginal-2] == delim2[0]){
+        newString = (char*) calloc(strlen(original) + strlen(param) + 2 + 1, sizeof(char)); // original + param + ',' + ' ' +  '\0'
+        auxNewAdd = newString;
+        auxNewAdd = customCat(auxNewAdd,original,delim2[0],0);
         //printf("caso 1... %s \n",newString);
-		newString = customCat(newString,param,0,0);
+        auxNewAdd = customCat(auxNewAdd,", ",0,0);
         //printf("caso 1... %s \n",newString);
-		newString = customCat(newString,delim2,0,0);
+        auxNewAdd = customCat(auxNewAdd,param,0,0);
         //printf("caso 1... %s \n",newString);
-	}
-	else {
-		//printf("%ld %ld \n",strlen(original),strlen(param));	   	
-		newString = (char*) malloc(sizeof(char)*(strlen(original)+1+strlen(param)+1+1)); // ( , ) e  \0	   	
-		newString = customCat(newString,original,'\n',0);
-		newString = customCat(newString,delim1,0,0);
-		newString = customCat(newString,param,0,0);
-		newString = customCat(newString,delim2,0,0);
-	}
-    if(statementEnd){
-        newString = customCat(newString,";",0,0);
+        auxNewAdd = customCat(auxNewAdd,delim2,0,0);
+        //printf("caso 1... %s \n",newString);
     }
+    else {
+        newString = (char*) calloc(strlen(original) + 1 + strlen(param) + 1 + 1, sizeof(char));
+//		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+        auxNewAdd = newString;
+        if(statementEnd){
+            auxNewAdd = customCat(auxNewAdd,original,';',0);
+        }
+        else{
+            auxNewAdd = customCat(auxNewAdd,original,'\n',0);
+        }
+        auxNewAdd = customCat(auxNewAdd,delim1,0,0);
+        auxNewAdd = customCat(auxNewAdd,param,0,0);
+        auxNewAdd = customCat(auxNewAdd,delim2,0,0);
+    }
+    if(statementEnd){
+        auxNewAdd = customCat(auxNewAdd,";",0,0);
+    }
+    if(breakline){
+        auxNewAdd = customCat(auxNewAdd,"\n",0,0);
+    }
+//	newString = newString - ((strlen(original)+strlen(param)+2)-breakline);
 
-	if(breakline){
-	  newString = customCat(newString,"\n",0,0);
-	}
-	newString = newString - ((strlen(original)+strlen(param)+2)-1);	
-
-	return newString;
+    return newString;
 }
 
-void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, int pointIni, int pointEnd, int size, int *newPointInit, int *newPointEnd)
+void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
+                             int *newPointInit, int *newPointEnd, int variantPointIni)
 {
     char aux[size - (pointEnd+1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
     int i;
@@ -167,7 +172,18 @@ void updateSubStringInterval(const char *newValue,  char *updated, int sizeNew, 
             }
         }
     }
-    (*newPointInit) = pointIni; // invariante (manter por enquanto)
+    updated[size] = '\0';
+    (*newPointInit) = variantPointIni? (*newPointEnd) : pointIni;
 
+}
+
+
+char* overwriteParam(char* moduleName, char* param){
+    char* refOldPt;
+    refOldPt = strstr(moduleName,"(");
+    memset(refOldPt, '\n', 1);
+    refOldPt++;
+    memset(refOldPt, '\0', strlen(refOldPt));
+    return addParams(moduleName,param,"(",")");
 }
 

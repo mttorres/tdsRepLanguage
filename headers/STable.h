@@ -7,6 +7,8 @@
 
 #define  MAX_TABLE 950
 
+#define MAX_SIMPLE 100
+
 #define  MAX_CHILD 150
 
 struct S_TABLE;
@@ -40,14 +42,17 @@ typedef struct S_TABLE
   int lastEntryIndex;
   int backup;
   int collision;
-    
+  int notEvaluated;
+  int usedSize;
+  int childOfFunction;
+  int indexRef;
 } STable;
 
 
 TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parentScope);
 
 
-STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order);
+STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int indexRef);
 
 
 STable* addSubScope(STable* parent, SCOPE_TYPE type);
@@ -76,7 +81,7 @@ int checkTypeSet(STable* current, char* name,  char* typeid);
 */
 void addEntryToTypeSet(STable* current, char* name, char* typeid); 
 
-void addTypeSetSmv(char* name, void** any, int any_type, int object_size, STable* current);
+void addTypeSetSmv(char *name, void **any, int object_size, STable *current);
 
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
@@ -101,9 +106,11 @@ TableEntry* lookup(STable* t, char* name);
 
 void printEntry(TableEntry* e);
 
+
 /**
  * Libera as entradas da tabela de simbolos, seguindo diferentes esquemas dependendo do type.
  *      tupla-objeto-linguagem: n objetos de mesmo tipo (inteiro, timedirective, booleano, label, null, tds)
+ *      tupla-init/next: pos, tamanho, pointIni, pointEnd
  *      tupla-inteiros : pos, tamanho, pointIni, pointEnd, min, max
  *      tupla-booleano:  pos, tamanho
  *      tupla-set:   pos, tamanho, SIMPLE_HASH
@@ -112,6 +119,13 @@ void printEntry(TableEntry* e);
  * */
 void letgoEntry(TableEntry *e);
 
-
+/**
+ * Libera as entradas da tabela de simbolos, usando o nome de uma variável dessa tabela (chama o método anterior)
+ * Porque desse método? Caso seja necessário "economizar entradas" antes do fim da execução, ele limpa os valores da tabela (NULL)
+ * @param a tabela a liberar os dados
+ * @param name o nome da variável
+ * @SideEffects chama o letGoEntry original e seta o table->data[hash] = NULL
+ * */
+void letGoEntryByName(STable* table, char* name);
 
 #endif

@@ -1,0 +1,115 @@
+MODULE main
+VAR
+	time: 0..20;
+	finalAutomata: finalAutomata(ports)
+	ports: portsModule(time);
+	x : -1..4;
+	z : boolean;
+	zelda : boolean;
+	w_scope1_0 : 0..1;
+	r_scope1_1 : boolean;
+	u_scope1_1_2_0 : boolean;
+	y : 0..6;
+	w_scope1_2 : 0..1;
+	u_scope1_2_2_0 : boolean;
+	tdsA : 0..1;
+ASSIGN
+	init(time) := 0;
+	next(time) := case
+		time < 20: time + 1;
+		TRUE: time;
+esac;
+	init(x):= 2;
+	init(z):= TRUE;
+	init(zelda):= FALSE;
+	init(w_scope1_0):= case 
+		!z : 1;
+		TRUE : 0; 
+	esac;
+	init(r_scope1_1):= case 
+		zelda : FALSE;
+		TRUE : FALSE; 
+	esac;
+	init(u_scope1_1_2_0):= case 
+		zelda & z  : FALSE;
+		TRUE : FALSE; 
+	esac;
+	next(x):= case 
+		next(time) = 2  : 4;
+		next(time) = 3  : -1;
+		TRUE : x; 
+	esac;
+	init(y):= 0;
+	next(y):= case 
+		next(time) = 2  : 5;
+		next(time) = 4  & !next(zelda)  : 2;
+		next(time) = 4  & !!next(zelda)  : 6;
+		TRUE : y; 
+	esac;
+	next(zelda):= case 
+		next(time) = 4  : FALSE;
+		TRUE : zelda; 
+	esac;
+	next(z):= case 
+		next(time) = 4  : TRUE;
+		TRUE : z; 
+	esac;
+	init(w_scope1_2):= 0;
+	next(w_scope1_2):= case 
+		next(time) = 4  & !next(zelda)  : 1;
+		TRUE : w_scope1_2; 
+	esac;
+	init(u_scope1_2_2_0):= FALSE;
+	next(u_scope1_2_2_0):= case 
+		next(time) = 4  & !next(zelda) & next(z)   : FALSE;
+		TRUE : u_scope1_2_2_0; 
+	esac;
+	init(tdsA):= 0;
+	next(tdsA):= case 
+		next(time) = 4  : 0;
+		TRUE : tdsA; 
+	esac;
+
+MODULE merger1(ports)
+VAR
+	cs: {q0};
+TRANS
+	((cs = q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & FALSE) -> next(cs) = q0) &
+	((cs = q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & FALSE) -> next(cs) = q0);
+
+MODULE fifo2(ports)
+VAR
+	cs: {q0,p0,p1};
+ASSIGN
+	init(cs) := {q0};
+TRANS
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 0 & FALSE) -> next(cs) = p0) &
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 1 & FALSE) -> next(cs) = p1) &
+	((cs = p0 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 0) -> next(cs) = q0) &
+	((cs = p0) -> ((next(cs) != p1))) &
+	((cs = p1 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 1) -> next(cs) = q0) &
+	((cs = p1) -> ((next(cs) != p0)));
+
+MODULE finalAutomata(ports)
+VAR
+	prod1: merger1(ports)
+	prod2: fifo2(ports)
+	cs: {q0q0,q0p0,q0p1};
+ASSIGN
+	init(cs) := {q0q0};
+TRANS
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0p0) -> ((next(cs) != q0p1))) &
+	((cs = q0p1) -> ((next(cs) != q0p0)));
+INVAR
+	(((prod1.cs = q0) & (prod2.cs = q0)) <-> (cs = q0q0)) &
+	(((prod1.cs = q0) & (prod2.cs = p0)) <-> (cs = q0p0)) &
+	(((prod1.cs = q0) & (prod2.cs = p1)) <-> (cs = q0p1));
+
+MODULE portsModule(time)
+VAR 
+ASSIGN
+
