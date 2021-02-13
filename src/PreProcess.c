@@ -182,6 +182,7 @@ void processPorts(char* buffer, char* varString, char *fVarString, int stage, He
         char name[] = {buffer[1],'\0'};
         addValue(name,po,LOGICAL_ENTRY,1,0,Hcontrol->originalPorts,-1);
     }
+    Hcontrol->expectedPorts++;
 }
 
 void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {

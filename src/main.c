@@ -85,8 +85,15 @@ int main(int argc, char* argv[]) {
 
     printAllHeaders(controller);
 
- 	if(!controller->declaredPorts){
- 		fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMENDED THAT YOU REVIEW YOUR .tds FILE \n");
+ 	if(controller->declaredPorts != controller->expectedPorts){
+ 	    printf("\n");
+ 	    if(!controller->declaredPorts){
+            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
+ 	    }
+ 	    else{
+            fprintf(stderr,"[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER ONLY %d PORTS WERE DECLARED. %d PORTS WERE EXPECTED \n",
+                    controller->declaredPorts,controller->expectedPorts);
+ 	    }
  	}
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
 	fclose(smvP);
