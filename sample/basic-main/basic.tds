@@ -1,38 +1,25 @@
 INTERVAL: 0 ~ 20
 
-x = 2  //redef =0 , context =0
-// usei aqui o x
-x = 30  //redef =1 , context =0
-// usei redef1
 
-//z = true
+x = 1
 
-z = false // ERRO -> corrigido
+y = 30
 
-if(not z){
-   w = 1
-}
+x = 20
 
 
 C_TIME = 2
-x = 4 //redef =1 , context =2
-// estamos em time =2 e referenciamos redef1
-// fizemos várias operações que nem a de C_TIME = 3 ... (que geraria colisão = atualiza a condição anterior)
 
-C_TIME = 2
-x = 90  //redef =1 , context =2 // erro (caso de , variavel foi redefinida em time > 0)(unico que não funciona ainda)
-y = 1 // e se esse y depender de x? ele vai estar olhando agora o x =5! NÃO O IGUAL A 4...
+x = 3
 
+x= 4
 
 C_TIME = 3
-x = 80 // // usa redef(next) anterior , context =3
 
-// e como vamos lidar com INVAR? (a pensar ainda...? Criar um buffer invar! E escrever em ordem no final!, "utilidade")
+y = 0
 
-z = false // ERRO -> corrigido
+x = 80
 
-if(not z){
-   w = 1
-}
+//condicaoTeste = true
 
 
