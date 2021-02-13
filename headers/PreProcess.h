@@ -3,6 +3,7 @@
 #define PREP_H
 
 #include "HeaderSmv.h"
+#include "STable.h"
 
 
 
@@ -14,7 +15,7 @@
 					  *	cria um header (necessita de free depois) 
 */
 
-void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcontrol);
+void initPreProcessHeader(int type, char* moduleName, HeaderController* Hcontrol); 
 
 
 
@@ -25,7 +26,8 @@ void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcon
 						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
 
 */
-void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename);
+void selectBuffer(int part, char* line, HeaderSmv* header, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
+
 
 
 /*
@@ -33,37 +35,25 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 
 */
-void saveLineOnBuffer(smvtype currentHeader, headerpart part, char *line, HeaderController *Hcontrol, int controlRename);
+void saveLineOnBuffer(int pos,int part, char* line, HeaderController* Hcontrol, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
+
 
 
 /* fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
  	as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
  	stages são os módulos 0(main), automato(2), ports(3)
 */
-void processPhase(smvtype stage, headerpart part, HeaderController *Hcontrol, char *line, int controlRename);
+void processPhase(int stage, int part, HeaderController* Hcontrol, char * line, int controlRename, int readVarsPortsModule, STable** writeSmvTypeTable);
 
-/**
- * Salva o arquivo SMV original em headers, separados por categorias e partes de um arquivo SMV.
- * Durante esse pré processamento, são usadas variáveis strings auxiliares para reconhecer pontos de interesse no arquivo.
- * A cada ponto de interesse identificado, um buffer do header é escolhido, e esse atualizado.
- * Ao se identificar o alguma referência a portsModule essa tem o parâmetro time adicionado, e uma referência é salva no header do automato,
- * para renomações futuras. Além disso são criadas entradas na tabelas de simbolos auxiliares (SMV_INFO) usadas pelo main e ports, respectivamente,
- * a variável time e as portas que vierem do módulo original.
- * */
-void preProcessSmv(FILE *smvP, HeaderController *Hcontrol);
 
-/**
- *  Configura a tabela de controle SMV info da main para a variável time a incializando
- *  com uma tupla de inteiros (que não possui typeset, por so poder ser X..Y). Além disso,
- *  inicializa as diretivas temporais no escopo global (main).
- *
- *  @param Hcontrol o controller de headers e informações SMV
- *  @param global a tabela de simbolos global do "programa" .tds
- *
- *  @SideEffects:  Chama o addValue da tabela de simbolos para os casos citados, alocando memória para as Entry de
- *  cada tupla.
- * */
-void setUpMainSmvTable(HeaderController *Hcontrol, STable *global);
+void preProcessSmv(FILE* smvP, HeaderController* Hcontrol, STable** writeSmvTypeTable); 
+
+/* 
+	configura a tabela de controle de escrita para as variáveis do Header Main
+	inicializando com a variável time (que não possui typeset, por so poder ser X..Y)
+*/
+void setUpMainSmvTable(HeaderController* Hcontrol, STable** writeSmvTypeTable);
+
 
 #endif
 
