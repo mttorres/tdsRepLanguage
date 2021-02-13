@@ -5,10 +5,41 @@
 #include <stdio.h>
 #include <string.h>
 #include "../headers/PostProcess.h"
-#include "../headers/InterpreterEvals.h"
 
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
+
+// caso a gente queira simplificar os parâmetros (note que muitos são desnecessários em alguns evals (MELHORIA))
+//typedef Object* (*generic_fp)(void);
+/*
+ * generic_fp executores[80] = {
+
+        (generic_fp ) evalNUM, (generic_fp ) evalBOOL, (generic_fp ) evalSTRING, (generic_fp ) evalNULL, (generic_fp ) evalIDVAR, (generic_fp ) evalTIME_DIRECTIVE,
+        (generic_fp ) evalDataV, (generic_fp ) evalPARAMS_CALL, (generic_fp ) evalDEFINE_INTERVAL , (generic_fp ) evalAC_V,
+        (generic_fp ) evalOTHER_ASSIGN, (generic_fp ) evalV_PROP, (generic_fp ) evalADD_V, (generic_fp ) evalADD_V_PROP, (generic_fp ) evalV_PROP_TDS, (generic_fp ) evalEXPR, (generic_fp )
+        (generic_fp ) evalCMD_IF, (generic_fp ) evalMATCH_IF
+};
+ * */
+
+Object **eval(Node *n, STable *scope, HeaderController *controllerSmv);
+Object* evalNUM(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalBOOL(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalSTRING(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalNULL(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalIDVAR(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalDataV(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalPARAMS_CALL(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalAC_V(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalV_PROP(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalADD_V(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalADD_V_PROP(Node* n, STable* scope, HeaderController* controllerSmv);
+Object* evalV_PROP_TDS(Node* n, STable* scope, HeaderController* controllerSmv);
+Object * evalEXPR(Node* n, STable* scope, HeaderController* controllerSmv);
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, HeaderController* controllerSmv);
+Object * evalCMD_IF(Node* n, STable* scope, HeaderController* controllerSmv);
+Object * evalMATCH_IF(Node* n, STable* scope, HeaderController* controllerSmv);
 
 STable* selectSMV_SCOPE(STable* scope, HeaderController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
@@ -600,7 +631,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, HeaderController* controlle
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->MAIN_RELATED[0],controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,0,ptitime);
+        updateTime(controllerSmv->MAIN_RELATED[0],controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,0,0);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -608,7 +639,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, HeaderController* controlle
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->MAIN_RELATED[0],controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,1,ptftime);
+        updateTime(controllerSmv->MAIN_RELATED[0],controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,1,1);
     }
     return NULL;
 }
@@ -617,8 +648,10 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
 {
     Object* expr = NULL;
     Object** sintExpr = NULL;
+
+    // recuperação de diretiva temporal principal para uso
     TableEntry* ctimeEntry = lookup(scope, "C_TIME");
-    int ctime = *(int*) ctimeEntry->val->values[0];     // recuperação de diretiva temporal principal para uso
+    int ctime = *(int*) ctimeEntry->val->values[0];
 
     // caso de atribuição de diretiva
     if(n->children[0]->type == ASSIGN_TDIRECTIVE)
@@ -629,9 +662,9 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, THE CONTEXT IS LOCKED! \n", n->children[0]->leafs[0]);
             exit(-1);
         }
-        // dois casos: alterar o valor na tabela de simbolo
-        // Mudou intervalos: alterar intervalo no main do SMV e mudar o init ou next (dependendo da diretiva)
-        // Mudou CONTEXTO (C_TIME) : seguir o caso default
+        // dois casos: alterar o valor na tabela de simbolos
+        //Mudou intervalos: alterar intervalo no main do SMV e mudar o init ou next (dependendo da diretiva)
+        //Mudou CONTEXTO (C_TIME) : seguir o caso default
 
         // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
         sintExpr = eval(n->children[1], scope, controllerSmv);
@@ -642,7 +675,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
             exit(-1);
         }
         if(*(int*)expr->values[0] < ctime ){
-            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, IMPOSSIBLE TO RETURN TO PREVIOUS TIME CONTEXTS  \n", n->children[0]->leafs[0]);
+            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, IMPOSSIBLE TO RETURN TO PAST CONTEXTS  \n", n->children[0]->leafs[0]);
             exit(-1);
         }
         // validaçao de intervalo
@@ -670,8 +703,14 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
         char* varName = n->children[0]->leafs[0];
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
-
-        // decidir o que vai usar do Hcontroller (tem que ser melhor adaptado) (foi separado em métodos
+        int minmax = 0;
+        // tratamento do intervalo nuXmv de inteiros
+        if(var && expr->type == NUMBER_ENTRY){
+            int old = *(int*)var->values[0];
+            int new = *(int*)expr->values[0];
+            minmax = new > old;
+        }
+        // decidir o que vai usar do Hcontroller (tem que ser melhor adaptado)
         //STable* refAuxTable = accessSmvInfo(controllerSmv,scope->type == FUNC && expr->type == TDS_ENTRY? PORTS : MAIN);
         STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
         HeaderSmv* refHeader = selectSMV_INFO(scope,expr->type == FUNCTION_ENTRY? expr : NULL,controllerSmv);
@@ -699,16 +738,15 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
                 // note que temporal condition tem que ser um cubo de condição e tempo
                 if(changeContext){
-                    specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, defaultValueBind,
-                               0, NULL, scope->order, scope->level, expr->type, 0, NULL);
+                    specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, NULL,
+                               0, NULL, scope->order, scope->level, expr->type, 0, minmax);
                     specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
-                               0, NULL, scope->order, scope->level, expr->type, 1, expr->values[0]);
-
+                               0, NULL, scope->order, scope->level, expr->type, 1, 1);
                 }
                 else{
                     // condition em INIT? e default, deve-se criar default tmb
                     specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, defaultValueBind,
-                               0, NULL, scope->order, scope->level, expr->type, 0, expr->values[0]);
+                               0, NULL, scope->order, scope->level, expr->type, 0, 0);
                 }
             }
             else{
@@ -720,22 +758,22 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, HeaderController* controllerSmv
                 if(changeContext && var->redef == prevDef){
                     conditionCube = formatBinds(ctime,changeContext,defaultValueBind,valueBind,defaultValueBind,expr,scope, prevContext? 0 : 1);
                     specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
-                               var->redef, NULL, scope->order, scope->level, expr->type, 1, expr->values[0]);
+                               var->redef, NULL, scope->order, scope->level, expr->type, 1, minmax);
                 }
                 else{
                     // tempo = 0, redefinição
                     if(!changeContext){
                         conditionCube = formatBinds(ctime,changeContext,defaultValueBind,valueBind,defaultValueBind,expr,scope,1);
                         specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
-                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, expr->values[0]);
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
                     }
                     // tempo > 0 e redefinição
                     else{
                         conditionCube = formatBinds(ctime,changeContext,defaultValueBind,valueBind,defaultValueBind,expr,scope,1);
-                        specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, defaultValueBind,
-                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, expr->values[0]);
+                        specAssign(varName, refHeader, refAuxTable, defaultValueBind, NULL, NULL,
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 0, minmax);
                         specAssign(varName, refHeader, refAuxTable, valueBind, conditionCube, NULL,
-                                   var->redef, NULL, scope->order, scope->level, expr->type, 1, expr->values[0]);
+                                   var->redef, NULL, scope->order, scope->level, expr->type, 1, minmax);
                     }
                 }
             }

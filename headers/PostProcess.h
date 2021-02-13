@@ -31,7 +31,7 @@ void copyValueBind(Object* o, char* bind,int index,int defaultValue);
  * o init(time) ou next(time) dependendo se for I_TIME ou F_TIME
  * */
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValueBind, int type, int typeExpr, int *newValue);
+void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExrp,int minmax);
 
 /**
  * Cria um cubo de condições da forma:
@@ -58,27 +58,9 @@ void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValueBind
  * */
 char *createConditionCube(char *opBind1, char *opBind2, char *operation, char *evaluation, int firstCond);
 
-/**
- * Cria um bind SMV partindo de uma expressão entre duas objetos componentes (que também podem ser expressões que já tem bind de expressão)
- * @param result o ponteiro para
- * @param o1 a primeira componente da expressão
- * @param o2 a segunda componente da expressão
- * @param op a operação que junta as componentes
- *
- * @SideEffects: Escreve a expressão no buffer result, isso evita um malloc e free atoa, já que essa string já será passada como parâmetro
- * para o create Object (que vai fazer um malloc também).
- * */
+/***/
 void createExprBind(char *result, Object *o1, Object *o2, char *op);
-
-/**
- * Associa uma condição (vinda de um objeto) a um escopo
- *
- * @param scope a tabela de simbolos corrente
- * @param conditionExpr o objeto expressão
- *
- * @SideEffects: Associa o bind desse objeto ao escopo, alocando memória para essa condição
- *
- * */
+/***/
 void bindCondition(STable* scope, Object* conditionExpr);
 
 /**
@@ -144,17 +126,17 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
  *  além disso, atualiza na entrada da tabela da simbolos o tipo (typeSet) associada a varName,
  *  se o tipo mudar (caso de next após mudança de contexto).
  * */
-void updateAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition, int type,
-             int typeExpr);
+void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax);
 
 /**
  * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições
  * @param
  * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValueBind, char *condition,
-                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr,
-                void *newValue);
+void specAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValue, char *condition,
+                char *defaultValue, int redef, char *funcRef, int order, int level, int type, int typeExpr, int minmax);
+
+
 
 
 void writeResultantHeaders(HeaderController* controller, const char* path);
