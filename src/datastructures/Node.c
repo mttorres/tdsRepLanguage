@@ -6,32 +6,36 @@
 
 
 const char* mappingEnumNode[] =  {
+	
+	"NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE", "AC_V", "DATA_V", 
 
-        "NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE",
+	"ADD_V", "ADD_V_PROP", "V_PROP_TDS",	
 
-        "DATA_V", "PARAMS_CALL", "DEFINE_INTERVAL",
+	"EXPR",
 
-        "AC_V", "OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
+	"TDS_DEF_COMPLETE", "TD_DEF_DEPEN",
 
-        "EXPR", "CMD_IF", "MATCH_IF",
+	"DOMAIN_FUNCTION", "TIME_LIST", "TIME_COMP",
 
-        "ASSIGN_IDVAR", "ASSIGN_AC_V", "ASSIGN_TDIRECTIVE",
+	"DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
 
-        "TDS_DEF_COMPLETE", "TD_DEF_DEPEN",
+	"PROG", "FUNC_DEFS", "CMD", 
 
-        "DOMAIN_FUNCTION", "TIME_LIST", "TIME_COMP",
+	"FUNC_DEF", "PROC_DEF", "F_BODY", "OPT_RETURN", "PARAMS", "PARAM", 
 
-        "DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
+	"CMD_IF", "CMD_OTHER",
+	
+	"CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
 
-        "HEADERS_E_PROG", "PROG", "FUNC_DEFS", "CMD",
+	"MATCH_IF", 
 
-        "FUNC_DEF", "PROC_DEF", "OPT_RETURN", "PARAMS", "PARAM",
+	"OTHER_LOOP", "FUNC_CALL", "PROC_CALL", "OTHER_ASSIGN",
 
-         "CMD_OTHER",
+	"PARAMS_OP","PARAMS_CALL", "PARAM_CALL",  
 
-        "CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
+	"ASSIGN_IDVAR", "ASSIGN_IDVAR", "ASSIGN_TDIRECTIVE",
 
-        "OTHER_LOOP", "FUNC_CALL", "PROC_CALL"
+	"CHANGE_ITD", "CHANGE_CTD", "CHANGE_FTD", 
 };
 
 
@@ -71,13 +75,11 @@ Node* createNode(int numArgs, ...){
 
 	if(current_node->nleafs > 0){
 		//printf("CRIANDO FOLHAS \n");
-		char* ptLeaf = NULL;
 		char** leafs = (char**) malloc(current_node->nleafs*sizeof(char*));
 		int pos = 0;
 		for(i = parametrosFilhos; i <= numArgs; i++){
-		    ptLeaf = va_arg(args, char*);
-		    leafs[pos] = malloc(sizeof(char)*strlen(ptLeaf)+1);
-		    strcpy(leafs[pos],ptLeaf);
+		    
+		    leafs[pos] = va_arg(args, char*); 
 		    pos++;
 		}		
 		current_node->leafs = leafs;
@@ -177,9 +179,6 @@ void letgoNode(Node* n){
 		free(n->children);
 	}
 	if(n->leafs){
-        for(i=0; i < n->nleafs; i++){
-            free(n->leafs[i]);
-        }
 		free(n->leafs);
 	}	
 	free(n);

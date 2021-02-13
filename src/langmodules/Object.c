@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "../../headers/constants.h"
 #include "../../headers/Object.h"
 
 const char* mappingEnumObjectType[] =  {
@@ -9,36 +10,28 @@ const char* mappingEnumObjectType[] =  {
     "STRING",
     "T_DIRECTIVE",
     "TDS",
-    "null*",
-    "FUNCTION",
-    "WRITE_SMV_INFO",
+    "POSxSIZE",
     "TYPE_SET",
 };
 
 // talvez esse método não seja mais necessário (seria melhor sempre alocar ANTES DE PASSAR UM INTEIRO (até porque esse inteiro vai ser um atributo sintetizado que vai ser retornado para uma chamada de cima))
 // e caso tenha ALGUMA OPERAÇÃO INTERMEDIARIA ENTRE ESSES VALORES (?) ... já que vamos sempre alocar .... acho MELHOR CENTRALIZAR , afinal para isso object foi criado!
 // 
-// MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...
-void* allocatePtObjects(int type, void* value, Object* newOb,int index)
+// MANTER ESSA FUNÇÃO: E sempre criar objetos para valores sintetizados (caso seja necessário, dar free em valores intermediarios que não venham a ser usados...(?))
+void* allocatePtObjects(int type, void* value) 
 {
-	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY || type == LOGICAL_ENTRY || type == WRITE_SMV_INFO)
+	if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
-		printf("[allocatePtObjects - numVariants] valor: %d \n",*(int*) pt);
-		printf("[allocatePtObjects - numVariants] success \n");
+		printf("[allocatePtObjects] valor: %d \n",*(int*) pt);
 		return pt;
 	}
 	
-	// precisa alocar para strings ? (pode ser que já tenha sido alocado pelo parser) Necessita alocar:  Pode gerar efeito colateral em alguns casos (string pode ser re-usada)
-	if(type == LABEL_ENTRY || type == NULL_ENTRY) 
+	// precisa alocar para strings ? (pode ser que já tenha sido alocado pelo parser)
+	if(type == LABEL_ENTRY) 
 	{
-		char* deref = (char*) value;
-		newOb->STR[index] = strlen(value);
-		char* pt = malloc(sizeof(char)*newOb->STR[index]+1);
-		strcpy(pt, deref);
-		printf("[allocatePtObjects - labelVariants] valor: %s (%d)\n",pt,type);
-		return pt;
+		//TODO (ao fazer o pós processamento)
 	}
 
 
@@ -48,7 +41,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 void* allocateTypeSetObjects(int index, void* value)
 {
 	// (0,1,2)
-	if(index < 2 )
+	if(index < 2)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -62,32 +55,15 @@ void* allocateTypeSetObjects(int index, void* value)
 }
 
 
-Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *BIND)
+
+Object* createObject(int type, int OBJECT_SIZE, void** values) 
 {
 
 	Object* newOb = (Object*) malloc(sizeof(Object));
 
 	newOb->type = type;
 	newOb->OBJECT_SIZE = OBJECT_SIZE;
-	newOb->redef = 0;
-	newOb->timeContext = timeContext;
-    if(BIND){
-        newOb->SINTH_BIND = malloc(sizeof(char)*strlen(BIND) + 1);
-        strcpy(newOb->SINTH_BIND, BIND);
-    }
-    else{
-//      newOb->ORIGINAL_BIND = NULL;
-        newOb->SINTH_BIND = NULL;
-    }
-
-    if(type == LABEL_ENTRY)
-	{
-		newOb->STR = malloc(sizeof(int)*OBJECT_SIZE);
-	}
-    else{
-        newOb->STR = NULL;
-    }
-
+	newOb->changedType = 0;
 	if(OBJECT_SIZE)
 	{
 		// malloc para garantir que o objeto utilizado não "seja perdido" em chamadas
@@ -105,13 +81,13 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 			// casos como por exemplo do conjunto de tipos: não precisa de malloc (já é um ponteiro de um objeto alocado a muito tempo )
 			//		-> tupla ponteiro smv (indiceHeader, tamanhoPalavra, Hashmap)
 
-			if(type == TYPE_SET)
+			if(type == TYPE_SET || type == POSxSIZE)
 			{
 				vo[i] = allocateTypeSetObjects(i,values[i]);
 			}
 			else
 			{
-				vo[i] = allocatePtObjects(type,values[i],newOb,i);
+				vo[i] = allocatePtObjects(type,values[i]);
 			}
 
 		}
@@ -119,9 +95,9 @@ Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, 
 	}
 
 
-	int info = newOb == NULL ?  1 : 0;
+	//int info = newOb == NULL ?  1 : 0;
 
-	printf("[DEBUG - createObject] info: %d \n", info);
+	//printf("[DEBUG - createObject] info: %d \n", info);
 
 	//printObject(newOb);
 
@@ -142,7 +118,7 @@ void printObject(Object* o)
 	{
 		int i;
 		//printf("[DEBUG - printObject] tipoDetectado: %s \n", mappingEnumObjectType[o->type]);
-		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET || o->type == WRITE_SMV_INFO)
+		if(o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY || o->type == TYPE_SET || o->type == POSxSIZE)
 		{
 			printf("(");
 			printf("%s :: ", mappingEnumObjectType[o->type]);
@@ -181,7 +157,7 @@ void printObject(Object* o)
 
 		}
 
-		if(o->type == LABEL_ENTRY || o->type == NULL_ENTRY)
+		if(o->type == LABEL_ENTRY)
 		{
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
@@ -202,97 +178,36 @@ void printObject(Object* o)
 }
 
 
-void letgoObject(Object *o)
+void letgoObject(Object* o)
 {
 	if(o)
 	{
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
 		{
-			if(o->type != TYPE_SET || i < 2)
+			if(o->type == TYPE_SET)
 			{
-			    free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
-			                         // na chamada anterior
+				if(i < 2)
+				{
+					free(o->values[i]);
+				}
+				// usar o free da tabela de simbolos (em outra localidade anteriormente?)
 			}
 			else if(o->type == TDS_ENTRY)
 			{
 				// TODO PARA TDS
 			}
-            o->values[i] = NULL;
+			else
+			{
+				free(o->values[i]);
+			}
 		}
 	}
-    free(o->values);
-    o->values = NULL;
-	if(o->STR){
-	    free(o->STR);
-	}
-    o->STR = NULL;
-	if(o->SINTH_BIND){
-	    free(o->SINTH_BIND);
-	}
-    o->SINTH_BIND = NULL;
-	free(o);
 }
 
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
-	return newOb;
-}
 
-
-void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int index, int prop)
-{
-    //printf("[updateObject] indexUpdate: %d \n",index);
-    if(object_size == 1)
-    {
-        o->values[index] = NULL;
-        void* newPt = allocatePtObjects(any_type,any[0],o,index);
-        o->values[index] = newPt;
-    }
-
-}
-
-
-
-
-void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange)
-{
-    // caso x = y (copia o valor, diferente de array com indice 0, isto é, x[0](unico) )
-	if(index == -1 && prop == -1)
-	{
-            // vale para ambos os casos (mesmo que o seja um vetor sendo sobrescrito ou variavel comum)
-            int i;
-            for (i = 0; i < o->OBJECT_SIZE; i++)
-            {
-                free(o->values[i]);
-                o->values[i] = NULL;
-            }
-            if(object_size > 1)
-            {
-                // passa referencia
-                o->values = any;
-                o->OBJECT_SIZE = object_size;
-            }
-            updateObjectCell(o,any,any_type,object_size,0,-1);
-	}
-    // caso x[i] = y
-	else if(index != -1 ){
-        free(o->values[index]);
-        o->values[index] = NULL;
-        updateObjectCell(o,any,any_type,object_size,index,-1);
-	}
-
-	int typeChanged = 0;
-	if(o->type != any_type && o->type != any_type)
-	{
-		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
-		o->type = any_type;
-		typeChanged = 1;
-	}
-	int oldRedef = o->redef;
-    o->redef = typeChanged || (contextChange != o->timeContext)? o->redef : o->redef+1;
-    o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
 }
 

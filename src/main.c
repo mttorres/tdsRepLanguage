@@ -2,11 +2,13 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/STable.h"
+  #include "../headers/constants.h"
   #include "../headers/Node.h"
+  #include "../headers/Enum.h"	
   #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
-  #include "../headers/Interpreter.h"
   #include "../headers/PostProcess.h"
+  #include "../headers/STable.h" 	
 
   extern int yylex(void);
   extern int yyparse();
@@ -23,7 +25,6 @@ int main(int argc, char* argv[]) {
 	fp = fopen(argv[1], "r");
 	astout = fopen("results/astOutput", "w");
 	smvP = fopen(argv[2], "r+");
-	
 	//printf("%s \n",argv[1]);
 	//printf("%s \n",argv[2]);
 
@@ -40,76 +41,84 @@ int main(int argc, char* argv[]) {
 	fclose(fp);
 
 	// tabelas e componentes globais
-    HeaderController* controller = createController();
-	STable* global = createTable(GLOBAL, NULL, 0, 0, -1);
+	HeaderController* controller = createController(5);  
 
-	//pré processamento
-	preProcessSmv(smvP,controller);
-	setUpMainSmvTable(controller,global);
+	STable* global = createTable(GLOBAL,NULL,0,0);
+
+	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
+	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
+	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
+	//pré processamento 
+	preProcessSmv(smvP,controller,writeSmvTypeTable);
+	setUpMainSmvTable(controller,writeSmvTypeTable);
   
-  	printf("--------------------------------- EVAL ---------------------------------------------\n");
-  	printf("\n");
-  	printf("\n");
-  	
-	//pos processamento
-    eval(root, global, controller);
 
-	printf("\n");
-	printf("------------------------------------------------------------------------------\n");
+	//pos processamento
+	eval(root,global,writeSmvTypeTable,controller);
 
  	printf("\n");	
  	printf("\n");
  	printf("\n");
  	printf("\n");
 
- 	printf("--------------------------------- PROGRAM TABLES ---------------------------------------------\n");
+ 	printf("--------------------------------- TABLES ---------------------------------------------\n");
 
 	printTable(global);
     printf("\n");
+	printTable(writeSmvTypeTable[0]);
+	printf("\n");
+    printTable(writeSmvTypeTable[1]);
+	printf("\n");
 
-    printf("--------------------------------- smv-INFO TABLES ---------------------------------------------\n");
+	//letGoHeadersStruct(headers,5);
 
-    printTable(controller->mainInfo);
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printTable(controller->originalPorts);
-    printf("\n");
+
+	printf("\n");	
  	printf("\n");
  	printf("\n");
+ 	printf("\n");
 
-    letgoTable(global);
-
- 	printf("--------------------------------- HEADERS ---------------------------------------------\n");
+ 	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
 
 
-    printAllHeaders(controller);
+	//printHeader(controller->headers[0]);
+	//printHeader(controller->headers[1]);
+	//printHeader(controller->headers[2]);
+	//printHeader(controller->headers[3]);
+	//printHeader(controller->headers[4]);
 
- 	if(controller->declaredPorts != controller->expectedPorts){
- 	    printf("\n");
- 	    if(!controller->declaredPorts){
-            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
- 	    }
- 	    else{
-            fprintf(stderr,"[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER ONLY %d PORTS WERE DECLARED. %d PORTS WERE EXPECTED \n",
-                    controller->declaredPorts,controller->expectedPorts);
- 	    }
- 	}
- 	writeResultantHeaders(controller,"results/newSmvfile.smv");
 	fclose(smvP);
+	
 	letgoNode(root);
 
+//	letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
+
+  	
 
 
-//  char* temp = controller->PORTS_RELATED[0]->varBuffer[1];
-//  char* result = addParams(temp,"BATATA","{","}");
-//  printf("%s\n",result);
-//  char* testAgain = addParams(result,"JUDGEMENT AHS COME TO YOU","{","}");
-//  printf("%s\n",testAgain);
 
-	letGoHeaderControl(controller);
+//TESTE PORTS REFS (aparentemente tudo funcionando)
 
+/*
+  	printf("TESTE PORT REFS !!! \n\n\n");
+  	char* string1 = "	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 0 & FALSE) -> next(cs) = p0) &";
+  	char* nova =clearOldPortsRefs(string1);
+  	printf("ANTES:  %s \n\n\n",string1);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);
 
+  	char* string2 = "	((cs = q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & FALSE) -> next(cs) = q0);";
+  	nova =clearOldPortsRefs(string2);
+  	printf("ANTES:  %s \n\n\n",string2);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova); 
+
+  	char* string3 = "	((cs = q0p0) -> ((next(cs) != q0p1))) &";
+  	nova =  clearOldPortsRefs(string3);
+  	printf("ANTES:  %s \n\n\n",string3);
+    	printf("DEPOIS:  %s \n\n\n",nova);	
+    	free(nova);    
+*/
 
 }
 
