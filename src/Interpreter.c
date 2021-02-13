@@ -9,7 +9,7 @@
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
-Object **eval(Node *n, STable *scope,  HeaderController *controllerSmv);
+Object *eval(Node *n, STable *scope,  HeaderController *controllerSmv);
 Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalBOOL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalSTRING(Node* n, STable* scope,  HeaderController* controllerSmv);
@@ -27,7 +27,7 @@ Object* evalV_PROP_TDS(Node* n, STable* scope,  HeaderController* controllerSmv)
 Object * evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalDEFINE_INTERVAL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv);
-
+//Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv);
 
 STable* selectSMV_SCOPE(STable* scope, HeaderController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
@@ -378,9 +378,7 @@ Object* evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv)
     // operação unária ou simplesmente FOLHA
     if(n->nchild <= 1)
     {
-        Object * sintUni;
-        Object** sint = eval(n->children[0], scope, controllerSmv);
-        sintUni = sint[0];
+        Object * sintUni = eval(n->children[0], scope, controllerSmv);
 
         char ops[1];
         // caso de operação unária (tem folhas e filhos)
@@ -399,7 +397,6 @@ Object* evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv)
             fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c OPERATION!", ops[0]);
             exit(-1);
         }
-        free(sint);
         return sintUni;
     }
     // operação binária
@@ -659,8 +656,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         //Mudou intervalos: alterar intervalo no main do SMV e mudar o init ou next (dependendo da diretiva)
         //Mudou CONTEXTO (C_TIME) : seguir o caso default
         // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
-        sintExpr = eval(n->children[1], scope, controllerSmv);
-        expr = sintExpr[0];
+        expr = eval(n->children[1], scope, controllerSmv);
         if(expr && expr->type != NUMBER_ENTRY && expr->OBJECT_SIZE > 1)
         {
             fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->children[0]->leafs[0]);
@@ -688,8 +684,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
     }
     else{
         // busca expressão
-        sintExpr = eval(n->children[1], scope, controllerSmv);
-        expr = sintExpr[0];
+        expr = eval(n->children[1], scope, controllerSmv);
 
         // busca a variável e seu contexto
         char* varName = n->children[0]->leafs[0];
@@ -774,7 +769,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
             }
 
             Node* ref = n->children[0]->children[0];
-            Object* indexRef = ref->type == V_PROP ? NULL : eval(n, scope, controllerSmv)[0];
+            Object* indexRef = ref->type == V_PROP ? NULL : eval(n, scope, controllerSmv);
 
             if(ref->type == V_PROP || ref->type == ADD_V_PROP)
             {
@@ -806,22 +801,17 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         }
 
     }
-    free(sintExpr);
     return NULL;
 }
 
 Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
 
     Object* conditionalExpr = NULL;
-    Object** sintExpr = NULL;
 
     STable* IF_SCOPE = addSubScope(scope,IF_BLOCK);
-    sintExpr = eval(n->children[0], scope, controllerSmv);
-    conditionalExpr = sintExpr[0];
+    conditionalExpr = eval(n->children[0], scope, controllerSmv);
     printObject(conditionalExpr);
     bindCondition(IF_SCOPE,conditionalExpr);
-    free(sintExpr);
-
     IF_SCOPE->notEvaluated = !(!IF_SCOPE->parent->notEvaluated && *(int*)conditionalExpr->values[0]);
     eval(n->children[1], IF_SCOPE, controllerSmv);
     // cria else
@@ -840,8 +830,82 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
     return NULL;
 }
 
+/*
+Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
+    int x = 1;
+    // leaf 4 (3)
+    // filho 1 (0) -> fazer via eval -> -> é loop que termina em eval expr
+    // filho 2 (1) -> via eval também  -> são os extras
+    char* portName = n->leafs[3];
+    Object ** domainInfo = eval(n->children[0],scope,controllerSmv);
+    Object** extraInfo = eval(n->children[1],scope,controllerSmv);
 
-Object **eval(Node *n, STable *scope, HeaderController *controllerSmv)
+
+
+    return NULL;
+}
+
+Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){
+
+    Object** SYNTH =  eval(n->children[0],scope,controllerSmv);
+    Object* TIME_COMPONENT = SYNTH[0];
+    free(SYNTH);
+    return TIME_COMPONENT; // retona uma "time component" (mas essa sempre vai ser um "vetor" quando subir o nível
+}
+
+Object * evalTDS_DATA_LIST_DOMAIN(Node* n, STable* scope,  HeaderController* controllerSmv){
+
+    if(n->nchild > 1){
+        // deve retornar uma lista com ambos
+        Object ** list = eval(n->children[0],scope,controllerSmv); // vai ter sempre uma outra lista (que possui uma lista e 1 componente)
+        // onde a lista possui uma lista e uma componente ...
+        // essa lista tem tamanho: n
+        Object ** SYNTH_TIME_COMPONENT = eval(n->children[1],scope,controllerSmv);
+        Object* TIME_COMPONENTE = SYNTH_TIME_COMPONENT[0];
+        free(SYNTH_TIME_COMPONENT);
+
+        // juntando a lista com a componente ->  n + 1 (a chamada de cima vai sintetizar uma lista com n+1 membros e outra componnete)
+        // mas como saber o tamanho quando ele subir o nível?
+        // é util mantermos essa estrutura de Object**  ???  (Afinal, qualquer processamento que e feito em nos com mais de um filho
+        // e por meio dos EXECUTORES)
+        // unico caso útil seria na hora de sintetizar expressões complexas.
+
+        // Note que voltar com Object* como era antes não resolve totalmente esse problema também, teriamos que ter um
+        // "evalIterador" que constrói uma lista de objetos sintetizados.
+
+        // A UNICA MANEIRA É USAR O PROPRIO OBJETCT e retornar só Object*
+        // aproveitar da estrutura de lista dos objects para isso!
+        // fazer um object que tem uma lista de objects do tipo TIME_COMPONENT (tempo, dado) -> util para evitar "problema de indices"
+        // deve ter um novo tipo (ex: TIME_COMPONENT? ou TIME_COMPONENT_{tipoDado} ?) (ME PARECE MELHOR A PRIMEIRA)
+        // e então dado É OUTRO OBJECT (que tem o seu tipo proprio)
+        // problema: poderia ficar "redundante" e dificil de manipular considerando as listas.
+
+        // note que essa estrutura deve ser construida em um método generico
+    }
+
+    return NULL;
+}
+
+Object* eval_ITERATOR(Node* STARTING_NODE, STable* scope, HeaderController* controllerSmv, int LIST_TYPE){
+
+    Object* SYNTH_LIST = NULL;
+    if(STARTING_NODE){
+        if(STARTING_NODE->nchild == 1){
+            // deixar assim por enquanto;
+            // é igual ao eval
+            SYNTH_LIST = eval(STARTING_NODE->children[0],scope,controllerSmv)[0];
+        }
+        else{
+            // join list (pega dois objects e "junta" suas listas.
+            // vai sintetizar primeiro a lista mais a esquerda (contem os primeiros membros ("mais fundo")
+            // depois vai sintetizar o ultimo membro da lista atual
+        }
+    }
+    return  SYNTH_LIST;
+}
+*/
+
+Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
 {
     //printf("[eval] %s \n",n->name);
     if(n)
@@ -850,30 +914,22 @@ Object **eval(Node *n, STable *scope, HeaderController *controllerSmv)
         //void** SYNTH_C[n->nchild];
         // sintetizado dos filhos
         //void** SYNTH_L[n->nleafs];
-        Object ** SYNTH_O = malloc(n->nchild*sizeof(Object*));
+        Object* SYNTH_O = NULL;
 
         if(executores[n->type])
         {
             printf("[PostProcess - eval] eval especifico \n\n");
-            SYNTH_O[0] = executores[n->type](n,scope,controllerSmv);
+            // o nó pode ou não ter mais dem filho, e esse trata o processamento desses nao sendo somente uma varredura e largura.
+            SYNTH_O = executores[n->type](n,scope,controllerSmv);
         }
         else
         {
-            printf("[PostProcess - eval] eval genérico \n");
-            if(n->children)
+            //printf("[PostProcess - eval] eval genérico \n");
+            if(n->nchild && n->children)
             {
-                int i;
-                for(i= 0; i < n->nchild; i++)
-                {
-                    Node* toEval = n->children[i];
-                    if(toEval)
-                    {
-                        printf("(%d) %s \n",i,toEval->name);
-                        Object** SYNTH_SET = eval(n->children[i], scope, controllerSmv);
-                        SYNTH_O[i] = SYNTH_SET[0];
-                        free(SYNTH_SET);
-                    }
-                    // (já criamos Object) resolver dependencias realmente necessário? Parando para pensar podemos acessar o filho imediatamente abaixo do nó em questão e já pegar os valores ! Evita criar mais structs! (pode ficar complexo para alguns casos por outro lado... e fora que inviabiliza tds e vetores)
+                int i; // passa a diante (varredura em pos ordem)
+                for (i=0; i < n->nchild; i++){
+                    eval(n->children[i],scope,controllerSmv);
                 }
             }
         }

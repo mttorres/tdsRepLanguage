@@ -25,7 +25,9 @@ typedef enum smvtype {MAIN = 1, AUTOMATA = 2, PORTS = 3, FUNCTION_SMV = 4} smvty
 
 
 // COLOCAR OS MAIS IMPORTANTES PRIMEIRO
-
+// NOTA, alguns ENUMS só existem para validações, outros que são usados para dar evaluate.
+// esses que só existem para validações as vezes estão já dentro de outro eval (o que poderiamos separar em diferntes evals para deixar,
+// mais modularizado (VAMOS TENTAR FAZER ISSO COM AS IMPLEMENTAÇÕES MAIS RECENTES)
 typedef enum EVAL_TYPE { 
 
 	NUMBER, L_BOOL, STRING, D_NULL, IDVAR, TIME_DIRECTIVE, 
@@ -34,19 +36,19 @@ typedef enum EVAL_TYPE {
 
 	AC_V, OTHER_ASSIGN, V_PROP, ADD_V, ADD_V_PROP, V_PROP_TDS,
 
-	EXPR, CMD_IF, MATCH_IF,
+	EXPR, CMD_IF, TDS_DEF_COMPLETE, TD_DEF_DEPEN,
 
-	ASSIGN_IDVAR, ASSIGN_AC_V, ASSIGN_TDIRECTIVE,
+    TIME_LIST, TIME_COMP, DOMAIN_FUNCTION,
 
-	TDS_DEF_COMPLETE, TD_DEF_DEPEN,
+    MATCH_IF,
 
-	DOMAIN_FUNCTION, TIME_LIST, TIME_COMP,
+    ASSIGN_IDVAR, ASSIGN_AC_V, ASSIGN_TDIRECTIVE,
 
 	DEF_EXTRAS_LINKED, DEF_EXTRAS_DELAYED,
 
     HEADERS_E_PROG, PROG, FUNC_DEFS, CMD,
 
-	FUNC_DEF, PROC_DEF, F_BODY, OPT_RETURN, PARAMS, PARAM, 
+	FUNC_DEF, PROC_DEF, OPT_RETURN, PARAMS, PARAM,
 
 	CMD_OTHER,
 	

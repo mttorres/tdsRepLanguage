@@ -25,7 +25,7 @@ const char* mappingEnumNode[] =  {
 
         "HEADERS_E_PROG", "PROG", "FUNC_DEFS", "CMD",
 
-        "FUNC_DEF", "PROC_DEF", "F_BODY", "OPT_RETURN", "PARAMS", "PARAM",
+        "FUNC_DEF", "PROC_DEF", "OPT_RETURN", "PARAMS", "PARAM",
 
          "CMD_OTHER",
 
