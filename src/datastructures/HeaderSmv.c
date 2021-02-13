@@ -284,18 +284,10 @@ void addNewHeader(HeaderController* controller, HeaderSmv* newHeader){
     }
 }
 
-void propagParamDependence(HeaderSmv **headers, char *param, int sizeHeaders, smvtype type) {
+void propagParamDependence(HeaderSmv** headers, char* param, int sizeHeaders){
     int i;
-    char* refOldName;
     char* refOldPt;
     for(i = 0; i < sizeHeaders; i++){
-        if(type != MAIN){
-            refOldName = headers[i]->moduleName;
-            char* newName = addParams(refOldName,param,"(",")");
-            free(refOldName);
-            headers[i]->moduleName = newName;
-        }
-
         refOldPt = headers[i]->varBuffer[headers[i]->VAR_RENAME_POINTER];
         char* newDeclaration = addParams(refOldPt,param,"(",")");
         free(refOldPt);
@@ -310,9 +302,9 @@ void addParamToPortsModule(HeaderController *controller, char *param, int first)
     updated->moduleName = newName;
     // agora deve propagar as alterações para todos os demais módulos
     if(!first){
-        propagParamDependence(controller->MAIN_RELATED, param, controller->H_MAIN_CURRENT_SIZE, MAIN);
+        propagParamDependence(controller->MAIN_RELATED,param,controller->H_MAIN_CURRENT_SIZE);
     }
-    propagParamDependence(controller->AUTOMATA_RELATED, param, controller->H_AUTOMATA_CURRENT_SIZE, AUTOMATA);
+    propagParamDependence(controller->AUTOMATA_RELATED,param,controller->H_AUTOMATA_CURRENT_SIZE);
 }
 
 
