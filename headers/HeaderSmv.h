@@ -38,10 +38,9 @@ typedef struct headerController
   int declaredPorts;
   STable* mainInfo;
   STable* portsInfo;
-  STable** functionsInfo;
   //int CURRENT_SIZE; // usar current size com -1 (se vc está processando o indice atual(ultimo) é porque ele já alocou para o seguinte!)
                     // ex:  sétimo membro(6) (CURRENT_SIZE = 7) (ou seja para referenciar o último é só pegar CURRENT-1)
-
+  
 }HeaderController;
 
 HeaderController *createController();

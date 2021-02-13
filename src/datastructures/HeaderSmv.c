@@ -101,7 +101,6 @@ void letGoHeadersStruct(HeaderController *H) {
 HeaderController *createController() {
 
     int DEFAULT_HEADERS_SIZE = 5;
-    int DEFAULT_FUNCTIONS = 300;
 
     HeaderController* Hcontrol = malloc(sizeof(HeaderController));
 	Hcontrol->H_MAIN_CURRENT_SIZE = 0;
@@ -110,11 +109,10 @@ HeaderController *createController() {
 
     Hcontrol->mainInfo = createTable(SMV_V_MAIN,NULL,0,0);
     Hcontrol->portsInfo =  createTable(SMV_PORTS,NULL,0,0);
-    Hcontrol->functionsInfo =  malloc(sizeof(STable*)*DEFAULT_FUNCTIONS);
 
     Hcontrol->MAIN_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
     Hcontrol->AUTOMATA_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
+    Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);;
 	Hcontrol->declaredPorts=0;
 
 	return Hcontrol;

@@ -12,7 +12,7 @@
 #include "Node.h"
 #include "Object.h"
 
-Object *eval(Node *n, STable *scope, HeaderController *controllerSmv);
+Object * eval(Node* node, STable* scope, STable** writeSmvTypeTable, HeaderController* controllerSmv);
 
 
 #endif
