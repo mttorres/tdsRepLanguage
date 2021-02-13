@@ -165,9 +165,9 @@ Object* evalIDVAR(Node* n, STable* scope,  HeaderController* controllerSmv)
 
         // criar MÉTODO DE COPIA DE OBJETO (variavel)
 
-        if(entry->val->OBJECT_SIZE > 1)
+        // retorna a referência (ai pode sim ter colaterais) (não permite "passagem de referência" gerar conversão no nuXmv (não existe)
+        if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1)
         {
-            // retorna a referência (ai pode sim ter colaterais)
             return entry->val;
         }
         else
@@ -839,7 +839,6 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
 Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
     int x = 1;
     // leaf 4 (3)
-    return  NULL;
     // filho 1 (0) -> fazer via eval -> -> é loop que termina em eval expr
     // filho 2 (1) -> via eval também  -> são os extras
     char* portName = n->leafs[3];
@@ -879,7 +878,7 @@ Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv)
         Object * RIGHT_COMPONENT = eval(n->children[1],scope,controllerSmv);
         // ao terminar temos os membros da lista MAIS A ESQUERDA e MAIS A DIREITA
 
-//        Object* MERGED = mergeGenericList(LEFT_COMPONENT,RIGHT_COMPONENT);
+        Object* MERGED = mergeGenericList(LEFT_COMPONENT,RIGHT_COMPONENT);
 
         // juntando a lista com a componente ->  n + 1 (a chamada de cima vai sintetizar uma lista com n+1 membros e outra componnete)
         // mas como saber o tamanho quando ele subir o nível?
@@ -898,6 +897,7 @@ Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv)
         // problema: poderia ficar "redundante" e dificil de manipular considerando as listas.
 
         // note que essa estrutura deve ser construida em um método generico
+        return MERGED;
     }
 
     return NULL;

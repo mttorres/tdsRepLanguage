@@ -43,7 +43,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 		return pt;
 	}
 	// listas provavelmente também vão apenas referenciar os vários objetos (assim como a time component)
-    if(type == TIME_COMPONENT && index == 1){
+    if(type == GEN_LIST || type == TIME_COMPONENT && index == 1){
         return value;
     }
 
@@ -299,5 +299,40 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 	int oldRedef = o->redef;
     o->redef = typeChanged || (contextChange != o->timeContext)? o->redef : o->redef+1;
     o->timeContext = contextChange == o->timeContext? o->timeContext : contextChange;
+}
+
+
+Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT){
+
+    enum ENTRY_TYPE selectedType;
+    // permite juntar tipos diferentes nesse caso
+
+    if(LEFT_COMPONENT->type == RIGHT_COMPONENT->type){
+        selectedType = GEN_LIST;
+    }
+    else{
+        Object* MEMBER_OF_LIST = (Object*) LEFT_COMPONENT->values[0];
+        if(LEFT_COMPONENT->OBJECT_SIZE > 1 && MEMBER_OF_LIST->type != RIGHT_COMPONENT->type) {
+            fprintf(stderr, "ERROR: Array structure with different data types.");
+            exit(-1);
+        }
+        else{
+            selectedType = GEN_LIST;
+        }
+    }
+    int mergedSize = LEFT_COMPONENT->type == GEN_LIST? LEFT_COMPONENT->OBJECT_SIZE+1 : 2; // lista + novo ou novo + novo
+    void* mergedValues[mergedSize];
+    int i;
+    for (i = 0; i < mergedSize-1; ++i) {
+        // copia a de objetos lista (sempre mais a esquerda (outros objetos))
+        if(LEFT_COMPONENT->type == GEN_LIST){
+            mergedValues[i] = LEFT_COMPONENT->values[i];
+        }
+        else{
+            mergedValues[i] = LEFT_COMPONENT;
+        }
+    }
+    mergedValues[i] = RIGHT_COMPONENT;
+    return createObject(selectedType,mergedSize,mergedValues,-1,NULL);
 }
 

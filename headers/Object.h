@@ -35,4 +35,15 @@ Object* copyObject(Object* o);
 */
 void updateObject(Object *o, void **any, int any_type, int object_size, int index, int prop, int contextChange);
 
+/***
+ * Junta duas componentes sintetizadas de uma lista em uma
+ * nova lista (Objeto do tipo GEN_LIST ou do mesmo tipo que os demais membros da lista (para os objetos não internos da linguagem) ).
+ * É usado para parâmetros, listas, e outras estruturas recursivas da AST.
+ *
+ * @param LEFT_COMPONENT
+ * @param RIGHT_COMPONENT
+ * @return
+ */
+Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT);
+
 #endif
