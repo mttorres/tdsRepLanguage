@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../headers/HeaderSmv.h"
+#include "../../headers/Enum.h"
 
 
 HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP) {
@@ -26,7 +27,6 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
   }
   else{
   	header->transBuffer = NULL;
-  	header->VAR_RENAME_POINTER = -1;
   }
 
   return header; 
@@ -77,42 +77,27 @@ void letgoHeader(HeaderSmv* h){
   	free(h);  				
 }
 
-void letGoRelatedHeaders(HeaderSmv** RHeader, int size){
-    int i;
-    if(RHeader){
-        for(i = 0; i< size; i++){
-            letgoHeader(RHeader[i]);
-            RHeader[i] = NULL;
-        }
-    }
+
+HeaderSmv** initHeadersStruct(int size) {
+  
+  HeaderSmv** headers = ( HeaderSmv**) malloc(sizeof(HeaderSmv*)*size);
+  return headers;
 }
 
-void letGoHeadersStruct(HeaderController *H) {
-
-    letGoRelatedHeaders(H->MAIN_RELATED, H->H_MAIN_CURRENT_SIZE);
-    letGoRelatedHeaders(H->AUTOMATA_RELATED, H->H_AUTOMATA_CURRENT_SIZE);
-    letGoRelatedHeaders(H->PORTS_RELATED, H->H_PORTS_CURRENT_SIZE);
-
-    letgoTable(H->mainInfo);
-    letgoTable(H->portsInfo);
-    free(H);
+void letGoHeadersStruct(HeaderSmv** hs, int size){
+  
+  int i;
+  for(i = 0; i< size; i++){
+	letgoHeader(hs[i]);
+	hs[i] = NULL;
+  }
+  free(hs);
 }
 
-HeaderController *createController() {
-
-    int DEFAULT_HEADERS_SIZE = 5;
-
-    HeaderController* Hcontrol = malloc(sizeof(HeaderController));
-	Hcontrol->H_MAIN_CURRENT_SIZE = 0;
-    Hcontrol->H_AUTOMATA_CURRENT_SIZE = 0;
-    Hcontrol->H_PORTS_CURRENT_SIZE = 0;
-
-    Hcontrol->mainInfo = createTable(SMV_V_MAIN,NULL,0,0);
-    Hcontrol->portsInfo =  createTable(SMV_PORTS,NULL,0,0);
-
-    Hcontrol->MAIN_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->AUTOMATA_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);;
+HeaderController* createController(int size) {
+	HeaderController* Hcontrol = malloc(sizeof(HeaderController));
+	Hcontrol->CURRENT_SIZE = 0;
+	Hcontrol->headers = initHeadersStruct(size);
 	Hcontrol->declaredPorts=0;
 
 	return Hcontrol;
@@ -120,20 +105,8 @@ HeaderController *createController() {
 
 
 void letGoHeaderControl(HeaderController* Hcontrol) {
-    letGoHeadersStruct(Hcontrol);
-}
-
-void printAllHeaders(HeaderController* Hcontrol){
-    int i;
-    for (i = 0; i < Hcontrol->H_MAIN_CURRENT_SIZE; i++){
-        printHeader(Hcontrol->MAIN_RELATED[i]);
-    }
-    for (i = 0; i < Hcontrol->H_AUTOMATA_CURRENT_SIZE; i++){
-        printHeader(Hcontrol->AUTOMATA_RELATED[i]);
-    }
-    for (i = 0; i < Hcontrol->H_PORTS_CURRENT_SIZE; i++){
-        printHeader(Hcontrol->PORTS_RELATED[i]);
-    }
+	letGoHeadersStruct(Hcontrol->headers,Hcontrol->CURRENT_SIZE);
+	free(Hcontrol);
 }
 
 
@@ -234,77 +207,6 @@ void writeHeader(HeaderSmv* header, FILE* smvoutput){
 		writeHeaderBuffer(header,i,smvoutput);
 	}
 	fprintf(smvoutput,"%s","\n");
-}
-
-HeaderSmv* accessHeader(HeaderController* controller, smvtype cat, int indexOfHeader){
-    HeaderSmv* toReturn = NULL;
-    if(cat == MAIN){
-        toReturn = indexOfHeader != -1? controller->MAIN_RELATED[indexOfHeader] : controller->MAIN_RELATED[controller->H_MAIN_CURRENT_SIZE-1];
-    }
-    if(cat == AUTOMATA){
-        toReturn = indexOfHeader != -1? controller->AUTOMATA_RELATED[indexOfHeader] : controller->AUTOMATA_RELATED[controller->H_AUTOMATA_CURRENT_SIZE-1];
-    }
-    if(cat == PORTS){
-        toReturn = indexOfHeader != -1? controller->PORTS_RELATED[indexOfHeader] : controller->PORTS_RELATED[controller->H_PORTS_CURRENT_SIZE-1];
-    }
-    if(!toReturn){
-        fprintf(stderr, "[accessHeader] INVALID SMV TYPE FOR OPERATION");
-        exit(-1);
-    }
-    return toReturn;
-
-}
-
-STable* accessSmvInfo(HeaderController* controller, smvtype cat){
-    if(cat == MAIN){
-        return controller->mainInfo;
-    }
-    if(cat == PORTS){
-        return controller->portsInfo;
-    }
-    if(cat == AUTOMATA){
-        return NULL; // melhorar, apesar que sabe-se que não tem operação em tabela de simbolos para automato (por enquanto)
-    }
-    fprintf(stderr, "[accessSmvInfo] INVALID SMV TYPE FOR OPERATION");
-    exit(-1);
-}
-
-void addNewHeader(HeaderController* controller, HeaderSmv* newHeader){
-    if(newHeader->type == MAIN){
-        controller->MAIN_RELATED[controller->H_MAIN_CURRENT_SIZE] = newHeader;
-        controller->H_MAIN_CURRENT_SIZE++;
-    }
-    if(newHeader->type == AUTOMATA){
-        controller->AUTOMATA_RELATED[controller->H_AUTOMATA_CURRENT_SIZE] = newHeader;
-        controller->H_AUTOMATA_CURRENT_SIZE++;
-    }
-    if(newHeader->type == PORTS){
-        controller->PORTS_RELATED[controller->H_PORTS_CURRENT_SIZE] = newHeader;
-        controller->H_PORTS_CURRENT_SIZE++;
-    }
-}
-
-void propagParamDependence(HeaderSmv** headers, char* param, int sizeHeaders){
-    int i;
-    char* refOldPt;
-    for(i = 0; i < sizeHeaders; i++){
-        refOldPt = headers[i]->varBuffer[headers[i]->VAR_RENAME_POINTER];
-        char* newDeclaration = addParams(refOldPt,param,"(",")");
-        free(refOldPt);
-        headers[i]->varBuffer[headers[i]->VAR_RENAME_POINTER] = newDeclaration;
-    }
-}
-
-void addParamToPortsModule(HeaderController *controller, char *param, int first) {
-    HeaderSmv* updated = accessHeader(controller,PORTS,0);
-    char* newName = addParams(updated->moduleName,param,"(",")");
-    free(updated->moduleName);
-    updated->moduleName = newName;
-    // agora deve propagar as alterações para todos os demais módulos
-    if(!first){
-        propagParamDependence(controller->MAIN_RELATED,param,controller->H_MAIN_CURRENT_SIZE);
-    }
-    propagParamDependence(controller->AUTOMATA_RELATED,param,controller->H_AUTOMATA_CURRENT_SIZE);
 }
 
 

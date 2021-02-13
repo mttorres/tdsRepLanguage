@@ -410,14 +410,8 @@ void writeResultantHeaders(HeaderController* controller, const char* path){
   
   int i;
   FILE* smvoutput = fopen(path, "w");
-  for(i = 0; i< controller->H_MAIN_CURRENT_SIZE; i++){
-        writeHeader(controller->MAIN_RELATED[i],smvoutput);
-  }
-  for(i = 0; i< controller->H_AUTOMATA_CURRENT_SIZE; i++){
-        writeHeader(controller->AUTOMATA_RELATED[i],smvoutput);
-  }
-  for(i = 0; i< controller->H_PORTS_CURRENT_SIZE; i++){
-        writeHeader(controller->PORTS_RELATED[i],smvoutput);
+  for(i = 0; i< controller->CURRENT_SIZE; i++){
+		writeHeader(controller->headers[i],smvoutput);
   }
   fclose(smvoutput);
 

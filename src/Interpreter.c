@@ -592,7 +592,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->MAIN_RELATED[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,0,0);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,0,0);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -600,7 +600,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, STable** writeSmvTypeTable,
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->MAIN_RELATED[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,1,1);
+        updateTime(controllerSmv->headers[0],writeSmvTypeTable[0],smvBind,NUMBER_ENTRY,1,1);
     }
     return NULL;
 }
@@ -671,10 +671,9 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, STable** writeSmvTypeTable, Hea
             int new = *(int*)expr->values[0];
             minmax = new > old;
         }
-        // decidir o que vai usar do Hcontroller (tem que ser melhor adaptado)
-        STable* refAuxTable = accessSmvInfo(controllerSmv,scope->type == FUNC && expr->type == TDS_ENTRY? PORTS : MAIN);
-        HeaderSmv* refHeader = accessHeader(controllerSmv,scope->type == FUNC && expr->type == TDS_ENTRY? PORTS : MAIN ,scope->order);
-
+        STable* refAuxTable = writeSmvTypeTable[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
+        // ports ou main
+        HeaderSmv* refHeader = controllerSmv->headers[scope->type == FUNC && expr->type == TDS_ENTRY? controllerSmv->CURRENT_SIZE-1 : 0 ];
         TableEntry* itimeEntry = lookup(scope,"I_TIME");
         int itime = *(int*)itimeEntry->val->values[0];
         int changeContext = ctime > itime; // verifica se mudou o contexto

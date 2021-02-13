@@ -103,7 +103,7 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->backup = 0;
 	newtable->collision = 0;
 	newtable->conditionBind == NULL;
-	newtable->children = NULL;
+	
 	newtable->parent = parent;
 
 /*
@@ -112,7 +112,19 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	}
 */
 
-	int selectSize =  type == SIMPLE_HASH ?  MAX_SIMPLE : MAX_TABLE;
+	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
+
+/*
+	if(type == SIMPLE_HASH)
+	{
+		printf("[createTable] criando simple hash \n\n");
+	}
+	else
+	{
+		printf("[createTable] criando escopo \n\n");
+	}
+*/
+	
 	newtable->tableData = (TableEntry**) malloc(selectSize*sizeof(TableEntry*));
 	
 	
@@ -189,8 +201,7 @@ void letgoTable(STable *t)
 		free(t->children);
 	}
 	if(t->tableData){
-		int size = t->type == SIMPLE_HASH ?  MAX_SIMPLE : MAX_TABLE;
-		for(i=0; i < size; i++)
+		for(i=0; i < MAX_TABLE; i++)
 		{
 		    if(t->tableData[i]) {
                 letgoEntry(t->tableData[i]);
