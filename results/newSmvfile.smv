@@ -12,7 +12,6 @@ VAR
 	y : 0..6;
 	w_scope1_2 : 0..1;
 	u_scope1_2_2_0 : boolean;
-	tdsA : 0..1;
 ASSIGN
 	init(time) := 0;
 	next(time) := case
@@ -63,11 +62,6 @@ esac;
 	next(u_scope1_2_2_0):= case 
 		next(time) = 4  & !next(zelda) & next(z)   : FALSE;
 		TRUE : u_scope1_2_2_0; 
-	esac;
-	init(tdsA):= 0;
-	next(tdsA):= case 
-		next(time) = 4  : 0;
-		TRUE : tdsA; 
 	esac;
 
 MODULE merger1(ports)
