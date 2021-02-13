@@ -6,15 +6,7 @@
 
 
 const char* mappingEnumTable[] =  {
-    "GLOBAL",
-    "FUNC",
-    "LOOP",
-    "IF_BLOCK",
-    "ELSE_BLOCK",
-    "SMV_PORTS",
-    "SMV_V_MAIN",
-    "SIMPLE_HASH",
-    "TYPE_SET"
+  "GLOBAL", "FUNC", "LOOP", "IF_BLOCK", "ELSE_BLOCK", "SMV_PORTS", "SMV_V_MAIN" ,"SIMPLE_HASH"
 };
 
 
@@ -77,7 +69,7 @@ void printEntry(TableEntry* e) {
 		}
 		printf(")");
 		printf("\n");
-		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
+		printf("\t (context: %d, methodParam: %d, level: %d, order: %d ) \n",e->val->timeContext,e->methodParam,e->level,e->order);
 
 	}
 }
@@ -86,7 +78,7 @@ void printEntry(TableEntry* e) {
 
 /// table
 
-STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
+STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int indexRef) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
 	
@@ -110,10 +102,13 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->lastEntryIndex = 0;
 	newtable->backup = 0;
 	newtable->collision = 0;
+	newtable->conditionBind = NULL;
+	newtable->notEvaluated = 0;
+	newtable->children = NULL;
 	
-	if(parent){
-		newtable->parent = parent;
-	}
+	newtable->parent = parent;
+    newtable->childOfFunction = parent && (parent->type == FUNC || parent->childOfFunction);
+    newtable->indexRef = newtable->type == FUNC? indexRef : newtable->childOfFunction? parent->indexRef : -1;
 
 /*
 	if(chillist){
@@ -121,7 +116,8 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	}
 */
 
-	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
+	int selectSize =  type == SIMPLE_HASH || type == SMV_PORTS ?  MAX_SIMPLE : MAX_TABLE;
+    newtable->usedSize = selectSize;
 
 /*
 	if(type == SIMPLE_HASH)
@@ -165,20 +161,29 @@ void printTable(STable* t){
 				
 			}
 		}
+		else{
+            printf("|--> Entries: {NONE} \n");
+		}
 		if(t->nchild)
 		{
 			int i;
 			for (i = 0; i < t->nchild; i++)
 			{
-				printf("child (%d): \n",i+1);
+				printf("\tchild (%d): \n",i+1);
+				printf("\t\t");
 				printTable(t->children[i]);
 			}
 		}
 	}
 }
 
+void letGoEntryByName(STable* table, char* name){
+    int index = hash(name,table);
+    letgoEntry(table->tableData[index]);
+    table->tableData[index] = NULL;
+}
 
-void letgoEntry(TableEntry* e) {
+void letgoEntry(TableEntry *e) {
 	if(!e) {
 	    return;
 	}
@@ -188,33 +193,43 @@ void letgoEntry(TableEntry* e) {
 	}
 	if(e->val)
 	{
-		letgoObject(e->val);
+	    if(e->val->type == TYPE_SET){
+            letgoTable((STable *) e->val->values[2]);
+	    }
+        letgoObject(e->val);
 	}
 	free(e);
 }
 
 
-void letgoTable(STable* t)
+void letgoTable(STable *t)
 {
 	if(!t) {
 	    return;
 	}
+	if(t->parent){
+	    t->parent->children[t->order] = NULL;
+	}
 	int i;
 	if(t->children){
 		for(i=0; i < t->nchild; i++){
-			letgoTable(t->children[i]);
+            letgoTable(t->children[i]);
 		}
 		free(t->children);
 	}
 	if(t->tableData){
-		for(i=0; i < MAX_TABLE; i++)
+		int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
+		for(i=0; i < size; i++)
 		{
-				if(t->tableData[i]) {
-			 	letgoEntry(t->tableData[i]);   
+		    if(t->tableData[i]) {
+                letgoEntry(t->tableData[i]);
 			}
 		}
 	    free(t->tableData);
 	}
+    if(t->conditionBind){
+        free(t->conditionBind);
+    }
 	free(t);
 }
 
@@ -226,7 +241,7 @@ void letgoTable(STable* t)
 int hash(char * str, STable* t) {
 	int hash = 401;
 	int c;
-	int SIZE_FOR_HASH = t->collision ? t->collision : MAX_TABLE;
+	int SIZE_FOR_HASH = t->collision ? t->collision : t->usedSize;
 	
 	if(t->collision)
 	{
@@ -289,7 +304,8 @@ void insert(STable* t, TableEntry* e) {
     if(lookup(t,e->name))
     {
     	printf("[insert] COLLISION! (%s) É: %d \n",e->name,index);
-    	redistributeHashs(t,e);
+    	exit(-1);
+    	//redistributeHashs(t,e);
     }
     else
     {
@@ -300,33 +316,37 @@ void insert(STable* t, TableEntry* e) {
     
 }
 
+
 TableEntry* lookup(STable* t, char* name) {
     
     int index = hash(name,t);
-    return t->tableData[index];
-    
+    TableEntry* e = t->tableData[index];
+    if(e)
+    {
+    	return e;
+    }
+    // não achou procura na hierarquia de escopos acima
+    printf("[lookup] WARNING %s not in scope : ",name);
+    printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+    STable* parent = t->parent;
+   	while(!e && parent)
+    {
+    	//printf("[lookup] parent: %s (%d,%d)",mappingEnumTable[parent->type],parent->level,parent->order);
+    	e = parent->tableData[index];
+    	//printTable(parent);
+    	parent = parent->parent;
+    }
+   	return e;
 }
 
 
-
-// op's novas que funcionam
-
-// note que ! eu poderia muito bem por que os valores FOLHA dos nós da arvore são os mesmos que ENTRY_TYPE, existe ligeira redundância...
-// QUE POR SINAL.... meu entry_type vai ser o meu "proxy" para valores? 
-		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
-		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
-		// primeiro eu vou testar usando valores literais 
-
-
-/*
-
-	Verifica se é necessário chamar addEntryToTypeSet
-*/
 int checkTypeSet(STable* current, char* name,  char* typeid)
 {
+	// procura a variável em questão na tabela do SMV
 	TableEntry* entry = lookup(current,name);
 	if(entry)
 	{
+		// procura o tipo
 		if(lookup(entry->val->values[2],typeid))
 		{
 			printf("[checkTypeSet] %s encontrado no conjunto da variável %s \n",typeid,name);
@@ -350,8 +370,8 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
 	if(entry)
 	{
 		int present = 1;
-		void* po = {&present};	
-		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val->values[2]);
+		void* po = {&present};
+        addValue(typeid, po, LOGICAL_ENTRY, 1, 0, entry->val->values[2], 0);
 	}
 }
 
@@ -381,22 +401,45 @@ void addEntryToTypeSet(STable* current, char* name, char* typeid)
  
 
 */
-void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current)
+void addTypeSetSmv(char *name, void **any, int object_size, STable *current)
 {
-	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+	STable* hashset = createTable(SIMPLE_HASH, NULL, 0, 0, -1);
 
 	void* po[] = {any[0], any[1], hashset};
 
-	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+	printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
 
-	printf("[addTypeSet] var-name: %s \n",name);
-
-	addValue(name,po,any_type,object_size+1,0,current);
+    addValue(name, po, TYPE_SET, object_size + 1, 0, current, 0);
 }
 
+void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
+
+    printf("[addNumericalIntervalSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+
+    max = newValue > max && newValue > min ? newValue : max;
+    max = newValue < max && newValue < min ? newValue : min;
+
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
+    addValue(name, po, WRITE_SMV_INFO, 4, 0, current, 0);
+}
+
+/*
+void addWriteInfo(char* name, void** any, int any_type, int object_size, STable* current)
+{
+    printf("[addWriteInfo] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+    STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+
+    void* po[] = {any[0], any[1], hashset};
+
+    printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+
+    addValue(name,po,any_type,object_size+1,0,current);
+}
+*/
 
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
-void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
+void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
 
 	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
@@ -406,8 +449,24 @@ void addValue(char* name, void** any, int any_type, int object_size ,int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any);
+	Object* o = createObject(any_type, object_size, any, timeContext, name);
 	addValueCurrentScope(name,o,methodParam,current);
+}
+
+
+void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current, int contextChange)
+{
+
+	TableEntry* e = lookup(current,name);
+	if(e){
+        printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
+        updateObject(e->val, any, any_type, object_size, oIndex, oProp, contextChange);
+	}
+	else{
+	   // valor novo
+        addValue(name, any, any_type, object_size, 0, current, 0);
+	}
+
 }
 
 
@@ -436,7 +495,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
 	// LEMBRE-SE nchild usa a próxima posição para o escopo filho (inicia em 0, primeira pos)
 
-	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
+	STable* child = createTable(type, parent, parent->level + 1, parent->nchild, -1);
 	
 	printf("[addSubScope] alocando filho: %d \n",parent->nchild);
 
@@ -486,7 +545,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 STable * letgoSubScope(STable* current)
 {
 	STable* parent = current->parent;
-	letgoTable(current);
+    letgoTable(current);
 	parent->nchild --;
 
 	return parent;

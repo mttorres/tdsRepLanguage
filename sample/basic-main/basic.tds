@@ -1,0 +1,25 @@
+INTERVAL: 0 ~ 20
+
+
+x = 1
+
+y = 30
+
+x = 20
+
+
+C_TIME = 2
+
+x = 3
+
+x= 4
+
+C_TIME = 3
+
+y = 0
+
+x = 80
+
+//condicaoTeste = true
+
+

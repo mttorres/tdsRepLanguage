@@ -90,17 +90,16 @@
 %token <sval> FINALTIME
 %token <sval> ID
 %token <sval> PASS
-%token <sval> LDPASS
-%token <sval> RDPASS
+%token <sval> DPASS
+%token <sval> INTERVAL
+%token <sval> BETWEEN
 
 %type <ast> prog
 %type <ast> cmds
 %type <ast> cmd
 %type <ast> functiondefs 
 %type <ast> functiondef
-%type <ast> functionbody 
-%type <ast> params  
-%type <ast> optionalreturn
+%type <ast> params
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> assignable
@@ -121,14 +120,14 @@
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
-%type <ast> timedirective
 %type <ast> anonimtdsop
-%type <ast> interval
+%type <ast> intervaldefs
+%type <ast> main
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
 
-%start prog
+%start main
 
 
 %%
@@ -136,6 +135,37 @@
 /*
 	Gramatica para o parser 
 */
+
+
+intervaldefs: RAWNUMBERDATA BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(7,0,3,"OBSERVATION-INTERVAL-COMPLETE", DEFINE_INTERVAL,$1,$2,$3);
+			$$ = data;
+
+	  }
+	  | BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-END-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+
+	  }
+	  | RAWNUMBERDATA BETWEEN {
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-BEGIN-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+	  }
+
+main: INTERVAL COLON intervaldefs prog {
+
+        Node* main = createNode(6,2,2,"Headers + program", HEADERS_E_PROG, $3,$4, $1,$2);
+        $$ = main;
+        root = $$;
+    }
+    |
+    prog {
+        $$ = $1;
+        root = $$;
+    }
+    ;
 
 prog: functiondefs cmds  {
 		
@@ -156,15 +186,13 @@ prog: functiondefs cmds  {
 
 		//printf(" teste lineno %d",yylineno);
 
-		$$ = prog; 
-		root = $$;
+		$$ = prog;
 
 	  }
 	  | cmds {
 
 		Node* prog = createNode(5,1,0,"Prog -  comandos ", PROG, $1);	  
-	  	$$ = prog; 
-	  	root = $$;
+	  	$$ = prog;
 	  } 
       ; 
 
@@ -211,7 +239,7 @@ functiondefs: functiondefs functiondef {
 	  }  
 	  ; 	
 
-functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
+functiondef: FUNCTION ID LPAREN params RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(12,2,6,"Functiondef -  definição de função ", FUNC_DEF,  $4,$7, $1,$2,$3,$5,$6,$8);
 			//printf("DEFINICAO DE FUNÇÃO \n");
@@ -219,44 +247,14 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 			//infoNode($$);
 		
 		}
-		| FUNCTION ID LPAREN RPAREN LBRACE functionbody  RBRACE  {
+		| FUNCTION ID LPAREN RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(11,1,6,"Functiondef -  definição de procedimento ", PROC_DEF, $6, $1,$2,$3,$4,$5,$7);
 			//printf("DEFINICAO DE FUNÇÃO \n");
 			$$ = functiondef; 
 			//infoNode($$);
-
 		}
 		;
-
-// MUDANÇA - NAO PERMITIR CHAMADA A TDS CREATE dentro de funções! (ou verificar em tempo de semantica?)
-functionbody: cmds optionalreturn {
-	
-			if($2){
-				Node* functionbody = createNode(6,2,0,"Functionbody - função composta/programa ", F_BODY, $1,$2);
-				$$ = functionbody; 
-			}
-			else {
-				Node* functionbody = createNode(5,1,0,"Functionbody - função composta/programa ", F_BODY, $1);
-				$$ = functionbody; 
-			}
-
-	  		
-			
-		}
-
-
-optionalreturn: RETURN expr {
-
-		Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
-		$$ = optionalreturn; 
-
-		//printf("RETORNO \n");
-		
-		}
-	    | /* empty */  {printf("nao teve mais(optionalreturn) \n \n"); $$ = NULL;}
-	    ;
-
 
 
 
@@ -310,30 +308,15 @@ anonimtdsop: PASS  {
 				Node* p = createNode(5,0,1,"CMD -  PASS", TDS_ANON_OP_PASS ,$1); 
 				$$ = p;
 		}
-		| LDPASS interval RDPASS  {
-				Node* p = createNode(5,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
-				$$ = p;
-		} 
-
-
-interval:  ID {
-
-				Node* i = createNode(5,0,1,"VARIAVEL", IDVAR ,$1); 
-				$$ = i;
-			
-		}
-		| RAWNUMBERDATA 
-		{
-				Node* i = createNode(5,0,1,"CMD -  PASS", NUMBER ,$1); 
-				$$ = i;
-		}
-
+		|   DPASS  {
+        		Node* p = createNode(5,0,1,"CMD -  DPASS", TDS_ANON_OP_DPASS ,$1);
+        		$$ = p;
+        }
 
 
 paramsCall: expr {
 		
-			Node* paramsCall = createNode(5,1,0,"Params -  parametro da chamada de função ", PARAM_CALL, $1);
-			$$ = paramsCall; 		
+			$$ = $1; 		
 
 		}
 	    | paramsCall COMMA expr {
@@ -389,7 +372,11 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 		//infoNode($$);
 
-	 }	 
+	 }
+	 | RETURN expr {
+	    	Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
+        	$$ = optionalreturn;
+	 }
 	 ;
 
 
@@ -407,33 +394,15 @@ assignable : ID extraaccesses {
 				Node* assignment = createNode(5,0,1,"VARIAVEL", ASSIGN_IDVAR, $1);
 				$$ = assignment;	
 		}
-
-
 	 }
-
-	 | INITTIME {
-		
-			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-		
-	  }
-
-
-	  | CURRENTTIME {
+	 | CURRENTTIME {
 
 			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
 			$$ = data;	
 
 	  }
+	  ;
 
-	  | FINALTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-
-	  }
-
-	  ;	 
 
 
 expr: MINUS expr {
@@ -458,8 +427,8 @@ expr: MINUS expr {
 	 }
 	 | multiexp {
 
-		$$ = $1;	
-
+       Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
+       $$ = expr;
 	 }
 	 ;
 
@@ -486,8 +455,8 @@ multiexp: multiexp TIMES ineqexp {
 		}
 		|ineqexp {
 
-			$$ = $1;		
-			
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 3", EXPR ,$1);
+            $$ = expr;
 		}
 		;
 
@@ -531,8 +500,8 @@ ineqexp:  ineqexp LE logical {
 	
         }
         | logical {
-
-			$$ = $1;
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 4", EXPR ,$1);
+            $$ = expr;
         }
         ;
 
@@ -555,6 +524,10 @@ logical: NOT data {
 			$$ = logical;			
 
 		 }
+		 | LPAREN expr RPAREN {
+                 Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", EXPR ,$1);
+                 $$ = expr;
+         }
 		 | data {
 
 		 	$$ = $1;
@@ -627,12 +600,12 @@ extraaccesses : LBRACK expr RBRACK variableprop {
 	
 					if($4)
 					{
-			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", ADD_V_PROP ,$2,$4,  $1,$3);	
+			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel(vetor)", ADD_V_PROP ,$2,$4,  $1,$3);	
 						$$ = extraaccesses;
 					}
 					else
 					{
-			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", ADD_V ,$2, $1,$3);	
+			  	 		Node* extraaccesses = createNode(7,1,2,"indice de variavel", ADD_V ,$2, $1,$3);	
 						$$ = extraaccesses;						
 					}		
 
@@ -786,8 +759,8 @@ timecomponent: RAWNUMBERDATA COLON expr {
 
 timelist: timecomponent { 
 
-			Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", TIME_LIST ,$1);
-			$$ = timelist;    			 		  
+			//Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", TIME_LIST ,$1);
+			$$ = $1;
 		  }
 
 		  |timelist COMMA timecomponent {
