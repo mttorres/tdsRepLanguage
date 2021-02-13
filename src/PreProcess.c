@@ -313,4 +313,6 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
    	free(buffer);
    	//printf("terminou! \n");
     addParamToPortsModule(Hcontrol, "time", 1);
+//    addParamToPortsModule(Hcontrol, "random", 0);
+//    addParamToPortsModule(Hcontrol, "testandoDnovo", 0);
 }
