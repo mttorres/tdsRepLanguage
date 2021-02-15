@@ -6,7 +6,7 @@ TDS* createTDS(char* name, TDS_TYPE type, Object* valueList, Object* linkedTDSs,
 
     TDS* newTDS = (TDS*) malloc(sizeof(TDS));
 
-	newTDS->name = name;
+	newTDS->name = name; // nome sintetizado diretamente do código.
 	newTDS->type = type;
 	newTDS->DATA_TIME = valueList;
 	newTDS->linked = linkedTDSs;
@@ -14,4 +14,8 @@ TDS* createTDS(char* name, TDS_TYPE type, Object* valueList, Object* linkedTDSs,
     newTDS->functionRef = functionRef;
 
 	return newTDS;						
+}
+
+void* letGoTDS(TDS* tds){
+
 }

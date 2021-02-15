@@ -11,7 +11,7 @@
 typedef struct TDS
 {
   char* name;
-  int type;
+  TDS_TYPE type;
   Object* DATA_TIME;
   Object* linked;
   char* functionRef;
@@ -31,6 +31,8 @@ typedef struct TDS
 } TDS;
 
 // passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
-TDS* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int linked, int delayed);
+TDS* createTDS(char* name, TDS_TYPE type, Object* valueList, Object* linkedTDSs, int delayed, char* functionRef);
+
+void* letGoTDS(struct TDS* tds);
 
 #endif
