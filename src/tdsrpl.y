@@ -670,9 +670,9 @@ tdsprop: functioncall {
 
 
 
-variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extras RBRACE {
+variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE RBRACE {
 		
-			Node* tdsformat = createNode(16,2,10,"Informações de TDS",  TDS_DEF_COMPLETE , $9,$11,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$12);
+			Node* tdsformat = createNode(16,2,10,"Informações de TDS",  TDS_DEF_COMPLETE , $9,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$11);
 			$$ = tdsformat;
 
 		}
