@@ -3,19 +3,18 @@
 #define TDSV_H
 
 #include "Enum.h"
+#include "Object.h"
 
 
 //struct de TDS: 
 
-typedef struct TDS_VAR
+typedef struct TDS
 {
   char* name;
   int type;
-  int I_TIME; // reflete os valores globais
-  int F_TIME;
-  int C_TIME; // apesar que o C_TIME é do contexto dessa tds... 
-
-  int linked; // lista unica que referencia outra TDS e toma os valores dela! (economiza um campo, evita ref ciclica)
+  Object* DATA_TIME;
+  Object* linked;
+  char* functionRef;
   int delayed;
 
   // ainda não sei como isso vai ficar
@@ -29,9 +28,9 @@ typedef struct TDS_VAR
 
 
 
-} TDSvar;
+} TDS;
 
 // passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
-TDSvar* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int linked, int delayed);
+TDS* createTDS(char* name, int type, int I_TIME, int F_TIME, int C_TIME, int linked, int delayed);
 
 #endif

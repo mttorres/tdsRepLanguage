@@ -80,7 +80,7 @@
 %token <sval> MOD
 %token <sval> FUNCTIONDOMAIN
 %token <sval> FUNCTION
-%token <sval> LABEL
+%token <sval> PLICK
 %token <sval> DATATIME
 %token <sval> DELAYED
 %token <sval> PORTNAME
@@ -577,9 +577,8 @@ data: RAWNUMBERDATA {
 	  }
 	  	  
 
-	  | LABEL {
-			
-			Node* data = createNode(5,0,1,"LABEL", STRING ,$1);	
+	  | PLICK ID PLICK {
+			Node* data = createNode(5,0,1,"LABEL", STRING ,$2);
 			$$ = data;	
 
 	  }
@@ -670,15 +669,15 @@ tdsprop: functioncall {
 
 
 
-variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE RBRACE {
+variabledata: LBRACE PORTNAME COLON PLICK ID PLICK COMMA DATATIME COLON LBRACE dataflow RBRACE RBRACE {
 		
-			Node* tdsformat = createNode(16,2,10,"Informações de TDS",  TDS_DEF_COMPLETE , $9,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$11);
+			Node* tdsformat = createNode(15,1,10,"Informações de TDS",  TDS_DEF_COMPLETE , $11,  $1,$2,$3,$5,$7,$8,$9,$10,$12,$13);
 			$$ = tdsformat;
 
 		}
-		| LBRACE PORTNAME COLON LABEL extras RBRACE {
+		| LBRACE PORTNAME COLON PLICK ID PLICK extras RBRACE {
 			
-			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TD_DEF_DEPEN ,$5,  $1,$2,$3,$4,$6);
+			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TD_DEF_DEPEN ,$7,  $1,$2,$3,$5,$8);
 			$$ = tdsformat;
 		
 		}
