@@ -7,14 +7,14 @@
 typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
-                               INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR } MAP_CONVERSIONS;
+                               INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR, TDS_MODULE_NAME } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s" };
+                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s", "tds_%s" };
 
 int  ALOC_SIZE_LINE = 300;
 
@@ -432,29 +432,34 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
 
 }
 
-char *processActiveName(STable *currentScope, char *varName, int notExistsOutScope, int isOnNextContext) {
+char *processActiveName(STable *currentScope, char *varName, int notExistsOutScope, int isOnNextContext, int type) {
 
     char* useVar = NULL;
-    char interScope[ALOC_SIZE_LINE];  //nome com info de scope
-    char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
-    // qualquer escopo diferente de GLOBAL/MAIN
-    if(notExistsOutScope && (currentScope->order || currentScope->level) ){
-        // if, else, fors ....
-        if(currentScope->parent->type != GLOBAL){
-            sprintf(interScope,SmvConversions[NAME_SSCOPE],varName,currentScope->parent->level,
-                    currentScope->parent->order,currentScope->level,currentScope->order);
+    if(type != TDS_ENTRY) {
+        char interScope[ALOC_SIZE_LINE];  //nome com info de scope
+        char interRedef[ALOC_SIZE_LINE];  //nome com redefinição
+        // qualquer escopo diferente de GLOBAL/MAIN
+        if (notExistsOutScope && (currentScope->order || currentScope->level)) {
+            // if, else, fors ....
+            if (currentScope->parent->type != GLOBAL) {
+                sprintf(interScope, SmvConversions[NAME_SSCOPE], varName, currentScope->parent->level,
+                        currentScope->parent->order, currentScope->level, currentScope->order);
+            } else {
+                sprintf(interScope, SmvConversions[NAME_BY_SCOPE], varName, currentScope->level, currentScope->order);
+            }
+            useVar = interScope;
+        } else {
+            useVar = varName;
         }
-        else{
-            sprintf(interScope,SmvConversions[NAME_BY_SCOPE],varName,currentScope->level,currentScope->order);
+        if (isOnNextContext) {
+            sprintf(interRedef, SmvConversions[NEXT], useVar);
+            useVar = interRedef;
         }
-        useVar = interScope;
     }
     else{
-        useVar = varName;
-    }
-    if(isOnNextContext){
-        sprintf(interRedef,SmvConversions[NEXT],useVar);
-        useVar = interRedef;
+        char interTDS[ALOC_SIZE_LINE];
+        sprintf(interTDS, SmvConversions[TDS_MODULE_NAME], varName);
+        useVar = interTDS;
     }
     char* activeName = malloc(sizeof(ALOC_SIZE_LINE));
     strcpy(activeName,useVar);
@@ -463,7 +468,7 @@ char *processActiveName(STable *currentScope, char *varName, int notExistsOutSco
 
 char *formatValueBind(char *varName, STable *parentScope, Object *expr, int index, int isDefault, int isSelf) {
     if(isSelf){
-        char* useVar = processActiveName(parentScope, varName, 1, 0);
+        char* useVar = processActiveName(parentScope, varName, 1, 0, expr->type);
         return useVar;
     }
     else{
@@ -477,7 +482,7 @@ Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
-    useVar = processActiveName(var->parentScope, var->name, 1, var->val->timeContext);
+    useVar = processActiveName(var->parentScope, var->name, 1, var->val->timeContext, var->val->type);
     Object* copyRef = copyObject(var->val);
     if(useVar){
         free(copyRef->SINTH_BIND);
@@ -501,7 +506,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
 
     // decide o nome apropriado para a variável
     char* useVar = NULL; // por default, usamos o nome da varável (se não for, em escopos diferentes ou ainda em redef )
-    useVar = processActiveName(scope, varName, varInit, 0);
+    useVar = processActiveName(scope, varName, varInit, 0, newValue->type);
 
     int minmax = -1;
     if(typeExpr  && newValue->type == NUMBER_ENTRY) {
@@ -570,13 +575,22 @@ void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, in
     updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,INIT,minmax);
 }
 
+char* createReferenceTDS(char* declaredName){
+    return processActiveName(NULL,declaredName,-1,-1,TDS_ENTRY);
+}
+
+void specTDS(Object* tds, int C_TIME,HeaderController* controller, STable* currentScope){
+
+}
+
+/*
 void letGoOldEntry(TableEntry* var, STable* refAuxTable){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
 
     int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
-    useVar = processActiveName(var->parentScope, var->name, 1, 0);
+    useVar = processActiveName(var->parentScope, var->name, 1, 0, 0);
     char varInit[ALOC_SIZE_LINE/2];
     char varNext[ALOC_SIZE_LINE/2];
     sprintf(varInit,SmvConversions[INIT],useVar);
@@ -587,7 +601,7 @@ void letGoOldEntry(TableEntry* var, STable* refAuxTable){
     letGoEntryByName(refAuxTable,varNext);
     free(useVar);
 }
-
+*/
 
 void writeResultantHeaders(HeaderController* controller, const char* path){
   

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <TDS.h>
 #include "../headers/PostProcess.h"
 
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
@@ -705,11 +706,12 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto
 
         // atribuição simples
-        if(expr && n->children[0]->type == ASSIGN_IDVAR)
+        if(expr && expr->type != TDS_ENTRY && n->children[0]->type == ASSIGN_IDVAR)
         {
             //primeira vez da variavel (ou não inicializada, mudança para depois
             if(!var)
             {
+                //int isTDS = expr->type == TDS_ENTRY;
                 if(!scope->notEvaluated){
                     addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
                 }
@@ -763,17 +765,16 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         else if(expr){
             if(var && expr->type != var->type){
                 fprintf(stderr, "TYPE ERROR: %s datastructure type is imutable \n",varName);
-                exit(-1);
+                exit(-1); // por enquanto declarações unicas de estruturas de dados
             }
-
-            printf("[evalOTHER_ASSIGN] atribui variável (atributo ou indice) \n");
             if(!var)
             {
-                fprintf(stderr, "ERROR: %s is not defined as datastruct \n",varName);
-                exit(-1);
+                if(expr->type == TDS_ENTRY){
+                    specTDS(,C_TIME,)
+                }
             }
 
-            Node* ref = n->children[0]->children[0];
+/*            Node* ref = n->children[0]->children[0];
             Object* indexRef = ref->type == V_PROP ? NULL : eval(n, scope, controllerSmv);
 
             if(ref->type == V_PROP || ref->type == ADD_V_PROP)
@@ -803,6 +804,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
                 // ainda parcialmente incompleto
                 updateValue(varName, expr->values, var->type, var->OBJECT_SIZE, index, -1, scope, 0);
             }
+                    */
         }
 
     }
@@ -837,17 +839,25 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
 
 
 Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
-    int x = 1;
+
+    if(scope->type != GLOBAL){
+        fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv. "
+                        "Please refer to the documentation for further info. \n");
+    }
     // leaf 4 (3)
     // filho 1 (0) -> fazer via eval -> -> é loop que termina em eval expr
     // filho 2 (1) -> via eval também  -> são os extras
     char* portName = n->leafs[3];
     Object * domainInfo = eval(n->children[0],scope,controllerSmv);
-    Object* extraInfo = eval(n->children[1],scope,controllerSmv);
+    TDS_TYPE type = domainInfo->type == GEN_LIST ? DATA_LIST : domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
+    TDS* newTDS =  createTDS(portName,type,domainInfo,NULL,0,
+                             type == FUNCTION_APPLY? (char*) domainInfo->values[0] : NULL );
 
-
-
-    return NULL;
+    void* vp[] = {newTDS};
+    char* TDS_BIND = createReferenceTDS(portName);
+    Object* encapsulatedTDS = createObject(TDS_ENTRY,1,vp,-1,TDS_BIND);
+    free(TDS_BIND); // pode parecer "irrelevante" mas é uma garantia, o createObject não cuida do free dos binds. Em especial por causa da cópia de variáveis.
+    return encapsulatedTDS;
 }
 
 Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){

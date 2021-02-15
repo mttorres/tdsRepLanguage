@@ -43,10 +43,16 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 		return pt;
 	}
 	// listas provavelmente também vão apenas referenciar os vários objetos (assim como a time component)
-    if(type == GEN_LIST || type == TIME_COMPONENT && index == 1){
+    if(type == TDS_ENTRY || type == GEN_LIST || type == TIME_COMPONENT && index == 1){
         return value;
     }
-
+    if(newOb->SINTH_BIND){
+        fprintf(stderr, "FAIL IN ALLOCATE VALUES FOR %s ! \n",newOb->SINTH_BIND);
+    }
+    else{
+        fprintf(stderr, "FAIL IN ALLOCATE VALUES FOR CURRENT OBJECT! \n");
+    }
+    exit(-1);
 }	
 
 
@@ -199,8 +205,7 @@ void printObject(Object* o)
 		if(o->type == TDS_ENTRY){
 			// TODO (struct TDS)
 		}
-    }
-    else
+	} else
     {
     	printf("null \n");
     }
@@ -221,7 +226,9 @@ void letgoObject(Object *o)
 			}
 			else if(o->type == TDS_ENTRY)
 			{
-				// TODO PARA TDS
+				//if(always){
+				//    //letGoTDS;
+				//}
 			}
             o->values[i] = NULL;
 		}
@@ -331,6 +338,12 @@ Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT){
         else{
             mergedValues[i] = LEFT_COMPONENT;
         }
+    }
+    // se não for uma componente unica (ou seja, é só uma lista de referências para objetos)
+    if(LEFT_COMPONENT->type == GEN_LIST){
+        // importante (manter bind para saber como referênciar os objetos da lista no nuXmv)
+        //if(LEFT_COMPONENT->SINTH_BIND)
+        free(LEFT_COMPONENT);
     }
     mergedValues[i] = RIGHT_COMPONENT;
     return createObject(selectedType,mergedSize,mergedValues,-1,NULL);

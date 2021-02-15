@@ -145,11 +145,18 @@ Object* refCopyOfVariable(TableEntry* var);
 /**
  * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições
  * @param
- * @sideEffects:  Todos os colaterais de updateAssign ou createAssign
+ * @SideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
 void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
            Object *newValue, int redef, int typeExpr, int C_TIME);
 
+/**
+ * Cria um nome ativo para uma TDS da forma tds_{declaredName}
+ * @param declaredName
+ * @return um bind do nome criado.
+ * @SideEffects: aloca uma string para retornar, tornando responsabilidade do chamador a liberar da memória depois.
+ */
+char* createReferenceTDS(char* declaredName);
 
 /**
  * Para casos de redefinição, libera a entrada anterior dessa variável já que a mesma não será mais referênciada

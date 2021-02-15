@@ -85,6 +85,16 @@ void addTypeSetSmv(char *name, void **any, int object_size, STable *current);
 
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
+/***
+ * Adiciona a referência a um objeto(ED) a uma variável de um dado escopo
+ * @param name o nome da variável
+ * @param DATA_STRUCT a estrutura de dados (VETORES E TDS'S)
+ * @param methodParam  se essa referência é passada como parâmetro ou não (provavelmente útil ao dar free já que dar free e ele existe fora da uma
+ * função implicaria em perda de dados)
+ * @param current o escopo corrente.
+ */
+void addReferenceCurrentScope(char* name, Object* DATA_STRUCT, int methodParam, STable* current);
+
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current);
 
 /*

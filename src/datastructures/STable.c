@@ -469,6 +469,9 @@ void updateValue(char *name, void **any, int any_type, int object_size, int oInd
 
 }
 
+void addReferenceCurrentScope(char* name, Object* DATA_STRUCT, int methodParam, STable* current){
+    addValueCurrentScope(name,DATA_STRUCT,methodParam,current);
+}
 
 
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current) {
