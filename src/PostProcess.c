@@ -1,22 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <TDS.h>
 #include "../headers/PostProcess.h"
 
 
 typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
-                               INTERVAL_DEC, BOOLEAN_DEC ,SET, PAR, TDS_MODULE_NAME } MAP_CONVERSIONS;
+                               INTERVAL_DEC, BOOLEAN_DEC ,SET, V_MODULE_DEC ,PAR, TDS_MODULE_NAME } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s \n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};", "%s, %s", "tds_%s" };
+                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s" };
 
 int  ALOC_SIZE_LINE = 300;
+int  DEFAULT_CASE_SIZE = 30; // 29 +1
 
 
 void copyValueBind(Object* o, char* bind,int index,int defaultValue)
@@ -44,7 +46,9 @@ void copyValueBind(Object* o, char* bind,int index,int defaultValue)
         }
     }
     else{
-
+        // listas vão ser objetos (de tamanho > 1) que guardam objetos
+        Object* listComponent = (Object*) o->values[index];
+        copyValueBind(o,bind,0,defaultValue);
     }
 }
 
@@ -193,10 +197,11 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
 }
 
 
-void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, Object *newValue,
+void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValueBind, Object *newValue,
                 int type)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
+    int pos = header->VAR_POINTER;
     if(type == NUMBER_ENTRY || type == T_DIRECTIVE_ENTRY){
         int valSin = newValue? *(int*) newValue->values[0] : 0;
         int min = 0;
@@ -213,24 +218,44 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
         char* auxFim = strstr(auxDelim,"..");
         int pointIni = (auxDelim-newType+2);
         int pointEnd = ((auxFim-newType))-1;
-        int pos = header->VAR_POINTER;
         int tam = strlen(newType);
 
         void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
         addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
-    if(type == LOGICAL_ENTRY){
+    else if(type == LOGICAL_ENTRY){
         sprintf(newType, SmvConversions[BOOLEAN_DEC], varName, newValueBind, newValueBind);
-        int pos = header->VAR_POINTER;
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
         addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
 
     }
-    if(type == TDS_ENTRY || LABEL_ENTRY)
+    else if(type == TDS_ENTRY || type == LABEL_ENTRY)
     {
-        //void* po[] = {&pos, &tam};
-        //addTypeSetSmv(varName,po,TYPE_SET,2,writeSmvTypeTable);
+        sprintf(newType, SmvConversions[SET], varName, newValueBind);
+        int tam = strlen(newType);
+        int* typeSetHashMap = malloc(sizeof(int)*MAX_SIMPLE);
+        if(type == TDS_ENTRY){
+            int hashNULL = hash("NULL",NULL);
+            int hashZERO = hash("0",NULL);
+            int hashONE = hash("1",NULL);
+            typeSetHashMap[hashNULL] = 1;
+            typeSetHashMap[hashZERO] = 1;
+            typeSetHashMap[hashONE] = 1;
+        }
+        else{
+            typeSetHashMap[hash(newValueBind,NULL)] = 1;
+        }
+        void* po[] = {&pos, &tam,typeSetHashMap};
+        addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
+
+        //addTypeSetSmv(varName,po,TYPE_SET,2,);
+    }
+    else{
+        sprintf(newType,SmvConversions[V_MODULE_DEC],varName,newValueBind);
+        int tam = strlen(newType);
+        void* po[] = {&pos, &tam};
+        addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
     }
     header->varBuffer[header->VAR_POINTER] = newType;
     header->VAR_POINTER += 1;
@@ -355,9 +380,13 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
     header->assignBuffer[header->ASSIGN_POINTER] = exprResultString;
     int pos = header->ASSIGN_POINTER;
     header->ASSIGN_POINTER += 1;
-    //atualiza tabela auxiliar para init/next(var)
-    void* po[] = {&pos, &size,&pointIni,&pointEnd};
-    addValue(exprInterL, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
+
+    //atualiza tabela auxiliar para init/next(var) (se necessário)
+    if(writeSmvTypeTable) {
+        void* po[] = {&pos, &size,&pointIni,&pointEnd};
+        addValue(exprInterL, po, WRITE_SMV_INFO, 4, 0, writeSmvTypeTable, 0);
+    }
+
 }
 
 
@@ -457,7 +486,7 @@ char *processActiveName(STable *currentScope, char *varName, int notExistsOutSco
         }
     }
     else{
-        char interTDS[ALOC_SIZE_LINE];
+       char interTDS[ALOC_SIZE_LINE];
         sprintf(interTDS, SmvConversions[TDS_MODULE_NAME], varName);
         useVar = interTDS;
     }
@@ -579,7 +608,159 @@ char* createReferenceTDS(char* declaredName){
     return processActiveName(NULL,declaredName,-1,-1,TDS_ENTRY);
 }
 
-void specTDS(Object* tds, int C_TIME,HeaderController* controller, STable* currentScope){
+HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int transP, HeaderController* controller){
+    HeaderSmv* newHeader = createHeader(type,name,varP,assignP,transP);
+    addNewHeader(controller,newHeader);
+    selectBuffer(VAR,"VAR\n",newHeader,0);
+    selectBuffer(ASSIGN,"ASSIGN\n",newHeader,0);
+    return newHeader;
+}
+
+void validateTdsDeclaration(char* declarationName, HeaderController* controller){
+    if(lookup(controller->originalPorts,declarationName)){
+        controller->validPorts++;
+    }
+}
+
+void addTdsOnPortsModule(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller){
+    char  declarationNameSmv[ALOC_SIZE_LINE];
+    char  nameWithNoBreakL[ALOC_SIZE_LINE];
+    int c = 0;
+    while(*moduleName != '\n'){
+        nameWithNoBreakL[c] = *moduleName;
+        moduleName++;
+        c++;
+    }
+    nameWithNoBreakL[c] = '\0';
+    char* declarationName = newTDS->name? newTDS->name : newEncapsulatedTDS->SINTH_BIND;
+    createType(declarationName,controller->PORTS_RELATED[0],controller->portsInfo[0],nameWithNoBreakL,NULL,-1);
+    controller->declaredPorts[controller->declaredPortsNumber] = newTDS;
+    controller->declaredPortsNumber++;
+    validateTdsDeclaration(declarationName,controller);
+}
+
+void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller){
+    TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
+    SYNTH_TDS->AUX_REF = controller->PORTS_INFO_CURRENT_SIZE;
+    SYNTH_TDS->SMV_REF = controller->H_PORTS_CURRENT_SIZE;
+    char moduleName[ALOC_SIZE_LINE];
+    sprintf(moduleName,SmvConversions[ANY_BREAK_LINE],encapsulatedTDS->SINTH_BIND);
+    HeaderSmv* newTdsHeader = specHeader(PORTS, moduleName, 0, 0, -1, controller);
+    STable* auxTable = createTable(SMV_PORTS, NULL, 0, 0, -1);
+    addNewAuxInfo(controller,auxTable);
+    createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY);
+    addTdsOnPortsModule(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
+}
+
+void specTDS(char *varName, Object *encapsulatedTDS, int I_TIME, int C_TIME, int F_TIME, HeaderController *controller,
+             STable *currentScope) {
+    HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
+    TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
+    char* valueString = "value";
+    char* defaultConditionEval = "NULL";
+    char* valueOnZero = "NULL"; // para caso a inicialização seja com NULL
+
+    //Object* firstTimeComponent = (Object*) SYNTH_TDS->DATA_TIME->values[0];
+
+
+
+    // testando synth (de ponteiro de funçoes) (tenho que salvar tambem o caminho do programa) (o escopo e controller mudam mas isso nao)
+
+    //Object* valueComponent = (Object*) timeComponent->values[1];
+    //(n,scope,controllerSmv);
+
+
+ /*
+    if(SYNTH_TDS->type == DATA_LIST){
+
+        char result[ALOC_SIZE_LINE];
+        char* parcialResult = malloc(sizeof(ALOC_SIZE_LINE)*sizeof(char));
+
+        char* limitCondition = NULL;
+        int limitedByTime = 0;
+
+        char* components[SYNTH_TDS->DATA_TIME->OBJECT_SIZE]; // N strings. (no caso teste 3)
+
+        int hasZeroTimeComponent = 0;
+        int i;
+
+
+        for (i = 0; i < SYNTH_TDS->DATA_TIME->OBJECT_SIZE; ++i) {
+
+            Object* timeComponent = (Object*) SYNTH_TDS->DATA_TIME->values[1];
+            int time = *(int*) timeComponent->values[0];
+            Object* valueComponent = (Object*) timeComponent->values[1];
+            char timeBind[ALOC_SIZE_LINE];
+            sprintf(timeBind, "%d", time);
+
+
+            // deve dar free
+            char* valueBind = formatValueBind(NULL,NULL,valueComponent,0,0,0);
+
+            if(C_TIME > time){
+                fprintf(stderr, "[WARNING] DATA-LIST-DEFINITION FOR %s IS NOT VALID IN THE CURRENT TEMPORAL CONTEXT.\n CURRENT TIME = %d, USED TIME = %d,",
+                        varName,C_TIME,time);
+                limitedByTime = 1;
+                // alocar limited condition (se já não foi alocada)
+                if(!limitCondition) {
+                    char CtimeBind[ALOC_SIZE_LINE];
+                    sprintf(CtimeBind, "%d", C_TIME);
+                    limitCondition = createConditionCube("next(time)", CtimeBind, "=", NULL, 0);
+                }
+            }
+            if(!hasZeroTimeComponent && time == I_TIME) {
+                hasZeroTimeComponent = 1;
+            }
+            // criar a string de múltiplas condições (lista)
+            else{
+                // deve criar a condição e avaliação
+                char* componentConversion = createConditionCube("next(time)", timeBind, "=", NULL, 0);
+
+                char* conditionCube = limitCondition ?
+                createConditionCube(limitCondition, componentConversion, "&", valueBind, 1) :
+                createConditionCube(componentConversion, "", "", valueBind, 1);
+                free(componentConversion);
+                if(i+1 == SYNTH_TDS->DATA_TIME->OBJECT_SIZE){
+                    sprintf(parcialResult,)
+                }
+                else{
+
+                }
+            }
+
+            else{
+                if(i == 0){
+                    sprintf(assignTo, SmvConversions[INIT], "value");
+                    sprintf(componentBind,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],assignTo,"NULL");
+                }
+                if(time != 0){
+                    char timeBind[ALOC_SIZE_LINE/2];
+                    sprintf(timeBind,"%d",time);
+                    sprintf(assignTo, SmvConversions[NEXT], valueString);
+
+                }
+            }
+
+
+
+                // deve agora condiçao: next(time)
+                char* specifiedCondition = createConditionCube("next(time)", timeBind, "=", NULL, 1);
+
+
+        }
+        // cria init(value) = NULL ou valor;
+        createAssign(valueString,newTdsHeader,NULL,valueOnZero,limitCondition,INIT,"NULL");
+        if(hasZeroTimeComponent && i == 1) {
+            // sub-caso onde só temos a inicialização (e o next deve atribuir como NULL para todos os seguintes)
+            createAssign(valueString,newTdsHeader,NULL,"NULL",NULL,NEXT,"NULL");
+        }
+        else{
+            // caso onde temos (OU NÃO) a zeroTime)
+            // deve criar um next para os demais (fazendo uso de todas as componentes)
+            selectBuffer(ASSIGN,result,newTdsHeader,0);
+        }
+    }
+    */
 
 }
 

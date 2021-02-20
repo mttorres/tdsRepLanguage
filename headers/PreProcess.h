@@ -20,15 +20,6 @@ void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcon
 
 
 /*
-	escolhe um buffer do header atual para salvar a linha (alocando sempre uma string para essa linha, que depois deve ser liberada).
-	efeitos colaterais:  * ao ter readVarPortsModule como true, ele salva as variáveis do portsModule em uma tabela de portas
-						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
-
-*/
-void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename);
-
-
-/*
 	prepara para chamar a função de escolha de buffer, t
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 

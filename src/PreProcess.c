@@ -17,67 +17,6 @@ void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcon
     addNewHeader(Hcontrol,newHeader);
 }
 
-
-void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename) {
-	int pt;
-	int tam = strlen(line);
-	char* aloc = malloc((tam+1) * sizeof(char));
-	if(part != TRANS)
-	{
-		if(part == VAR) 
-		{
-
-            if(header->type == AUTOMATA || (header->type == MAIN && header->VAR_POINTER != header->VAR_RENAME_POINTER) ){
-
-                char* ref = strstr(line,"(");
-                if(ref){
-                    ref = overwriteParam(line,"ports");
-                    strcpy(aloc,ref);
-                    free(ref);
-                }
-                else{
-                    strcpy(aloc,line);
-                }
-            }else{
-                strcpy(aloc,line);
-            }
-            pt = header->VAR_POINTER;
-            header->varBuffer[pt] = aloc;
-            header->VAR_POINTER += 1;
-		}
-		if(part == ASSIGN) 
-		{
-            strcpy(aloc,line);
-			pt = header->ASSIGN_POINTER;
-			header->assignBuffer[pt] = aloc;
-			header->ASSIGN_POINTER += 1;
-		}
-	}
-	else
-	{
-		pt = header->TRANS_POINTER;
-		if(!controlRename)
-		{
-			strcpy(aloc,line);
-			header->transBuffer[pt] = aloc;
-		}
-		else
-		{
-			//char** bufferAux = clearOldPortsRefs(line); 
-			//printf("[selectBuffer] tratamento de rename refs a portsModule ANTES:%s\n\n",line);
-			//strcpy(aloc,bufferAux);
-			clearOldPortsRefs(line,aloc);
-			header->transBuffer[pt] = aloc;
-			//printf("[selectBuffer] tratamento de rename refs a portsModule DEPOIS:%s\n\n",header->transBuffer[pt]);			
-			//if(bufferAux){
-			//	free(bufferAux);	
-			//}
-		}
-		header->TRANS_POINTER += 1;
-
-	}
-}
-
 /*
 	prepara para chamar a função de escolha de buffer, t
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
@@ -278,6 +217,7 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
    				else 
    				{
    					break; // não precisa mais ler(vai ser lido da arvore)
+   					addNewAuxInfo(Hcontrol,createTable(SMV_PORTS,NULL,0,0,-1));
    				}
    				
 

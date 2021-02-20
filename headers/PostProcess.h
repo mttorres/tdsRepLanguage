@@ -166,6 +166,26 @@ char* createReferenceTDS(char* declaredName);
  * */
 void letGoOldEntry(TableEntry* var, STable* auxTable);
 
+/**
+ * Processa uma TDS para criar o seu equivalente nuXmv em módulo. Além disso, cria sua tabela auxiliar e Header.
+ * @param encapsulatedTDS
+ * @param controller
+ * @SideEffects: Aloca um Header e o salva no controller nas ports. Aloca uma tabela de simbolos para esse módulo.
+ * Essas devem ser liberadas assim como as outras.
+ */
+
+void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller);
+
+/**
+ * Define um módulo smv para a TDS associada ao parâmetro. Recupera as informações da encapsulatedTDS avaliada, seus dados, seu header,
+ * seu conjunto de tipos esperados (NULL é o default os demais são retirados dos dados).
+ * @param encapsulatedTDS o objeto TDS encapsulado.
+ * @param C_TIME o contexto temporal atual, usado para criar condições de inicialização para essa TDS.
+ * @param controller o controller para conseguir realizar a escrita.
+ * @param currentScope o escopo corrente usado para outras passagens necessárias de informação.
+ */
+void specTDS(char *varName, Object *encapsulatedTDS, int I_TIME, int C_TIME, int F_TIME, HeaderController *controller,
+             STable *currentScope);
 
 void writeResultantHeaders(HeaderController* controller, const char* path);
 

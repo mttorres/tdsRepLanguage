@@ -64,6 +64,13 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
     }
 }
 
+// avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
+
+// deve chamar isso também ao FIM DO PROGRAMA
+void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv){
+    //specTDS(varName, expr, I_TIME, C_TIME, F_TIME, controllerSmv, scope);
+}
+
 Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
@@ -684,6 +691,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
          *       void* vp[] = {v};
          * */
         // só fazer isso se eu tiver dado malloc em v!
+        // antes de realizar a mudança, devemos dar commit da TDS!
+        commitCurrentTime(scope,controllerSmv);
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         letgoObject(expr);
@@ -770,8 +779,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
             if(!var)
             {
                 if(expr->type == TDS_ENTRY){
-                    specTDS(,C_TIME,)
+                    //TableEntry* ftimeEntry = lookup(scope,"F_TIME");
+                    //int F_TIME = *(int*)ftimeEntry->val->values[0];
+                    preProcessTDS(expr,controllerSmv);
                 }
+                addReferenceCurrentScope(varName,expr,0,scope);
             }
 
 /*            Node* ref = n->children[0]->children[0];
@@ -844,14 +856,15 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* control
         fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv. "
                         "Please refer to the documentation for further info. \n");
     }
-    // leaf 4 (3)
-    // filho 1 (0) -> fazer via eval -> -> é loop que termina em eval expr
-    // filho 2 (1) -> via eval também  -> são os extras
     char* portName = n->leafs[3];
     Object * domainInfo = eval(n->children[0],scope,controllerSmv);
     TDS_TYPE type = domainInfo->type == GEN_LIST ? DATA_LIST : domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
-    TDS* newTDS =  createTDS(portName,type,domainInfo,NULL,0,
-                             type == FUNCTION_APPLY? (char*) domainInfo->values[0] : NULL );
+
+    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
+    int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
+
+    TDS* newTDS = createTDS(portName, type, domainInfo, NULL, 0,
+                            type == FUNCTION_APPLY ? (char *) domainInfo->values[0] : NULL, C_TIME, F_TIME);
 
     void* vp[] = {newTDS};
     char* TDS_BIND = createReferenceTDS(portName);
@@ -866,13 +879,16 @@ Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* control
 
 Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){
 
-    Object* SYNTH =  eval(n->children[0],scope,controllerSmv);
-    if(SYNTH->OBJECT_SIZE > 1){
+    //Object* (*SYNTH) (Node*, STable*, HeaderController*) = eval;
+    Node* PROGRAM_PATH = n->children[0];
+/*    if(SYNTH->OBJECT_SIZE > 1){
         fprintf(stderr, "TDS data per time not compatible with lists. Please reffer to the documentation for further info. \n");
         exit(-1);
     }
+    // VALIDAR NO PARSER? Ou na hora de sintetizar o que vei odessa time_component?
+*/
     int TIME = atoi(n->leafs[0]);
-    void* TC[] = {&TIME,SYNTH};
+    void* TC[] = {&TIME,PROGRAM_PATH};
     Object* SYNTH_TIME_COMPONENT = createObject(TIME_COMPONENT,2,TC,-1,NULL);
     return SYNTH_TIME_COMPONENT;
 }
@@ -939,6 +955,10 @@ Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
                 for (i=0; i < n->nchild; i++){
                     eval(n->children[i],scope,controllerSmv);
                 }
+            }
+            if(n->type == PROG){
+                // terminou
+                commitCurrentTime(scope,controllerSmv);
             }
         }
         return SYNTH_O;

@@ -42,7 +42,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 		printf("[allocatePtObjects - labelVariants] valor: %s (%d)\n",pt,type);
 		return pt;
 	}
-	// listas provavelmente também vão apenas referenciar os vários objetos (assim como a time component)
+	// listas e estruturas complexas também vão apenas referenciar os vários objetos (assim como a time component)
     if(type == TDS_ENTRY || type == GEN_LIST || type == TIME_COMPONENT && index == 1){
         return value;
     }
@@ -219,12 +219,13 @@ void letgoObject(Object *o)
 		int i;
 		for (i = 0; i < o->OBJECT_SIZE; i++)
 		{
-			if(o->type != TYPE_SET || i < 2)
-			{
+			//if(o->type != TYPE_SET || i < 2)
+			//{
 			    free(o->values[i]);  // usar o free da tabela de simbolos para i == 3 (em outra localidade anteriormente)
 			                         // na chamada anterior
-			}
-			else if(o->type == TDS_ENTRY)
+			//}
+			//else
+			if(o->type == TDS_ENTRY)
 			{
 				//if(always){
 				//    //letGoTDS;

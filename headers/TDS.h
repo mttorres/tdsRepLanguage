@@ -26,12 +26,19 @@ typedef struct TDS
   // senão usar VOID 
   void ** values; // delayed? passar lista "alternada?", ou usar object?
 
+  int I_INTERVAL;
+  int F_INTERVAL;
+  int* COMPONENT_TIMES;
+  int AUX_REF; // devemos ter duas referências porque a tabela de simbolos auxiliar NÃO É USADA POR PORTS MODULE.
+  int SMV_REF; // por outro lado, os HEADERS SÃO USADOS POR AMBOS!
+
 
 
 } TDS;
 
 // passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
-TDS* createTDS(char* name, TDS_TYPE type, Object* valueList, Object* linkedTDSs, int delayed, char* functionRef);
+TDS *createTDS(char *name, TDS_TYPE type, Object *valueList, Object *linkedTDSs, int delayed, char *functionRef,
+               int I_INTERVAL, int F_INTERVAL);
 
 void* letGoTDS(struct TDS* tds);
 

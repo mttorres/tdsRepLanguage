@@ -5,6 +5,7 @@
 #include "Enum.h"
 #include "STable.h"
 #include "textManager.h"
+#include "TDS.h"
 
 typedef enum headerpart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2} headerpart;
 
@@ -27,7 +28,7 @@ HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int t
 void letgoHeader(HeaderSmv* h);
 
 
-typedef struct headerController
+typedef struct envcontroller
 {
     HeaderSmv* MAIN;
     HeaderSmv** AUTOMATA_RELATED;
@@ -37,15 +38,18 @@ typedef struct headerController
     int H_FUNCTION_CURRENT_SIZE;
     int H_AUTOMATA_CURRENT_SIZE;
     int H_PORTS_CURRENT_SIZE;
+    int PORTS_INFO_CURRENT_SIZE;
 
     STable* mainInfo; // tabela de simbolos auxiliar para main
-    //STable** portsInfo; // para cada tds (talvez não va precisar, a lógica vai estar TODA nas funções ou nele mesmo (de maneira constante)
+    STable** portsInfo; // para cada tds (talvez não va precisar, a lógica vai estar TODA nas funções ou nele mesmo (de maneira constante)
     STable** functionsInfo; // para cada função
 
     STable* originalPorts; // tabela de simbolos auxiliar para ports (necessária?) (só vai ter o módulo de cada porta) (pode ser na verdade para as portas declaradas)
     int expectedPorts;
+    int validPorts;
     // ai ele verifica se foram usadas (não tem declarações de funções)
-    int declaredPorts;
+    int declaredPortsNumber;
+    TDS** declaredPorts;
 
 
 }HeaderController;
@@ -115,6 +119,22 @@ STable* accessSmvInfo(HeaderController* controller, smvtype cat, int SMV_INFO_ID
  * @param o novo header retornado por createHeader
  */
 void addNewHeader(HeaderController* controller, HeaderSmv* newHeader);
+
+/**
+ * Adiciona uma nova tabela de simbolos auxiliar ao controller encapsulando suas operações e categorizando apropriadamente
+ * @param o controller
+ * @param a nova tabela de simbolos auxiliar retornada por retornado por createTable
+ */
+void addNewAuxInfo(HeaderController* controller, STable* newTableInfo);
+
+/*
+	escolhe um buffer do header atual para salvar a linha (alocando sempre uma string para essa linha, que depois deve ser liberada).
+	efeitos colaterais:  * ao ter readVarPortsModule como true, ele salva as variáveis do portsModule em uma tabela de portas
+						 * ao ter controlRename como true, ele remove todas as ocorrências de determinados caracteres (no caso [])
+
+*/
+void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename);
+
 
 /**
  * Adiciona um novo parâmetro a portModule, e resolve as depêndencias nos demais módulos main e automato.

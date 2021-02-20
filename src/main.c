@@ -85,14 +85,22 @@ int main(int argc, char* argv[]) {
 
     printAllHeaders(controller);
 
- 	if(controller->declaredPorts != controller->expectedPorts){
+ 	if(controller->declaredPortsNumber != controller->expectedPorts){
  	    printf("\n");
- 	    if(!controller->declaredPorts){
-            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER NO TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
+ 	    if(!controller->declaredPortsNumber){
+            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, NO TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
  	    }
  	    else{
-            fprintf(stderr,"[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER ONLY %d PORTS WERE DECLARED. %d PORTS WERE EXPECTED \n",
-                    controller->declaredPorts,controller->expectedPorts);
+ 	        if(controller->validPorts != controller->expectedPorts){
+ 	            if(controller->validPorts){
+                    fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED ONLY %d of %d PORTS WERE COMPLIANT TO THE ORIGINAL MODEL. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n ",
+                            controller->declaredPortsNumber, controller->validPorts,controller->expectedPorts);
+                }
+ 	            else{
+                    fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED NONE WERE COMPLIANT TO THE ORIGINAL MODEL. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n ",
+                            controller->declaredPortsNumber);
+ 	            }
+ 	        }
  	    }
  	}
  	writeResultantHeaders(controller,"results/newSmvfile.smv");

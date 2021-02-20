@@ -125,6 +125,14 @@ void letGoHeadersStruct(HeaderController *H) {
             }
         }
     }
+    if(H->portsInfo){
+        int i;
+        for (i=0; i < H->PORTS_INFO_CURRENT_SIZE; i++){
+            if(H->portsInfo[i]){
+                letgoTable(H->portsInfo[i]);
+            }
+        }
+    }
     //letgoTable(H->portsInfo);
     letgoTable(H->originalPorts);
     free(H);
@@ -137,17 +145,13 @@ HeaderController *createController() {
     HeaderController* Hcontrol = malloc(sizeof(HeaderController));
     Hcontrol->H_AUTOMATA_CURRENT_SIZE = 0;
     Hcontrol->H_PORTS_CURRENT_SIZE = 0;
+    Hcontrol->PORTS_INFO_CURRENT_SIZE = 0;
     Hcontrol->H_FUNCTION_CURRENT_SIZE = 0;
 
     Hcontrol->originalPorts = createTable(SMV_PORTS, NULL, 0, 0, -1);
     Hcontrol->mainInfo = createTable(SMV_V_MAIN, NULL, 0, 0, -1);
     Hcontrol->functionsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_SIZE);
-    int i;
-    for (i = 0; i < DEFAULT_HEADERS_SIZE; i++) {
-        Hcontrol->functionsInfo[i] = NULL;
-    }
-
-    //Hcontrol->portsInfo =  createTable(SMV_PORTS,NULL,0,0);
+    Hcontrol->portsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_SIZE);
 
     Hcontrol->MAIN = NULL;
     Hcontrol->AUTOMATA_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
@@ -155,7 +159,20 @@ HeaderController *createController() {
     Hcontrol->FUNCTIONS = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
 
     Hcontrol->expectedPorts = 0;
-    Hcontrol->declaredPorts= 0;
+    Hcontrol->validPorts = 0;
+    Hcontrol->declaredPortsNumber= 0;
+    Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_SIZE); // NULL até sabermos o intervalo de tempo
+
+
+    int i;
+    for (i = 0; i < DEFAULT_HEADERS_SIZE; i++) {
+        Hcontrol->functionsInfo[i] = NULL;
+        Hcontrol->portsInfo[i] =  NULL;
+        Hcontrol->AUTOMATA_RELATED[i] = NULL;
+        Hcontrol->PORTS_RELATED[i] = NULL;
+        Hcontrol->FUNCTIONS[i] = NULL;
+    }
+
     return Hcontrol;
 }
 
@@ -225,7 +242,7 @@ void printHeader(HeaderSmv* h) {
  	}
 
 // 	if(h->type == PORTS){
-// 		printf("ports: %s\n",h->declaredPorts[0]);
+// 		printf("ports: %s\n",h->declaredPortsNumber[0]);
 // 	}
 
 	char* tiposBuffers[] = {
@@ -309,12 +326,12 @@ STable* accessSmvInfo(HeaderController* controller, smvtype cat, int SMV_INFO_ID
     if(cat == MAIN){
         return controller->mainInfo;
     }
-    if(SMV_INFO_ID > 0  && SMV_INFO_ID < controller->H_FUNCTION_CURRENT_SIZE  && cat == FUNCTION_SMV){
-        return controller->functionsInfo[SMV_INFO_ID];
+    if(SMV_INFO_ID < controller->H_FUNCTION_CURRENT_SIZE  && cat == FUNCTION_SMV){
+        return SMV_INFO_ID > 0? controller->functionsInfo[SMV_INFO_ID] : controller->functionsInfo[controller->H_FUNCTION_CURRENT_SIZE-1];
     }
-//  if(cat == PORTS){
-//        return controller->portsInfo;
-//  }
+    if(SMV_INFO_ID < controller->H_PORTS_CURRENT_SIZE && cat == PORTS){
+      return SMV_INFO_ID > 0? controller->portsInfo[SMV_INFO_ID] : controller->portsInfo[controller->PORTS_INFO_CURRENT_SIZE-1];
+   }
     if(cat == AUTOMATA){
         return NULL; // melhorar, apesar que sabe-se que não tem operação em tabela de simbolos para automato (por enquanto)
     }
@@ -338,6 +355,67 @@ void addNewHeader(HeaderController* controller, HeaderSmv* newHeader){
     if(newHeader->type == FUNCTION_SMV ){
         controller->FUNCTIONS[controller->H_FUNCTION_CURRENT_SIZE] = newHeader;
         controller->H_FUNCTION_CURRENT_SIZE++;
+    }
+}
+
+void addNewAuxInfo(HeaderController* controller, STable* newTableInfo){
+    if(newTableInfo->type == SMV_PORTS){
+        controller->portsInfo[controller->PORTS_INFO_CURRENT_SIZE] = newTableInfo;
+        controller->PORTS_INFO_CURRENT_SIZE++;
+    }
+}
+
+
+void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename) {
+    int pt;
+    int tam = strlen(line);
+    char* aloc = malloc((tam+1) * sizeof(char));
+    if(part != TRANS)
+    {
+        if(part == VAR)
+        {
+
+            if(header->type == AUTOMATA || (header->type == MAIN && header->VAR_POINTER != header->VAR_RENAME_POINTER) ){
+
+                char* ref = strstr(line,"(");
+                if(ref){
+                    ref = overwriteParam(line,"ports");
+                    strcpy(aloc,ref);
+                    free(ref);
+                }
+                else{
+                    strcpy(aloc,line);
+                }
+            }else{
+                strcpy(aloc,line);
+            }
+            pt = header->VAR_POINTER;
+            header->varBuffer[pt] = aloc;
+            header->VAR_POINTER += 1;
+        }
+        if(part == ASSIGN)
+        {
+            strcpy(aloc,line);
+            pt = header->ASSIGN_POINTER;
+            header->assignBuffer[pt] = aloc;
+            header->ASSIGN_POINTER += 1;
+        }
+    }
+    else
+    {
+        pt = header->TRANS_POINTER;
+        if(!controlRename)
+        {
+            strcpy(aloc,line);
+            header->transBuffer[pt] = aloc;
+        }
+        else
+        {
+            clearOldPortsRefs(line,aloc);
+            header->transBuffer[pt] = aloc;
+        }
+        header->TRANS_POINTER += 1;
+
     }
 }
 
