@@ -105,5 +105,11 @@ INVAR
 
 MODULE portsModule(time)
 VAR 
+	a : tds_a(time);
+ASSIGN
+
+tds_a(time)
+VAR
+	value : {NULL, 0, 1};
 ASSIGN
 
