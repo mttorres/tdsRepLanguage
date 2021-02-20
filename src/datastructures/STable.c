@@ -116,8 +116,8 @@ STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int i
 	}
 */
 
-	int selectSize =  type == SIMPLE_HASH || type == SMV_PORTS ?  MAX_SIMPLE : MAX_TABLE;
-    newtable->usedSize = selectSize;
+
+
 
 /*
 	if(type == SIMPLE_HASH)
@@ -130,12 +130,12 @@ STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int i
 	}
 */
 	
-	newtable->tableData = (TableEntry**) malloc(selectSize*sizeof(TableEntry*));
+	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
 	
 	
 	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
 	int i;
-	for (i = 0; i < selectSize; i++)
+	for (i = 0; i < MAX_TABLE; i++)
 	{
 		newtable->tableData[i] = NULL;	
 	}
@@ -193,9 +193,9 @@ void letgoEntry(TableEntry *e) {
 	}
 	if(e->val)
 	{
-	    if(e->val->type == TYPE_SET){
-            letgoTable((STable *) e->val->values[2]);
-	    }
+	    //if(e->val->type == TYPE_SET){
+        //    letgoTable((STable *) e->val->values[2]);
+	    //}
         letgoObject(e->val);
 	}
 	free(e);
@@ -241,9 +241,9 @@ void letgoTable(STable *t)
 int hash(char * str, STable* t) {
 	int hash = 401;
 	int c;
-	int SIZE_FOR_HASH = t->collision ? t->collision : t->usedSize;
-	
-	if(t->collision)
+	int SIZE_FOR_HASH = t && t->collision ? t->collision : MAX_TABLE;
+
+	if(t && t->collision)
 	{
 		printf("[hash] collision : (%d) \n",SIZE_FOR_HASH);
 	}

@@ -7,7 +7,7 @@
 
 #define  MAX_TABLE 950
 
-#define MAX_SIMPLE 100
+#define MAX_SIMPLE 200
 
 #define  MAX_CHILD 150
 
@@ -43,7 +43,6 @@ typedef struct S_TABLE
   int backup;
   int collision;
   int notEvaluated;
-  int usedSize;
   int childOfFunction;
   int indexRef;
 } STable;
