@@ -88,7 +88,7 @@ int main(int argc, char* argv[]) {
  	if(controller->declaredPortsNumber != controller->expectedPorts){
  	    printf("\n");
  	    if(!controller->declaredPortsNumber){
-            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, NO TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
+            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, NO VALID TDS DEFINITION WAS FOUND \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE \n");
  	    }
  	    else{
  	        if(controller->validPorts != controller->expectedPorts){

@@ -622,7 +622,51 @@ void validateTdsDeclaration(char* declarationName, HeaderController* controller)
     }
 }
 
-void addTdsOnPortsModule(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller){
+int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, int C_TIME, int I_TIME, int F_TIME){
+    int someIsValidToLazy = 0; // nenhum é valido = 0 , algum é valido = 1,  -1 a gente pode falar que algum é valido mas o primeiro é invalid (C_TIME = 0)
+    int initialIsInvalid = 0;
+    int i;
+    for (i = 0; i < newTDS->DATA_TIME->OBJECT_SIZE; i++){
+        Object* timeComponent = (Object*) newTDS->DATA_TIME->values[i];
+        int time = *(int*) timeComponent->values[0];
+        if(time < C_TIME){
+            fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined on a C_TIME  >= %d context!  \n",
+                    encapsulatedTDS->SINTH_BIND,time,C_TIME);
+            initialIsInvalid = time == 0? 1 : initialIsInvalid;
+        }
+        else if(time < I_TIME || time > F_TIME){
+            fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined out of the model time interval: %d ~ %d  \n",
+                    encapsulatedTDS->SINTH_BIND,time,I_TIME,F_TIME);
+        }
+        else{
+            if(!someIsValidToLazy){
+                someIsValidToLazy = 1;
+            }
+            newTDS->COMPONENT_TIMES[time] = i;
+        }
+    }
+    if(initialIsInvalid && someIsValidToLazy){
+        someIsValidToLazy = -1; // senão vai ficar como 0 (então TODOS são invalidos)
+    }
+    return someIsValidToLazy;
+}
+
+void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME,  int I_TIME, int F_TIME){
+    int addToLazy = newTDS->type != DATA_LIST? 1: validateTdsTimeList(encapsulatedTDS,newTDS,C_TIME, I_TIME,F_TIME);
+    if(addToLazy){
+        // só o inicial é invalido
+        if(addToLazy == -1){
+            createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"NULL",NULL,INIT,NULL);
+        }
+        controller->declaredPorts[controller->declaredPortsNumber] = newTDS;
+        controller->declaredPortsNumber++;
+    }else{
+        createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"NULL",NULL,INIT,NULL);
+        createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"value",NULL,NEXT,NULL);
+    }
+}
+
+void addTdsOnPortsModule(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME,  int I_TIME, int F_TIME){
     char  declarationNameSmv[ALOC_SIZE_LINE];
     char  nameWithNoBreakL[ALOC_SIZE_LINE];
     int c = 0;
@@ -634,12 +678,11 @@ void addTdsOnPortsModule(char* moduleName, Object * newEncapsulatedTDS, TDS* new
     nameWithNoBreakL[c] = '\0';
     char* declarationName = newTDS->name? newTDS->name : newEncapsulatedTDS->SINTH_BIND;
     createType(declarationName,controller->PORTS_RELATED[0],controller->portsInfo[0],nameWithNoBreakL,NULL,-1);
-    controller->declaredPorts[controller->declaredPortsNumber] = newTDS;
-    controller->declaredPortsNumber++;
+    addTdsToLazyControl(newEncapsulatedTDS,newTDS,controller,C_TIME,I_TIME,F_TIME);
     validateTdsDeclaration(declarationName,controller);
 }
 
-void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller){
+void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME){
     TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
     SYNTH_TDS->AUX_REF = controller->PORTS_INFO_CURRENT_SIZE;
     SYNTH_TDS->SMV_REF = controller->H_PORTS_CURRENT_SIZE;
@@ -649,16 +692,36 @@ void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller){
     STable* auxTable = createTable(SMV_PORTS, NULL, 0, 0, -1);
     addNewAuxInfo(controller,auxTable);
     createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY);
-    addTdsOnPortsModule(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
+    addTdsOnPortsModule(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller,C_TIME, I_TIME, F_TIME);
 }
 
-void specTDS(char *varName, Object *encapsulatedTDS, int I_TIME, int C_TIME, int F_TIME, HeaderController *controller,
-             STable *currentScope) {
-    HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
-    TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
-    char* valueString = "value";
-    char* defaultConditionEval = "NULL";
-    char* valueOnZero = "NULL"; // para caso a inicialização seja com NULL
+void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderController *controller, STable *currentScope) {
+
+    //HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
+    //TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
+    HeaderSmv *currentHeader = accessHeader(controller, PORTS, currentTDS->SMV_REF);
+    STable *currentInfo = accessSmvInfo(controller, PORTS, currentTDS->AUX_REF);
+    if (currentTDS->type == DATA_LIST) {
+        if (C_TIME == I_TIME) {
+            createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, NULL, INIT, NULL);
+        } else {
+            char *conditionCube = NULL;
+            char *directiveValueBind = formatDirective(C_TIME);
+            if (lookup(currentInfo, "next(value)")) {
+                conditionCube = formatCondtion(currentScope, 0, 0, lazyValue->SINTH_BIND, directiveValueBind, 0);
+                updateAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, TDS_ENTRY, NEXT,
+                             -1);
+            } else {
+                conditionCube = formatCondtion(currentScope, 0, 0, lazyValue->SINTH_BIND, directiveValueBind, 1);
+                createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL");
+            }
+        }
+    }
+
+}
+//    char* valueString = "value";
+//    char* defaultConditionEval = "NULL";
+//    char* valueOnZero = "NULL"; // para caso a inicialização seja com NULL
 
     //Object* firstTimeComponent = (Object*) SYNTH_TDS->DATA_TIME->values[0];
 
@@ -762,7 +825,7 @@ void specTDS(char *varName, Object *encapsulatedTDS, int I_TIME, int C_TIME, int
     }
     */
 
-}
+
 
 /*
 void letGoOldEntry(TableEntry* var, STable* refAuxTable){

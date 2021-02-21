@@ -66,9 +66,33 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
 
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
-// deve chamar isso também ao FIM DO PROGRAMA
+// deve chamar isso também ao FIM DO PROGRAMA (para cada CHAMADA RESTANTE, ex: C_TIME terminou em 4, deve chamar até F_TIME (5, ... , F_TIME).
 void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv){
-    //specTDS(varName, expr, I_TIME, C_TIME, F_TIME, controllerSmv, scope);
+    // deve resolver a avaliação para cada TDS.
+    int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
+    int I_TIME = *(int*) lookup(currentScope,"I_TIME")->val->values[0];
+    int i;
+    Node* PROGRAM_PATH = NULL;
+    Object* lazyValue = NULL;
+    for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
+        // resolve call-by-need cada expressão ativa da TDS.
+        TDS* currentTDS = controllerSmv->declaredPorts[i];
+        if(currentTDS->type == DATA_LIST){
+            // eval de forma que ele deve saber qual componente temporal ele deve pegar
+            if(currentTDS->COMPONENT_TIMES[C_TIME]){
+                Object* timeComponent = (Object*) currentTDS->DATA_TIME->values[currentTDS->COMPONENT_TIMES[C_TIME]];
+                PROGRAM_PATH = (Node*) timeComponent->values[1];
+                lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
+                specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+            }
+        }else{
+            // eval da forma "valor unico" (é uma operação call-by need em contexto de escopo)
+            lazyValue = NULL;
+            PROGRAM_PATH = NULL; // por enquanto
+            specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+        }
+
+    }
 }
 
 Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controllerSmv) = {
@@ -85,7 +109,7 @@ Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv)
     sint = atoi(n->leafs[0]);
     printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, NULL);
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0]);
     return o;
 }
 
@@ -691,8 +715,10 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
          *       void* vp[] = {v};
          * */
         // só fazer isso se eu tiver dado malloc em v!
-        // antes de realizar a mudança, devemos dar commit da TDS!
-        commitCurrentTime(scope,controllerSmv);
+        // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
+        if(*(int*) expr->values[0] != C_TIME){
+            commitCurrentTime(scope,controllerSmv);
+        }
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         letgoObject(expr);
@@ -779,9 +805,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
             if(!var)
             {
                 if(expr->type == TDS_ENTRY){
-                    //TableEntry* ftimeEntry = lookup(scope,"F_TIME");
-                    //int F_TIME = *(int*)ftimeEntry->val->values[0];
-                    preProcessTDS(expr,controllerSmv);
+                    int F_TIME = *(int*)lookup(scope,"F_TIME")->val->values[0];
+                    preProcessTDS(expr,controllerSmv,C_TIME,I_TIME,F_TIME);
                 }
                 addReferenceCurrentScope(varName,expr,0,scope);
             }

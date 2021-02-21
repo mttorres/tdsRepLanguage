@@ -30,10 +30,15 @@ C_TIME = 2
 
 y = 5
 
+tdsA = {
+	portname : 'a',
+	data-time: {0: 0, 1: 1, 2: 0, 21:4}
+}
 
 C_TIME = 3
 
 x = -1 // corrigido
+
 
 C_TIME = 4
 
@@ -42,9 +47,9 @@ zelda = false
 z = true
 
 if(not zelda){
-   w = 1
+   w = true
    y = 2
-   if(z){
+   if(w){
       u = false
    }
 }
@@ -53,7 +58,4 @@ else{
 }
 
 
-//tdsA = {
-//	portname : 'a',
-//	data-time: {0: 0, 1: 1, 2: 0}
-//}
+
