@@ -296,6 +296,10 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 
 	 | LPAREN params RPAREN anonimtdsop ID {
 
+        if($2->nchild > 1 && $4->type == TDS_ANON_OP_D_PASS){
+                fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
+                exit(-1);
+        }
 		Node* cmd = createNode(9,2,3,"CMD -  Comando (criação TDS-anonima)",  CMD_TDS_ANON ,$2,$4,  $1,$3,$5); 
 		//infoNode($$);
 		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
@@ -776,6 +780,12 @@ extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
 	
 	   	 	Node* extra;
 	   	 	if($7){
+	   	 	    // NOVA VALIDAÇÃO DE PARSING:
+	   	 	    Node* synth_params = $5;
+	   	 	    if(synth_params->nchild > 1){
+                   fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option not valid for multiples inputs! \n");
+                   exit(-1);
+	   	 	    }
 	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5,$7,  $1,$2,$3,$4,$6);
 	   	 	}
 	   	 	else {

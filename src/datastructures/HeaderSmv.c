@@ -161,6 +161,7 @@ HeaderController *createController() {
     Hcontrol->expectedPorts = 0;
     Hcontrol->validPorts = 0;
     Hcontrol->declaredPortsNumber= 0;
+    Hcontrol->IO_RELATION = 0;
     Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_SIZE); // NULL até sabermos o intervalo de tempo
 
 

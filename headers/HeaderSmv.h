@@ -51,6 +51,9 @@ typedef struct envcontroller
     int declaredPortsNumber;
     TDS** declaredPorts;
 
+    // avisa caso não tenha nenhuma TDS linkada uma com a outra
+    int IO_RELATION;
+
 
 }HeaderController;
 
