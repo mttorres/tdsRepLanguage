@@ -241,7 +241,7 @@ void letgoTable(STable *t)
 int hash(char * str, STable* t) {
 	int hash = 401;
 	int c;
-	int SIZE_FOR_HASH = t && t->collision ? t->collision : MAX_TABLE;
+	int SIZE_FOR_HASH = t && t->collision ? t->collision : !t ? MAX_SIMPLE : MAX_TABLE;
 
 	if(t && t->collision)
 	{

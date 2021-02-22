@@ -20,15 +20,23 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d
 int  ALOC_SIZE_LINE = 300;
 int  DEFAULT_CASE_SIZE = 30; // 29 +1
 
-
-void copyValueBind(Object* o, char* bind,int index,int defaultValue)
+/**
+ *
+ * @param o
+ * @param bind
+ * @param index
+ * @param defaultValue
+ * @param valueNotRef serve para quando atualizarmos um type-set (só considera os valores possíveis).
+ * Assim, a conversão não vai pegar o nome da variável ou a expressão e sim o resultado
+ */
+void copyValueBind(Object *o, char *bind, int index, int defaultValue, int valueNotRef)
 {
     char* formatS = "%s";
     char* formatN = "%d";
     char* formatRef = "%s[%d]";
 
     if(!index) {
-        if (o->SINTH_BIND) {
+        if (!defaultValue && o->SINTH_BIND && !valueNotRef) {
             sprintf(bind, formatS, o->SINTH_BIND);
         } else {
             if (o->type == NUMBER_ENTRY || o->type == T_DIRECTIVE_ENTRY) {
@@ -48,7 +56,7 @@ void copyValueBind(Object* o, char* bind,int index,int defaultValue)
     else{
         // listas vão ser objetos (de tamanho > 1) que guardam objetos
         Object* listComponent = (Object*) o->values[index];
-        copyValueBind(o,bind,0,defaultValue);
+        copyValueBind(o, bind, 0, defaultValue, 0);
     }
 }
 
@@ -160,7 +168,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
                   Object *expr, STable *scope, int firstCondition, int initVar, int ignoreTemporal, int ignoreCond) {
 
     sprintf(directiveValueBind, "%d", ctime); // SINTH_BIND da diretiva temporal corrente
-    copyValueBind(expr,valueBind,0,0); // SINTH_BIND da expressão, pode variar para vetores e estruturas complexas
+    copyValueBind(expr, valueBind, 0, 0, 0); // SINTH_BIND da expressão, pode variar para vetores e estruturas complexas
 
     char* condition = !ignoreCond &&  (scope->type == IF_BLOCK || scope->type == ELSE_BLOCK) ? scope->conditionBind : NULL; // SINTH_BIND do escopo
     // SINTH_BIND da condição temporal, ex: "next(time) = 2"
@@ -185,7 +193,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
 
     // "otimização" para criar o caso default, se necessário
     if(initVar){
-        copyValueBind(expr,defaultValueBind,0,1);
+        copyValueBind(expr, defaultValueBind, 0, 1, 0);
     }
     // o default vai ser ele mesmo (usado depois na criação de expressão)
     else{
@@ -234,7 +242,11 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     {
         sprintf(newType, SmvConversions[SET], varName, newValueBind);
         int tam = strlen(newType);
-        int* typeSetHashMap = malloc(sizeof(int)*MAX_SIMPLE);
+        int* typeSetHashMap = malloc(sizeof(int)*MAX_SIMPLE); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
+        int i;
+        for (i = 0; i < MAX_SIMPLE; i++) {
+            typeSetHashMap[i] = 0;
+        }
         if(type == TDS_ENTRY){
             int hashNULL = hash("NULL",NULL);
             int hashZERO = hash("0",NULL);
@@ -248,10 +260,9 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
         }
         void* po[] = {&pos, &tam,typeSetHashMap};
         addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
-
-        //addTypeSetSmv(varName,po,TYPE_SET,2,);
     }
     else{
+        // cria uma variável que é instancia de modulo nuXmv
         sprintf(newType,SmvConversions[V_MODULE_DEC],varName,newValueBind);
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
@@ -261,8 +272,8 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     header->VAR_POINTER += 1;
 }
 
-void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, int type, int minmax,
-                Object *newValueNumber)
+void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type, int minmax,
+                Object *newValue)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
@@ -283,7 +294,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
 
             int newPointIni = 0;
             int newPointEnd = 0;
-            int sizeNew = strlen(newValue);
+            int sizeNew = strlen(newValueBind);
             // min..max;
             if(minmax)
             {
@@ -292,7 +303,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
                 pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
                 //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
             }
-            updateSubStringInterval(newValue, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
+            updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
                                     &newPointEnd, 0);
             size = -1*((pointEnd-pointIni+1) - sizeNew) + size;
             void* vpSize[] = {&size};
@@ -303,22 +314,38 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
             {
                 void* vpInEnd[] = {&newPointEnd};
                 updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
-                int min = newValueNumber? *(int*) newValueNumber->values[0] : 0;
+                int min = newValue ? *(int*) newValue->values[0] : 0;
                 void* vpmin[] = {&min};
                 updateValue(varName, vpmin, WRITE_SMV_INFO, 1, 4, -1, writeSmvTypeTable, 0);
             }
             else{
-                int max = newValueNumber? *(int*) newValueNumber->values[0] : 1;
+                int max = newValue ? *(int*) newValue->values[0] : 1;
                 void* vpmax[] = {&max};
                 updateValue(varName, vpmax, WRITE_SMV_INFO, 1, 5, -1, writeSmvTypeTable, 0);
             }
         }
-        else{
-            printf("[updateType] WARNING: type of %s not declared on headers \n",varName);
-        }
+//        else{
+//            printf("[updateType] WARNING: type of %s not declared on headers \n",varName);
+//        }
     }
-    if(type == LOGICAL_ENTRY){
-        // não faz nada
+    if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY){
+        char rawValueBind[ALOC_SIZE_LINE/2];
+        copyValueBind(newValue,rawValueBind,0,0,1);
+        TableEntry* entryTypeSetInfo;
+        entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
+        int pos = *(int*) entryTypeSetInfo->val->values[0];
+        int size = *(int*) entryTypeSetInfo->val->values[1];
+        int* hash_set = (int*) entryTypeSetInfo->val->values[2];
+
+        int hashForNewValue = hash(rawValueBind,NULL);
+        if(!hash_set[hashForNewValue]) {
+            hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
+            char* original = header->varBuffer[pos];
+            char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
+            char* newTypeSet = addParams(original,rawValueBind,"{","}");
+            header->varBuffer[pos] = newTypeSet;
+            free(original);
+        }
     }
 }
 // quebrar em spec next e spec init
@@ -502,7 +529,7 @@ char *formatValueBind(char *varName, STable *parentScope, Object *expr, int inde
     }
     else{
         char* valueBind = malloc(sizeof(char)*ALOC_SIZE_LINE);
-        copyValueBind(expr,valueBind,index,isDefault);
+        copyValueBind(expr, valueBind, index, isDefault, 0);
         return valueBind;
     }
 }
@@ -717,6 +744,17 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
             }
         }
     }
+    // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
+    else{
+        // se essa TDS já foi avaliada, senão...
+        if(currentTDS){
+
+        }
+        else{
+
+        }
+    }
+    updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,-1,lazyValue);
 
 }
 //    char* valueString = "value";

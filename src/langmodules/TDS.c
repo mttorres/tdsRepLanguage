@@ -20,7 +20,7 @@ TDS *createTDS(char *name, TDS_TYPE type, Object *valueList, Object *linkedTDSs,
     if(newTDS->COMPONENT_TIMES){
         int i;
         for (i = 0; i < F_INTERVAL; i++) {
-            newTDS->COMPONENT_TIMES[i] = 0;
+            newTDS->COMPONENT_TIMES[i] = -1;
         }
     }
 

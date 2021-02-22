@@ -21,7 +21,7 @@
  * @SideEffects Aletra o conteúdo em memória vindo de SINTH_BIND
  *
  * */
-void copyValueBind(Object* o, char* bind,int index,int defaultValue);
+void copyValueBind(Object *o, char *bind, int index, int defaultValue, int valueNotRef);
 
 
 /*

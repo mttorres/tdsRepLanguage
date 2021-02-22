@@ -66,20 +66,18 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
 
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
-// deve chamar isso também ao FIM DO PROGRAMA (para cada CHAMADA RESTANTE, ex: C_TIME terminou em 4, deve chamar até F_TIME (5, ... , F_TIME).
-void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv){
-    // deve resolver a avaliação para cada TDS.
-    int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
-    int I_TIME = *(int*) lookup(currentScope,"I_TIME")->val->values[0];
-    int i;
+
+void resolveTdsLazyEvaluation(STable *currentScope, HeaderController *controllerSmv, int C_TIME) {
+    int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
     Node* PROGRAM_PATH = NULL;
     Object* lazyValue = NULL;
+    int i;
     for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
         // resolve call-by-need cada expressão ativa da TDS.
         TDS* currentTDS = controllerSmv->declaredPorts[i];
         if(currentTDS->type == DATA_LIST){
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
-            if(currentTDS->COMPONENT_TIMES[C_TIME]){
+            if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
                 Object* timeComponent = (Object*) currentTDS->DATA_TIME->values[currentTDS->COMPONENT_TIMES[C_TIME]];
                 PROGRAM_PATH = (Node*) timeComponent->values[1];
                 lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
@@ -92,6 +90,19 @@ void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv){
             specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
         }
 
+    }
+}
+
+// CASO FORA DE FLUXO 1: e se ele "pular", ex: commitar c_time = 2 (quando era 0 antes), ele pulou o 1! A gente deve ver a "diferença"
+// CHAMAR ESSA FUNÇÃO DIFERENÇA VEZES.
+// CASO FORA DE FLUXO 2: deve chamar isso também ao FIM DO PROGRAMA (para cada CHAMADA RESTANTE, ex: C_TIME terminou em 4, deve chamar até F_TIME (5, ... , F_TIME).
+// DIFERENÇA VEZES DE NOVO!
+void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv, int changedTo){
+    // deve resolver a avaliação para cada TDS "n" vezes. Antes do proximo intervalo ou fim do programa.
+    int i;
+    int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
+    for (i = C_TIME; i < changedTo; i++) {
+        resolveTdsLazyEvaluation(currentScope, controllerSmv, i);
     }
 }
 
@@ -717,7 +728,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         // só fazer isso se eu tiver dado malloc em v!
         // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
         if(*(int*) expr->values[0] != C_TIME){
-            commitCurrentTime(scope,controllerSmv);
+            commitCurrentTime(scope,controllerSmv,*(int*) expr->values[0]);
         }
         void* vp[] = {expr->values[0]};
         updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
@@ -983,7 +994,8 @@ Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
             }
             if(n->type == PROG){
                 // terminou
-                commitCurrentTime(scope,controllerSmv);
+                int F_TIME = *(int*) lookup(scope,"F_TIME")->val->values[0];
+                commitCurrentTime(scope,controllerSmv,F_TIME);
             }
         }
         return SYNTH_O;
