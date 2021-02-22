@@ -18,6 +18,7 @@ Object* evalNULL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalIDVAR(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalTIME_DIRECTIVE(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalDataV(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object* evalPARAMS(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalPARAMS_CALL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalAC_V(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSmv);
@@ -31,6 +32,7 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv);
 
 Object* eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv);
 
@@ -108,9 +110,9 @@ void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv, in
 
 Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controllerSmv) = {
 
-        evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalDEFINE_INTERVAL ,evalAC_V,
+        evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalPARAMS ,evalDEFINE_INTERVAL ,evalAC_V,
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF,
-        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT
+        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, evalANON_TDS, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT
 };
 
 
@@ -261,6 +263,11 @@ Object* evalDataV(Node* n, STable* scope,  HeaderController* controllerSmv)
 }
 
 Object* evalPARAMS_CALL(Node* n, STable* scope,  HeaderController* controllerSmv)
+{
+    printf("[evalPARAMS_CALL] \n");
+}
+
+Object* evalPARAMS(Node* n, STable* scope,  HeaderController* controllerSmv)
 {
     printf("[evalPARAMS_CALL] \n");
 }
@@ -907,6 +914,11 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* control
     Object* encapsulatedTDS = createObject(TDS_ENTRY,1,vp,-1,TDS_BIND);
     free(TDS_BIND); // pode parecer "irrelevante" mas é uma garantia, o createObject não cuida do free dos binds. Em especial por causa da cópia de variáveis.
     return encapsulatedTDS;
+}
+
+Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
+    //printf("teste \n %d",n->type == CMD_TDS_ANON);
+    //Object* SYNTH_OBJECT = evalIDVAR() // VAI TER QUE CHAMAR O ITERATOR! que nem antes só que para PARAM!
 }
 
 Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){

@@ -295,8 +295,7 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	 // jogar para nó mais abaixo a operação para avaliar antes de toda a expressão!
 
 	 | LPAREN params RPAREN anonimtdsop ID {
-
-        if($2->nchild > 1 && $4->type == TDS_ANON_OP_D_PASS){
+        if($2->type != PARAM && $4->type == TDS_ANON_OP_DPASS){
                 fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
                 exit(-1);
         }
