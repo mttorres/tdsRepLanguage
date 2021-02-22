@@ -21,6 +21,11 @@ if(zelda){
    }
 }
 
+tdsA = {
+	portname : 'a',
+	data-time: {0: 0, 1: 1, 2: 2, 21:4}
+}
+
 C_TIME = 2
 
 x = 4 //redef =1 , context =2
@@ -30,10 +35,6 @@ C_TIME = 2
 
 y = 5
 
-tdsA = {
-	portname : 'a',
-	data-time: {0: 0, 1: 1, 2: 0, 21:4}
-}
 
 C_TIME = 3
 
