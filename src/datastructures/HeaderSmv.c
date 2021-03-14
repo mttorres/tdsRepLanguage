@@ -370,7 +370,7 @@ void addNewAuxInfo(HeaderController* controller, STable* newTableInfo){
 void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename) {
     int pt;
     int tam = strlen(line);
-    char* aloc = malloc((tam+1) * sizeof(char));
+    char* aloc = malloc((tam+2) * sizeof(char)); //  o +2 é estritamente para acomodar tamanho extra do buffer
     if(part != TRANS)
     {
         if(part == VAR)
@@ -381,7 +381,7 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
                 char* ref = strstr(line,"(");
                 if(ref){
                     ref = overwriteParam(line,"ports");
-                    strcpy(aloc,ref);
+                    strcpy(aloc,ref); // CUIDADO, strcpy copia mesmo que o buffer dest não tenha tamanho  o suficiente
                     free(ref);
                 }
                 else{
