@@ -120,8 +120,8 @@ void processPorts(char* buffer, char* varString, char *fVarString, int stage, He
         void* po[] = {&used};
         char name[] = {buffer[1],'\0'};
         addValue(name,po,LOGICAL_ENTRY,1,0,Hcontrol->originalPorts,-1);
+        Hcontrol->expectedPorts++;
     }
-    Hcontrol->expectedPorts++;
 }
 
 void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
@@ -216,8 +216,8 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
    				}
    				else 
    				{
+                    addNewAuxInfo(Hcontrol,createTable(SMV_PORTS,NULL,0,0,-1));
    					break; // não precisa mais ler(vai ser lido da arvore)
-   					addNewAuxInfo(Hcontrol,createTable(SMV_PORTS,NULL,0,0,-1));
    				}
    				
 
