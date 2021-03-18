@@ -36,6 +36,10 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 
 }
 
+void removeAfter(char* dest, char* src, char stop){
+    customCat(dest,src,stop,0);
+}
+
 void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
 
     int removedCharacters = 0;
@@ -179,11 +183,26 @@ void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, i
 
 
 char* overwriteParam(char* moduleName, char* param){
-    char* refOldPt;
-    refOldPt = strstr(moduleName,"(");
-    memset(refOldPt, '\n', 1);
-    refOldPt++;
-    memset(refOldPt, '\0', strlen(refOldPt));
-    return addParams(moduleName,param,"(",")");
+    char* refOldPt = moduleName;
+    char moduleNameNoParam[strlen(moduleName)];
+    char* refModuleNameNoParam = moduleNameNoParam;
+    //refOldPt = strstr(moduleName,"(");
+    while(*refOldPt != '('){
+        *refModuleNameNoParam = *refOldPt;
+        refOldPt++;
+        refModuleNameNoParam++;
+    }
+    if(moduleName[strlen(moduleName)-2] == ';'){
+        *refModuleNameNoParam = ';';
+        refModuleNameNoParam++;
+    }
+    *refModuleNameNoParam = '\n';
+    refModuleNameNoParam++;
+    *refModuleNameNoParam = '\0';
+
+    //memset(refOldPt, '\n', 1);
+    //refOldPt++;
+    //memset(refOldPt, '\0', strlen(refOldPt));
+    return addParams(moduleNameNoParam,param,"(",")");
 }
 
