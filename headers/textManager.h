@@ -76,4 +76,14 @@ void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, i
  * */
 char* overwriteParam(char* moduleName, char* param);
 
+/**
+ * Recebendo uma String dest como parâmetro, para evitar a responsabiliddade de retornar uma alocada (podemos inclusive mudar isso nos demais métodos)
+ * copia dados de src para ela até um determinado caracter de parada
+ * @param dest a string destino alocada ou não fora desse método (tenha em mente que a string NÃO PODE SER READ ONLY)
+ * @param src a string a qual iremos copiar
+ * @param stop o caracter onde pararemos a copia.
+ * @SideEffects: Copia caracteres para dest, se é alocado ou não é responsabilidade de quem chamar a função
+ */
+void removeAfter(char* dest, char* src, char stop);
+
 #endif
