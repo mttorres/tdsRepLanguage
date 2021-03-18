@@ -5,7 +5,7 @@
 
 
 
-HeaderSmv* createHeader(int type, char* moduleName, int varP, int assignP, int transP) {
+HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assignP, int transP) {
 
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
 
@@ -162,6 +162,7 @@ HeaderController *createController() {
     Hcontrol->validPorts = 0;
     Hcontrol->declaredPortsNumber= 0;
     Hcontrol->IO_RELATION = 0;
+    Hcontrol->multiPortDeclartion = 0;
     Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_SIZE); // NULL até sabermos o intervalo de tempo
 
 
