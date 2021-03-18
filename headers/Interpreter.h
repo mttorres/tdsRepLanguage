@@ -6,9 +6,7 @@
 
 #define INTERP_H
 
-#include "textManager.h"
-#include "HeaderSmv.h"
-#include "STable.h"
+#include "PostProcess.h"
 #include "Node.h"
 #include "Object.h"
 

@@ -4,13 +4,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <TDS.h>
-#include "../headers/PostProcess.h"
+#include "../headers/Interpreter.h"
 
 typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
-Object *eval(Node *n, STable *scope,  HeaderController *controllerSmv);
+
 Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalBOOL(Node* n, STable* scope,  HeaderController* controllerSmv);
 Object* evalSTRING(Node* n, STable* scope,  HeaderController* controllerSmv);
@@ -69,6 +68,28 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
 
+/**
+ * Resolve a dependencia de todas as TDS's associadas a TDS corrente durante a avaliação lazy
+ * @param currentTDS a TDS corrente
+ * @param controllerSmv o controller usado para atualizar o type-set das TDS's dependentes.
+ * @param C_TIME para indexar o data-time correto
+ */
+void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_TIME );
+
+void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_TIME){
+    int i;
+    for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
+        currentTDS->linkedDependent[i]->DATA_TIME[C_TIME] = currentTDS->DATA_TIME[C_TIME];
+        propagateTypeSet(currentTDS,currentTDS->linkedDependent[i],controllerSmv,C_TIME);
+    }
+}
+
+/**
+ * Resolve a avaliação lazy das TDS's pendentes após uma mudança de contexto temporal. E salva seus dados para Memoization.
+ * @param currentScope o escopo atual
+ * @param controllerSmv o controlador de ambiente
+ * @param C_TIME o contexto temporal atual
+ */
 void resolveTdsLazyEvaluation(STable *currentScope, HeaderController *controllerSmv, int C_TIME) {
     int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
     Node* PROGRAM_PATH = NULL;
@@ -80,13 +101,24 @@ void resolveTdsLazyEvaluation(STable *currentScope, HeaderController *controller
         if(currentTDS->type == DATA_LIST){
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
             if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
-                Object* timeComponent = (Object*) currentTDS->DATA_TIME->values[currentTDS->COMPONENT_TIMES[C_TIME]];
+                Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
                 PROGRAM_PATH = (Node*) timeComponent->values[1];
                 lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
                 specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+                currentTDS->DATA_TIME[C_TIME] = lazyValue;
+                // deve agora verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
+                if(currentTDS->TOTAL_DEPENDENTS_PT){
+                    resolveDependencies(currentTDS,controllerSmv,C_TIME);
+                }
             }
         }else{
+            // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
+            if(currentTDS->type != TDS_DEPEN){
+                // FAZ O PROCESSO
+            }
             // eval da forma "valor unico" (é uma operação call-by need em contexto de escopo)
+            // não necessita olhar indice por tempo no DATA_SPEC
+            //lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
             lazyValue = NULL;
             PROGRAM_PATH = NULL; // por enquanto
             specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
@@ -587,12 +619,12 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope,  HeaderController* con
             fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
             exit(-1);
         }
-        printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
+       // printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
         return expr;
     }
 
     char* propName;
-    printf("[evalProp] VARIAVEL pos prop %d \n",propName);
+    //printf("[evalProp] VARIAVEL pos prop %d \n",propName);
     return NULL;
 
 }
@@ -822,10 +854,6 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
             }
             if(!var)
             {
-                if(expr->type == TDS_ENTRY){
-                    int F_TIME = *(int*)lookup(scope,"F_TIME")->val->values[0];
-                    preProcessTDS(expr,controllerSmv,C_TIME,I_TIME,F_TIME);
-                }
                 addReferenceCurrentScope(varName,expr,0,scope);
             }
 
@@ -892,34 +920,111 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
     return NULL;
 }
 
+/**
+ *
+ * @param n o nó passado para resolução de dependências
+ * @param portName o nome da porta da tds
+ * @param scope o escopo corrente
+ * @param newTDS a nova TDS
+ * @param controller o controlador de ambiente
+ * @param I_TIME a diretiva de tempo inicial
+ * @param C_TIME a diretiva de tempo corrente
+ * @return a TDS com as dependencias computadas
+ * @SideEffects: Aloca e posições no vetor de dependências de uma TDS se for necessário
+ */
+TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, HeaderController* controller, int I_TIME, int C_TIME){
+    Object * dependenceList = eval(n->children[0],scope,controller);
+    Object * DEP_HEAD = dependenceList->OBJECT_SIZE > 1 ? dependenceList->values[0] : NULL;
+    if(DEP_HEAD && DEP_HEAD->type == TDS_ENTRY || dependenceList->type == TDS_ENTRY) {
+        if (n->children[1]->type == TDS_ANON_OP_PASS && dependenceList->OBJECT_SIZE > 2) {
+            fprintf(stderr,
+                    "[WARNING] %s definition uses more than 2 inputs.\nIt is recommended to check the input model, for instance, reo2nuXmv only generates merge-like connections with at most 2 inputs  \n",
+                    portName);
+        }
+        if(C_TIME > I_TIME){
+            fprintf(stderr, "[WARNING] %s uses a temporal condition to initialization.\nIt is recommended to review your specification. This behaviour is usually acceptable in case the modeled port is lossy (eg: LossySync)\n",
+                    portName);
+        }
+
+    }
+    else{
+        fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, %s is not receiving input from another TDS! \n",portName);
+        exit(-1);
+    }
+
+    TDS** SYNTH_DEPENDENCY_LIST = malloc(sizeof(TDS*)*dependenceList->OBJECT_SIZE);
+    if(dependenceList->OBJECT_SIZE > 1){
+        int i;
+        for (i = 0; i < dependenceList->OBJECT_SIZE; i++) {
+            TDS* DEPENDENCY = (TDS*) dependenceList->values[i];
+            SYNTH_DEPENDENCY_LIST[i] = DEPENDENCY;
+            addTdsDependent(DEPENDENCY,newTDS);
+        }
+    }
+    else{
+        addTdsDependent(dependenceList->values[0],newTDS);
+        SYNTH_DEPENDENCY_LIST[0] = (TDS*) dependenceList->values[0];
+    }
+    controller->IO_RELATION = 1;
+
+    return SYNTH_DEPENDENCY_LIST;
+}
+
+/**
+ * Real as operaçoes basicas envolvidas em quaisquer declaraçoes de TDS's. Dentre elas, alocaçao da estrutura,
+ * consulta das diretivas temporais, sintetização de binds e, se necessário, resolução de dependências.
+ * @param pathForDepen o path para se resolver uma dependência, isto é o dos nós mais abaixo da AST
+ * @param portName o nome da porta
+ * @param type o tipo da TDS para enumeraçao
+ * @param tdsSpec o objeto que representa a especificaçao da TDS
+ * @param delayed o parametro delayed de uma TDS
+ * @param scope o scopo corrente
+ * @param controller o controlador de ambiente
+ * @return um objeto sintetizado com a TDS criada.
+ * @SideEffects: Aloca uma TDS, e posições no vetor de dependências de uma TDS se for necessário
+ */
+Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, HeaderController* controller){
+    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
+    int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
+    int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
+
+    TDS* newTDS = createTDS(portName,type,tdsSpec,delayed,
+                        type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL,C_TIME,F_TIME);
+    TDS** SYNTH_DEP = NULL;
+    if(type == TDS_DEPEN){
+        SYNTH_DEP =  computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
+    }
+
+    void* vp[] = {newTDS};
+    char* TDS_BIND = createReferenceTDS(portName);
+    Object* encapsulatedTDS = createObjectDS(TDS_ENTRY,1,vp,C_TIME,TDS_BIND,0);
+    free(TDS_BIND); // pode parecer "irrelevante" mas é uma garantia, o createObject não cuida do free dos binds. Em especial por causa da cópia de variáveis.
+    preProcessTDS(encapsulatedTDS,controller,C_TIME,I_TIME,F_TIME,SYNTH_DEP);
+    return encapsulatedTDS;
+}
 
 Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
 
     if(scope->type != GLOBAL){
-        fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv. "
-                        "Please refer to the documentation for further info. \n");
+        fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv.\nPlease refer to the documentation for further info. \n");
     }
     char* portName = n->leafs[3];
     Object * domainInfo = eval(n->children[0],scope,controllerSmv);
-    TDS_TYPE type = domainInfo->type == GEN_LIST ? DATA_LIST : domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
-
-    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
-    int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
-
-    TDS* newTDS = createTDS(portName, type, domainInfo, NULL, 0,
-                            type == FUNCTION_APPLY ? (char *) domainInfo->values[0] : NULL, C_TIME, F_TIME);
-
-    void* vp[] = {newTDS};
-    char* TDS_BIND = createReferenceTDS(portName);
-    Object* encapsulatedTDS = createObject(TDS_ENTRY,1,vp,-1,TDS_BIND);
-    free(TDS_BIND); // pode parecer "irrelevante" mas é uma garantia, o createObject não cuida do free dos binds. Em especial por causa da cópia de variáveis.
-    return encapsulatedTDS;
+    TDS_TYPE type =  domainInfo->type == TIME_COMPONENT? DATA_LIST :
+            domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
+    return computeTDSBasicOperations(NULL,portName,type,domainInfo,0,scope,controllerSmv);
 }
 
 Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
     //printf("teste \n %d",n->type == CMD_TDS_ANON);
     //Object* SYNTH_OBJECT = evalIDVAR() // VAI TER QUE CHAMAR O ITERATOR! que nem antes só que para PARAM!
+    Object* encapsulatedTDS = computeTDSBasicOperations(n,n->leafs[2],TDS_DEPEN,NULL,
+                                                        n->children[1]->type == TDS_ANON_OP_DPASS,scope,controllerSmv);
+    TDS* newTDS = encapsulatedTDS->values[0];
+    addReferenceCurrentScope(newTDS->name,encapsulatedTDS,0,scope);
+    return encapsulatedTDS;
 }
+
 
 Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){
     return NULL;
@@ -933,11 +1038,12 @@ Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* 
         fprintf(stderr, "TDS data per time not compatible with lists. Please reffer to the documentation for further info. \n");
         exit(-1);
     }
-    // VALIDAR NO PARSER? Ou na hora de sintetizar o que vei odessa time_component?
+    // VALIDAR NO PARSER? Ou na hora de sintetizar o que veio dessa time_component?
 */
-    int TIME = atoi(n->leafs[0]);
-    void* TC[] = {&TIME,PROGRAM_PATH};
-    Object* SYNTH_TIME_COMPONENT = createObject(TIME_COMPONENT,2,TC,-1,NULL);
+    int* TIME = malloc(sizeof(int));
+    *TIME = atoi(n->leafs[0]);
+    void* TC[] = {TIME,PROGRAM_PATH};
+    Object* SYNTH_TIME_COMPONENT = createObjectDS(TIME_COMPONENT,2,TC,-1,NULL,0);
     return SYNTH_TIME_COMPONENT;
 }
 
@@ -973,8 +1079,10 @@ Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv)
         // note que essa estrutura deve ser construida em um método generico
         return MERGED;
     }
-
-    return NULL;
+    else{
+        Object * HEAD = eval(n->children[0],scope,controllerSmv);
+        return HEAD;
+    }
 }
 
 Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
