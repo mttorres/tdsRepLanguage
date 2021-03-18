@@ -66,6 +66,7 @@ INTERVAL                {yylval.sval = strdup(yytext); return INTERVAL;}
 I_TIME					{yylval.sval = strdup(yytext); return INITTIME;}
 C_TIME		    		{yylval.sval = strdup(yytext); return CURRENTTIME;}
 F_TIME		    		{yylval.sval = strdup(yytext); return FINALTIME;}
+TO                      {yylval.sval = strdup(yytext); return TO;}
 '        	            {yylval.sval = strdup(yytext); return PLICK;}
 linked              	{yylval.sval = strdup(yytext); return LINKED;}
 data-time           	{yylval.sval = strdup(yytext); return DATATIME;}

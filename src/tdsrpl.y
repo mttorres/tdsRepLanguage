@@ -99,6 +99,7 @@
 %type <ast> cmd
 %type <ast> functiondefs 
 %type <ast> functiondef
+%type <ast> param
 %type <ast> params
 %type <ast> data
 %type <ast> otherstmt
@@ -257,16 +258,17 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE cmds  RBRACE  {
 		;
 
 
+param: ID {
+    Node* params = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
+    $$ = params;
+}
 
-params: ID {
-		
-			Node* params = createNode(5,0,1,"parametro da definição de função", PARAM, $1);
-			$$ = params; 		
-
+params: param {
+			$$ = $1;
 		}
-	    | params COMMA ID {
+	    | params COMMA param {
 			
-			Node* params = createNode(7,1,2,"Paramslist - lista de parâmetros a mais de uma função ", PARAMS , $1, $2,$3);
+			Node* params = createNode(7,1,2,"Paramslist - lista de parâmetros a mais de uma função ", LIST_ITERATOR , $1, $2,$3);
 			$$ = params; 	
 	    }
 
@@ -295,7 +297,7 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	 // jogar para nó mais abaixo a operação para avaliar antes de toda a expressão!
 
 	 | LPAREN params RPAREN anonimtdsop ID {
-        if($2->type != PARAM && $4->type == TDS_ANON_OP_DPASS){
+        if($2->type != IDVAR && $4->type == TDS_ANON_OP_DPASS){
                 fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
                 exit(-1);
         }
@@ -379,6 +381,10 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 	 | RETURN expr {
 	    	Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
         	$$ = optionalreturn;
+	 }
+	 | CURRENTTIME TO expr {
+			Node* data = createNode(5,1,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);
+			$$ = data;
 	 }
 	 ;
 
@@ -680,7 +686,7 @@ variabledata: LBRACE PORTNAME COLON PLICK ID PLICK COMMA DATATIME COLON LBRACE d
 		}
 		| LBRACE PORTNAME COLON PLICK ID PLICK extras RBRACE {
 			
-			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TD_DEF_DEPEN ,$7,  $1,$2,$3,$5,$8);
+			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TDS_DEF_DEPEN ,$7,  $1,$2,$3,$5,$8);
 			$$ = tdsformat;
 		
 		}
