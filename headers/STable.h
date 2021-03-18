@@ -4,10 +4,9 @@
 
 #include "Enum.h"
 #include "Object.h"
+#include "Hash.h"
 
 #define  MAX_TABLE 950
-
-#define MAX_SIMPLE 200
 
 #define  MAX_CHILD 150
 
@@ -63,7 +62,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type);
 
     Após isso tenta novamente inserir  param :e
 
-    efeitos colaterais: muda comportamento da função hash e chama insert novamente para param :e
+    efeitos colaterais: muda comportamento da função calculateHashPos e chama insert novamente para param :e
 
 */
 void redistributeHashs(STable* t, TableEntry* e);
@@ -73,14 +72,6 @@ void redistributeHashs(STable* t, TableEntry* e);
   Efeitos colaterais: chama lookup para a variavel na tabela de controle (current) e lookup para o tipo na tabela* da tupla (indice, tamanho, tabela*) 
 */
 int checkTypeSet(STable* current, char* name,  char* typeid);
-
-/*
-  Adiciona um tipo para o "conjunto de tipos das variáveis" para otimizar a escrita no arquivo SMV.
-  Efeitos colaterais: chama addValue para a tabela* da tupla (indice, tamanho, tabela*)
-*/
-void addEntryToTypeSet(STable* current, char* name, char* typeid); 
-
-void addTypeSetSmv(char *name, void **any, int object_size, STable *current);
 
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext);
 
@@ -107,7 +98,7 @@ void printTable(STable* t);
 
 void letgoTable(STable *t);
 
-int hash(char * str, STable* t);
+int calculateHashPos(char * str, STable* t);
 
 void insert(STable* t, TableEntry* e); 
 
@@ -133,7 +124,7 @@ void letgoEntry(TableEntry *e);
  * Porque desse método? Caso seja necessário "economizar entradas" antes do fim da execução, ele limpa os valores da tabela (NULL)
  * @param a tabela a liberar os dados
  * @param name o nome da variável
- * @SideEffects chama o letGoEntry original e seta o table->data[hash] = NULL
+ * @SideEffects chama o letGoEntry original e seta o table->data[calculateHashPos] = NULL
  * */
 void letGoEntryByName(STable* table, char* name);
 

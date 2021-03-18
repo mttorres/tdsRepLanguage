@@ -2,7 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../headers/STable.h"
-#include "../../headers/constants.h"
 
 
 const char* mappingEnumTable[] =  {
@@ -65,7 +64,7 @@ void printEntry(TableEntry* e) {
 		printObject(e->val);	
 		if(e->val->type == TYPE_SET)
 		{
-			printTable((STable*)e->val->values[2]);
+			//printTable((STable*)e->val->values[2]);
 		}
 		printf(")");
 		printf("\n");
@@ -122,7 +121,7 @@ STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int i
 /*
 	if(type == SIMPLE_HASH)
 	{
-		printf("[createTable] criando simple hash \n\n");
+		printf("[createTable] criando simple calculateHashPos \n\n");
 	}
 	else
 	{
@@ -178,7 +177,7 @@ void printTable(STable* t){
 }
 
 void letGoEntryByName(STable* table, char* name){
-    int index = hash(name,table);
+    int index = calculateHashPos(name, table);
     letgoEntry(table->tableData[index]);
     table->tableData[index] = NULL;
 }
@@ -234,26 +233,26 @@ void letgoTable(STable *t)
 }
 
 
-
-
-
-
-int hash(char * str, STable* t) {
+int hash(char* str, int SIZE_ED){
 	int hash = 401;
-	int c;
-	int SIZE_FOR_HASH = t && t->collision ? t->collision : !t ? MAX_SIMPLE : MAX_TABLE;
-
-	if(t && t->collision)
-	{
-		printf("[hash] collision : (%d) \n",SIZE_FOR_HASH);
-	}
-
 	while (*str != '\0') {
-		hash = ((hash << 4) + (int)(*str)) % SIZE_FOR_HASH;
+		hash = ((hash << 4) + (int)(*str)) % SIZE_ED;
 		str++;
 	}
+	return hash % SIZE_ED;
+}
 
-	return hash % SIZE_FOR_HASH;
+
+
+
+int calculateHashPos(char * str, STable* t) {
+
+	int SIZE_FOR_HASH = t && t->collision ? t->collision : MAX_TABLE;
+	if(t && t->collision)
+	{
+		printf("[calculateHashPos] collision : (%d) \n",SIZE_FOR_HASH);
+	}
+	return hash(str,SIZE_FOR_HASH);
 }
 
 
@@ -279,7 +278,7 @@ void redistributeHashs(STable* t, TableEntry* e)
 	{
 		if(t->tableData[i])
 		{
-			int index = hash(t->tableData[i]->name,t);
+			int index = calculateHashPos(t->tableData[i]->name, t);
 			printf("[redistributeHashs] new index (%s) %d \n",t->tableData[i]->name,index);
 			newTableData[index] = t->tableData[i];
 		}
@@ -298,7 +297,7 @@ void redistributeHashs(STable* t, TableEntry* e)
 
 void insert(STable* t, TableEntry* e) {
     
-    int index = hash(e->name,t);
+    int index = calculateHashPos(e->name, t);
     printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
     
     if(lookup(t,e->name))
@@ -319,7 +318,7 @@ void insert(STable* t, TableEntry* e) {
 
 TableEntry* lookup(STable* t, char* name) {
     
-    int index = hash(name,t);
+    int index = calculateHashPos(name, t);
     TableEntry* e = t->tableData[index];
     if(e)
     {
@@ -339,79 +338,6 @@ TableEntry* lookup(STable* t, char* name) {
    	return e;
 }
 
-
-int checkTypeSet(STable* current, char* name,  char* typeid)
-{
-	// procura a variável em questão na tabela do SMV
-	TableEntry* entry = lookup(current,name);
-	if(entry)
-	{
-		// procura o tipo
-		if(lookup(entry->val->values[2],typeid))
-		{
-			printf("[checkTypeSet] %s encontrado no conjunto da variável %s \n",typeid,name);
-			return 0;
-		}
-		printf("[checkTypeSet] %s não existe no conjunto da variável %s \n",typeid,name);
-		// poderiamos chamar o método add aqui né ? (problemas: efeitos colaterais demais de uma só vez (atrapalha debug, lembre-se do print haha))
-		return 1;
-	}
-}
-
-
-/*
-	Adiciona um tipo para o "conjunto de tipos das variáveis" 
-	para otimizar a escrita no arquivo SMV.
-	
-*/
-void addEntryToTypeSet(STable* current, char* name, char* typeid) 
-{
-	TableEntry* entry = lookup(current,name);
-	if(entry)
-	{
-		int present = 1;
-		void* po = {&present};
-        addValue(typeid, po, LOGICAL_ENTRY, 1, 0, entry->val->values[2], 0);
-	}
-}
-
-
-
-// método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto)) 
-/*
-
-	Objeto:  vetor dinamico[inteirosDoConjunto], nullable, vetor dinamico[labelsDoConjunto]
-
-	Prós: Menos structs para alocar,não tem que alocar uma TABELA INTEIRA só para alguns valores, 
-	a linguagem possui poucos tipos (atualmente: int, label, boolean(FALSE E TRUE são só enums no nuXmv),
-	e tds (que na verdade retorna qualquer um dos tipos anteriores))
-
-	Cons:  Outro objeto (mais coisas para dar free), 
-		   "quebaria" o conceito de hashmap que é justamente não ter duplicata, ia ser um objeto só para checar algumas coisas
-		    Toda vez que adicionar um tipo novo necessita alterar essa estrutura
-
-	Hashmap: estrutura que já temos atualmente, teria pelo menos umas 5 entras (talvez mais ou menos)
-
-		Pŕos: Não necessita criar mais nada,  não precisa alocar vetores (indexa pela string em qualquer caso),
-			  aberto para novos tipos (indexa pela string)
-
-		Cons:  Vai ficar uma estrutura "recursiva" tabela --x entradas--> entradaSmv(porta ou main) --> Objeto(iHeader,size,
-																											tabela ---y entradas--->entradas --> Objeto(bool))
-				Mais coisas para centralizar e dar free
- 
-
-*/
-void addTypeSetSmv(char *name, void **any, int object_size, STable *current)
-{
-	printf("[addTypeSetSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
-	STable* hashset = createTable(SIMPLE_HASH, NULL, 0, 0, -1);
-
-	void* po[] = {any[0], any[1], hashset};
-
-	printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
-
-    addValue(name, po, TYPE_SET, object_size + 1, 0, current, 0);
-}
 
 void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
 
@@ -442,10 +368,7 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
 
-	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
-
-	// POR ENQUANTO:
-
+	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ?
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
