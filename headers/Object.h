@@ -8,18 +8,40 @@
 // pode permitir lazy evalution no futuro
 typedef struct SYNTH_OBJECT
 {
-    ENTRY_TYPE type;
+    object_type type;
     int OBJECT_SIZE;
-    int* STR; // tamanho strings mapeado
+    int STR; // tamanho strings mapeado
     void ** values; // a pergunta é ... lista de valores ou valor único ?(em geral vai ser unico, pode ser também um ponteiro para uma lista)
     int redef; // serve para auxiliar na escrita no nuXmv (e talvez em um futuro se permitir lista de valores diferentes)
     char* SINTH_BIND; // auxilia a variavel anterior, // serve para auxiliar a limpeza de memória e escrever no nuXmv
     int timeContext;
+    int aList;
 
 } Object;
 
-// mudar depois o tipo
-Object *createObject(int type, int OBJECT_SIZE, void **values, int timeContext, char *BIND);
+
+/**
+ * Aloca um objeto atômicos da linguagem (que não sejam uma estrutura TDS ou TimeComponent)
+ * @param type o tipo do objeto
+ * @param OBJECT_SIZE o tamanho do objeto
+ * @param values os valores passados
+ * @param timeContext o contexto temporal
+ * @param BIND o bind sintetizado para aquele objeto
+ * @return um objeto qualquer da linguagem que não envolva estruturas de dados
+ * @SideEffects: Aloca uma lista de ponteiros para void de tamanho OBJECT_SIZE e para parte da lista aloca um
+ * ponteiro para o tipo apropriado. Ver métodos: allocatePtObjects e allocateTypeSetObjects
+ */
+Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND);
+
+/**
+ * Aloca um Object em forma de estrutura dados composta de objetos
+ * @param type o tipo da lista (e de todos os seus objetos)
+ * @param OBJECT_SIZE o tamanho da lista
+ * @param value os valores a serem passados
+ * @param aList flag para tratamento de alocação de lista
+ * @return Aloca um object composto de outros objects já alocados anteriormente.
+ */
+Object* createObjectDS(object_type type, int OBJECT_SIZE, void ** values, int timeContext, char *BIND, int aList);
 
 void printObject(Object* o);
 
@@ -40,9 +62,10 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
  * nova lista (Objeto do tipo GEN_LIST ou do mesmo tipo que os demais membros da lista (para os objetos não internos da linguagem) ).
  * É usado para parâmetros, listas, e outras estruturas recursivas da AST.
  *
- * @param LEFT_COMPONENT
- * @param RIGHT_COMPONENT
- * @return
+ * @param LEFT_COMPONENT o objeto mais a esquerda LISTA ou valor único
+ * @param RIGHT_COMPONENT o objeto mais a direita, um valor únco
+ * @param separator um separador utilizado para sintetizar expressões no SMV (, &, |) ...
+ * @return uma lista genérica ou uma lista de objetos comuns da linguagem
  */
 Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT);
 
