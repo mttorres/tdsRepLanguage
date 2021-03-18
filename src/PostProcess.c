@@ -1,24 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <TDS.h>
 #include "../headers/PostProcess.h"
 
 
 typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
-                               INTERVAL_DEC, BOOLEAN_DEC ,SET, V_MODULE_DEC ,PAR, TDS_MODULE_NAME } MAP_CONVERSIONS;
+                               INTERVAL_DEC, BOOLEAN_DEC ,SET, V_MODULE_DEC ,PAR, TDS_MODULE_NAME, TDS_VALUE_REF, TDS_DELAYED_EXPR_NEXT, MODULE_BREAK_LINE  } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
-                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s" };
+                          "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s", "%s.value",
+                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;", "MODULE %s\n" };
 
 int  ALOC_SIZE_LINE = 300;
-int  DEFAULT_CASE_SIZE = 30; // 29 +1
+int  MULTIPLIER_SIMPLE_HASH = 1;
 
 /**
  *
@@ -232,7 +232,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
         addValue(varName, po, WRITE_SMV_INFO, 6, 0, writeSmvTypeTable, 0);
     }
     else if(type == LOGICAL_ENTRY){
-        sprintf(newType, SmvConversions[BOOLEAN_DEC], varName, newValueBind, newValueBind);
+        sprintf(newType, SmvConversions[BOOLEAN_DEC], varName);
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
         addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
@@ -242,27 +242,10 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     {
         sprintf(newType, SmvConversions[SET], varName, newValueBind);
         int tam = strlen(newType);
-        int* typeSetHashMap = malloc(sizeof(int)*MAX_SIMPLE); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
-        int i;
-        for (i = 0; i < MAX_SIMPLE; i++) {
-            typeSetHashMap[i] = 0;
-        }
-        if(type == TDS_ENTRY){
-            int hashNULL = hash("NULL",NULL);
-            int hashZERO = hash("0",NULL);
-            int hashONE = hash("1",NULL);
-            typeSetHashMap[hashNULL] = 1;
-            typeSetHashMap[hashZERO] = 1;
-            typeSetHashMap[hashONE] = 1;
-        }
-        else{
-            typeSetHashMap[hash(newValueBind,NULL)] = 1;
-        }
-        void* po[] = {&pos, &tam,typeSetHashMap};
-        addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
+        addTypeSetSmv(varName,pos,tam,newValueBind,type,writeSmvTypeTable);
     }
+    // cria uma variável que é instancia de modulo nuXmv
     else{
-        // cria uma variável que é instancia de modulo nuXmv
         sprintf(newType,SmvConversions[V_MODULE_DEC],varName,newValueBind);
         int tam = strlen(newType);
         void* po[] = {&pos, &tam};
@@ -270,6 +253,37 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     }
     header->varBuffer[header->VAR_POINTER] = newType;
     header->VAR_POINTER += 1;
+}
+
+/**
+ * Realiza as operações de hash e atualização de um type-set
+ * @param newValue o novo valor a ser adicionado ao conjunto
+ * @param varName o nome da variável
+ * @param writeSmvTypeTable a tabela de simbolos auxiliar
+ * @param header o header
+ * @SideEffects: Altera as informações do objeto type-set recuperado da tabela auxiliar
+ */
+void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, HeaderSmv* header)
+{
+    TableEntry* entryTypeSetInfo;
+    entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
+    int pos = *(int*) entryTypeSetInfo->val->values[0];
+    int size = *(int*) entryTypeSetInfo->val->values[1];
+    int* hash_set = (int*) entryTypeSetInfo->val->values[2];
+    //int usedSize = *(int*) entryTypeSetInfo->val->values[3];
+
+    int hashForNewValue = hash(newValue, MAX_SIMPLE);
+    if(!hash_set[hashForNewValue]) {
+        hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
+        char* original = header->varBuffer[pos];
+        char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
+        char* newTypeSet = addParams(original,newValue,"{","}");
+        header->varBuffer[pos] = newTypeSet;
+        free(original);
+    }
+    else{
+        // warning
+    }
 }
 
 void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type, int minmax,
@@ -331,26 +345,12 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
     if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY){
         char rawValueBind[ALOC_SIZE_LINE/2];
         copyValueBind(newValue,rawValueBind,0,0,1);
-        TableEntry* entryTypeSetInfo;
-        entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
-        int pos = *(int*) entryTypeSetInfo->val->values[0];
-        int size = *(int*) entryTypeSetInfo->val->values[1];
-        int* hash_set = (int*) entryTypeSetInfo->val->values[2];
-
-        int hashForNewValue = hash(rawValueBind,NULL);
-        if(!hash_set[hashForNewValue]) {
-            hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
-            char* original = header->varBuffer[pos];
-            char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
-            char* newTypeSet = addParams(original,rawValueBind,"{","}");
-            header->varBuffer[pos] = newTypeSet;
-            free(original);
-        }
+        updateTypeSet(rawValueBind,varName,writeSmvTypeTable,header);
     }
 }
 // quebrar em spec next e spec init
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int typeExpr, char *defaultEvalCond)
+                  int typeExpr, char *defaultEvalCond, int freeCondition)
 {
 
     printf("...\n");
@@ -376,7 +376,9 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
                 sprintf(exprInterR,SmvConversions[CASE],condition,varName); // default sendo o inicial
             }
         }
-        free(condition);
+        if(freeCondition){
+            free(condition);
+        }
         sprintf(exprResultString,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],exprInterL,exprInterR);
 
         char* auxChPoint;
@@ -595,7 +597,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
         }
         else{
             conditionCube = formatCondtion(scope,0,0,newValueBind,directiveValueBind,1);
-            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL);
+            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL, 1);
         }
         Object* auxRefValue = newValue->type == NUMBER_ENTRY? newValue : NULL;
         updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax, auxRefValue);
@@ -610,13 +612,13 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
             conditionCube = formatCondtion(scope,1,1,newValueBind,directiveValueBind,1);
 
             createType(useVar, header, writeSmvTypeTable, defaultValueBind, newValue, newValue->type);
-            createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind);
+            createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind, 1);
         }
         else{
             conditionCube = formatCondtion(scope,0,1,newValueBind,directiveValueBind,1);
 
             createType(useVar, header, writeSmvTypeTable, newValueBind, newValue, newValue->type);
-            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, INIT, defaultValueBind);
+            createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, INIT, defaultValueBind, 1);
         }
     }
     free(defaultValueBind);
@@ -635,6 +637,17 @@ char* createReferenceTDS(char* declaredName){
     return processActiveName(NULL,declaredName,-1,-1,TDS_ENTRY);
 }
 
+/**
+ * Cria um Header padrão que será escrito no arquivo SMV, sendo salvo até lá no controlador para futuras modificações
+ * @param type o tipo do HEADER {MAIN = 1, AUTOMATA = 2, PORTS = 3, FUNCTION_SMV = 4}
+ * @param name o nome processado anteriomente de maneira compor a declaração de módulo
+ * @param varP o ponteiro de alocaçao de linhas de da parte var (util para controlar casos que o modulo nao venha a necessitar de alguma parte)
+ * @param assignP o ponteiro de alocaçao de linhas de da parte var
+ * @param transP o ponteiro de alocaçao de linhas de da parte trans
+ * @param controller o controlador de ambiente para armazenar o header
+ * @return o novo header alocado
+ * @SideEffects: Aloaca um header que deve ser liberado como responsabilidade do chamador
+ */
 HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int transP, HeaderController* controller){
     HeaderSmv* newHeader = createHeader(type,name,varP,assignP,transP);
     addNewHeader(controller,newHeader);
@@ -644,17 +657,65 @@ HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int trans
 }
 
 void validateTdsDeclaration(char* declarationName, HeaderController* controller){
-    if(lookup(controller->originalPorts,declarationName)){
-        controller->validPorts++;
+    TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
+    if(expected_entry){
+        Object* info = expected_entry->val;
+        int* isDeclared = info->values[0];
+        if(!(*isDeclared)){
+            controller->validPorts++;
+            *isDeclared = 1;
+        }
+        else{
+            controller->multiPortDeclartion = 1;
+        }
     }
 }
 
-int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, int C_TIME, int I_TIME, int F_TIME){
+/***
+ * Baseada na validação anterior (para tds's de time-components) verifica se deve criar init vazio ou init e next vazios.
+ * Isso evita estouro de estados no nuXmv, considerando que caso esses não sejam especificados a TDS pode variar de forma
+ * não deterministica.
+ * @param newTDS
+ * @param controller
+ * @param initialIsInvalid
+ * @param someIsValid
+ */
+
+void specAssignForInvalidTds(TDS* newTDS, HeaderController* controller, int initialIsInvalid, int someIsValid){
+    if(initialIsInvalid){
+        // só o inicial é invalido
+        createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
+                     accessSmvInfo(controller, PORTS, newTDS->AUX_REF), "NULL", NULL, INIT, NULL, 1);
+    }else{
+        // nenhum é válido
+        if(!someIsValid){
+            createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
+                         accessSmvInfo(controller, PORTS, newTDS->AUX_REF), "NULL", NULL, INIT, NULL, 1);
+            createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
+                         accessSmvInfo(controller, PORTS, newTDS->AUX_REF), "value", NULL, NEXT, NULL, 1);
+        }
+    }
+}
+/**
+ * Valida se a nova TDS de time-component é válida, isto é, se nenhuma especificação para instantes exatos de tempo
+ * violam I_TIME ~ F_TIME. Ou ainda, se a especificação da time-component é de um tempo já do passado
+ * (gerando tornando um assign inútil e avaliações inúteis que podem ter efeitos indesejados no modelo e no interpretador)
+ * @param encapsulatedTDS o objeto encapsulado da TDS, serve para notificar o usuário por meio do seu SYNTH_BIND em qual variável de TDS ocorreu a violação de validação
+ * @param newTDS a nova TDS especificada
+ * @param controller o controlador de ambiente
+ * @param C_TIME o tempo corrente do intervalo
+ * @param I_TIME o tempo inícial do intervalo
+ * @param F_TIME o tempo final do intervalo
+ * @return
+ */
+
+int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, HeaderController*  controller, int C_TIME, int I_TIME, int F_TIME){
     int someIsValidToLazy = 0; // nenhum é valido = 0 , algum é valido = 1,  -1 a gente pode falar que algum é valido mas o primeiro é invalid (C_TIME = 0)
     int initialIsInvalid = 0;
     int i;
-    for (i = 0; i < newTDS->DATA_TIME->OBJECT_SIZE; i++){
-        Object* timeComponent = (Object*) newTDS->DATA_TIME->values[i];
+    Object * timeComponentList = newTDS->DATA_SPEC;
+    for (i = 0; i < newTDS->DATA_SPEC->OBJECT_SIZE; i++){
+        Object* timeComponent = (Object*) newTDS->DATA_SPEC->values[i];
         int time = *(int*) timeComponent->values[0];
         if(time < C_TIME){
             fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined on a C_TIME  >= %d context!  \n",
@@ -672,54 +733,118 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, int C_TIME, int I_
             newTDS->COMPONENT_TIMES[time] = i;
         }
     }
-    if(initialIsInvalid && someIsValidToLazy){
-        someIsValidToLazy = -1; // senão vai ficar como 0 (então TODOS são invalidos)
-    }
+    specAssignForInvalidTds(newTDS,controller,initialIsInvalid,someIsValidToLazy);
+//    if(initialIsInvalid && someIsValidToLazy){
+//        someIsValidToLazy = -1; // senão vai ficar como 0 (então TODOS são invalidos)
+//    }
     return someIsValidToLazy;
 }
 
+/**
+ * Adiciona a nova TDS a lista de callby need das TDS (após o COMMIT de C_TIME). Note que, nos casos de Time list nem todas são sempre
+ * adicionadas a lazy caso o instante de tempo especificado não seja alcançável (validação de time-list).
+ * Vale ressaltar, que escolhemos epsular o tratamento da validaçao da Time list aqui para nao realizar a validaçao 2 vezes.
+ * @param encapsulatedTDS o objeto da tds encapsulado
+ * @param newTDS a TDS em si
+ * @param controller o controlador de ambiente
+ * @param C_TIME o tempo corrente
+ * @param I_TIME o tempo inicial
+ * @param F_TIME o tempo final
+ * @SideEffects: Adiciona a TDS a lista de pendentes, e caso seja necessario algum tratamento sobre a data-list seus
+ * init ou next sao declarados (linha alocada)
+ */
+
 void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME,  int I_TIME, int F_TIME){
-    int addToLazy = newTDS->type != DATA_LIST? 1: validateTdsTimeList(encapsulatedTDS,newTDS,C_TIME, I_TIME,F_TIME);
+    int addToLazy = newTDS->type != DATA_LIST? 1: validateTdsTimeList(encapsulatedTDS,newTDS,controller,C_TIME, I_TIME,F_TIME);
     if(addToLazy){
-        // só o inicial é invalido
-        if(addToLazy == -1){
-            createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"NULL",NULL,INIT,NULL);
-        }
         controller->declaredPorts[controller->declaredPortsNumber] = newTDS;
         controller->declaredPortsNumber++;
-    }else{
-        createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"NULL",NULL,INIT,NULL);
-        createAssign("value",accessHeader(controller,PORTS,newTDS->SMV_REF),accessSmvInfo(controller,PORTS,newTDS->AUX_REF),"value",NULL,NEXT,NULL);
     }
 }
 
-void addTdsOnPortsModule(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME,  int I_TIME, int F_TIME){
-    char  declarationNameSmv[ALOC_SIZE_LINE];
+
+/**
+ * Para uma TDS que possuia dependencias, cria os assigns apropriados.
+ * @param newTDS a nova TDS
+ * @param controller a
+ * @param dependencies
+ */
+void addTdsRelationOnSmv(TDS* newTDS, HeaderController* controller, TDS** dependencies){
+    // adiciona informações de relacionamento no nuXmv (separar em método)
+    int i;
+    if(newTDS->delayed){
+        if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
+            fprintf(stderr, "[WARNING] %s with delayed property and more than one dependency  \n",newTDS->name);
+            exit(-1);
+        }
+
+        char refToTdsValue[ALOC_SIZE_LINE];
+        sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
+        char defaultDelayedEvalCond[ALOC_SIZE_LINE];
+        sprintf(defaultDelayedEvalCond, SmvConversions[TDS_DELAYED_EXPR_NEXT], refToTdsValue,
+                dependencies[0]->name, dependencies[0]->name, refToTdsValue);
+
+        createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+            accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+            INIT, NULL, 0);
+        createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+            accessSmvInfo(controller, PORTS, 0), NULL, defaultDelayedEvalCond, NEXT,
+            refToTdsValue, 0);
+    }
+    else{
+        // esquema dos parâmtros e multimerger
+        for (i=0; i < newTDS->TOTAL_DEPENDENCIES_PT; i++){
+
+        }
+    }
+}
+
+
+/**
+ * Adiciona a referência de declaração ao novo módulo TDS ao nuXmv (portsModule).
+ * Caso a TDS seja relacional, o relacionamento será explicitado no portsModule.
+ * @param moduleName
+ * @param newEncapsulatedTDS
+ * @param newTDS
+ * @param controller
+ * @param C_TIME
+ * @param I_TIME
+ * @param F_TIME
+ */
+
+void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME){
     char  nameWithNoBreakL[ALOC_SIZE_LINE];
-    int c = 0;
-    while(*moduleName != '\n'){
-        nameWithNoBreakL[c] = *moduleName;
-        moduleName++;
-        c++;
-    }
-    nameWithNoBreakL[c] = '\0';
+    nameWithNoBreakL[0] = '\0';
+    char* declarationDetails = strstr(moduleName,"t");
+    removeAfter(nameWithNoBreakL,declarationDetails,'\n');
     char* declarationName = newTDS->name? newTDS->name : newEncapsulatedTDS->SINTH_BIND;
-    createType(declarationName,controller->PORTS_RELATED[0],controller->portsInfo[0],nameWithNoBreakL,NULL,-1);
-    addTdsToLazyControl(newEncapsulatedTDS,newTDS,controller,C_TIME,I_TIME,F_TIME);
-    validateTdsDeclaration(declarationName,controller);
+    createType(declarationName,accessHeader(controller, PORTS, 0),
+               accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC);
 }
 
-void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME){
+void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
     TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
+
     SYNTH_TDS->AUX_REF = controller->PORTS_INFO_CURRENT_SIZE;
     SYNTH_TDS->SMV_REF = controller->H_PORTS_CURRENT_SIZE;
+
     char moduleName[ALOC_SIZE_LINE];
-    sprintf(moduleName,SmvConversions[ANY_BREAK_LINE],encapsulatedTDS->SINTH_BIND);
+    moduleName[0] = '\0';
+    sprintf(moduleName,SmvConversions[MODULE_BREAK_LINE],encapsulatedTDS->SINTH_BIND);
     HeaderSmv* newTdsHeader = specHeader(PORTS, moduleName, 0, 0, -1, controller);
+
     STable* auxTable = createTable(SMV_PORTS, NULL, 0, 0, -1);
     addNewAuxInfo(controller,auxTable);
+
     createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY);
-    addTdsOnPortsModule(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller,C_TIME, I_TIME, F_TIME);
+
+    char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
+
+    addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller, C_TIME, I_TIME, F_TIME);
+    addTdsRelationOnSmv(SYNTH_TDS,controller,SYNTH_DEP);
+
+    addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
+    validateTdsDeclaration(declarationName,controller);
 }
 
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderController *controller, STable *currentScope) {
@@ -730,7 +855,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
     STable *currentInfo = accessSmvInfo(controller, PORTS, currentTDS->AUX_REF);
     if (currentTDS->type == DATA_LIST) {
         if (C_TIME == I_TIME) {
-            createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, NULL, INIT, NULL);
+            createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, NULL, INIT, NULL, 1);
         } else {
             char *conditionCube = NULL;
             char *directiveValueBind = formatDirective(C_TIME);
@@ -740,28 +865,30 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
                              -1);
             } else {
                 conditionCube = formatCondtion(currentScope, 0, 0, lazyValue->SINTH_BIND, directiveValueBind, 1);
-                createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL");
+                createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL",
+                             1);
             }
+            updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
         }
     }
-    // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
-    else{
+        // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
+    else {
         // se essa TDS já foi avaliada, senão...
-        if(currentTDS){
+        if (currentTDS) {
 
-        }
-        else{
+        } else {
 
         }
     }
-    updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,-1,lazyValue);
-
 }
+//    updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,-1,lazyValue);
+
+
 //    char* valueString = "value";
 //    char* defaultConditionEval = "NULL";
 //    char* valueOnZero = "NULL"; // para caso a inicialização seja com NULL
 
-    //Object* firstTimeComponent = (Object*) SYNTH_TDS->DATA_TIME->values[0];
+    //Object* firstTimeComponent = (Object*) SYNTH_TDS->DATA_SPEC->values[0];
 
 
 
@@ -780,15 +907,15 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
         char* limitCondition = NULL;
         int limitedByTime = 0;
 
-        char* components[SYNTH_TDS->DATA_TIME->OBJECT_SIZE]; // N strings. (no caso teste 3)
+        char* components[SYNTH_TDS->DATA_SPEC->OBJECT_SIZE]; // N strings. (no caso teste 3)
 
         int hasZeroTimeComponent = 0;
         int i;
 
 
-        for (i = 0; i < SYNTH_TDS->DATA_TIME->OBJECT_SIZE; ++i) {
+        for (i = 0; i < SYNTH_TDS->DATA_SPEC->OBJECT_SIZE; ++i) {
 
-            Object* timeComponent = (Object*) SYNTH_TDS->DATA_TIME->values[1];
+            Object* timeComponent = (Object*) SYNTH_TDS->DATA_SPEC->values[1];
             int time = *(int*) timeComponent->values[0];
             Object* valueComponent = (Object*) timeComponent->values[1];
             char timeBind[ALOC_SIZE_LINE];
@@ -821,7 +948,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
                 createConditionCube(limitCondition, componentConversion, "&", valueBind, 1) :
                 createConditionCube(componentConversion, "", "", valueBind, 1);
                 free(componentConversion);
-                if(i+1 == SYNTH_TDS->DATA_TIME->OBJECT_SIZE){
+                if(i+1 == SYNTH_TDS->DATA_SPEC->OBJECT_SIZE){
                     sprintf(parcialResult,)
                 }
                 else{
@@ -884,6 +1011,39 @@ void letGoOldEntry(TableEntry* var, STable* refAuxTable){
     free(useVar);
 }
 */
+
+void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable)
+{
+    int usedSize = MAX_SIMPLE*MULTIPLIER_SIMPLE_HASH;
+    int* typeSetHashMap = malloc(sizeof(int)*usedSize); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
+    int i;
+    for (i = 0; i < MAX_SIMPLE*MULTIPLIER_SIMPLE_HASH; i++) {
+        typeSetHashMap[i] = 0;
+    }
+    if(type == TDS_ENTRY){
+        int hashNULL = hash("NULL", usedSize);
+        int hashZERO = hash("0", usedSize);
+        int hashONE = hash("1", usedSize);
+        typeSetHashMap[hashNULL] = 1;
+        typeSetHashMap[hashZERO] = 1;
+        typeSetHashMap[hashONE] = 1;
+    }
+    else{
+        typeSetHashMap[hash(newValueBind, usedSize)] = 1;
+    }
+    void* po[] = {&pos, &tam,typeSetHashMap};
+    addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
+}
+
+void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* controller, int C_TIME){
+    STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
+
+    HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);
+
+    char rawValueBind[ALOC_SIZE_LINE/2];
+    copyValueBind(dependence->DATA_TIME[C_TIME],rawValueBind,0,0,1);
+    updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant);
+}
 
 void writeResultantHeaders(HeaderController* controller, const char* path){
   

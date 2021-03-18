@@ -4,8 +4,6 @@
 
 #include "textManager.h"
 #include "HeaderSmv.h"
-#include "STable.h"
-#include "Node.h"
 #include "Object.h"
 
 
@@ -114,7 +112,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
  * */
 
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int typeExpr, char *defaultEvalCond);
+                  int typeExpr, char *defaultEvalCond, int freeCondition);
 
 
 /**
@@ -167,17 +165,20 @@ char* createReferenceTDS(char* declaredName);
 void letGoOldEntry(TableEntry* var, STable* auxTable);
 
 /**
- * Processa uma TDS para criar o seu equivalente nuXmv em módulo. Além disso, cria sua tabela auxiliar e Header.
- * @param encapsulatedTDS
- * @param controller
+ * Processa uma TDS para criar o seu equivalente nuXmv em módulo.
+ * Criando assim, sua tabela auxiliar e Header (modulo), sua declaração em ports module, e realizando sua validação
+ *
+ * @param encapsulatedTDS o objeto tds encapsulado
+ * @param controller o controlador de contexto
  * @param C_TIME o contexto temporal atual, usado para validar o uso dessa TDS em casos de listas de dados (onde os dados são vinculados diretamente)
  * @param I_TIME o tempo inicial de um intervalo, usado para validações lógicas de TDS de listas de dados
  * @param F_TIME o tempo final de um intervalo, usado para validações lógicas de TDS de listas de dados
+ * @param SYNTH_DEP as tds's necessárias para criar o assign inicial em casos de tds com dependencia de outras
  * @SideEffects: Aloca um Header e o salva no controller nas ports. Aloca uma tabela de simbolos para esse módulo.
- * Essas devem ser liberadas assim como as outras.
+ * Essas devem ser liberadas assim como as outras. Realiza declaração da tds em ports module (linha que deve ser liebrada depois)
  */
 
-void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME);
+void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP);
 
 /**
  * Define um módulo smv para a TDS associada ao parâmetro. Recupera as informações da encapsulatedTDS avaliada, seus dados, seu header,
@@ -188,6 +189,41 @@ void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_
  * @param currentScope o escopo corrente usado para outras passagens necessárias de informação.
  */
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderController *controller, STable *currentScope);
+
+/**
+ * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
+ * para atualizar um type-set. Delega as demais operações para o updateTypeSet depois
+ * @param dependence a TDS fornecedora de valor
+ * @param dependant a TDS que recebe valores
+ * @param controller o controlador de ambiente
+ * @param C_TIME o tempo corrente para recuperar os valores.
+ * @SideEffects: O mesmos do updateTypeSet
+ */
+void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* controller, int C_TIME );
+// doc antiga
+// método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
+/*
+
+	Objeto:  vetor dinamico[inteirosDoConjunto], nullable, vetor dinamico[labelsDoConjunto]
+
+	Prós: Menos structs para alocar,não tem que alocar uma TABELA INTEIRA só para alguns valores,
+	a linguagem possui poucos tipos (atualmente: int, label, boolean(FALSE E TRUE são só enums no nuXmv),
+	e tds (que na verdade retorna qualquer um dos tipos anteriores))
+
+	Cons:  Outro objeto (mais coisas para dar free),
+		   "quebaria" o conceito de hashmap que é justamente não ter duplicata, ia ser um objeto só para checar algumas coisas
+		    Toda vez que adicionar um tipo novo necessita alterar essa estrutura
+
+	Hashmap: estrutura que já temos atualmente, teria pelo menos umas 5 entras (talvez mais ou menos)
+
+		Pŕos: Não necessita criar mais nada,  não precisa alocar vetores (indexa pela string em qualquer caso),
+			  aberto para novos tipos (indexa pela string)
+
+		Cons:  Vai ficar uma estrutura "recursiva" tabela --x entradas--> entradaSmv(porta ou main) --> Objeto(iHeader,size,
+																											tabela ---y entradas--->entradas --> Objeto(bool))
+				Mais coisas para centralizar e dar free
+*/
+void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable);
 
 void writeResultantHeaders(HeaderController* controller, const char* path);
 
