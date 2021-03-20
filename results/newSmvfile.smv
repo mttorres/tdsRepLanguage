@@ -1,11 +1,11 @@
 MODULE main
 VAR
 	time: 0..20;
-	finalAutomata: finalAutomata(ports)
+	finalAutomata: finalAutomata(ports);
 	ports: portsModule(time);
 	x : -1..4;
 	z : boolean;
-	zelda : boolean;
+	zeta : boolean;
 	w_scope1_0 : 0..1;
 	r_scope1_1 : boolean;
 	u_scope1_1_2_0 : boolean;
@@ -20,17 +20,17 @@ ASSIGN
 esac;
 	init(x):= 2;
 	init(z):= TRUE;
-	init(zelda):= FALSE;
+	init(zeta):= FALSE;
 	init(w_scope1_0):= case 
 		!z : 1;
 		TRUE : 0; 
 	esac;
 	init(r_scope1_1):= case 
-		zelda : FALSE;
+		zeta : FALSE;
 		TRUE : FALSE; 
 	esac;
 	init(u_scope1_1_2_0):= case 
-		zelda & z  : FALSE;
+		zeta & z  : FALSE;
 		TRUE : FALSE; 
 	esac;
 	next(x):= case 
@@ -41,13 +41,13 @@ esac;
 	init(y):= 0;
 	next(y):= case 
 		next(time) = 2  : 5;
-		next(time) = 4  & !next(zelda)  : 2;
-		next(time) = 4  & !!next(zelda)  : 6;
+		next(time) = 4  & !next(zeta)  : 2;
+		next(time) = 4  & !!next(zeta)  : 6;
 		TRUE : y; 
 	esac;
-	next(zelda):= case 
+	next(zeta):= case 
 		next(time) = 4  : FALSE;
-		TRUE : zelda; 
+		TRUE : zeta; 
 	esac;
 	next(z):= case 
 		next(time) = 4  : TRUE;
@@ -55,12 +55,12 @@ esac;
 	esac;
 	init(w_scope1_2):= FALSE;
 	next(w_scope1_2):= case 
-		next(time) = 4  & !next(zelda)  : TRUE;
+		next(time) = 4  & !next(zeta)  : TRUE;
 		TRUE : w_scope1_2; 
 	esac;
 	init(u_scope1_2_2_0):= FALSE;
 	next(u_scope1_2_2_0):= case 
-		next(time) = 4  & !next(zelda) & next(w_scope1_2)   : FALSE;
+		next(time) = 4  & !next(zeta) & next(w_scope1_2)   : FALSE;
 		TRUE : u_scope1_2_2_0; 
 	esac;
 
@@ -86,8 +86,8 @@ TRANS
 
 MODULE finalAutomata(ports)
 VAR
-	prod1: merger1(ports)
-	prod2: fifo2(ports)
+	prod1: merger1(ports);
+	prod2: fifo2(ports);
 	cs: {q0q0,q0p0,q0p1};
 ASSIGN
 	init(cs) := {q0q0};
@@ -106,9 +106,16 @@ INVAR
 MODULE portsModule(time)
 VAR 
 	a : tds_a(time);
+	d : tds_d(time);
 ASSIGN
+	init(d.value):= NULL;
+	next(d.value):= case 
+		d.value = NULL : a.value;
+		a.value = NULL & d.value != NULL : NULL;
+		TRUE : d.value; 
+	esac;
 
-tds_a(time)
+MODULE tds_a(time)
 VAR
 	value : {NULL, 0, 1, 2};
 ASSIGN
@@ -118,4 +125,9 @@ ASSIGN
 		next(time) = 2  : 2;
 		TRUE : NULL; 
 	esac;
+
+MODULE tds_d(time)
+VAR
+	value : {NULL, 0, 1, 2};
+ASSIGN
 
