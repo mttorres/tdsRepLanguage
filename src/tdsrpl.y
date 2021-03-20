@@ -105,6 +105,7 @@
 %type <ast> otherstmt
 %type <ast> assignable
 %type <ast> expr
+%type <ast> subexp
 %type <ast> multiexp
 %type <ast> ineqexp
 %type <ast> logical
@@ -369,7 +370,7 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//infoNode($$);
 
 	 }
-	 | assignable ASSIGN expr {
+	 | assignable ASSIGN variabledata {
 		
 		Node* assignment = createNode(7,2,1,"Assignment", OTHER_ASSIGN ,$1,$3, $2);
 		$$ = assignment;	
@@ -378,7 +379,7 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//infoNode($$);
 
 	 }
-	 | RETURN expr {
+	 | RETURN variabledata {
 	    	Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
         	$$ = optionalreturn;
 	 }
@@ -415,32 +416,31 @@ assignable : ID extraaccesses {
 
 
 expr: MINUS expr {
-	
-		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
-		$$ = expr;		
-
-
-	 }
-	 | expr MINUS multiexp {
-		
-		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
-		$$ = expr;			
-
-	 }
-	 | expr PLUS multiexp {
-
+             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
+             $$ = expr;
+      }
+      |expr PLUS subexp {
 		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
-		$$ = expr;						
-		
-
+		$$ = expr;
 	 }
-	 | multiexp {
+	 | subexp {
 
        Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
        $$ = expr;
 	 }
 	 ;
 
+subexp: subexp MINUS multiexp {
+
+        Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
+        		$$ = expr;
+
+        }
+        | multiexp {
+
+           Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
+           $$ = expr;
+        }
 
 multiexp: multiexp TIMES ineqexp {
 	
@@ -470,43 +470,30 @@ multiexp: multiexp TIMES ineqexp {
 		;
 
 ineqexp:  ineqexp LE logical {
-	
-
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", EXPR, $1,$3,  $2);
-			$$ = ineqexp;						
-		
-
+			$$ = ineqexp;
 		}
 		| ineqexp GE logical {
-
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;				
-
+			$$ = ineqexp;
 		}
 		| ineqexp LT logical {
-
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
-
 		}
 		| ineqexp GT logical {
-
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", EXPR, $1,$3,  $2);
-			$$ = ineqexp;			
-
-	
+			$$ = ineqexp;
 		}
         | ineqexp EQUAL logical {
 
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;				
-		
+			$$ = ineqexp;
         }
         | ineqexp NOTEQUAL logical {
 
 			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;	
-	
+			$$ = ineqexp;
         }
         | logical {
             Node* expr = createNode(5,1,0,"Expressão Básica - Nível 4", EXPR ,$1);
@@ -516,22 +503,16 @@ ineqexp:  ineqexp LE logical {
 
 
 logical: NOT data {
-	
 			Node* logical = createNode(6,1,1,"Lógico  - Negação ", EXPR ,$2,  $1);
-			$$ = logical;					
-
+			$$ = logical;
 		 }
 		 | logical AND data {
-
 			Node* logical = createNode(7,2,1,"Lógico  - AND ", EXPR ,$1,$3,  $2);
-			$$ = logical;	
-
+			$$ = logical;
 		 }
 		 | logical OR data {
-
 			Node* logical = createNode(7,2,1,"Lógico  - OR ", EXPR ,$1,$3,  $2);
-			$$ = logical;			
-
+			$$ = logical;
 		 }
 		 | LPAREN expr RPAREN {
                  Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", EXPR ,$1);
@@ -540,7 +521,6 @@ logical: NOT data {
 		 | data {
 
 		 	$$ = $1;
-
 		 }
 		 ;
 		 
@@ -592,10 +572,25 @@ data: RAWNUMBERDATA {
 
 	  }
 
-	  | variabledata {
+	  | functioncall {
 
 	  	$$ = $1;	
 
+	  }
+	  | ID extraaccesses {
+
+			if($2){
+				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
+				$$ = assignment;
+
+				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+				//infoNode($$);
+			}
+			else {
+				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
+				$$ = assignment;
+
+	  		}
 	  }
 	  ;
 
@@ -690,37 +685,15 @@ variabledata: LBRACE PORTNAME COLON PLICK ID PLICK COMMA DATATIME COLON LBRACE d
 			$$ = tdsformat;
 		
 		}
-
-		| ID extraaccesses {
-
-			if($2){
-				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
-				$$ = assignment;	
-
-				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
-				//infoNode($$);
-			}
-			else {
-				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
-				$$ = assignment;
-
-	  		}
-	  	}
-
 	  	// VETOR
 	  	| LBRACE paramsCall RBRACE 
 	  	{
 	  		Node* data = createNode(7,1,2,"VETOR", DATA_V ,$2, $1,$3);	
 			$$ = data;	
 	  	}
-
-		// causa possível da redundancia? (podemos separar em procedure call e function call?)
-	  	| functioncall {
-
-			Node* variabledata = createNode(5,1,0,"Dados de chamada de função", FUNC_CALL, $1);	
-			$$ = variabledata;	
-
-	  	}			  
+	  	| expr {
+	  	    $$ = $1;
+	  	}
 		;
 
 	
