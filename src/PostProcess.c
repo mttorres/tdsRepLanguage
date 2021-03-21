@@ -7,7 +7,10 @@
 typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_NAME, NAME_BY_SCOPE, NAME_SSCOPE,
                                INIT, NEXT, ASSIGN_TO,
                                ASSIGN_TO_TAB_BREAK_LINE, CASE, CASE_EVAL, N_CASE_EVAL, DEFAULT_CASE_EVAL, EQUAL_CASE_EVAL,
-                               INTERVAL_DEC, BOOLEAN_DEC ,SET, V_MODULE_DEC ,PAR, TDS_MODULE_NAME, TDS_VALUE_REF, TDS_DELAYED_EXPR_NEXT, MODULE_BREAK_LINE  } MAP_CONVERSIONS;
+                               INTERVAL_DEC, BOOLEAN_DEC ,SET, V_MODULE_DEC ,PAR, TDS_MODULE_NAME, TDS_VALUE_REF,
+                               TDS_DELAYED_EXPR_NEXT, TDS_DELAYED_EXPR_NEXT_TIMEV,
+                               TDS_INPUT_EXPR, TDS_INPUT_EXPR_TIMEV,
+                               MODULE_BREAK_LINE  } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
 char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
@@ -15,7 +18,9 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
                           "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s", "%s.value",
-                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;", "MODULE %s\n" };
+                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;",  "next(time) > %d & %s = NULL : %s.value;\n\t\tnext(time) > %d & %s.value = NULL & %s != NULL : NULL;",
+                          "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s > %d & %s = NULL : %s;\n\t\t%s > %d & %s = NULL : %s;",
+                          "MODULE %s\n" };
 
 int  ALOC_SIZE_LINE = 300;
 int  MULTIPLIER_SIMPLE_HASH = 1;
@@ -781,9 +786,14 @@ void addTdsRelationOnSmv(TDS* newTDS, HeaderController* controller, TDS** depend
         char refToTdsValue[ALOC_SIZE_LINE];
         sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
         char defaultDelayedEvalCond[ALOC_SIZE_LINE];
-        sprintf(defaultDelayedEvalCond, SmvConversions[TDS_DELAYED_EXPR_NEXT], refToTdsValue,
-                dependencies[0]->name, dependencies[0]->name, refToTdsValue);
-
+        if(newTDS->I_INTERVAL > 0){
+            sprintf(defaultDelayedEvalCond, SmvConversions[TDS_DELAYED_EXPR_NEXT_TIMEV], newTDS->I_INTERVAL, refToTdsValue,
+                    dependencies[0]->name, newTDS->I_INTERVAL ,dependencies[0]->name, refToTdsValue);
+        }
+        else{
+            sprintf(defaultDelayedEvalCond, SmvConversions[TDS_DELAYED_EXPR_NEXT], refToTdsValue,
+                    dependencies[0]->name, dependencies[0]->name, refToTdsValue);
+        }
         createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
             accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
             INIT, NULL, 0);
@@ -791,11 +801,95 @@ void addTdsRelationOnSmv(TDS* newTDS, HeaderController* controller, TDS** depend
             accessSmvInfo(controller, PORTS, 0), NULL, defaultDelayedEvalCond, NEXT,
             refToTdsValue, 0);
     }
-    else{
-        // esquema dos parâmtros e multimerger
+    else if(newTDS->TOTAL_DEPENDENCIES_PT > 0){
+
+        char refToTdsValue[ALOC_SIZE_LINE];
+        sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
+        char defaultDelayedEvalCond[ALOC_SIZE_LINE];
+        char refNextToTdsValue[strlen(newTDS->name)+14];
+        sprintf(refNextToTdsValue,SmvConversions[NEXT],refToTdsValue);
+
+        int limitedByTime = newTDS->I_INTERVAL > 0;
+
+
+
+        TDS* firstDependence = dependencies[0];
+        char refToDepTdsValue[strlen(firstDependence->name)+8];  // .value0
+        sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],firstDependence->name);
+        char refNextToDepTdsValue[strlen(firstDependence->name)+14]; // next(.value)
+        sprintf(refNextToDepTdsValue,SmvConversions[NEXT],refToDepTdsValue);
+        if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
+            char resultExprInit[ALOC_SIZE_LINE*2];
+            char resultExprNext[ALOC_SIZE_LINE*2+(newTDS->TOTAL_DEPENDENTS_PT*6)];
+
+            TDS* secondDependence = dependencies[1];
+            char refToDep2TdsValue[strlen(secondDependence->name)+8];
+            sprintf(refToDep2TdsValue,SmvConversions[TDS_VALUE_REF],secondDependence->name);
+            char refNextToDep2TdsValue[strlen(secondDependence->name)+14];
+            sprintf(refNextToDep2TdsValue,SmvConversions[NEXT],refToDep2TdsValue);
+            if(limitedByTime){
+                sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR_TIMEV],
+                        "next(time)",newTDS->I_INTERVAL,refNextToDep2TdsValue, refNextToDepTdsValue,
+                        "next(time)",newTDS->I_INTERVAL,refNextToDepTdsValue,refNextToDep2TdsValue);
+                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                             accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+                             INIT, NULL, 0);
+            }
+            else{
+                sprintf(resultExprInit,SmvConversions[TDS_INPUT_EXPR],
+                        refToDep2TdsValue, refToDepTdsValue,
+                        refToDepTdsValue,refToDep2TdsValue);
+                sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR],
+                        refNextToDep2TdsValue, refNextToDepTdsValue,
+                        refNextToDepTdsValue,refNextToDep2TdsValue);
+
+                createAssign(refToTdsValue,accessHeader(controller, PORTS, 0),accessSmvInfo(controller, PORTS, 0),
+                             NULL,resultExprInit,INIT,"NULL",0);
+            }
+            createAssign(refToTdsValue,accessHeader(controller, PORTS, 0),accessSmvInfo(controller, PORTS, 0),
+                         NULL,resultExprNext,NEXT,"NULL",0);
+        }
+        else{
+            if(limitedByTime){
+                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                             accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+                             INIT, NULL, 0);
+
+                char timeBind[ALOC_SIZE_LINE/2];
+                sprintf(timeBind,"%d",newTDS->I_INTERVAL);
+                char* evalByTimeNext = createConditionCube("next(time)",timeBind,">",refNextToDepTdsValue,1);
+                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                             accessSmvInfo(controller, PORTS, 0), "NULL", evalByTimeNext,
+                             NEXT, NULL, 1);
+            }
+            else{
+                createAssign(refToTdsValue,accessHeader(controller, PORTS, 0),accessSmvInfo(controller, PORTS, 0),
+                             refToDepTdsValue,NULL,INIT,NULL,0);
+                createAssign(refToTdsValue,accessHeader(controller, PORTS, 0),accessSmvInfo(controller, PORTS, 0),
+                             refNextToDepTdsValue,NULL,NEXT,NULL,0);
+            }
+        }
+        // limitado a duas dependencias
+        /*
         for (i=0; i < newTDS->TOTAL_DEPENDENCIES_PT; i++){
 
+            TDS* dependence = dependencies[i];
+            char refToDepTdsValue[strlen(dependence->name)];
+            sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
+            char refNextToDepTdsValue[strlen(dependence->name)+10];
+            sprintf(refNextToDepTdsValue,SmvConversions[NEXT],newTDS->name);
+
+            char* current = i+1 == newTDS->TOTAL_DEPENDENTS_PT? end: continuation;
+            if(i == 0){
+                sprintf(resultExprInit,SmvConversions[FirstcondType],,current);
+                sprintf(resultExprNext,SmvConversions[FirstcondType],,current);
+            }
+            else{
+                sprintf(resultExprInit,SmvConversions[InducondType],,current);
+                sprintf(resultExprNext,SmvConversions[InducondType],,current);
+            }
         }
+         */
     }
 }
 

@@ -757,7 +757,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
         TableEntry* itimeEntry = lookup(scope,"F_TIME");
         int ftime = *(int*)itimeEntry->val->values[0];
         if(C_TIME > ftime){
-            fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL \n", n->children[0]->leafs[0]);
+            fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL. The statement has no effect \n", n->children[0]->leafs[0]);
         }
         /* TOMAR NOTA: NUNCA MAIS FAZER ISSO
          * 		int* v;
@@ -766,12 +766,12 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
          * */
         // só fazer isso se eu tiver dado malloc em v!
         // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
-        if(*(int*) expr->values[0] != C_TIME){
+        else if(*(int*) expr->values[0] != C_TIME){
             commitCurrentTime(scope,controllerSmv,*(int*) expr->values[0]);
+            void* vp[] = {expr->values[0]};
+            updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
+            letgoObject(expr);
         }
-        void* vp[] = {expr->values[0]};
-        updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
-        letgoObject(expr);
     }
     else{
         // busca expressão
@@ -936,12 +936,12 @@ TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* 
     Object * dependenceList = eval(n->children[0],scope,controller);
     Object * DEP_HEAD = dependenceList->OBJECT_SIZE > 1 ? dependenceList->values[0] : NULL;
     if(DEP_HEAD && DEP_HEAD->type == TDS_ENTRY || dependenceList->type == TDS_ENTRY) {
-        if (n->children[1]->type == TDS_ANON_OP_PASS && dependenceList->OBJECT_SIZE > 2) {
+        if (dependenceList->OBJECT_SIZE > 2) {
             fprintf(stderr,
                     "[WARNING] %s definition uses more than 2 inputs.\nIt is recommended to check the input model, for instance, reo2nuXmv only generates merge-like connections with at most 2 inputs  \n",
                     portName);
         }
-        if(C_TIME > I_TIME){
+        if(( newTDS->delayed || dependenceList->OBJECT_SIZE > 1) && C_TIME > I_TIME){
             fprintf(stderr, "[WARNING] %s uses a temporal condition to initialization.\nIt is recommended to review your specification. This behaviour is usually acceptable in case the modeled port is lossy (eg: LossySync)\n",
                     portName);
         }
@@ -956,9 +956,12 @@ TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* 
     if(dependenceList->OBJECT_SIZE > 1){
         int i;
         for (i = 0; i < dependenceList->OBJECT_SIZE; i++) {
-            TDS* DEPENDENCY = (TDS*) dependenceList->values[i];
-            SYNTH_DEPENDENCY_LIST[i] = DEPENDENCY;
-            addTdsDependent(DEPENDENCY,newTDS);
+            Object* ENCAPSULATED_DEPENDENCY = (Object*) dependenceList->values[i];
+            TDS* DEPENDENCY = (TDS*) ENCAPSULATED_DEPENDENCY->values[0];
+            if(DEPENDENCY){
+                SYNTH_DEPENDENCY_LIST[i] = DEPENDENCY;
+                addTdsDependent(DEPENDENCY,newTDS);
+            }
         }
     }
     else{
@@ -1027,7 +1030,8 @@ Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
 
 
 Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){
-    return NULL;
+    return computeTDSBasicOperations(n->children[0],n->leafs[3],TDS_DEPEN,NULL,
+                                     n->children[0]->nchild == 2,scope,controllerSmv);
 }
 
 Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){

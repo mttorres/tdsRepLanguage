@@ -388,7 +388,7 @@ Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT){
         //}
     }
     Object* newList = LEFT_COMPONENT;
-    if(LEFT_COMPONENT->OBJECT_SIZE == 2 && !LEFT_COMPONENT->aList){
+    if(!LEFT_COMPONENT->aList){
         void* vp[] = {LEFT_COMPONENT,RIGHT_COMPONENT};
         newList = createObjectDS(selectedType,2,vp,LEFT_COMPONENT->timeContext,LEFT_COMPONENT->SINTH_BIND,1);
     }
