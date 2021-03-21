@@ -80,6 +80,9 @@ void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_
     int i;
     for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
         currentTDS->linkedDependent[i]->DATA_TIME[C_TIME] = currentTDS->DATA_TIME[C_TIME];
+        if(currentTDS->linkedDependent[i]->TOTAL_DEPENDENTS_PT > 0){
+            resolveDependencies(currentTDS->linkedDependent[i],controllerSmv,C_TIME);
+        }
         propagateTypeSet(currentTDS,currentTDS->linkedDependent[i],controllerSmv,C_TIME);
     }
 }

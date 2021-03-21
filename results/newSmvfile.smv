@@ -157,6 +157,6 @@ ASSIGN
 
 MODULE tds_d(time)
 VAR
-	value : {NULL, 0, 1};
+	value : {NULL, 0, 1, 2, 3, 4, 5, 6};
 ASSIGN
 
