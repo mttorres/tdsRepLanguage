@@ -519,11 +519,6 @@ char *processActiveName(STable *currentScope, char *varName, int notExistsOutSco
             useVar = interRedef;
         }
     }
-    else{
-       char interTDS[ALOC_SIZE_LINE];
-        sprintf(interTDS, SmvConversions[TDS_MODULE_NAME], varName);
-        useVar = interTDS;
-    }
     char* activeName = malloc(sizeof(ALOC_SIZE_LINE));
     strcpy(activeName,useVar);
     return activeName;
@@ -639,7 +634,12 @@ void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, in
 }
 
 char* createReferenceTDS(char* declaredName){
-    return processActiveName(NULL,declaredName,-1,-1,TDS_ENTRY);
+
+    char interTDS[ALOC_SIZE_LINE];
+    sprintf(interTDS, SmvConversions[TDS_MODULE_NAME], declaredName);
+    char* BIND_TDS = malloc(sizeof(ALOC_SIZE_LINE));
+    strcpy(BIND_TDS,interTDS);
+    return BIND_TDS;
 }
 
 /**
