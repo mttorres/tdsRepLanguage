@@ -19,39 +19,42 @@ ASSIGN
 		TRUE: time;
 esac;
 	init(x):= 2;
+	next(x):= case 
+		next(time) = 2  : 4;
+		next(time) = 3  : -1;
+		TRUE : 0; 
+	esac;
 	init(z):= TRUE;
+	next(z):= case 
+		next(time) = 4  : TRUE;
+		TRUE : FALSE; 
+	esac;
 	init(zeta):= FALSE;
+	next(zeta):= case 
+		next(time) = 4  : FALSE;
+		TRUE : FALSE; 
+	esac;
 	init(w_scope1_0):= case 
 		!z : 1;
 		TRUE : 0; 
 	esac;
+	next(w_scope1_0):= w_scope1_0;
 	init(r_scope1_1):= case 
 		zeta : FALSE;
 		TRUE : FALSE; 
 	esac;
+	next(r_scope1_1):= r_scope1_1;
 	init(u_scope1_1_2_0):= case 
 		zeta & z  : FALSE;
 		TRUE : FALSE; 
 	esac;
-	next(x):= case 
-		next(time) = 2  : 4;
-		next(time) = 3  : -1;
-		TRUE : x; 
-	esac;
+	next(u_scope1_1_2_0):= u_scope1_1_2_0;
 	init(y):= 0;
 	next(y):= case 
 		next(time) = 2  : 5;
 		next(time) = 4  & !next(zeta)  : 2;
 		next(time) = 4  & !!next(zeta)  : 6;
 		TRUE : y; 
-	esac;
-	next(zeta):= case 
-		next(time) = 4  : FALSE;
-		TRUE : zeta; 
-	esac;
-	next(z):= case 
-		next(time) = 4  : TRUE;
-		TRUE : z; 
 	esac;
 	init(w_scope1_2):= FALSE;
 	next(w_scope1_2):= case 

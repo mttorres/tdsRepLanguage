@@ -112,7 +112,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
  * */
 
 void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValue, char *condition,
-                  int typeExpr, char *defaultEvalCond, int freeCondition);
+                  int typeExpr, char *defaultEvalCond, int freeCondition, int initialNext);
 
 
 /**
