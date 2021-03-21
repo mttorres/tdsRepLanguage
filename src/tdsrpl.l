@@ -79,7 +79,7 @@ portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
 
 void yyerror(const char *s) {
   printf("\n");
-  printf("PARSING ERROR near line %d \n",s,yylineno);
+  printf("PARSING ERROR %s near line %d \n",s,yylineno);
   exit(-1);
 }
 
