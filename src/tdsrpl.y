@@ -268,8 +268,7 @@ params: param {
 			$$ = $1;
 		}
 	    | params COMMA param {
-			
-			Node* params = createNode(7,1,2,"Paramslist - lista de parâmetros a mais de uma função ", LIST_ITERATOR , $1, $2,$3);
+			Node* params = createNode(7,2,1,"Paramslist - lista de parâmetros a mais de uma função ", LIST_ITERATOR , $1,$3, $2);
 			$$ = params; 	
 	    }
 
@@ -764,7 +763,7 @@ extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
                    fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option not valid for multiples inputs! \n");
                    exit(-1);
 	   	 	    }
-	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5,$7,  $1,$2,$3,$4,$6);
+	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5, $7, $1,$2,$3,$4,$6);
 	   	 	}
 	   	 	else {
 	   	 		extra = createNode(10,1,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED , $5,  $1,$2,$3,$4,$6);
@@ -778,9 +777,9 @@ extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
 	}
 	
 
-delayedoption: COMMA DELAYED COLON BOOLEAN {
+delayedoption: COMMA DELAYED {
 	   		
-		Node* extra = createNode(8,0,4,"DELAYED-EXTRA-ARGS-TDS", DEF_EXTRAS_DELAYED ,$1,$2,$3,$4);
+		Node* extra = createNode(6,0,2,"DELAYED-EXTRA-ARGS-TDS", DEF_EXTRAS_DELAYED ,  $1,$2);
 	   	$$ = extra;
 	   }
 	   | /* empty */ {  $$ = NULL;}
