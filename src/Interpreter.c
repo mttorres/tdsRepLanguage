@@ -6,34 +6,9 @@
 #include <string.h>
 #include "../headers/Interpreter.h"
 
-typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, LT = 60, GT = 62, NOTEQUAL = 94, NOT_PREFIX = 110,
-    LE = 121, EQUAL = 122, GE = 123} MAP_OP;
-
-
-Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv);
-Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalEXPR(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope, EnvController* controllerSmv);
-Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv);
-
-Object* eval_ITERATOR(Node* n, STable* scope, EnvController* controllerSmv);
+/*
+ * Funções Auxiliares
+ */
 
 STable* selectSMV_SCOPE(STable* scope, EnvController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
@@ -68,14 +43,6 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
 
-/**
- * Resolve a dependencia de todas as TDS's associadas a TDS corrente durante a avaliação lazy
- * @param currentTDS a TDS corrente
- * @param controllerSmv o controller usado para atualizar o type-set das TDS's dependentes.
- * @param C_TIME para indexar o data-time correto
- */
-void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME );
-
 void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME){
     int i;
     for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
@@ -87,12 +54,6 @@ void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TI
     }
 }
 
-/**
- * Resolve a avaliação lazy das TDS's pendentes após uma mudança de contexto temporal. E salva seus dados para Memoization.
- * @param currentScope o escopo atual
- * @param controllerSmv o controlador de ambiente
- * @param C_TIME o contexto temporal atual
- */
 void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv, int C_TIME) {
     int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
     Node* PROGRAM_PATH = NULL;
@@ -143,13 +104,9 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
     }
 }
 
-Object* (*executores[80]) (Node* n, STable* scope, EnvController* controllerSmv) = {
-
-        evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalPARAMS ,evalDEFINE_INTERVAL ,evalAC_V,
-        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF,
-        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, evalANON_TDS, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT
-};
-
+/*
+ * Funções de avaliação
+ */
 
 Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
 {
@@ -489,7 +446,7 @@ Object* evalEXPR(Node* n, STable* scope, EnvController* controllerSmv)
         }
         return sintUni;
     }
-    // operação binária
+        // operação binária
     else
     {
         // CUIDADO (ordem avaliação)
@@ -622,7 +579,7 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope, EnvController* control
             fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
             exit(-1);
         }
-       // printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
+        // printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
         return expr;
     }
 
@@ -703,7 +660,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
         }
     }
     if(  (ptitime != NULL && ptftime != NULL && I_TIME > F_TIME)  ||
-        ( ptitime != NULL && I_TIME < 0 ) || ( ptftime != NULL && F_TIME <= 0 )  ) {
+         ( ptitime != NULL && I_TIME < 0 ) || ( ptftime != NULL && F_TIME <= 0 )  ) {
         fprintf(stderr, "ERROR: BAD USE OF INTERVAL TIME DIRECTIVE, INVALID INTERVAL! \n");
         exit(-1);
     }
@@ -762,13 +719,13 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
         if(C_TIME > ftime){
             fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL. The statement has no effect \n", n->children[0]->leafs[0]);
         }
-        /* TOMAR NOTA: NUNCA MAIS FAZER ISSO
-         * 		int* v;
-         *       v = 5;  (PODE LITERALMENTE ALOCAR QUALQUER, REPITO QUALQUER REGIÃO DE MEMÓRIA PARA MEU 5!
-         *       void* vp[] = {v};
-         * */
-        // só fazer isso se eu tiver dado malloc em v!
-        // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
+            /* TOMAR NOTA: NUNCA MAIS FAZER ISSO
+             * 		int* v;
+             *       v = 5;  (PODE LITERALMENTE ALOCAR QUALQUER, REPITO QUALQUER REGIÃO DE MEMÓRIA PARA MEU 5!
+             *       void* vp[] = {v};
+             * */
+            // só fazer isso se eu tiver dado malloc em v!
+            // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
         else if(*(int*) expr->values[0] != C_TIME){
             commitCurrentTime(scope,controllerSmv,*(int*) expr->values[0]);
             void* vp[] = {expr->values[0]};
@@ -923,18 +880,6 @@ Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv){
     return NULL;
 }
 
-/**
- *
- * @param n o nó passado para resolução de dependências
- * @param portName o nome da porta da tds
- * @param scope o escopo corrente
- * @param newTDS a nova TDS
- * @param controller o controlador de ambiente
- * @param I_TIME a diretiva de tempo inicial
- * @param C_TIME a diretiva de tempo corrente
- * @return a TDS com as dependencias computadas
- * @SideEffects: Aloca e posições no vetor de dependências de uma TDS se for necessário
- */
 TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME){
     Object * dependenceList = eval(n->children[0],scope,controller);
     Object * DEP_HEAD = dependenceList->OBJECT_SIZE > 1 ? dependenceList->values[0] : NULL;
@@ -976,26 +921,13 @@ TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* 
     return SYNTH_DEPENDENCY_LIST;
 }
 
-/**
- * Real as operaçoes basicas envolvidas em quaisquer declaraçoes de TDS's. Dentre elas, alocaçao da estrutura,
- * consulta das diretivas temporais, sintetização de binds e, se necessário, resolução de dependências.
- * @param pathForDepen o path para se resolver uma dependência, isto é o dos nós mais abaixo da AST
- * @param portName o nome da porta
- * @param type o tipo da TDS para enumeraçao
- * @param tdsSpec o objeto que representa a especificaçao da TDS
- * @param delayed o parametro delayed de uma TDS
- * @param scope o scopo corrente
- * @param controller o controlador de ambiente
- * @return um objeto sintetizado com a TDS criada.
- * @SideEffects: Aloca uma TDS, e posições no vetor de dependências de uma TDS se for necessário
- */
 Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, EnvController* controller){
     int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
     int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
 
     TDS* newTDS = createTDS(portName,type,tdsSpec,delayed,
-                        type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL,C_TIME,F_TIME);
+                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL,C_TIME,F_TIME);
     TDS** SYNTH_DEP = NULL;
     if(type == TDS_DEPEN){
         SYNTH_DEP =  computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
@@ -1017,7 +949,7 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerS
     char* portName = n->leafs[3];
     Object * domainInfo = eval(n->children[0],scope,controllerSmv);
     TDS_TYPE type =  domainInfo->type == TIME_COMPONENT? DATA_LIST :
-            domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
+                     domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
     return computeTDSBasicOperations(NULL,portName,type,domainInfo,0,scope,controllerSmv);
 }
 
@@ -1092,42 +1024,15 @@ Object * eval_ITERATOR(Node* n, STable* scope, EnvController* controllerSmv){
     }
 }
 
-Object *eval(Node *n, STable *scope, EnvController *controllerSmv)
-{
-    //printf("[eval] %s \n",n->name);
-    if(n)
-    {
-        // sintetizado dos filhos
-        //void** SYNTH_C[n->nchild];
-        // sintetizado dos filhos
-        //void** SYNTH_L[n->nleafs];
-        Object* SYNTH_O = NULL;
-
-        if(executores[n->type])
-        {
-            printf("[PostProcess - eval] eval especifico \n\n");
-            // o nó pode ou não ter mais dem filho, e esse trata o processamento desses nao sendo somente uma varredura e largura.
-            SYNTH_O = executores[n->type](n,scope,controllerSmv);
-        }
-        else
-        {
-            //printf("[PostProcess - eval] eval genérico \n");
-            if(n->nchild && n->children)
-            {
-                int i; // passa a diante (varredura em pos ordem)
-                for (i=0; i < n->nchild; i++){
-                    eval(n->children[i],scope,controllerSmv);
-                }
-            }
-            if(n->type == PROG){
-                // terminou
-                int F_TIME = *(int*) lookup(scope,"F_TIME")->val->values[0];
-                commitCurrentTime(scope,controllerSmv,F_TIME);
-            }
-        }
-        return SYNTH_O;
-    }
-    return NULL;
+void startInterpreter(Node* n, STable* scope, EnvController* controller){
+    /*
+    * Realização de estrutura auxiliar
+    */
+    Object ** REALIZATION = malloc(sizeof(Object*)*DEFAULT_MEMOI);
+    MEMOI = REALIZATION;
+    eval(n,scope,controller);
+    commitCurrentTime(scope,controller,*(int*) lookup(scope,"F_TIME")->val->values[0]);
+    letgoNode(n);
 }
 
 

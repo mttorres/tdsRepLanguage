@@ -46,13 +46,13 @@ int main(int argc, char* argv[]) {
 	//pré processamento
 	preProcessSmv(smvP,controller);
 	setUpMainSmvTable(controller,global);
-  
+
   	printf("--------------------------------- EVAL ---------------------------------------------\n");
   	printf("\n");
   	printf("\n");
-  	
-	//pos processamento
-    eval(root, global, controller);
+
+	//interpretação e pos processamento
+    startInterpreter(root,global,controller);
 
 	printf("\n");
 	printf("------------------------------------------------------------------------------\n");
@@ -82,7 +82,6 @@ int main(int argc, char* argv[]) {
 
  	printf("--------------------------------- HEADERS ---------------------------------------------\n");
 
-
     printAllHeaders(controller);
 
  	if(controller->declaredPortsNumber != controller->expectedPorts){
@@ -108,7 +107,6 @@ int main(int argc, char* argv[]) {
  	}
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
 	fclose(smvP);
-	letgoNode(root);
 
 
 
@@ -119,8 +117,4 @@ int main(int argc, char* argv[]) {
 //  printf("%s\n",testAgain);
 
 	letGoHeaderControl(controller);
-
-
-
 }
-
