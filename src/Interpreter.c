@@ -10,32 +10,32 @@ typedef enum MAP_OP { PLUS = 43, MINUS = 45, TIMES = 42, DIVIDE = 47, MOD = 37, 
     LE = 121, EQUAL = 122, GE = 123} MAP_OP;
 
 
-Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalBOOL(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalSTRING(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalNULL(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalIDVAR(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalTIME_DIRECTIVE(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalDataV(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalPARAMS(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalPARAMS_CALL(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalAC_V(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalV_PROP(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalADD_V(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalADD_V_PROP(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object* evalV_PROP_TDS(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalDEFINE_INTERVAL(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv);
-Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalEXPR(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope, EnvController* controllerSmv);
+Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv);
 
-Object* eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv);
+Object* eval_ITERATOR(Node* n, STable* scope, EnvController* controllerSmv);
 
-STable* selectSMV_SCOPE(STable* scope, HeaderController* controllerSmv){
+STable* selectSMV_SCOPE(STable* scope, EnvController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
         return accessSmvInfo(controllerSmv,FUNCTION_SMV,scope->indexRef);
 //        return controllerSmv->functionsInfo[scope->indexRef];
@@ -45,7 +45,7 @@ STable* selectSMV_SCOPE(STable* scope, HeaderController* controllerSmv){
     }
 }
 
-HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderController* controllerSmv){
+HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController* controllerSmv){
     if(!functionPointer){
         return controllerSmv->MAIN;
     }
@@ -74,9 +74,9 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer,HeaderControll
  * @param controllerSmv o controller usado para atualizar o type-set das TDS's dependentes.
  * @param C_TIME para indexar o data-time correto
  */
-void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_TIME );
+void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME );
 
-void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_TIME){
+void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME){
     int i;
     for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
         currentTDS->linkedDependent[i]->DATA_TIME[C_TIME] = currentTDS->DATA_TIME[C_TIME];
@@ -93,7 +93,7 @@ void resolveDependencies(TDS* currentTDS,HeaderController* controllerSmv, int C_
  * @param controllerSmv o controlador de ambiente
  * @param C_TIME o contexto temporal atual
  */
-void resolveTdsLazyEvaluation(STable *currentScope, HeaderController *controllerSmv, int C_TIME) {
+void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv, int C_TIME) {
     int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
     Node* PROGRAM_PATH = NULL;
     Object* lazyValue = NULL;
@@ -134,7 +134,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, HeaderController *controller
 // CHAMAR ESSA FUNÇÃO DIFERENÇA VEZES.
 // CASO FORA DE FLUXO 2: deve chamar isso também ao FIM DO PROGRAMA (para cada CHAMADA RESTANTE, ex: C_TIME terminou em 4, deve chamar até F_TIME (5, ... , F_TIME).
 // DIFERENÇA VEZES DE NOVO!
-void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv, int changedTo){
+void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int changedTo){
     // deve resolver a avaliação para cada TDS "n" vezes. Antes do proximo intervalo ou fim do programa.
     int i;
     int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
@@ -143,7 +143,7 @@ void commitCurrentTime(STable* currentScope, HeaderController* controllerSmv, in
     }
 }
 
-Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controllerSmv) = {
+Object* (*executores[80]) (Node* n, STable* scope, EnvController* controllerSmv) = {
 
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE, evalDataV, evalPARAMS_CALL, evalPARAMS ,evalDEFINE_INTERVAL ,evalAC_V,
         evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR, evalCMD_IF,
@@ -151,7 +151,7 @@ Object* (*executores[80]) (Node* n, STable* scope,  HeaderController* controller
 };
 
 
-Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
 {
     int sint;
     sint = atoi(n->leafs[0]);
@@ -161,7 +161,7 @@ Object* evalNUM(Node* n, STable* scope,  HeaderController* controllerSmv)
     return o;
 }
 
-Object* evalBOOL(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalBOOL] \n");
     int sint;
@@ -180,7 +180,7 @@ Object* evalBOOL(Node* n, STable* scope,  HeaderController* controllerSmv)
 }
 
 
-Object* evalSTRING(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalSTRING] \n");
     char* sint =  n->leafs[0];
@@ -200,7 +200,7 @@ Object* evalSTRING(Node* n, STable* scope,  HeaderController* controllerSmv)
 
 */
 
-Object* evalNULL(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalNULL] \n");
     // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
@@ -216,7 +216,7 @@ Object* evalNULL(Node* n, STable* scope,  HeaderController* controllerSmv)
 }
 
 
-Object* evalIDVAR(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalIDVAR] \n");
 
@@ -260,7 +260,7 @@ Object* evalIDVAR(Node* n, STable* scope,  HeaderController* controllerSmv)
 }
 
 
-Object* evalTIME_DIRECTIVE(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalTIME_DIRECTIVE] \n");
 
@@ -281,7 +281,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope,  HeaderController* controller
 
 
 
-Object* evalDataV(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalDataV] \n");
 
@@ -297,12 +297,12 @@ Object* evalDataV(Node* n, STable* scope,  HeaderController* controllerSmv)
     // vai chamar evalParams , e sintetizar um Object Vetor (ou um vetor void que será jogado em um object)
 }
 
-Object* evalPARAMS_CALL(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalPARAMS_CALL] \n");
 }
 
-Object* evalPARAMS(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalPARAMS_CALL] \n");
 }
@@ -462,7 +462,7 @@ Object* evalEqual(Object* o1, Object* o2, int opCode)
 
 
 
-Object* evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalEXPR(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalEXPR] \n");
     // operação unária ou simplesmente FOLHA
@@ -595,7 +595,7 @@ Object* evalEXPR(Node* n, STable* scope,  HeaderController* controllerSmv)
 }
 
 
-Object* evalProp(Node* fatherRef, Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalProp(Node* fatherRef, Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalProp] \n");
     if(!n)
@@ -633,7 +633,7 @@ Object* evalProp(Node* fatherRef, Node* n, STable* scope,  HeaderController* con
 }
 
 
-Object* evalAC_V(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalAC_V] \n");
 
@@ -662,22 +662,22 @@ Object* evalAC_V(Node* n, STable* scope,  HeaderController* controllerSmv)
     }
 }
 
-Object* evalV_PROP(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv){
     printf("[evalV_PROP] \n");
 
 }
-Object* evalADD_V(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv){
     printf("[evalADD_V] \n");
 }
-Object* evalADD_V_PROP(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv){
     printf("[evalADD_V_PROP] \n");
 }
 
-Object* evalV_PROP_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv){
     printf("[evalV_PROP_TDS] \n");
 }
 
-Object * evalDEFINE_INTERVAL(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSmv){
 
     int I_TIME;
     int* ptitime = NULL;
@@ -726,7 +726,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope,  HeaderController* controll
     return NULL;
 }
 
-Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSmv)
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
 {
     Object* expr = NULL;
     Object** sintExpr = NULL;
@@ -897,7 +897,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope,  HeaderController* controllerSm
     return NULL;
 }
 
-Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv){
 
     Object* conditionalExpr = NULL;
 
@@ -935,7 +935,7 @@ Object * evalCMD_IF(Node* n, STable* scope,  HeaderController* controllerSmv){
  * @return a TDS com as dependencias computadas
  * @SideEffects: Aloca e posições no vetor de dependências de uma TDS se for necessário
  */
-TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, HeaderController* controller, int I_TIME, int C_TIME){
+TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME){
     Object * dependenceList = eval(n->children[0],scope,controller);
     Object * DEP_HEAD = dependenceList->OBJECT_SIZE > 1 ? dependenceList->values[0] : NULL;
     if(DEP_HEAD && DEP_HEAD->type == TDS_ENTRY || dependenceList->type == TDS_ENTRY) {
@@ -989,7 +989,7 @@ TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* 
  * @return um objeto sintetizado com a TDS criada.
  * @SideEffects: Aloca uma TDS, e posições no vetor de dependências de uma TDS se for necessário
  */
-Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, HeaderController* controller){
+Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, EnvController* controller){
     int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
     int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
@@ -1009,7 +1009,7 @@ Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE t
     return encapsulatedTDS;
 }
 
-Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerSmv){
 
     if(scope->type != GLOBAL){
         fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv.\nPlease refer to the documentation for further info. \n");
@@ -1021,7 +1021,7 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope,  HeaderController* control
     return computeTDSBasicOperations(NULL,portName,type,domainInfo,0,scope,controllerSmv);
 }
 
-Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv){
     //printf("teste \n %d",n->type == CMD_TDS_ANON);
     //Object* SYNTH_OBJECT = evalIDVAR() // VAI TER QUE CHAMAR O ITERATOR! que nem antes só que para PARAM!
     Object* encapsulatedTDS = computeTDSBasicOperations(n,n->leafs[2],TDS_DEPEN,NULL,
@@ -1032,14 +1032,14 @@ Object * evalANON_TDS(Node* n, STable* scope,  HeaderController* controllerSmv){
 }
 
 
-Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope, EnvController* controllerSmv){
     return computeTDSBasicOperations(n->children[0],n->leafs[3],TDS_DEPEN,NULL,
                                      n->children[0]->nchild == 2,scope,controllerSmv);
 }
 
-Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope, EnvController* controllerSmv){
 
-    //Object* (*SYNTH) (Node*, STable*, HeaderController*) = eval;
+    //Object* (*SYNTH) (Node*, STable*, EnvController*) = eval;
     Node* PROGRAM_PATH = n->children[0];
 /*    if(SYNTH->OBJECT_SIZE > 1){
         fprintf(stderr, "TDS data per time not compatible with lists. Please reffer to the documentation for further info. \n");
@@ -1055,7 +1055,7 @@ Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope,  HeaderController* 
 }
 
 
-Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv){
+Object * eval_ITERATOR(Node* n, STable* scope, EnvController* controllerSmv){
 
     if(n->nchild > 1){
         // deve retornar uma lista com ambos
@@ -1092,7 +1092,7 @@ Object * eval_ITERATOR(Node* n, STable* scope,  HeaderController* controllerSmv)
     }
 }
 
-Object *eval(Node *n, STable *scope, HeaderController *controllerSmv)
+Object *eval(Node *n, STable *scope, EnvController *controllerSmv)
 {
     //printf("[eval] %s \n",n->name);
     if(n)

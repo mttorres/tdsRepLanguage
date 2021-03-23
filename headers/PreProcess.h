@@ -2,19 +2,16 @@
 
 #define PREP_H
 
-#include "HeaderSmv.h"
-
-
-
+#include "EnvController.h"
 
 /* 
 	salva o headerSMV do módulo lido anteriormente. 
 	se for um automato o ponteiro de transição não é vázio.
-	efeito colateral: * ao criar ao salvar o header incrementa o tamanho de headers do HeaderController
+	efeito colateral: * ao criar ao salvar o header incrementa o tamanho de headers do EnvController
 					  *	cria um header (necessita de free depois) 
 */
 
-void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcontrol);
+void initPreProcessHeader(smvtype type, char* moduleName, EnvController* Hcontrol);
 
 
 
@@ -24,14 +21,14 @@ void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcon
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 
 */
-void saveLineOnBuffer(smvtype currentHeader, headerpart part, char *line, HeaderController *Hcontrol, int controlRename);
+void saveLineOnBuffer(smvtype currentHeader, headerpart part, char *line, EnvController *Hcontrol, int controlRename);
 
 
 /* fases: criação, var, assign(pode não existir), trans(pode não existir) (as partes de interesse)
  	as partes de interesse servem como delimitadores,  quebras de linha servem como delimitadores dos módulos
  	stages são os módulos 0(main), automato(2), ports(3)
 */
-void processPhase(smvtype stage, headerpart part, HeaderController *Hcontrol, char *line, int controlRename);
+void processPhase(smvtype stage, headerpart part, EnvController *Hcontrol, char *line, int controlRename);
 
 /**
  * Salva o arquivo SMV original em headers, separados por categorias e partes de um arquivo SMV.
@@ -41,7 +38,7 @@ void processPhase(smvtype stage, headerpart part, HeaderController *Hcontrol, ch
  * para renomações futuras. Além disso são criadas entradas na tabelas de simbolos auxiliares (SMV_INFO) usadas pelo main e ports, respectivamente,
  * a variável time e as portas que vierem do módulo original.
  * */
-void preProcessSmv(FILE *smvP, HeaderController *Hcontrol);
+void preProcessSmv(FILE *smvP, EnvController *Hcontrol);
 
 /**
  *  Configura a tabela de controle SMV info da main para a variável time a incializando
@@ -54,7 +51,7 @@ void preProcessSmv(FILE *smvP, HeaderController *Hcontrol);
  *  @SideEffects:  Chama o addValue da tabela de simbolos para os casos citados, alocando memória para as Entry de
  *  cada tupla.
  * */
-void setUpMainSmvTable(HeaderController *Hcontrol, STable *global);
+void setUpMainSmvTable(EnvController *Hcontrol, STable *global);
 
 #endif
 

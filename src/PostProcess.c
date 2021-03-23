@@ -750,7 +750,7 @@ char* createReferenceTDS(char* declaredName){
  * @return o novo header alocado
  * @SideEffects: Aloaca um header que deve ser liberado como responsabilidade do chamador
  */
-HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int transP, HeaderController* controller){
+HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int transP, EnvController* controller){
     HeaderSmv* newHeader = createHeader(type,name,varP,assignP,transP);
     addNewHeader(controller,newHeader);
     selectBuffer(VAR,"VAR\n",newHeader,0);
@@ -758,7 +758,7 @@ HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int trans
     return newHeader;
 }
 
-void validateTdsDeclaration(char* declarationName, HeaderController* controller){
+void validateTdsDeclaration(char* declarationName, EnvController* controller){
     TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
     if(expected_entry){
         Object* info = expected_entry->val;
@@ -783,7 +783,7 @@ void validateTdsDeclaration(char* declarationName, HeaderController* controller)
  * @param someIsValid
  */
 
-void specAssignForInvalidTds(TDS* newTDS, HeaderController* controller, int initialIsInvalid, int someIsValid){
+void specAssignForInvalidTds(TDS* newTDS, EnvController* controller, int initialIsInvalid, int someIsValid){
     if(initialIsInvalid){
         // só o inicial é invalido
         createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
@@ -811,7 +811,7 @@ void specAssignForInvalidTds(TDS* newTDS, HeaderController* controller, int init
  * @return
  */
 
-int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, HeaderController*  controller, int C_TIME, int I_TIME, int F_TIME){
+int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  controller, int C_TIME, int I_TIME, int F_TIME){
     int someIsValidToLazy = 0; // nenhum é valido = 0 , algum é valido = 1,  -1 a gente pode falar que algum é valido mas o primeiro é invalid (C_TIME = 0)
     int initialIsInvalid = 0;
     int i;
@@ -856,7 +856,7 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, HeaderController* 
  * init ou next sao declarados (linha alocada)
  */
 
-void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME,  int I_TIME, int F_TIME){
+void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME){
     int addToLazy = newTDS->type != DATA_LIST? 1: validateTdsTimeList(encapsulatedTDS,newTDS,controller,C_TIME, I_TIME,F_TIME);
     if(addToLazy){
         controller->declaredPorts[controller->declaredPortsNumber] = newTDS;
@@ -871,7 +871,7 @@ void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, HeaderController*
  * @param controller a
  * @param dependencies
  */
-void addTdsRelationOnSmv(TDS* newTDS, HeaderController* controller, TDS** dependencies){
+void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller, TDS** dependencies){
     // adiciona informações de relacionamento no nuXmv (separar em método)
     int i;
     if(newTDS->delayed){
@@ -1003,7 +1003,7 @@ void addTdsRelationOnSmv(TDS* newTDS, HeaderController* controller, TDS** depend
  * @param F_TIME
  */
 
-void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME){
+void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME){
     char  nameWithNoBreakL[ALOC_SIZE_LINE];
     nameWithNoBreakL[0] = '\0';
     char* declarationDetails = strstr(moduleName,"t");
@@ -1013,7 +1013,7 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Hea
                accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC);
 }
 
-void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
+void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
     TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
 
     SYNTH_TDS->AUX_REF = controller->PORTS_INFO_CURRENT_SIZE;
@@ -1038,7 +1038,7 @@ void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_
     validateTdsDeclaration(declarationName,controller);
 }
 
-void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderController *controller, STable *currentScope) {
+void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
 
     //HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
     //TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
@@ -1226,7 +1226,7 @@ void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type
     addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
 }
 
-void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* controller, int C_TIME){
+void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller, int C_TIME){
     STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
 
     HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);
@@ -1236,7 +1236,7 @@ void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* control
     updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant);
 }
 
-void writeResultantHeaders(HeaderController* controller, const char* path){
+void writeResultantHeaders(EnvController* controller, const char* path){
   
   int i;
   FILE* smvoutput = fopen(path, "w");

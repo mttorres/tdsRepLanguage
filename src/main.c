@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	fclose(fp);
 
 	// tabelas e componentes globais
-    HeaderController* controller = createController();
+    EnvController* controller = createController();
 	STable* global = createTable(GLOBAL, NULL, 0, 0, -1);
 
 	//pré processamento

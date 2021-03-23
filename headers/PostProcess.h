@@ -2,8 +2,7 @@
 
 #define POSP_H
 
-#include "textManager.h"
-#include "HeaderSmv.h"
+#include "EnvController.h"
 #include "Object.h"
 
 
@@ -178,7 +177,7 @@ void letGoOldEntry(TableEntry* var, STable* auxTable);
  * Essas devem ser liberadas assim como as outras. Realiza declaração da tds em ports module (linha que deve ser liebrada depois)
  */
 
-void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP);
+void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP);
 
 /**
  * Define um módulo smv para a TDS associada ao parâmetro. Recupera as informações da encapsulatedTDS avaliada, seus dados, seu header,
@@ -188,7 +187,7 @@ void preProcessTDS(Object* encapsulatedTDS, HeaderController* controller, int C_
  * @param controller o controller para conseguir realizar a escrita.
  * @param currentScope o escopo corrente usado para outras passagens necessárias de informação.
  */
-void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderController *controller, STable *currentScope);
+void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope);
 
 /**
  * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
@@ -199,7 +198,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, HeaderC
  * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* controller, int C_TIME );
+void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller, int C_TIME );
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*
@@ -225,7 +224,7 @@ void propagateTypeSet(TDS* dependence, TDS* dependant, HeaderController* control
 */
 void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable);
 
-void writeResultantHeaders(HeaderController* controller, const char* path);
+void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif
 

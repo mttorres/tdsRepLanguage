@@ -7,11 +7,11 @@
 /*
 	salva o headerSMV do módulo lido anteriormente. 
 	se for um automato o ponteiro de transição não é vázio.
-	efeito colateral: * ao criar ao salvar o header incrementa o tamanho de headers do HeaderController
+	efeito colateral: * ao criar ao salvar o header incrementa o tamanho de headers do EnvController
 					  *	cria um header (necessita de free depois) 
 */
 
-void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcontrol) {
+void initPreProcessHeader(smvtype type, char* moduleName, EnvController* Hcontrol) {
 	int transP = type == AUTOMATA? 0 : -1;
     HeaderSmv* newHeader = createHeader(type, moduleName, 0, 0, transP);
     addNewHeader(Hcontrol,newHeader);
@@ -22,12 +22,12 @@ void initPreProcessHeader(smvtype type, char* moduleName, HeaderController* Hcon
 	ratando a posição (pos) que representa o tamanho do vetor de HEADERS do controller (LEN-1)
 						 
 */
-void saveLineOnBuffer(smvtype currentHeader, headerpart part, char *line, HeaderController *Hcontrol, int controlRename)  {
+void saveLineOnBuffer(smvtype currentHeader, headerpart part, char *line, EnvController *Hcontrol, int controlRename)  {
     HeaderSmv* current = accessHeader(Hcontrol,currentHeader,-1);
     selectBuffer(part, line, current, controlRename);
 }
 
-void processPhase(smvtype stage, headerpart part, HeaderController *Hcontrol, char *line, int controlRename) {
+void processPhase(smvtype stage, headerpart part, EnvController *Hcontrol, char *line, int controlRename) {
 
 	// modulo
 	if(part == CREATE_MODULE) {
@@ -42,7 +42,7 @@ void processPhase(smvtype stage, headerpart part, HeaderController *Hcontrol, ch
 
 }
 
-void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
+void setUpMainSmvTable(EnvController *Hcontrol, STable *global)
 {
 	// seta alguns pontos de interesse da diretiva temporal
 	char nome[] = "time";
@@ -105,7 +105,7 @@ void setUpMainSmvTable(HeaderController *Hcontrol, STable *global)
 }
 
 
-void processPorts(char* buffer, char* varString, char *fVarString, int stage, HeaderController *Hcontrol) {
+void processPorts(char* buffer, char* varString, char *fVarString, int stage, EnvController *Hcontrol) {
     HeaderSmv* portsHeader = accessHeader(Hcontrol, stage, -1);
     int iniVar = portsHeader->VAR_POINTER == 0;
     if(iniVar &&  strstr(buffer,fVarString)) {
@@ -124,7 +124,7 @@ void processPorts(char* buffer, char* varString, char *fVarString, int stage, He
     }
 }
 
-void preProcessSmv(FILE *smvP, HeaderController *Hcontrol) {
+void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {
 	/*Strings que são usadas para a busca no arquivo*/
 	char varString[] = "VAR \n";
 	char assignString[] = "ASSIGN";
