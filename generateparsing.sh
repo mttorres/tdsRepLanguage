@@ -1,4 +1,2 @@
-bison -d tdsrpl.y
-flex tdsrpl.l 
-gcc tdsrpl.tab.c lex.yy.c datastructures/Node.c datastructures/constants.c -o tdsPARSING
-./tdsPARSING ../sample/merger.tdsrpl > PARSINGOUTPUT
+bison  -d src/flex-bison/tdsrpl.y -b src/flex-bison/tdsrpl
+flex -o src/flex-bison/lex.yy.c src/flex-bison/tdsrpl.l

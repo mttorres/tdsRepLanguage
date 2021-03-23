@@ -1,7 +1,7 @@
 %{
   #include <stdio.h>
-  #include <string.h>	
-  #include "../headers/Node.h"
+  #include <string.h>
+  #include "../../headers/Node.h"
   #include "tdsrpl.tab.h"
 
   

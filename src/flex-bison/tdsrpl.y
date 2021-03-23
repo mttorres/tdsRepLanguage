@@ -7,7 +7,7 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
-  #include "../headers/Node.h"	
+  #include "../../headers/Node.h"
 
   int yylex(void);
   int yyparse();
