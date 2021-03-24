@@ -265,53 +265,75 @@ Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv)
 }
 
 
-
-
-Object* evalPLUS(Object* o1, Object* o2)
+Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
 {
-    printf("[evalPLUS] \n");
-    int* r;
-    void* rp[1];
-    if(o1->type == NUMBER_ENTRY)
-    {
-        *r = (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
-        rp[0] = r;
-        return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '+' + 1
+        createExprBind(resultingBind, o1, o2, "+");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
     }
-    if(o1->type == LABEL_ENTRY)
-    {
-        // concatena
-
+    else if(!o1->aList && !o2->aList && o1->type == LABEL_ENTRY && o2->type == o1->type){
+        char* str1 = o1->values[0];
+        char* str2 = o2->values[0];
+        char r[strlen(str1)+ strlen(str2)];
+        r[0] = '\0';
+        char* refToEnd = customCat(r,str1,0,0);
+        customCat(refToEnd,str2,0,0);
+        void* rp[] = {r};
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, r);
     }
-
-}
-
-Object* evalMINUS(Object* o1, Object* o2)
-{
-    if(o1->type != NUMBER_ENTRY || (o2 && o2->type != NUMBER_ENTRY))
-    {
-        fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE (-) OPERATION!");
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
         exit(-1);
     }
-    printf("[evalMINUS] \n");
+}
+
+Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
+{
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = NULL;
+    if(n->nchild > 1){
+        o2 = eval(n->children[1],scope,controller);
+    }
+    if(o1->aList || (o2 && o2->aList) || (o1->type != NUMBER_ENTRY || (o2 && o2->type != NUMBER_ENTRY)))
+    {
+        if(o2){
+            fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (-) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+            exit(-1);
+        }
+        else{
+            fprintf(stderr, "INCOMPATIBLE OPERAND %s FOR THE (-) OPERATION!",o1->SINTH_BIND);
+        }
+        exit(-1);
+    }
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
     void* rp[] = {&r};
+    char resultingBind[o2? strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4: strlen(o1->SINTH_BIND) +2]; // + espaco + espaco + '-' + 1 ou  '-' + +1
+    createExprBind(resultingBind, o1, o2, "-");
     letgoObject(o1);
     if(o2){
         letgoObject(o2);
     }
-    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
+    return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
 }
 
-Object* evalNOT(Object* o)
-{
-    if(o->type != LOGICAL_ENTRY)
+Object * notObjectOperation(Object* o){
+    if(o->aList || (o->type != LOGICAL_ENTRY))
     {
-        fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE (not) OPERATION!");
+        fprintf(stderr, "INCOMPATIBLE OPERAND %s FOR THE (not) OPERATION!",o->SINTH_BIND);
         exit(-1);
     }
-    printf("[evalNOT] \n");
     int r;
     r =  !(*(int*) o->values[0]);
     void* rp[] = {&r};
@@ -321,234 +343,346 @@ Object* evalNOT(Object* o)
     return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
-Object* evalTIMES(Object* o1, Object* o2)
+Object* evalNOT(Node* n, STable* scope, EnvController* controller)
 {
-    int* r;
-    *r = (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
-    void* rp[] = {r};
-    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
+    Object* o = eval(n->children[0],scope,controller);
+    return notObjectOperation(o);
 }
 
-Object* evalDIVIDE(Object* o1, Object* o2, int type)
+Object* evalMULTI(Node* n, STable* scope, EnvController* controller)
 {
-    printf("[evalDIVIDE] \n");
-    void* rp[1];
-    if(*(int*)o2->values[0] == 0)
-    {
-        fprintf(stderr, "CANNOT DIVIDE BY ZERO!");
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '*' + 1
+        createExprBind(resultingBind, o1, o2, "*");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+    }
+    fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (*) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+    exit(-1);
+}
+
+Object* evalDIV(Node* n, STable* scope, EnvController* controller)
+{
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+    int isDivision = n->leafs[0][0] == DIVIDE;
+    char* op = isDivision ? "/" : "MOD";
+
+    if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        int SYNTH_O2 = *(int*)o2->values[0];
+        if(!SYNTH_O2){
+            fprintf(stderr, "CANNOT %s DIVIDE BY ZERO!",o1->SINTH_BIND);
+            exit(-1);
+        }
+        int aloca = isDivision ? 4 : 7;
+        r =  isDivision? (*(int*)o1->values[0]) / (SYNTH_O2) : (*(int*)o1->values[0]) % (SYNTH_O2);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +aloca]; // + espaco + espaco + '/' + 1
+        createExprBind(resultingBind, o1, o2, op);
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+    }
+    fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (%s) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND,op);
+    exit(-1);
+}
+
+Object * evalLE(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    int r;
+    void* rp[] = {&r};
+    if(o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        r =  (*(int*)o1->values[0]) <= (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5]; // + espaco + espaco + '<=' + 1
+        createExprBind(resultingBind, o1, o2, "<=");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
+        // compara tamanhos
+        r =  o1->OBJECT_SIZE <= o2->OBJECT_SIZE;
+        char resultingBind[300];
+        sprintf(resultingBind,"%d <= %d",o1->OBJECT_SIZE,o2->OBJECT_SIZE);
+        if(!o1->aList){
+            letgoObject(o1);
+        }
+        if(!o2->aList){
+            letgoObject(o2);
+        }
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
         exit(-1);
     }
-    int* r;
-    *r = type == DIVIDE? (*(int*)o1->values[0]) / (*(int*)o2->values[0]) : (*(int*)o1->values[0]) % (*(int*)o2->values[0]);
-    rp[0] = r;
-
-    return createObject(NUMBER_ENTRY, 1, rp, -1, NULL);
 }
 
-Object* evalLESS(Object* o1, Object* o2, int opCode)
+
+Object * evalGE(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    int r;
+    void* rp[] = {&r};
+    if(o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        r =  (*(int*)o1->values[0]) >= (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5]; // + espaco + espaco + '<=' + 1
+        createExprBind(resultingBind, o1, o2, ">=");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
+        // compara tamanhos
+        r =  o1->OBJECT_SIZE >= o2->OBJECT_SIZE;
+        char resultingBind[300];
+        sprintf(resultingBind,"%d >= %d",o1->OBJECT_SIZE,o2->OBJECT_SIZE);
+        if(!o1->aList){
+            letgoObject(o1);
+        }
+        if(!o2->aList){
+            letgoObject(o2);
+        }
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
+    }
+}
+
+Object * evalLT(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    int r;
+    void* rp[] = {&r};
+    if(o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        r =  (*(int*)o1->values[0]) < (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5]; // + espaco + espaco + '<=' + 1
+        createExprBind(resultingBind, o1, o2, "<");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
+        // compara tamanhos
+        r =  o1->OBJECT_SIZE < o2->OBJECT_SIZE;
+        char resultingBind[300];
+        sprintf(resultingBind,"%d < %d",o1->OBJECT_SIZE,o2->OBJECT_SIZE);
+        if(!o1->aList){
+            letgoObject(o1);
+        }
+        if(!o2->aList){
+            letgoObject(o2);
+        }
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
+    }
+}
+
+Object * evalGT(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    int r;
+    void* rp[] = {&r};
+    if(o1->type == NUMBER_ENTRY && o2->type == o1->type){
+        r =  (*(int*)o1->values[0]) > (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5]; // + espaco + espaco + '<=' + 1
+        createExprBind(resultingBind, o1, o2, ">");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
+        // compara tamanhos
+        r =  o1->OBJECT_SIZE > o2->OBJECT_SIZE;
+        char resultingBind[300];
+        sprintf(resultingBind,"%d > %d",o1->OBJECT_SIZE,o2->OBJECT_SIZE);
+        if(!o1->aList){
+            letgoObject(o1);
+        }
+        if(!o2->aList){
+            letgoObject(o2);
+        }
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
+    }
+}
+
+int comparator(Object* o1, Object* o2, char* op){
+
+    if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == NUMBER_ENTRY)
+    {
+        return (*(int*)o1->values[0]) == (*(int*)o2->values[0]);
+    }
+    if(!o1->aList && !o2->aList && o1->type == LABEL_ENTRY && o2->type == LABEL_ENTRY)
+    {
+        char* str1 = (char*) o1->values[0];
+        char* str2 = (char*) o2->values[0];
+        return strcmp(str1,str2);
+    }
+    fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (%s) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND,op);
+    exit(-1);
+}
+
+Object* evalEQUAL(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+    int r = comparator(o1,o2,"=");
+    void* rp[] = {&r};
+    char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
+    createExprBind(resultingBind, o1, o2, "=");
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+}
+
+Object* evalNEQUAL(Node* n, STable* scope, EnvController* controller){
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+    int r = !comparator(o1,o2,"!=");
+    void* rp[] = {&r};
+    char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
+    createExprBind(resultingBind, o1, o2, "!=");
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+}
+
+
+Object* evalAND(Node* n, STable* scope, EnvController* controller)
 {
-    printf("[evalLESS] \n");
-    void* rp[1];
-    int* r;
-    if(o1->OBJECT_SIZE > 1 || o2->OBJECT_SIZE > 1)
-    {
-        *r = opCode == LT? o1->OBJECT_SIZE < o2->OBJECT_SIZE : o1->OBJECT_SIZE <= o2->OBJECT_SIZE;
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  (*(int*)o1->values[0]) && (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '+' + 1
+        createExprBind(resultingBind, o1, o2, "&");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
     }
-    else
-    {
-        if(o1->type == NUMBER_ENTRY)
-        {
-            *r = opCode == LT? (*(int*)o1->values[0]) < (*(int*)o2->values[0]) : (*(int*)o1->values[0]) <= (*(int*)o2->values[0]);
-        }
-        if(o1->type == LABEL_ENTRY)
-        {
-            //teste o tamanho salvo no object 1 e object 2
-        }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
     }
-    rp[0] = r;
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, NULL);
 }
 
-Object* evalGREAT(Object* o1, Object* o2, int opCode)
+Object* evalOR(Node* n, STable* scope, EnvController* controller)
 {
-    printf("[evalGREAT] \n");
-    void* rp[1];
-    int* r;
-    if(o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1)
-    {
-        *r = opCode == GT? o1->OBJECT_SIZE > o2->OBJECT_SIZE : o1->OBJECT_SIZE >= o2->OBJECT_SIZE;
-    }
-    else
-    {
-        if(o1->type == NUMBER_ENTRY)
-        {
-            *r = opCode == GT? (*(int*)o1->values[0]) > (*(int*)o2->values[0]) : (*(int*)o1->values[0]) >= (*(int*)o2->values[0]);
-        }
-        if(o1->type == LABEL_ENTRY)
-        {
-            //teste o tamanho salvo no object 1 e object 2
-        }
-    }
-    rp[0] = r;
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, NULL);
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
 
+    if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  (*(int*)o1->values[0]) || (*(int*)o2->values[0]);
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '+' + 1
+        createExprBind(resultingBind, o1, o2, "|");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
+    }
 }
 
-Object* evalEqual(Object* o1, Object* o2, int opCode)
+/**
+ * Implementa implicação lógica
+ * @param a primeiro predicado
+ * @param b segundo predicado
+ * @return um resultado 0 ou 1
+ */
+_Bool IMP(_Bool a, _Bool b){ return !a || b; }
+
+/**
+ * Implementa biimplicação lógica
+ * @param a primeiro predicado
+ * @param b segundo predicado
+ * @return um resultado 0 ou 1
+ */
+_Bool BIMP(_Bool a, _Bool b){ return (a && b) || (!a && !b); }
+
+Object* evalIMP(Node* n, STable* scope, EnvController* controller)
 {
-    printf("[evalEqual] \n");
-    void* rp[1];
-    int* r;
-    if(o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1)
-    {
-        *r = opCode == EQUAL? o1->OBJECT_SIZE == o2->OBJECT_SIZE : o1->OBJECT_SIZE != o2->OBJECT_SIZE;
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  IMP((*(int*)o1->values[0]) , (*(int*)o2->values[0]));
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5]; // + espaco + espaco + '->' + 1
+        createExprBind(resultingBind, o1, o2, "->");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
-    else
-    {
-        if(o1->type == NUMBER_ENTRY)
-        {
-            *r = opCode == EQUAL? (*(int*)o1->values[0]) == (*(int*)o2->values[0]) : (*(int*)o1->values[0]) != (*(int*)o2->values[0]);
-        }
-        if(o1->type == LABEL_ENTRY)
-        {
-            //teste o tamanho salvo no object 1 e object 2
-        }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
     }
-    rp[0] = r;
 }
 
 
+Object* evalBIMP(Node* n, STable* scope, EnvController* controller)
+{
+    Object* o1 = eval(n->children[0],scope,controller);
+    Object* o2 = eval(n->children[1],scope,controller);
+
+    if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
+        int r;
+        void* rp[] = {&r};
+        r =  BIMP((*(int*)o1->values[0]) , (*(int*)o2->values[0]));
+        char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +6]; // + espaco + espaco + '+' + 1
+        createExprBind(resultingBind, o1, o2, "<->");
+        letgoObject(o1);
+        letgoObject(o2);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    }
+    else{
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        exit(-1);
+    }
+}
+
+Object* evalPRI_EXPR(Node* n, STable* scope, EnvController* controllerSmv)
+{
+    Object* pri = eval(n->children[0],scope,controllerSmv);
+    char* NEW_BIND = malloc(sizeof(char)*(strlen(pri->SINTH_BIND)+3)); // ( ) e \0
+    NEW_BIND[0] = '\0';
+    char* refToNew = NEW_BIND;
+    refToNew = customCat(refToNew,"(",0,0);
+    refToNew = customCat(refToNew,pri->SINTH_BIND,0,0);
+    customCat(refToNew,"(",0,0);
+    free(pri->SINTH_BIND);
+    pri->SINTH_BIND = NEW_BIND;
+    return pri;
+}
 
 Object* evalEXPR(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalEXPR] \n");
-    // operação unária ou simplesmente FOLHA
-    if(n->nchild <= 1)
-    {
-        Object * sintUni = eval(n->children[0], scope, controllerSmv);
-
-        char ops[1];
-        // caso de operação unária (tem folhas e filhos)
-        if(n->nchild == 1 && n->nleafs == 1 )
-        {
-            ops[0] = n->leafs[0][0]; // recupera a operação
-
-            if(ops[0] == MINUS  && sintUni->type == NUMBER_ENTRY)
-            {
-                return evalMINUS(sintUni,NULL);
-            }
-            if(ops[0] == NOT_PREFIX  && sintUni->type == LOGICAL_ENTRY)
-            {
-                return evalNOT(sintUni);
-            }
-            fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c OPERATION!", ops[0]);
-            exit(-1);
-        }
-        return sintUni;
-    }
-        // operação binária
-    else
-    {
-        // CUIDADO (ordem avaliação)
-        Object* o1 = evalEXPR(n->children[0], scope, controllerSmv);
-        Object* o2 = evalEXPR(n->children[1],scope, controllerSmv);
-
-        int sOp = strlen(n->leafs[0]);
-        char ops[2];
-        ops[1] = '\0';
-
-        if(sOp > 1)
-        {
-            ops[1] = n->leafs[0][1];
-        }
-        ops[0] = n->leafs[0][0];
-
-
-        // validações (adicionar uma para vetores depois (não deixar fazer nenhuma operação com eles exceto comparação de tamanho))
-        if(o1->type == TDS_ENTRY || o2->type == TDS_ENTRY)
-        {
-            if(sOp < 1)
-            {
-                fprintf(stderr, "TDS INCOMPATIBLE FOR THE %c OPERATION! ", ops[0]);
-                exit(-1);
-            }
-            else
-            {
-                fprintf(stderr, "TDS INCOMPATIBLE FOR THE %c%c OPERATION!", ops[0],ops[1]);
-                exit(-1);
-            }
-        }
-
-        if(o1->type == NULL_ENTRY || o2->type == TDS_ENTRY)
-        {
-            fprintf(stderr, "NULL REFERENCE FOR THE %c%c OPERATION! ", ops[0],ops[1]);
-            exit(-1);
-        }
-
-        if(o1->type != o2->type)
-        {
-            if(sOp < 1)
-            {
-                fprintf(stderr, "INCOMPATIBLE TYPES FOR THE %c OPERATION!", ops[0]);
-                exit(-1);
-            }
-            else
-            {
-                fprintf(stderr, "INCOMPATIBLE TYPES FOR THE %c%c OPERATION!", ops[0],ops[1]);
-                exit(-1);
-            }
-        }
-
-        int vetOp = o1->OBJECT_SIZE > 1 ||o2->OBJECT_SIZE > 1;
-
-        if(!vetOp && ops[0] == PLUS)
-        {
-            return evalPLUS(o1,o2);
-        }
-        if(!vetOp && ops[0] == MINUS && o1->type != LABEL_ENTRY)
-        {
-            return evalMINUS(o1,o2);
-        }
-        if(!vetOp && ops[0] == TIMES && o1->type != LABEL_ENTRY)
-        {
-            return evalTIMES(o1,o2);
-        }
-        if(!vetOp && ops[0] == DIVIDE && o1->type != LABEL_ENTRY)
-        {
-            return evalDIVIDE(o1,o2,DIVIDE);
-        }
-        if(!vetOp && ops[0] == MOD && o1->type != LABEL_ENTRY)
-        {
-            return evalDIVIDE(o1,o2,MOD);
-        }
-        if(ops[0] == LT)
-        {
-            if(sOp > 1)
-            {
-                return evalLESS(o1,o2,LE);
-            }
-            else
-            {
-                evalLESS(o1,o2,LT);
-            }
-        }
-        if(ops[0] == GT)
-        {
-            if(sOp > 1)
-            {
-                return evalGREAT(o1,o2,GE);
-            }
-            return evalGREAT(o1,o2,GT);
-        }
-        else
-        {
-            return(evalEqual(o1,o2,ops[0]+ops[2]));
-        }
-
-        fprintf(stderr, "INCOMPATIBLE OPERANDS FOR THE %c%c OPERATION!", ops[0],ops[1]);
-        exit(-1);
-    }
-
+    return eval(n->children[0],scope,controllerSmv);
 }
 
 
@@ -868,7 +1002,7 @@ Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv){
     if(n->children[2]){
         STable* ELSE_SCOPE = addSubScope(scope,ELSE_BLOCK);
         ELSE_SCOPE->notEvaluated = !(!ELSE_SCOPE->parent->notEvaluated && !*(int*)conditionalExpr->values[0]);
-        Object* notExpr =  evalNOT(conditionalExpr);
+        Object* notExpr = notObjectOperation(conditionalExpr);
         bindCondition(ELSE_SCOPE,notExpr);
         eval(n->children[2]->children[0], ELSE_SCOPE, controllerSmv);
         //letgoTable(ELSE_SCOPE);
