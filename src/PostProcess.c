@@ -813,7 +813,7 @@ void specAssignForInvalidTds(TDS* newTDS, EnvController* controller, int initial
 
 int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  controller, int C_TIME, int I_TIME, int F_TIME){
     int someIsValidToLazy = 0; // nenhum é valido = 0 , algum é valido = 1,  -1 a gente pode falar que algum é valido mas o primeiro é invalid (C_TIME = 0)
-    int initialIsInvalid = 0;
+    int initialIsInvalid = 1;
     int i;
     Object * timeComponentList = newTDS->DATA_SPEC;
     for (i = 0; i < newTDS->DATA_SPEC->OBJECT_SIZE; i++){
@@ -822,7 +822,7 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
         if(time < C_TIME){
             fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined on a C_TIME  >= %d context!  \n",
                     encapsulatedTDS->SINTH_BIND,time,C_TIME);
-            initialIsInvalid = time == 0? 1 : initialIsInvalid;
+            initialIsInvalid = time == 0?  1 : initialIsInvalid;
         }
         else if(time < I_TIME || time > F_TIME){
             fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined out of the model time interval: %d ~ %d  \n",
@@ -832,6 +832,7 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
             if(!someIsValidToLazy){
                 someIsValidToLazy = 1;
             }
+            initialIsInvalid = time == 0?  0 : initialIsInvalid;
             newTDS->COMPONENT_TIMES[time] = i;
         }
     }
