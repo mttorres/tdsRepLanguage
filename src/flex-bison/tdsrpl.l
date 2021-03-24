@@ -50,12 +50,12 @@ and						{yylval.sval = strdup(yytext); return AND;}
 or						{yylval.sval = strdup(yytext); return OR;}
 not                   	{yylval.sval = strdup(yytext); return NOT;}
 -\|\|>					{yylval.sval = strdup(yytext); return DPASS;}
+\<-\>					{yylval.sval = strdup(yytext); return BIMP;}
 ->						{yylval.sval = strdup(yytext); return PASS;}
-xor						{yylval.sval = strdup(yytext); return XOR;}
 [<=]              		{yylval.sval = strdup(yytext); return LE;}
 [>=]              		{yylval.sval = strdup(yytext); return GE;}
-[<]               		{yylval.sval = strdup(yytext); return LT;}
-[>]               		{yylval.sval = strdup(yytext); return GT;}
+\\<               		{yylval.sval = strdup(yytext); return LT;}
+\\>             		{yylval.sval = strdup(yytext); return GT;}
 [+]                 	{yylval.sval = strdup(yytext); return PLUS;}
 [-]                 	{yylval.sval = strdup(yytext); return MINUS;}
 [*]                 	{yylval.sval = strdup(yytext); return TIMES;}
@@ -72,6 +72,7 @@ linked              	{yylval.sval = strdup(yytext); return LINKED;}
 data-time           	{yylval.sval = strdup(yytext); return DATATIME;}
 delayed             	{yylval.sval = strdup(yytext); return DELAYED;}
 portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
+show            	    {yylval.sval = strdup(yytext); return PORTNAME;}
 [A-Za-z_]*				{yylval.sval = strdup(yytext); return ID;}
 
 

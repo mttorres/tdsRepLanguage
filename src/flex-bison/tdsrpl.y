@@ -68,7 +68,8 @@
 %token <sval> NOT
 %token <sval> ELSE
 %token <sval> Null
-%token <sval> XOR
+%token <sval> IMP
+%token <sval> BIMP
 %token <sval> LE
 %token <sval> GE
 %token <sval> LT
@@ -93,6 +94,7 @@
 %token <sval> DPASS
 %token <sval> INTERVAL
 %token <sval> BETWEEN
+%token <sval> SHOW
 
 %type <ast> prog
 %type <ast> cmds
@@ -386,6 +388,10 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 			Node* data = createNode(5,1,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);
 			$$ = data;
 	 }
+	 | SHOW LPAREN expr RPAREN {
+			Node* data = createNode(5,1,3,"CHANGE-CURRENTTIME-DIRECTIVE", SHOW_PRINT ,$3, $1,$2,$4);
+			$$ = data;
+	 }
 	 ;
 
 
@@ -415,11 +421,11 @@ assignable : ID extraaccesses {
 
 
 expr: MINUS expr {
-             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
+             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", MINUS_EXPR, $2,  $1);
              $$ = expr;
       }
       |expr PLUS subexp {
-		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
+		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", PLUS_EXPR ,$1,$3,  $2);
 		$$ = expr;
 	 }
 	 | subexp {
@@ -431,7 +437,7 @@ expr: MINUS expr {
 
 subexp: subexp MINUS multiexp {
 
-        Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
+        Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  MINUS_EXPR ,$1,$3,  $2);
         		$$ = expr;
 
         }
@@ -443,21 +449,21 @@ subexp: subexp MINUS multiexp {
 
 multiexp: multiexp TIMES ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  EXPR ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  MULTI_EXPR ,$1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp DIVIDE ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", EXPR, $1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", DIV_EXPR, $1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp MOD ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", EXPR ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", DIV_EXPR ,$1,$3,  $2);
 			$$ = multiexp;
 
 		}
@@ -469,29 +475,29 @@ multiexp: multiexp TIMES ineqexp {
 		;
 
 ineqexp:  ineqexp LE logical {
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", EXPR, $1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", LE_EXPR, $1,$3,  $2);
 			$$ = ineqexp;
 		}
 		| ineqexp GE logical {
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", EXPR ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", GE_EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
 		}
 		| ineqexp LT logical {
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  EXPR ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  LT_EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
 		}
 		| ineqexp GT logical {
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", EXPR, $1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", GT_EXPR, $1,$3,  $2);
 			$$ = ineqexp;
 		}
         | ineqexp EQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EXPR ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EQUAL_EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
         }
         | ineqexp NOTEQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", EXPR ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", NEQUAL_EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
         }
         | logical {
@@ -502,24 +508,28 @@ ineqexp:  ineqexp LE logical {
 
 
 logical: NOT data {
-			Node* logical = createNode(6,1,1,"Lógico  - Negação ", EXPR ,$2,  $1);
+			Node* logical = createNode(6,1,1,"Lógico  - Negação ", NOT_EXPR ,$2,  $1);
 			$$ = logical;
 		 }
 		 | logical AND data {
-			Node* logical = createNode(7,2,1,"Lógico  - AND ", EXPR ,$1,$3,  $2);
+			Node* logical = createNode(7,2,1,"Lógico  - AND ", AND_EXPR ,$1,$3,  $2);
 			$$ = logical;
 		 }
 		 | logical OR data {
-			Node* logical = createNode(7,2,1,"Lógico  - OR ", EXPR ,$1,$3,  $2);
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", OR_EXPR ,$1,$3,  $2);
 			$$ = logical;
 		 }
-		 | LPAREN expr RPAREN {
-                 Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", EXPR ,$1);
-                 $$ = expr;
-         }
+		 | logical IMP data {
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", IMP_EXPR ,$1,$3,  $2);
+			$$ = logical;
+		 }
+		 | logical BIMP data {
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", BIMP_EXPR ,$1,$3,  $2);
+			$$ = logical;
+		 }
 		 | data {
-
-		 	$$ = $1;
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 5", EXPR ,$1);
+            $$ = expr;
 		 }
 		 ;
 		 
@@ -591,6 +601,10 @@ data: RAWNUMBERDATA {
 
 	  		}
 	  }
+	  | LPAREN expr RPAREN {
+          Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", PRI_EXPR ,$1);
+          $$ = expr;
+      }
 	  ;
 
 
