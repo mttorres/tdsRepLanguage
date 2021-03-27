@@ -13,7 +13,7 @@ typedef enum MAP_CONVERSIONS { ANY, ANY_TERM, ANY_BREAK_LINE, UN_OP, OP, REDEF_N
                                MODULE_BREAK_LINE  } MAP_CONVERSIONS;
 
                                                 // ex: 1 + 1
-char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s ", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
+char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%", "%s_scope%d_%d","%s_scope%d_%d_%d_%d",
                           "init(%s)", "next(%s)", "%s:= %s;",
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
@@ -50,8 +50,11 @@ void copyValueBind(Object *o, char *bind, int index, int defaultValue, int value
             if (o->type == LOGICAL_ENTRY) {
                 sprintf(bind, formatS, *(int *) o->values[0] && !defaultValue ? "TRUE" : "FALSE");
             }
-            if (o->type == LABEL_ENTRY || o->type == NULL_ENTRY) {
+            if (o->type == LABEL_ENTRY) {
                 sprintf(bind, formatS, defaultValue? "NULL" : (char *) o->values[0]);
+            }
+            if(o->type == NULL_ENTRY){
+                sprintf(bind, formatS, "NULL");
             }
             if (o->type == TDS_ENTRY) {
                 // ...
@@ -70,7 +73,7 @@ void createExprBind(char *result, Object *o1, Object *o2, char *op) {
         sprintf(result,SmvConversions[UN_OP],op,o1->SINTH_BIND);
     }
     else{
-        sprintf(result,SmvConversions[OP],o1->SINTH_BIND,o2->SINTH_BIND);
+        sprintf(result,SmvConversions[OP],o1->SINTH_BIND,op,o2->SINTH_BIND);
     }
 }
 
@@ -243,7 +246,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
         addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
 
     }
-    else if(type == TDS_ENTRY || type == LABEL_ENTRY)
+    else if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY)
     {
         sprintf(newType, SmvConversions[SET], varName, newValueBind);
         int tam = strlen(newType);
@@ -694,8 +697,8 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
             conditionCube = formatCondtion(scope,0,0,newValueBind,directiveValueBind,1);
             createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL, 1, 0);
         }
-        Object* auxRefValue = newValue->type == NUMBER_ENTRY? newValue : NULL;
-        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax, auxRefValue);
+        //Object* auxRefValue = newValue->type == NUMBER_ENTRY? newValue : NULL;
+        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax, newValue);
         free(directiveValueBind);
     }
     // init casos

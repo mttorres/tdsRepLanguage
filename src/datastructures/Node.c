@@ -9,29 +9,34 @@ const char* mappingEnumNode[] =  {
 
         "NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE",
 
-        "DATA_V", "PARAMS_CALL", "DEFINE_INTERVAL",
+        "DATA_V", "PARAMS_CALL", "PARAMS", "DEFINE_INTERVAL",
 
         "AC_V", "OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
 
-        "EXPR", "CMD_IF", "MATCH_IF",
+        "EXPR", "MINUS_EXPR", "PLUS_EXPR", "MULTI_EXPR", "DIV_EXPR", "LE_EXPR", "GE_EXPR", "LT_EXPR", "GT_EXPR", "EQUAL_EXPR", "NEQUAL_EXPR",
+        "NOT_EXPR", "AND_EXPR", "OR_EXPR", "IMP_EXPR", "BIMP_EXPR", "PRI_EXPR",
+
+        "CMD_IF", "TDS_DEF_COMPLETE", "TDS_DEF_DEPEN", "CMD_TDS_ANON",
+
+        "LIST_ITERATOR", "TIME_COMP", "DOMAIN_FUNCTION",
+
+        "MATCH_IF",
 
         "ASSIGN_IDVAR", "ASSIGN_AC_V", "ASSIGN_TDIRECTIVE",
-
-        "TDS_DEF_COMPLETE", "TD_DEF_DEPEN",
-
-        "DOMAIN_FUNCTION", "TIME_LIST", "TIME_COMP",
 
         "DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
 
         "HEADERS_E_PROG", "PROG", "FUNC_DEFS", "CMD",
 
-        "FUNC_DEF", "PROC_DEF", "OPT_RETURN", "PARAMS", "PARAM",
+        "FUNC_DEF", "PROC_DEF", "OPT_RETURN", "PARAM",
 
-         "CMD_OTHER",
+        "CMD_OTHER",
 
-        "CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
+        "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
 
-        "OTHER_LOOP", "FUNC_CALL", "PROC_CALL"
+        "OTHER_LOOP", "FUNC_CALL", "PROC_CALL",
+
+        "SHOW_PRINT"
 };
 
 

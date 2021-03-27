@@ -123,15 +123,16 @@ Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
     printf("[evalBOOL] \n");
     int sint;
 
-    char* trueString = "true";
+    char* trueString = "TRUE";
+    char* falseString = "FALSE";
 
-    sint= strstr(n->leafs[0],trueString)? 1 : 0;
+    sint= strstr(n->leafs[0],"true")? 1 : 0;
 
-    printf("[evalBOOL] SINTH: %d \n",sint);
+    //printf("[evalBOOL] SINTH: %d \n",sint);
 
     void* bp[] = {&sint};
 
-    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, NULL);
+    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, sint? trueString : falseString);
 
     return o;
 }
@@ -146,7 +147,7 @@ Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 
     printf("[evalSTRING] SINTH: %s \n",sint);
 
-    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, NULL);
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint);
 
     return o;
 }
@@ -163,11 +164,11 @@ Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
     // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
     char* sint =  n->leafs[0];
 
-    void* np[] = {sint};
+//    void* np[] = {sint};
 
     printf("[evalNULL] SINTH: %s \n",sint);
 
-    Object* o = createObject(NULL_ENTRY, 1, np, -1, NULL);
+    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint);
 
     return o;
 }
@@ -232,7 +233,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
     else
     {
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
-        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, NULL);
+        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, "time");
     }
 }
 
@@ -380,7 +381,7 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
         void* rp[] = {&r};
         int SYNTH_O2 = *(int*)o2->values[0];
         if(!SYNTH_O2){
-            fprintf(stderr, "CANNOT %s DIVIDE BY ZERO!",o1->SINTH_BIND);
+            fprintf(stderr, "CANNOT DIVIDE %s BY ZERO!",o1->SINTH_BIND);
             exit(-1);
         }
         int aloca = isDivision ? 4 : 7;
@@ -578,10 +579,10 @@ Object* evalAND(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "&");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
-        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (and) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
         exit(-1);
     }
 }
@@ -599,10 +600,10 @@ Object* evalOR(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "|");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
-        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
+        fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (or) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
         exit(-1);
     }
 }
@@ -674,7 +675,7 @@ Object* evalPRI_EXPR(Node* n, STable* scope, EnvController* controllerSmv)
     char* refToNew = NEW_BIND;
     refToNew = customCat(refToNew,"(",0,0);
     refToNew = customCat(refToNew,pri->SINTH_BIND,0,0);
-    customCat(refToNew,"(",0,0);
+    customCat(refToNew,")",0,0);
     free(pri->SINTH_BIND);
     pri->SINTH_BIND = NEW_BIND;
     return pri;
@@ -916,7 +917,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                     updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, -1, -1, scope, C_TIME);
                 }
                 // tempo > 0 e não ocorreu redefinição
-                if(changeContext && var->redef == prevDef){
+                if(changeContext && var->timeContext != C_TIME){
                     specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
                 }
                 else{

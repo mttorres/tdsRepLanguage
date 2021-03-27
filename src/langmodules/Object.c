@@ -6,7 +6,7 @@
 const char* mappingEnumObjectType[] =  {
     "NUMBER",
     "BOOLEAN",
-    "STRING",
+    "LABEL",
     "T_DIRECTIVE",
     "TDS",
     "null*",
@@ -86,8 +86,10 @@ Object* setUpForNewObject(object_type type, int OBJECT_SIZE, int timeContext, ch
         newOb->values = vo;
     }
     else{
-        fprintf(stderr, "[createObject] Error during values allocation. Zero Sized object \n");
-        exit(-1);
+        if(newOb->type != NULL_ENTRY){
+            fprintf(stderr, "[createObject] Error during values allocation. Zero Sized object \n");
+            exit(-1);
+        }
     }
     return newOb;
 }
@@ -179,24 +181,27 @@ void printObject(Object* o)
 					int derefboolean = *(int*) o->values[i];
 					if(derefboolean)
 					{
-						printf(" (%s, %s) \n",mappingEnumObjectType[o->type],"true");
+						printf(" (%s :: %s) \n",mappingEnumObjectType[o->type],"true");
 					}
 					else
 					{
-						printf(" (%s, %s) \n",mappingEnumObjectType[o->type],"false");	
+						printf(" (%s :: %s) \n",mappingEnumObjectType[o->type],"false");
 					}
 				}					
 
 		}
 
-		if(o->type == LABEL_ENTRY || o->type == NULL_ENTRY)
+		if(o->type == LABEL_ENTRY)
 		{
 			for(i = 0; i < o->OBJECT_SIZE; i++)
 			{
 				const char* valor = (char*) o->values[i];
-				printf(" (%s, '%s' ) \n",mappingEnumObjectType[o->type],valor);	
+				printf(" (%s :: '%s' ) \n",mappingEnumObjectType[o->type],valor);
 				
 			}				
+		}
+		if(o->type == NULL_ENTRY){
+            printf(" (%s :: '%s' ) \n",mappingEnumObjectType[LABEL_ENTRY],"NULL");
 		}
 
 		if(o->type == TDS_ENTRY){

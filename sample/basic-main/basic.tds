@@ -1,109 +1,50 @@
 INTERVAL: 0 ~ 20
 
-x = 2  //redef =0 , context =0
-// usei aqui o x
+x = 2 + 2
 
+t = 4 * 5
 
-//r = true // só deve alterar para o false logo depois se a condição for verdadeira (not evaluate) (mas deve escrever correto)
+A = 4 * 7 + 3
 
-z = true
+B = 3 + 4 * 7
 
-zeta = false
+C = -3 + 4 * 7
 
-if(not z){
-   w = 1
-}
+D = 4 - -3   // unários só conseguem ser mais a esquerda (corrigido)
 
-if(zeta){
-   r = false
-   if(z){
-        u = false
-   }
-}
+ED =  3+4 - 2+2
 
-tdsA = {
-	portname : 'a',
-	data-time: {0: 0, 1: 1, 2: 2, 21:4}
-}
+DIV = ED/2
 
-tdsB = {
-	portname : 'b',
-	data-time: {3: 3, 4:4, 5:5, 6:6}
-}
+DIVC = 4*7+3/10
 
-//(tdsA) -> c // funciona
+P =  (4*7+3)/10
 
-(tdsA,tdsB) -> c // funciona
-(c) -||> d // funciona
+y = 4 + x
 
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA,tdsB}
-//}  // funciona
-
-
-//(tdsA,tdsB) -||> d // temos erro como o esperado
-
-//tdsD = {
-//	portname : 'd',
-//	linked : {tdsA,tdsB},
-//	delayed
-//}  // da erro (como esperado)
-
-C_TIME = 2
-
-//(tdsA) -||> d realiza a operação com warning
-
-//(tdsA) -> c // funciona
-
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA}
-//}  // funciona
-
-//(tdsA,tdsB) -> c // funciona
-
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA,tdsB}
-//}  // funciona
-
-//(tdsA,tdsB) -> c // funciona
-
-
-//(c) -> d // funciona
-
-//(c) -||> d // funciona
-
-x = 4 //redef =1 , context =2
-
-
-C_TIME = 2
-
-y = 5
-
-
-C_TIME = 3
-
-x = -1 // corrigido
-
-
-C_TIME = 4
-
-zeta = false
-
-z = true
-
-if(not zeta){
-   w = true
-   y = 2
-   if(w){
-      u = false
-   }
-}
-else{
-    y = 6
-}
+// testamos todas as expressões não lógicas
 
 
 
+C_TIME = x + y
+
+z = NULL
+
+w = 'batata'
+
+a = true
+
+b = false
+
+logand = a and b
+
+lognot = not b
+
+logandT = a and not b
+
+logor = a or b
+
+//logIMP = a -> b
+logIMP = not a -> not b
+
+logBIMP = not a <-> b

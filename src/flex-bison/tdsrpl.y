@@ -420,11 +420,7 @@ assignable : ID extraaccesses {
 
 
 
-expr: MINUS expr {
-             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", MINUS_EXPR, $2,  $1);
-             $$ = expr;
-      }
-      |expr PLUS subexp {
+expr: expr PLUS subexp {
 		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", PLUS_EXPR ,$1,$3,  $2);
 		$$ = expr;
 	 }
@@ -507,10 +503,10 @@ ineqexp:  ineqexp LE logical {
         ;
 
 
-logical: NOT data {
-			Node* logical = createNode(6,1,1,"Lógico  - Negação ", NOT_EXPR ,$2,  $1);
-			$$ = logical;
-		 }
+logical: MINUS data {
+             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", MINUS_EXPR, $2,  $1);
+             $$ = expr;
+        }
 		 | logical AND data {
 			Node* logical = createNode(7,2,1,"Lógico  - AND ", AND_EXPR ,$1,$3,  $2);
 			$$ = logical;
@@ -538,6 +534,10 @@ data: RAWNUMBERDATA {
 			Node* data = createNode(5,0,1,"Número", NUMBER ,$1);	
 			$$ = data;	
 
+	  }
+      | NOT data {
+			Node* logical = createNode(6,1,1,"Lógico  - Negação ", NOT_EXPR ,$2,  $1);
+			$$ = logical;
 	  }
 	  | BOOLEAN {
 
@@ -602,7 +602,7 @@ data: RAWNUMBERDATA {
 	  		}
 	  }
 	  | LPAREN expr RPAREN {
-          Node* expr = createNode(5,1,0,"Expressão Básica - encapsulada", PRI_EXPR ,$1);
+          Node* expr = createNode(7,1,2,"Expressão Básica - encapsulada", PRI_EXPR,  $2,  $1, $3);
           $$ = expr;
       }
 	  ;

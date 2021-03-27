@@ -51,7 +51,8 @@ or						{yylval.sval = strdup(yytext); return OR;}
 not                   	{yylval.sval = strdup(yytext); return NOT;}
 -\|\|>					{yylval.sval = strdup(yytext); return DPASS;}
 \<-\>					{yylval.sval = strdup(yytext); return BIMP;}
-->						{yylval.sval = strdup(yytext); return PASS;}
+->						{yylval.sval = strdup(yytext); return IMP;}
+==>						{yylval.sval = strdup(yytext); return PASS;}
 [<=]              		{yylval.sval = strdup(yytext); return LE;}
 [>=]              		{yylval.sval = strdup(yytext); return GE;}
 \\<               		{yylval.sval = strdup(yytext); return LT;}
