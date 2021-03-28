@@ -2,6 +2,9 @@
 
 #define TM_H
 
+
+#define  ALOC_SIZE_LINE 300
+
 /**
  *  Concatena strings, porém sempre retornando o final da string como ponteiro, servindo para evitar percorrer a mesma
  *  diversas vezes ao se concatenar várias componentes (usada ao adicionar parâmetros por exemplo). Por outro lado,
@@ -85,5 +88,13 @@ char* overwriteParam(char* moduleName, char* param);
  * @SideEffects: Copia caracteres para dest, se é alocado ou não é responsabilidade de quem chamar a função
  */
 void removeAfter(char* dest, char* src, char stop);
+
+/**
+ * Converte uma diretiva para uma string da mesma
+ * @param ctime o diretiva passada
+ * @return uma string alocada com o valor da diretiva passada
+ * @SideEffects: Aloca uma string com o valor da diretiva que deve ser liberado pelo chamador
+ */
+char* formatDirective(int ctime);
 
 #endif

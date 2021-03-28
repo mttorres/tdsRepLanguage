@@ -40,6 +40,12 @@ void removeAfter(char* dest, char* src, char stop){
     customCat(dest,src,stop,0);
 }
 
+char* formatDirective(int ctime){
+    char* directiveValueBind = malloc(sizeof(char)*ALOC_SIZE_LINE/10);
+    sprintf(directiveValueBind, "%d", ctime);
+    return directiveValueBind;
+}
+
 void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
 
     int removedCharacters = 0;
