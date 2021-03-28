@@ -234,18 +234,6 @@ void letgoTable(STable *t)
 }
 
 
-int hash(char* str, int SIZE_ED){
-	int hash = 401;
-	while (*str != '\0') {
-		hash = ((hash << 4) + (int)(*str)) % SIZE_ED;
-		str++;
-	}
-	return hash % SIZE_ED;
-}
-
-
-
-
 int calculateHashPos(char * str, STable* t) {
 
 	int SIZE_FOR_HASH = t && t->collision ? t->collision : MAX_TABLE;
