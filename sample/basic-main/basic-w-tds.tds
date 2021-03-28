@@ -23,17 +23,17 @@ if(zeta){
 
 tdsA = {
 	portname : 'a',
-	data-time: {0: 0, 1: 1, 2: 2, 21:4}
+	data-time: {0: x, 1: 1, 2: z, 21:4}
 }
 
 tdsB = {
 	portname : 'b',
-	data-time: {3: 3, 4:4, 5:5, 6:6}
+	data-time: {3: 3, 4:4, 5:5, 6:z}
 }
 
-//(tdsA) -> c // funciona
+//(tdsA) => c // funciona
 
-(tdsA,tdsB) -> c // funciona
+(tdsA,tdsB) ==> c // funciona
 (c) -||> d // funciona
 
 //tdsC = {
@@ -54,24 +54,24 @@ C_TIME = 2
 
 //(tdsA) -||> d realiza a operação com warning
 
-//(tdsA) -> c // funciona
+//(tdsA) ==> c // funciona
 
 //tdsC = {
 //	portname : 'c',
 //	linked : {tdsA}
 //}  // funciona
 
-//(tdsA,tdsB) -> c // funciona
+//(tdsA,tdsB) ==> c // funciona
 
 //tdsC = {
 //	portname : 'c',
 //	linked : {tdsA,tdsB}
 //}  // funciona
 
-//(tdsA,tdsB) -> c // funciona
+//(tdsA,tdsB) ==> c // funciona
 
 
-//(c) -> d // funciona
+//(c) ==> d // funciona
 
 //(c) -||> d // funciona
 
