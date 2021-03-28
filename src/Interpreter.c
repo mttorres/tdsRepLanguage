@@ -68,6 +68,10 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
                 Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
                 PROGRAM_PATH = (Node*) timeComponent->values[1];
                 lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
+                if(lazyValue->aList){
+                    fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", currentTDS->name);
+                    exit(-1);
+                }
                 specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
                 currentTDS->DATA_TIME[C_TIME] = lazyValue;
                 // deve agora verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
@@ -206,6 +210,10 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         // retorna a referência (ai pode sim ter colaterais) (não permite "passagem de referência" gerar conversão no nuXmv (não existe)
         if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1 || entry->val->type == NULL_ENTRY)
         {
+            if(controllerSmv->currentTDScontext){
+                fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", controllerSmv->currentTDScontext->name);
+                exit(-1);
+            }
             return entry->val;
         }
         else
@@ -217,7 +225,10 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
             else{
                 // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
 */
-                return refCopyOfVariable(entry);
+                Object* copy = refCopyOfVariable(entry);
+                //addParamToPortsModule()
+                //updatePortsVariableReference(controllerSmv->currentTDScontext,copy);
+                return copy;
 //            }
         }
     }
@@ -835,6 +846,12 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
  * @SideEffects: Atualiza o valor de uma entrada na tabela de simbolos
  */
 void updateVariable(char* varName, Object *var, Object *expr, STable* scope, int index, int C_TIME) {
+
+    int prevTimeContext = var->timeContext;
+    if(prevTimeContext == C_TIME){
+        fprintf(stderr, "ASSIGN ERROR: redefinition of %s in same time interval \n", varName);
+        exit(-1);
+    }
     /*
      * Caso var não seja NULL (isto é "placeholder")
      * Realiza operação normal, senão trata o null
@@ -950,27 +967,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                 }
                 // tempo > 0 e não ocorreu redefinição
                 if((expr->type != NULL_ENTRY && !scope->notWrite)){
-                    if(changeContext && var->timeContext != C_TIME){
+                    if(changeContext){
                         specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
-                    }
-                    else{
-                        fprintf(stderr, "ASSIGN ERROR: redefinition of %s in same time interval \n", varEntry->name);
-                        exit(-1);
-                        /* casos de redefinição (devemos dar free na entrada anterior (otimização)
-                        letGoOldEntry(varEntry,refAuxTable);
-                        // tempo = 0, redefinição
-                        if(!changeContext){
-                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
-                                       C_TIME);
-                        }
-                        // tempo > 0 e redefinição
-                        else{
-                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
-                                       C_TIME);
-                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
-                                       C_TIME);
-                        }
-                         */
                     }
                 }
             }
