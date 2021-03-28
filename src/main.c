@@ -3,10 +3,8 @@
   #include <string.h>
   #include "../headers/STable.h"
   #include "../headers/Node.h"
-  #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
   #include "../headers/Interpreter.h"
-  #include "../headers/PostProcess.h"
 
   extern int yylex(void);
   extern int yyparse();
