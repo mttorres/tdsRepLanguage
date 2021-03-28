@@ -34,6 +34,7 @@ typedef struct envcontroller
     // ai ele verifica se foram usadas (não tem declarações de funções)
     int declaredPortsNumber;
     TDS** declaredPorts;
+    TDS* currentTDScontext;
 
     // avisa caso não tenha nenhuma TDS linkada uma com a outra
     int IO_RELATION;
@@ -98,13 +99,24 @@ void addNewHeader(EnvController* controller, HeaderSmv* newHeader);
 void addNewAuxInfo(EnvController* controller, STable* newTableInfo);
 
 /**
+ * Tendo um controller com o contexto e associação Header e AuxTable,
+ * adiciona um parâmetro (se necessário) para o header do módulo da TDS.
+ * Também propaga as dependências relacionadas a esse parâmetro para o portsModule
+ * @param controller o controlador de ambiente
+ * @param param o bind daquele parâmetro
+ * @param currentTDS a TDS corrente
+ * @SideEffects: Aloca uma string nova, caso esse parâmetro já não tenha sido memoizado
+ */
+void addParamToTds(EnvController* controller, char* param, TDS* currentTDS);
+
+/**
  * Adiciona um novo parâmetro a portModule, e resolve as depêndencias nos demais módulos main e automato.
  * @param o controller
  * @param o novo parâmetro
  * @SideEffects: Para cada módulo (main, automato ...) é atualizada a linha com depdência a ports e essa operação chama
  * o módulo textManager e seus método addParams, criando uma string nova e liberando a antiga
  */
-void addParamToPortsModule(EnvController *controller, char *param, int first);
+void addParamToPortsModule(EnvController *controller, char *param);
 
 
 #endif //TDSREPLANGUAGE_ENVCONTROLLER_H

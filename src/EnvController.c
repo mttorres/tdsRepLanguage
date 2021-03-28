@@ -34,7 +34,7 @@ EnvController *createController() {
     Hcontrol->IO_RELATION = 0;
     Hcontrol->multiPortDeclartion = 0;
     Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_SIZE); // NULL até sabermos o intervalo de tempo
-
+    Hcontrol->currentTDScontext = NULL;
 
     int i;
     for (i = 0; i < DEFAULT_HEADERS_SIZE; i++) {
@@ -106,14 +106,14 @@ HeaderSmv* accessHeader(EnvController* controller, smvtype cat, int indexOfHeade
     }
 
     if(cat == AUTOMATA){
-        toReturn = indexOfHeader != -1? controller->AUTOMATA_RELATED[indexOfHeader] : controller->AUTOMATA_RELATED[controller->H_AUTOMATA_CURRENT_SIZE-1];
+        toReturn = indexOfHeader >= 0? controller->AUTOMATA_RELATED[indexOfHeader] : controller->AUTOMATA_RELATED[controller->H_AUTOMATA_CURRENT_SIZE-1];
     }
     if(cat == PORTS){
-        toReturn = indexOfHeader != -1? controller->PORTS_RELATED[indexOfHeader] : controller->PORTS_RELATED[controller->H_PORTS_CURRENT_SIZE-1];
+        toReturn = indexOfHeader >= 0? controller->PORTS_RELATED[indexOfHeader] : controller->PORTS_RELATED[controller->H_PORTS_CURRENT_SIZE-1];
     }
 
     if(cat == FUNCTION_SMV){
-        toReturn = indexOfHeader != -1? controller->FUNCTIONS[indexOfHeader] : controller->FUNCTIONS[controller->H_FUNCTION_CURRENT_SIZE-1];
+        toReturn = indexOfHeader >= 0? controller->FUNCTIONS[indexOfHeader] : controller->FUNCTIONS[controller->H_FUNCTION_CURRENT_SIZE-1];
     }
 
     if(!toReturn){
@@ -129,10 +129,10 @@ STable* accessSmvInfo(EnvController* controller, smvtype cat, int SMV_INFO_ID){
         return controller->mainInfo;
     }
     if(SMV_INFO_ID < controller->H_FUNCTION_CURRENT_SIZE  && cat == FUNCTION_SMV){
-        return SMV_INFO_ID > 0? controller->functionsInfo[SMV_INFO_ID] : controller->functionsInfo[controller->H_FUNCTION_CURRENT_SIZE-1];
+        return SMV_INFO_ID >= 0? controller->functionsInfo[SMV_INFO_ID] : controller->functionsInfo[controller->H_FUNCTION_CURRENT_SIZE-1];
     }
     if(SMV_INFO_ID < controller->H_PORTS_CURRENT_SIZE && cat == PORTS){
-        return SMV_INFO_ID > 0? controller->portsInfo[SMV_INFO_ID] : controller->portsInfo[controller->PORTS_INFO_CURRENT_SIZE-1];
+        return SMV_INFO_ID >= 0? controller->portsInfo[SMV_INFO_ID] : controller->portsInfo[controller->PORTS_INFO_CURRENT_SIZE-1];
     }
     if(cat == AUTOMATA){
         return NULL; // melhorar, apesar que sabe-se que não tem operação em tabela de simbolos para automato (por enquanto)
@@ -167,25 +167,61 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo){
     }
 }
 
-void addParamToPortsModule(EnvController *controller, char *param, int first) {
-    HeaderSmv* updated = accessHeader(controller,PORTS,0); // O PORTS MODULE É SEMPRE O PRIMEIRO
+int addParamToModule(EnvController* controller, char* param, smvtype cat, int indexOfHeader){
+    HeaderSmv* updated = accessHeader(controller,cat,indexOfHeader);
+    int possibleParamPos = hash(param,MAX_SIMPLE);
+    if(updated->PARAM_MAP[possibleParamPos]){
+       return 0;
+    }
     char* newName = addParams(updated->moduleName,param,"(",")");
     free(updated->moduleName);
     updated->moduleName = newName;
-    // agora deve propagar as alterações para todos os demais módulos
-    // OU SEJA JÁ QUE ESTÁ CENTRALIZADO NO MAIN (posição 3 do buffer de VAR), deve-se substituir esse
+    updated->PARAM_MAP[possibleParamPos] = 1;
+    return 1;
+}
 
-    HeaderSmv* mainUpdate = accessHeader(controller,MAIN,-1);
 
-    char* refOldPt;
-    refOldPt = mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER];
-    char* newDeclaration = addParams(refOldPt,param,"(",")");
-    free(refOldPt);
-    mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER] = newDeclaration;
+void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
+    addParamToPortsModule(controller,param);
+
+    // adiciona a TDS (tem uma variável de retorno dizendo se foi necessário adicionar esse parâmetro ou não
+    int paramAdd = addParamToModule(controller,param,PORTS,currentTDS->SMV_REF);
+    if(paramAdd){
+        // DEVE AGORA PROPAGAR A DEPENDENCIA PARA A DECLARAÇÃO DELE EM PORTS MODULE
+        // recuperar o indice da declaração
+        STable* portsAux = accessSmvInfo(controller, PORTS, 0);
+        TableEntry* infoOfTdsDec = lookup(portsAux,currentTDS->name);
+        int pos = *(int*) infoOfTdsDec->val->values[0];
+        int size = *(int*) infoOfTdsDec->val->values[1];
+
+        HeaderSmv* portsHeader =  accessHeader(controller,PORTS,0);
+        char* bufferToUpdate = portsHeader->varBuffer[pos];
+        char* newNameDeclaration = addParams(bufferToUpdate,param,"(",")");
+        free(bufferToUpdate);
+        portsHeader->varBuffer[pos] = newNameDeclaration;
+        size = strlen(newNameDeclaration);
+        void* vp[] = {&size};
+        updateValue(currentTDS->name,vp,WRITE_SMV_INFO,1,1,-1,portsAux,-1);
+    }
+}
+
+void addParamToPortsModule(EnvController *controller, char *param) {
+
+    int paramAdd = addParamToModule(controller,param,PORTS,0); // deve adicionar ao portsModule É SEMPRE O PRIMEIRO
+    if(paramAdd){
+        // agora deve propagar as alterações para todos os demais módulos
+        // OU SEJA JÁ QUE ESTÁ CENTRALIZADO NO MAIN (posição 3 do buffer de VAR), deve-se substituir esse
+        HeaderSmv* mainUpdate = accessHeader(controller,MAIN,-1);
+        char* refOldPt;
+        refOldPt = mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER];
+        char* newDeclaration = addParams(refOldPt,param,"(",")");
+        free(refOldPt);
+        mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER] = newDeclaration;
 
 //    if(!first){
 //        propagParamDependence(controller->MAIN_RELATED,param,controller->H_MAIN_CURRENT_SIZE);
 //    }
 //    propagParamDependence(controller->AUTOMATA_RELATED,param,controller->H_AUTOMATA_CURRENT_SIZE);
+    }
 }
 
