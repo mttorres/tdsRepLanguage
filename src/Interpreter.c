@@ -41,8 +41,6 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController
 }
 
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
-
-
 void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME){
     int i;
     for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
@@ -52,6 +50,38 @@ void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TI
         }
         propagateTypeSet(currentTDS,currentTDS->linkedDependent[i],controllerSmv,C_TIME);
     }
+}
+
+void resolveWatchVariable(TDS* currentTDS, Object* timeComponent, EnvController* controllerSmv, STable* scope, int currentWatchTime){
+
+    Node* PROGRAM_PATH = (Node*) timeComponent->values[1];
+    Object*  lazyValue = eval(PROGRAM_PATH, scope, controllerSmv);
+    updateTypeSetWatchTds(currentTDS,controllerSmv,lazyValue);
+    currentTDS->DATA_TIME[currentWatchTime] = lazyValue;
+    resolveDependencies(currentTDS,controllerSmv,currentWatchTime);
+}
+
+void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME, Node *PROGRAM_PATH, TDS *currentTDS) {
+
+    Object*  lazyValue = eval(PROGRAM_PATH, currentScope, controllerSmv);
+    if(lazyValue->aList){
+        fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", currentTDS->name);
+        exit(-1);
+    }
+    specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+    currentTDS->DATA_TIME[C_TIME] = lazyValue;
+
+    // deve agora verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
+    if(currentTDS->TOTAL_DEPENDENTS_PT){
+        resolveDependencies(currentTDS,controllerSmv,C_TIME);
+    }
+}
+
+void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME,
+                              Node *PROGRAM_PATH, TDS *currentTDS, Object *timeComponent) {
+    PROGRAM_PATH = (Node*) timeComponent->values[1];
+    controllerSmv->currentTDScontext = currentTDS;
+    resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
 }
 
 void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv, int C_TIME) {
@@ -66,33 +96,32 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
             if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
                 Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
-                PROGRAM_PATH = (Node*) timeComponent->values[1];
-                lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
-                if(lazyValue->aList){
-                    fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", currentTDS->name);
-                    exit(-1);
-                }
-                specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
-                currentTDS->DATA_TIME[C_TIME] = lazyValue;
-                // deve agora verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
-                if(currentTDS->TOTAL_DEPENDENTS_PT){
-                    resolveDependencies(currentTDS,controllerSmv,C_TIME);
+                resolveTimeComponentSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS,timeComponent);
+            }
+            int j;
+            for (j = 0; j < currentTDS->TOTAL_WATCH; j++) {
+                // chamada de antes para todos as variáveis que estão em observação
+                if(currentTDS->WATCH_LIST[j] != -1 && currentTDS->WATCH_LIST[j] != C_TIME ){
+                    int currentWatchTime = currentTDS->WATCH_LIST[j];
+                    Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[currentWatchTime]];
+                    resolveWatchVariable(currentTDS,timeComponent,controllerSmv,currentScope,currentWatchTime);
                 }
             }
         }else{
             // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
             if(currentTDS->type != TDS_DEPEN){
-                // FAZ O PROCESSO
+                resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
             }
             // eval da forma "valor unico" (é uma operação call-by need em contexto de escopo)
             // não necessita olhar indice por tempo no DATA_SPEC
             //lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
             lazyValue = NULL;
             PROGRAM_PATH = NULL; // por enquanto
-            specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+            //specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
         }
 
     }
+    controllerSmv->currentTDScontext = NULL;
 }
 
 // CASO FORA DE FLUXO 1: e se ele "pular", ex: commitar c_time = 2 (quando era 0 antes), ele pulou o 1! A gente deve ver a "diferença"
@@ -210,7 +239,7 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         // retorna a referência (ai pode sim ter colaterais) (não permite "passagem de referência" gerar conversão no nuXmv (não existe)
         if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1 || entry->val->type == NULL_ENTRY)
         {
-            if(controllerSmv->currentTDScontext){
+            if(entry->val->type != NULL_ENTRY && controllerSmv->currentTDScontext){
                 fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", controllerSmv->currentTDScontext->name);
                 exit(-1);
             }
@@ -226,8 +255,12 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
                 // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
 */
                 Object* copy = refCopyOfVariable(entry);
-                //addParamToPortsModule()
-                //updatePortsVariableReference(controllerSmv->currentTDScontext,copy);
+                if(controllerSmv->currentTDScontext){
+                    addParamToTds(controllerSmv,entry->name,controllerSmv->currentTDScontext);
+                    // encapsular em método depois
+                    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
+                    addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+                }
                 return copy;
 //            }
         }
