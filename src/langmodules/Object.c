@@ -287,6 +287,23 @@ Object* copyObject(Object* o)
 	return newOb;
 }
 
+void updateNullRef(Object *var, Object *expr){
+    var->type = expr->type;
+    // responsabilidade do metodo de atualizaçao de variavel logo depois
+    if(!expr->aList){
+        var->values = (void **) malloc(sizeof(void *) * 1);
+    }
+    if(expr->SINTH_BIND){
+        char* newBind = realloc(var->SINTH_BIND,strlen(expr->SINTH_BIND)+1);
+        if(!newBind){
+            fprintf(stderr, "[updateNullRef] Error while allocating bind \n");
+            exit(-1);
+        }
+        strcpy(newBind,expr->SINTH_BIND);
+        var->SINTH_BIND = newBind;
+    }
+}
+
 
 void updateObjectCell(Object* o, void** any, int any_type ,int object_size, int index, int prop)
 {
@@ -331,7 +348,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 */
             if(object_size > 1)
             {
-                // passa referencia
+                // passa referencia (é para arrays)
                 updateObjectReference();
 //              o->values = any;
 //              o->OBJECT_SIZE = object_size;
@@ -346,10 +363,10 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 	}
 
 //	int typeChanged = 0;
-	if(o->type != any_type && o->type != any_type)
+	if(o->type != any_type)
 	{
 		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
-		o->type = any_type;
+		exit(-1);
 		//typeChanged = 1;
 	}
 	//int oldRedef = o->redef;

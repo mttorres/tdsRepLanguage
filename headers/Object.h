@@ -64,9 +64,18 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
  *
  * @param LEFT_COMPONENT o objeto mais a esquerda LISTA ou valor único
  * @param RIGHT_COMPONENT o objeto mais a direita, um valor únco
- * @param separator um separador utilizado para sintetizar expressões no SMV (, &, |) ...
+ * @param separator um separador utilizado para sintetizar expressões no SMV (, &, |) ... (talvez nem seja usado)
  * @return uma lista genérica ou uma lista de objetos comuns da linguagem
  */
 Object * mergeGenericList(Object* LEFT_COMPONENT, Object* RIGHT_COMPONENT);
+
+/**
+ * Atualiza um objeto que era NULL
+ * @param var o objeto original
+ * @param expr o novo objeto
+ * @SideEffects: Aloca um BIND para var, aloca um values para var caso expr não seja uma lista, já que irá ocorrer copia
+ * de valores.
+ */
+void updateNullRef(Object *var, Object *expr);
 
 #endif

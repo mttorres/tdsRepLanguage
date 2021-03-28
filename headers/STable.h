@@ -42,6 +42,7 @@ typedef struct S_TABLE
   int backup;
   int collision;
   int notEvaluated;
+  int notWrite;
   int childOfFunction;
   int indexRef;
 } STable;

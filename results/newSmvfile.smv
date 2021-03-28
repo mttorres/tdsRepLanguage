@@ -14,7 +14,6 @@ VAR
 	DIVC : 0..28;
 	P : 0..3;
 	y : 0..8;
-	z : {NULL};
 	w : {NULL, batata};
 	a : boolean;
 	b : boolean;
@@ -52,11 +51,6 @@ esac;
 	next(P):= P;
 	init(y):= 4 + x;
 	next(y):= y;
-	init(z):= NULL;
-	next(z):= case 
-		next(time) = 12 : NULL;
-		TRUE : z; 
-	esac;
 	init(w):= NULL;
 	next(w):= case 
 		next(time) = 12 : batata;

@@ -103,6 +103,7 @@ STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int i
 	newtable->collision = 0;
 	newtable->conditionBind = NULL;
 	newtable->notEvaluated = 0;
+	newtable->notWrite = 0;
 	newtable->children = NULL;
 	
 	newtable->parent = parent;
@@ -379,15 +380,17 @@ void addValue(char *name, void **any, int any_type, int object_size, int methodP
 
 void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current, int contextChange)
 {
-
 	TableEntry* e = lookup(current,name);
 	if(e){
-        printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
+        //printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
         updateObject(e->val, any, any_type, object_size, oIndex, oProp, contextChange);
 	}
 	else{
-	   // valor novo
-        addValue(name, any, any_type, object_size, 0, current, 0);
+	   if(oIndex > 0){
+           fprintf(stderr, "ASSIGN ERROR: %s is not defined for reference %s[%d] \n", name,name,oIndex);
+           exit(-1);
+	   }
+	   addValue(name, any, any_type, object_size, 0, current, 0);
 	}
 
 }

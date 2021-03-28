@@ -204,15 +204,21 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         // criar MÉTODO DE COPIA DE OBJETO (variavel)
 
         // retorna a referência (ai pode sim ter colaterais) (não permite "passagem de referência" gerar conversão no nuXmv (não existe)
-        if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1)
+        if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1 || entry->val->type == NULL_ENTRY)
         {
             return entry->val;
         }
         else
         {
-            // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
-            return refCopyOfVariable(entry);
-            //return copyObject(entry->val);
+/*
+            if(entry->val->type == NULL_ENTRY){
+
+            }
+            else{
+                // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
+*/
+                return refCopyOfVariable(entry);
+//            }
         }
     }
 }
@@ -818,6 +824,38 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
     return NULL;
 }
 
+/**
+ * Método auxiliar para tratar atualização de valores de variáveis, incluindo de NULL e listas
+ * @param varName o nome da variável
+ * @param var o objeto referência da variável
+ * @param expr o objeto referência da expressão (que será atirbuida a var)
+ * @param scope o escopo atual
+ * @param index o indice o qual a atribuição é feita caso seja uma lista
+ * @param C_TIME a diretiva C_TIME
+ * @SideEffects: Atualiza o valor de uma entrada na tabela de simbolos
+ */
+void updateVariable(char* varName, Object *var, Object *expr, STable* scope, int index, int C_TIME) {
+    /*
+     * Caso var não seja NULL (isto é "placeholder")
+     * Realiza operação normal, senão trata o null
+     */
+    if(var->type == NULL_ENTRY){
+        if(expr->type != NULL_ENTRY) {
+            updateNullRef(var,expr);
+            updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, index, -1, scope, C_TIME);
+        }
+        // senao nao faz nada x = NULL , atribuir novamente a null não muda nada
+    }
+    else{
+        // VALIDAÇÃO DE TIPOS
+        if(var->type != expr->type){
+            fprintf(stderr, "ASSIGN ERROR: incompatible type for  %s \n", varName);
+            exit(-1);
+        }
+        updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, index, -1, scope, C_TIME);
+    }
+}
+
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
 {
     Object* expr = NULL;
@@ -886,9 +924,9 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
         int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto
 
         // atribuição simples
-        if(expr && expr->type != TDS_ENTRY && n->children[0]->type == ASSIGN_IDVAR)
+        if(expr && (expr->type != TDS_ENTRY || expr->aList ) && n->children[0]->type == ASSIGN_IDVAR)
         {
-            //primeira vez da variavel (ou não inicializada, mudança para depois
+            //primeira vez da variavel (ou não inicializada, mudança para depois)
             if(!var)
             {
                 //int isTDS = expr->type == TDS_ENTRY;
@@ -896,48 +934,44 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                     addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
                 }
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
-                // note que temporal condition tem que ser um cubo de condição e tempo
-                if(changeContext){
-                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
-                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME);
-                }
-                else{
-                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                if(expr->type != NULL_ENTRY && !scope->notWrite){
+                    if(changeContext){
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME);
+                    }
+                    else{
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                    }
                 }
             }
             else{
-                // VALIDAÇÃO DE TIPOS
-                if(var->type != expr->type){
-                    fprintf(stderr, "ASSIGN ERROR: incompatible type for  %s \n", varEntry->name);
-                    exit(-1);
-                }
-                int prevDef = var->redef;
-                int prevContext = var->timeContext;
                 if(!scope->notEvaluated){
-                    updateValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, -1, -1, scope, C_TIME);
+                    updateVariable(varName,var,expr,scope,-1,C_TIME);
                 }
                 // tempo > 0 e não ocorreu redefinição
-                if(changeContext && var->timeContext != C_TIME){
-                    specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
-                }
-                else{
-                    fprintf(stderr, "ASSIGN ERROR: redefinition of %s in same time interval \n", varEntry->name);
-                    exit(-1);
-                    /* casos de redefinição (devemos dar free na entrada anterior (otimização)
-                    letGoOldEntry(varEntry,refAuxTable);
-                    // tempo = 0, redefinição
-                    if(!changeContext){
-                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
-                                   C_TIME);
+                if((expr->type != NULL_ENTRY && !scope->notWrite)){
+                    if(changeContext && var->timeContext != C_TIME){
+                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
                     }
-                    // tempo > 0 e redefinição
                     else{
-                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
-                                   C_TIME);
-                        specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
-                                   C_TIME);
+                        fprintf(stderr, "ASSIGN ERROR: redefinition of %s in same time interval \n", varEntry->name);
+                        exit(-1);
+                        /* casos de redefinição (devemos dar free na entrada anterior (otimização)
+                        letGoOldEntry(varEntry,refAuxTable);
+                        // tempo = 0, redefinição
+                        if(!changeContext){
+                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
+                                       C_TIME);
+                        }
+                        // tempo > 0 e redefinição
+                        else{
+                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 0,
+                                       C_TIME);
+                            specAssign(0, varEntry, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
+                                       C_TIME);
+                        }
+                         */
                     }
-                     */
                 }
             }
             letgoObject(expr);
@@ -950,6 +984,12 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
             if(!var)
             {
                 addReferenceCurrentScope(varName,expr,0,scope);
+                if(expr->type != TDS_ENTRY){
+                    // spec de lista
+                }
+            }
+            else{
+                // update ref
             }
 
 /*            Node* ref = n->children[0]->children[0];
