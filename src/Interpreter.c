@@ -112,12 +112,8 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
             if(currentTDS->type != TDS_DEPEN){
                 resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
             }
-            // eval da forma "valor unico" (é uma operação call-by need em contexto de escopo)
-            // não necessita olhar indice por tempo no DATA_SPEC
-            //lazyValue = eval(PROGRAM_PATH,currentScope,controllerSmv);
-            lazyValue = NULL;
-            PROGRAM_PATH = NULL; // por enquanto
-            //specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
+            // senão são só tds de expressões básicas
+
         }
 
     }
