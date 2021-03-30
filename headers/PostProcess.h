@@ -172,12 +172,11 @@ void letGoOldEntry(TableEntry* var, STable* auxTable);
  * @param C_TIME o contexto temporal atual, usado para validar o uso dessa TDS em casos de listas de dados (onde os dados são vinculados diretamente)
  * @param I_TIME o tempo inicial de um intervalo, usado para validações lógicas de TDS de listas de dados
  * @param F_TIME o tempo final de um intervalo, usado para validações lógicas de TDS de listas de dados
- * @param SYNTH_DEP as tds's necessárias para criar o assign inicial em casos de tds com dependencia de outras
  * @SideEffects: Aloca um Header e o salva no controller nas ports. Aloca uma tabela de simbolos para esse módulo.
  * Essas devem ser liberadas assim como as outras. Realiza declaração da tds em ports module (linha que deve ser liebrada depois)
  */
 
-void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP);
+void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME);
 
 /**
  * Define um módulo smv para a TDS associada ao parâmetro. Recupera as informações da encapsulatedTDS avaliada, seus dados, seu header,
@@ -187,7 +186,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
  * @param controller o controller para conseguir realizar a escrita.
  * @param currentScope o escopo corrente usado para outras passagens necessárias de informação.
  */
-void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope);
+void updateTdsOnSmv(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope);
 
 /**
  * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
@@ -198,7 +197,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
  * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller, int C_TIME );
+void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*

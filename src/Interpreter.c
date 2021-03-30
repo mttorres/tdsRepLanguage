@@ -6,6 +6,7 @@
 #include <string.h>
 #include "../headers/Interpreter.h"
 
+
 /*
  * Funções Auxiliares
  */
@@ -40,17 +41,21 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController
     }
 }
 
-// avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
+// avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para o Novo Controller.h
 void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME){
-    int i;
-    for (i = 0; i < currentTDS->TOTAL_DEPENDENTS_PT; i++) {
-        currentTDS->linkedDependent[i]->DATA_TIME[C_TIME] = currentTDS->DATA_TIME[C_TIME];
-        if(currentTDS->linkedDependent[i]->TOTAL_DEPENDENTS_PT > 0){
-            resolveDependencies(currentTDS->linkedDependent[i],controllerSmv,C_TIME);
-        }
-        propagateTypeSet(currentTDS,currentTDS->linkedDependent[i],controllerSmv,C_TIME);
+    //updateLimitCondition(currentTDS, C_TIME);
+    Object* resolvedValueRef = NULL;
+    if(currentTDS->delayed){
+        resolveDelayedTdsDependencies(currentTDS,C_TIME);
+    }
+    else{
+        resolveMergerTdsDependencies(currentTDS, C_TIME);
+    }
+    if(currentTDS->DATA_TIME[C_TIME]){
+        propagateTypeSet(currentTDS,controllerSmv,C_TIME);
     }
 }
+
 
 void resolveWatchVariable(TDS* currentTDS, Object* timeComponent, EnvController* controllerSmv, STable* scope, int currentWatchTime){
 
@@ -68,13 +73,8 @@ void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int 
         fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", currentTDS->name);
         exit(-1);
     }
-    specTDS(currentTDS,lazyValue,C_TIME,I_TIME,controllerSmv,currentScope);
-    currentTDS->DATA_TIME[C_TIME] = lazyValue;
-
-    // deve agora verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
-    if(currentTDS->TOTAL_DEPENDENTS_PT){
-        resolveDependencies(currentTDS,controllerSmv,C_TIME);
-    }
+    updateTdsOnSmv(currentTDS, lazyValue, C_TIME, I_TIME, controllerSmv, currentScope);
+    addDataToTds(currentTDS,C_TIME,lazyValue);
 }
 
 void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME,
@@ -87,7 +87,6 @@ void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv
 void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv, int C_TIME) {
     int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
     Node* PROGRAM_PATH = NULL;
-    Object* lazyValue = NULL;
     int i;
     for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
         // resolve call-by-need cada expressão ativa da TDS.
@@ -108,12 +107,14 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
                 }
             }*/
         }else{
-            // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
+            // é só uma expressão simples
             if(currentTDS->type != TDS_DEPEN){
                 resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
             }
-            // senão são só tds de expressões básicas
-
+            else{
+                // senão deve verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
+                resolveDependencies(currentTDS,controllerSmv,C_TIME);
+            }
         }
 
     }
@@ -1082,7 +1083,7 @@ Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv){
     return NULL;
 }
 
-TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME){
+void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME){
     Object * dependenceList = eval(n->children[0],scope,controller);
     Object * DEP_HEAD = dependenceList->OBJECT_SIZE > 1 ? dependenceList->values[0] : NULL;
     if(DEP_HEAD && DEP_HEAD->type == TDS_ENTRY || dependenceList->type == TDS_ENTRY) {
@@ -1101,26 +1102,20 @@ TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* 
         fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, %s is not receiving input from another TDS! \n",portName);
         exit(-1);
     }
-
-    TDS** SYNTH_DEPENDENCY_LIST = malloc(sizeof(TDS*)*dependenceList->OBJECT_SIZE);
     if(dependenceList->OBJECT_SIZE > 1){
         int i;
         for (i = 0; i < dependenceList->OBJECT_SIZE; i++) {
             Object* ENCAPSULATED_DEPENDENCY = (Object*) dependenceList->values[i];
             TDS* DEPENDENCY = (TDS*) ENCAPSULATED_DEPENDENCY->values[0];
             if(DEPENDENCY){
-                SYNTH_DEPENDENCY_LIST[i] = DEPENDENCY;
-                addTdsDependent(DEPENDENCY,newTDS);
+                addTdsDependency(DEPENDENCY, newTDS);
             }
         }
     }
     else{
-        addTdsDependent(dependenceList->values[0],newTDS);
-        SYNTH_DEPENDENCY_LIST[0] = (TDS*) dependenceList->values[0];
+        addTdsDependency(dependenceList->values[0], newTDS);
     }
     controller->IO_RELATION = 1;
-
-    return SYNTH_DEPENDENCY_LIST;
 }
 
 Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, EnvController* controller){
@@ -1128,18 +1123,17 @@ Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE t
     int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
 
-    TDS* newTDS = createTDS(portName,type,tdsSpec,delayed,
-                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL,C_TIME,F_TIME);
-    TDS** SYNTH_DEP = NULL;
+    TDS* newTDS = createTDS(portName, type, tdsSpec, delayed,
+                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL, C_TIME, F_TIME, NULL);
     if(type == TDS_DEPEN){
-        SYNTH_DEP =  computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
+        computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
     }
 
     void* vp[] = {newTDS};
     char* TDS_BIND = createReferenceTDS(portName);
     Object* encapsulatedTDS = createObjectDS(TDS_ENTRY,1,vp,C_TIME,TDS_BIND,0);
     free(TDS_BIND); // pode parecer "irrelevante" mas é uma garantia, o createObject não cuida do free dos binds. Em especial por causa da cópia de variáveis.
-    preProcessTDS(encapsulatedTDS,controller,C_TIME,I_TIME,F_TIME,SYNTH_DEP);
+    preProcessTDS(encapsulatedTDS,controller,C_TIME,I_TIME,F_TIME);
     return encapsulatedTDS;
 }
 
