@@ -69,7 +69,7 @@ Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE t
 void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME);
 
 /**
- * Resolve a dependencia de todas as TDS's associadas a TDS corrente durante a avaliação lazy
+ * Resolve a dependencia de todas as TDS's linkadas a TDS corrente durante a avaliação lazy
  * @param currentTDS a TDS corrente
  * @param controllerSmv o controller usado para atualizar o type-set das TDS's dependentes.
  * @param C_TIME para indexar o data-time correto
