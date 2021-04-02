@@ -40,10 +40,16 @@ void removeAfter(char* dest, char* src, char stop){
     customCat(dest,src,stop,0);
 }
 
-char* formatDirective(int ctime){
-    char* directiveValueBind = malloc(sizeof(char)*ALOC_SIZE_LINE/10);
-    sprintf(directiveValueBind, "%d", ctime);
-    return directiveValueBind;
+char* formatNumeric(int num){
+    char* numericValueBind = malloc(sizeof(char) * ALOC_SIZE_LINE / 10);
+    sprintf(numericValueBind, "%d", num);
+    return numericValueBind;
+}
+
+char* formatString(char* str){
+    char* strValueBind = malloc(sizeof(char) * ALOC_SIZE_LINE);
+    strcpy(strValueBind,str);
+    return str;
 }
 
 void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
@@ -85,7 +91,7 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
     }
 }
 
-char *addParams(char *original, char *param, char* delim1, char* delim2) {
+char *addParams(char *original, char *param, char *delim1, char *delim2, int userealoc) {
 
     char *newString;
     char *auxNewAdd;
@@ -103,7 +109,12 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
     // qualquer string passada (original) são das seguintes formas:  xxxxxxxxx  ,  xxxxxxxxx;  , xxxxxxxxx(...)\n  , xxxxxxxxx(...);\n
     // caso possua o delmitador de fechamento ) ou qualquer outro...
     if(original[tamOriginal-3] == delim2[0]  || original[tamOriginal-2] == delim2[0]){
-        newString = (char*) calloc(strlen(original) + strlen(param) + 2 + 1, sizeof(char)); // original + param + ',' + ' ' +  '\0'
+        int newSize = strlen(original) + strlen(param) + 2 + 1; // original + param + ',' + ' ' +  '\0'
+        newString = userealoc ? (char*) realloc(original,newSize) : (char*) calloc(newSize, sizeof(char));
+        if(!newString){
+            fprintf(stderr,"[addParams] Fail in realloc\n");
+            exit(-1);
+        }
         auxNewAdd = newString;
         auxNewAdd = customCat(auxNewAdd,original,delim2[0],0);
         //printf("caso 1... %s \n",newString);
@@ -115,8 +126,12 @@ char *addParams(char *original, char *param, char* delim1, char* delim2) {
         //printf("caso 1... %s \n",newString);
     }
     else {
-        newString = (char*) calloc(strlen(original) + 1 + strlen(param) + 1 + 1, sizeof(char));
-//		newString = (char*) malloc(sizeof(char)*(strlen(original) + 1 + strlen(param) + 1 + 1)); // (  ) e  \0
+        int newSize = strlen(original) + 1 + strlen(param) + 1 + 1;
+        newString = userealoc ? (char*) realloc(original,newSize) : (char*) calloc(newSize, sizeof(char));
+        if(!newString){
+            fprintf(stderr,"[addParams] Fail in realloc\n");
+            exit(-1);
+        }
         auxNewAdd = newString;
         if(statementEnd){
             auxNewAdd = customCat(auxNewAdd,original,';',0);
@@ -209,6 +224,6 @@ char* overwriteParam(char* moduleName, char* param){
     //memset(refOldPt, '\n', 1);
     //refOldPt++;
     //memset(refOldPt, '\0', strlen(refOldPt));
-    return addParams(moduleNameNoParam,param,"(",")");
+    return addParams(moduleNameNoParam, param, "(", ")", 0);
 }
 
