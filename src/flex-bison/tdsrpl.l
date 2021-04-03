@@ -53,10 +53,10 @@ not                   	{yylval.sval = strdup(yytext); return NOT;}
 \<-\>					{yylval.sval = strdup(yytext); return BIMP;}
 ->						{yylval.sval = strdup(yytext); return IMP;}
 ==>						{yylval.sval = strdup(yytext); return PASS;}
-[<=]              		{yylval.sval = strdup(yytext); return LE;}
-[>=]              		{yylval.sval = strdup(yytext); return GE;}
-\\<               		{yylval.sval = strdup(yytext); return LT;}
-\\>             		{yylval.sval = strdup(yytext); return GT;}
+"<="              		{yylval.sval = strdup(yytext); return LE;}
+">="             		{yylval.sval = strdup(yytext); return GE;}
+"<"               		{yylval.sval = strdup(yytext); return LT;}
+">"             		{yylval.sval = strdup(yytext); return GT;}
 [+]                 	{yylval.sval = strdup(yytext); return PLUS;}
 [-]                 	{yylval.sval = strdup(yytext); return MINUS;}
 [*]                 	{yylval.sval = strdup(yytext); return TIMES;}
