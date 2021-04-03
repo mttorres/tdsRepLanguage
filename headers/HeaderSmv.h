@@ -7,6 +7,8 @@
 #include "Hash.h"
 #include <stdio.h>
 
+#define MAX_PARAM 301
+
 typedef enum headerpart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2} headerpart;
 
 typedef struct headersmv
