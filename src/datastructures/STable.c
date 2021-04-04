@@ -218,8 +218,8 @@ void letgoTable(STable *t)
 		free(t->children);
 	}
 	if(t->tableData){
-		int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
-		for(i=0; i < size; i++)
+		//int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
+		for(i=0; i < MAX_TABLE; i++)
 		{
 		    if(t->tableData[i]) {
                 letgoEntry(t->tableData[i]);

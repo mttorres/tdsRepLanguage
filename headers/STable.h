@@ -6,7 +6,7 @@
 #include "Object.h"
 #include "Hash.h"
 
-#define  MAX_TABLE 1025
+#define  MAX_TABLE 16385
 
 #define  MAX_CHILD 150
 
