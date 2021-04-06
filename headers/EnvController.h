@@ -10,6 +10,8 @@
 #include "textManager.h"
 #include "HeaderSmv.h"
 #include "TDS.h"
+#include "TypeSet.h"
+#include "TypeMinMax.h"
 
 #define TYPE_SET_DIR_SIZE 9999
 
@@ -31,7 +33,7 @@ typedef struct envcontroller
     STable** portsInfo; // para cada tds (talvez não va precisar, a lógica vai estar TODA nas funções ou nele mesmo (de maneira constante)
     STable** functionsInfo; // para cada função
 
-    char** typeSetWords; // "otmização"
+    char** typeSetWords; // dict para "otmização"
 
     // validação
     STable* originalPorts;
@@ -129,6 +131,22 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS);
  * o módulo textManager e seus método addParams, criando uma string nova e liberando a antiga
  */
 void addParamToPortsModule(EnvController *controller, char *param);
+
+/**
+ * Recupera uma palavra do dicionário de type-set do ambiente.
+ * @param word uma palavra já utilizada anteriomente em um type-set
+ * @param controller o controlador de ambiente
+ * @return um ponteiro para a palavra, ou NULL caso essa não exista
+ */
+char* getTypeSetWordFromDict(char* wordRef, EnvController* controller);
+
+/**
+ * Adiciona uma palavra ao dicionário de type-set do ambiente
+ * @param word a palavra nova
+ * @param controller o controlador
+ * @SideEffects: Aloca uma string nova de tamanho da word +1 (deve ser liberada no final do programa)
+ */
+void addTypeSetWordToDict(char* word, EnvController* controller);
 
 
 #endif //TDSREPLANGUAGE_ENVCONTROLLER_H

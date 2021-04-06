@@ -63,9 +63,10 @@ void setUpMainSmvTable(EnvController *Hcontrol, STable *global)
     pointIni = (auxDelim-linhaLida+2);
     pointEnd = ((auxFim-linhaLida))-1;
 
-    void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min,&max};
-    addValue(nome, po, WRITE_SMV_INFO, 6, 0, Hcontrol->mainInfo, 0);
-
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd};
+    //createMinMax(min,max);
+    addSmvInfoDeclaration(nome,po,WRITE_SMV_INFO,4,Hcontrol->mainInfo,createMinMax(min,max));
+    //addValue(nome, po, WRITE_SMV_INFO, 6, 0, Hcontrol->mainInfo, 0);
 
     // remover depois? (assim como a gente deve fazer o no pré processamento o "loop do time")
 	char* linhaLidaInit = Hcontrol->MAIN->assignBuffer[1];
@@ -76,9 +77,7 @@ void setUpMainSmvTable(EnvController *Hcontrol, STable *global)
 	auxFim = strstr(auxDelim,";");
     pointIni = auxDelim - linhaLidaInit+2; //
     pointEnd = auxFim - linhaLidaInit-1; // entra no intervalo de sobrescrita
-
     addValue("init(time)", po, WRITE_SMV_INFO, 4, 0, Hcontrol->mainInfo, 0);
-
 
 	char* linhaLidaNext = Hcontrol->MAIN->assignBuffer[3];
     pos = 3; // note que a posição de inicio de leitura do next é irrelevante pela formatação do case
@@ -91,7 +90,6 @@ void setUpMainSmvTable(EnvController *Hcontrol, STable *global)
 
     addValue("next(time)", po, WRITE_SMV_INFO, 4, 0, Hcontrol->mainInfo, 0);
 	// ele salva: time = 6 : 0; (reboot) ou  time < 3: time + 1; (incremento até F_TIME)
-		
 
 	// seta as diretivas temporais globais da linguagem
 	char* diretivas[] = {"I_TIME", "C_TIME","F_TIME"};

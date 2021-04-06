@@ -7,6 +7,7 @@
 #include "Hash.h"
 
 #define MAX_DEPEND 150
+#define MAX_WATCH_LIST 203
 
 
 //struct de TDS: 
@@ -19,20 +20,7 @@ typedef struct TDS
   Object** DATA_TIME; // todos os objetos de valor por tempo sintetizados para a TDS, usado para memoization
   struct TDS** linkedDependency; // tds's que estão sendo observadas por essa (são dependencias)
   int TOTAL_DEPENDENCIES_PT; // total de dependencias dessa TDS (quando aplicavel)
-  char* functionRef;  // a referência a função
   int delayed; // se ela é delayed ou não
-
-/*
-  // ainda não sei como isso vai ficar
-  void * fpointer;
-  
-
-  // dados da tds (lista de tamanho = F_TIME - I_TIME), (ACEITAR DADOS DIFERENTES? OU SÓ UM PARA A TDS?)
-  // se for um tipo só : usar union?  (pode ser um de cada vez mais não ao mesmo tempo)
-  // senão usar VOID 
-  void ** values; // delayed? passar lista "alternada?", ou usar object?
-*/
-
   int I_INTERVAL;
   int F_INTERVAL;
   int* COMPONENT_TIMES;
@@ -40,10 +28,11 @@ typedef struct TDS
   int SMV_REF; // por outro lado, os HEADERS SÃO USADOS POR AMBOS!
   int noValue;
   Object* limitCondition;
-  int* WATCH_LIST; // remover depois
-  int TOTAL_WATCH; // remover depois
   int LAST_DELAYED_ACCEPT_TIME;
-
+  //char** WATCH_LIST;
+  //int TOTAL_WATCH;
+  //int realocWatch;
+  //int PT_TOTAL_WATCH;
 
 
 } TDS;
@@ -96,7 +85,12 @@ void resolveMergerTdsDependencies(TDS *tds, int C_TIME);
  */
 void resolveDelayedTdsDependencies(TDS* tds, int C_TIME);
 
-void addToTdsWatchList(TDS *pTds, char* name, int C_TIME);
+/**
+ *
+ * @param pTds
+ * @param varName
+ */
+void addToTdsWatchList(TDS *pTds, char* varName);
 
 
 /**

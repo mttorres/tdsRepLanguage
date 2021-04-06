@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "../../headers/TDS.h"
 
 
@@ -25,7 +26,6 @@ TDS* createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *
 	newTDS->delayed = delayed;
     newTDS->I_INTERVAL = I_INTERVAL;
     newTDS->F_INTERVAL = F_INTERVAL;
-	newTDS->functionRef = functionRef;
     newTDS->SMV_REF = -1;
 
     newTDS->COMPONENT_TIMES = type == DATA_LIST?  malloc(sizeof(int)*F_INTERVAL+1) : NULL;
@@ -34,13 +34,17 @@ TDS* createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *
             newTDS->COMPONENT_TIMES[i] = -1;
         }
     }
-    newTDS->WATCH_LIST = type == DATA_LIST? malloc(sizeof(int)*(F_INTERVAL-I_INTERVAL)+1) : NULL;
-    if(newTDS->WATCH_LIST){
-        for (i = 0; i < F_INTERVAL; i++) {
-            newTDS->WATCH_LIST[i] = -1;
+    /*
+    newTDS->WATCH_LIST = malloc(sizeof(char*)*MAX_WATCH_LIST);
+    //if(newTDS->WATCH_LIST){
+        for (i = 0; i < MAX_WATCH_LIST; i++) {
+            newTDS->WATCH_LIST[i] = NULL;
         }
     }
-    newTDS->TOTAL_WATCH = 0;
+    newTDS->TOTAL_WATCH = MAX_WATCH_LIST;
+    newTDS->PT_TOTAL_WATCH = 0;
+    newTDS->realocWatch = 0;
+     */
 
     newTDS->noValue = 1;
     newTDS->limitCondition = limitCondition;
@@ -132,19 +136,33 @@ int addDataToTds(TDS* currentTDS, int C_TIME, Object* value){
     }
     return 0;
 }
-
-void addToTdsWatchList(TDS *pTds, char* name, int C_TIME) {
-    int pos = hash(name,((pTds->F_INTERVAL+1)*2)+3); // só pode ter F_INTERVAL variáveis, o resto da conta é heuristica para hash
-    int original = pTds->WATCH_LIST[pos];
-    if(original == -1){
-        pTds->WATCH_LIST[pos] = C_TIME;
-        pTds->TOTAL_WATCH = pos+1;
+/*
+void addToTdsWatchList(TDS *pTds, char* varName) {
+    int pos = hash(varName, pTds->TOTAL_WATCH);
+    char* original = pTds->WATCH_LIST[pos];
+    if(!original){
+        pTds->WATCH_LIST[pos] = varName;
+        pTds->PT_TOTAL_WATCH = pTds->PT_TOTAL_WATCH < pos? pos+1 : pTds->PT_TOTAL_WATCH;
     }
     else{
         // possibilidade de colisão
+        if(strcmp(original,varName) == 0){
+               pTds->realocWatch++;
+               char** newWatchList = realloc(pTds->WATCH_LIST,pTds->TOTAL_WATCH*2+pTds->realocWatch);
+               if(!newWatchList){
+                   fprintf(stderr,"[addToTdsWatchList] ALLOCATION ERROR");
+                   exit(-1);
+               }
+               // redistribuir
+               printf("Redistribuição de hash... possivelmente tem algo errado \n");
+               exit(-1);
+        }
     }
 }
+ */
 
 void* letGoTDS(TDS* tds){
 
 }
+
+// TODO REMOVER WATCH LIST QUANDO TERMINARMOS OS RESTOS

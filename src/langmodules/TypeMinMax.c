@@ -37,6 +37,23 @@ TypeMinMax* computeMinMaxSub(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
     return createMinMax(min,max);
 }
 
+TypeMinMax* computeMinMaxNeg(TypeMinMax* typeRefMinMax1){
+    int eNegativo = typeRefMinMax1->max <= 0;
+    int min;
+    int max;
+    // maior positivo
+    if(eNegativo){
+        min = (-1)*typeRefMinMax1->min;
+        max = (-1)*typeRefMinMax1->max;
+    }
+    // maior negativo
+    else{
+        min = (-1)*typeRefMinMax1->max;
+        max = (-1)*typeRefMinMax1->min;;
+    }
+    return createMinMax(min,max);
+}
+
 TypeMinMax* computeMinMaxMul(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinMax2){
     int min;
     int max;
@@ -135,4 +152,54 @@ TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1){
     int min = typeRefMinMax1->min < 0? typeRefMinMax1->min : 0; // o mínimo é o resto da divisão ser zero ou ser o menor número possível
     int max = typeRefMinMax1->max; // o máximo é ser o próprio número em seu valor máximo
     return createMinMax(min,max);
+}
+
+TypeMinMax* copyTypeMinMax(TypeMinMax* original){
+    if (original){
+        return createMinMax(original->min,original->max);
+    }
+    return NULL;
+}
+
+int mergeTypeMinMax(TypeMinMax* original, TypeMinMax* newInfo){
+    int min = original->min;
+    int max = original->max;
+    int newMax = newInfo->max;
+    int newMin = newInfo->min;
+
+    int changeMin = newMin < min? 0 : -1;
+    int changeMax = newMax > max? 1 : -1;
+
+    if(changeMax != -1 && changeMin != -1){
+        original->max = newMax;
+        original->min = newMin;
+        return 2;
+    }
+    if(changeMin != -1){
+        original->min = newMin;
+        return changeMin;
+    }
+    if(changeMax != -1){
+        original->max = newMax;
+        return changeMax;
+    }
+    return -1;
+}
+
+int changeMinMax(TypeMinMax* tmm, int value){
+    int min = tmm->min;
+    int max = tmm->max;
+    if(value < min){
+        tmm->min = value;
+        return 0;
+    }
+    if(value > max){
+        tmm->max = value;
+        return 1;
+    }
+    return -1;
+}
+
+void letGoTypeMinMax(TypeMinMax* tmm){
+    free(tmm);
 }

@@ -53,7 +53,7 @@ void* allocatePtObjects(int type, void* value, Object* newOb,int index)
 void* allocateTypeSetObjects(int index, void* value)
 {
 	// (0,1,2)
-	if(index < 2 )
+	if(index != 2)
 	{
 		int* pt = malloc(sizeof(int));
 		*pt = *(int*) value;
@@ -65,7 +65,7 @@ void* allocateTypeSetObjects(int index, void* value)
 	
 }
 
-Object* setUpForNewObject(object_type type, int OBJECT_SIZE, int timeContext, char* BIND){
+Object* setUpForNewObject(object_type type, int OBJECT_SIZE, int timeContext, char* BIND, void* TYPE_SMV_INFO){
     Object* newOb = (Object*) malloc(sizeof(Object));
 
     newOb->type = type;
@@ -91,12 +91,13 @@ Object* setUpForNewObject(object_type type, int OBJECT_SIZE, int timeContext, ch
             exit(-1);
         }
     }
+    newOb->type_smv_info = TYPE_SMV_INFO;
     return newOb;
 }
 
-Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND)
+Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND, void* TYPE_SMV_INFO)
 {
-    Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND);
+    Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND,TYPE_SMV_INFO);
  /*
     if(type == LABEL_ENTRY)
     {
@@ -132,7 +133,7 @@ Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeC
 }
 
 Object* createObjectDS(object_type type, int OBJECT_SIZE, void ** values, int timeContext, char *BIND, int aList) {
-    Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND);
+    Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND,NULL);
     newOb->aList = aList;
     int i;
     for (i = 0; i < OBJECT_SIZE; i++) {
@@ -250,7 +251,7 @@ void letgoObject(Object *o)
             for (i = 0; i < o->OBJECT_SIZE; i++)
             {
                 if(o->OBJECT_SIZE == 1 || o->type == WRITE_SMV_INFO || o->type == TYPE_SET) {
-                    free(o->values[i]);  // não precisa mais do mapeamento para type-sets
+                    free(o->values[i]);  // não precisa mais do mapeamento para type-sets (vai ser só um pos x size agora que tem type_smv_info um type-set)
                 }
                 // listas padrões
                 else{
@@ -277,6 +278,19 @@ void letgoObject(Object *o)
 	    free(o->SINTH_BIND);
 	}
     o->SINTH_BIND = NULL;
+	if(o->type == SMV_PORTS){
+	    //letgo min max verificando se o type_smv_info não é null
+	    if(o->type_smv_info){
+	        letGoTypeMinMax(o->type_smv_info);
+	    }
+	}
+	if(o->type == TYPE_SET){
+	    //let go type-set
+	    if(o->type_smv_info){
+	        letGoTypeSet(o->type_smv_info);
+	    }
+	}
+	o->type_smv_info = NULL;
 	free(o);
 }
 
@@ -284,7 +298,22 @@ void letgoObject(Object *o)
 Object* copyObject(Object* o) 
 {
     if(o){
-        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
+        /*
+        void* copy_type_smv_info = NULL;
+        if(o->type_smv_info){
+            if(o->type == NUMBER_ENTRY){
+                copy_type_smv_info = copyTypeMinMax(o->type_smv_info);
+            }
+            else{
+                if(o->type == LABEL_ENTRY){
+                    copy_type_smv_info = copyTypeSet(o->type_smv_info);
+                }
+            }
+        }
+         */
+        // não pode ser feito assim, porque senão isso implicaria que o object passado como parâmetro teria uma referencia ao que está na tabela de
+        // simbolos auxiliar (desse modo tendo dois lugares com a mesma informação)
+        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND, NULL);
         return newOb;
     }
     return NULL;

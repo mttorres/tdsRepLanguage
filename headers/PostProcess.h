@@ -4,7 +4,6 @@
 
 #include "EnvController.h"
 #include "Object.h"
-#include "TypeSet.h"
 
 
 /**
@@ -27,7 +26,7 @@ void copyValueBind(Object *o, char *bind, int index, int defaultValue, int value
  * o init(time) ou next(time) dependendo se for I_TIME ou F_TIME
  * */
 
-void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExrp,int minmax);
+void updateTime(HeaderSmv *main, STable *writeSmvTypeTable, char *newValueBind, int type, int typeExpr, int newValue);
 
 /**
  * Cria um cubo de condições da forma:
@@ -146,22 +145,23 @@ void createAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
  *  além disso, atualiza na entrada da tabela da simbolos o tipo (typeSet) associada a varName,
  *  se o tipo mudar (caso de next após mudança de contexto).
  * */
-void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr, int minmax);
+void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, char* newValue, char* condition, int type ,int typeExpr);
 
 /**
  * Devolve uma referência a um objeto, considerando seu bind com redefinições e escopo original onde foi criado
  * @param a entrada original na tabela de simbolos da linguagem
  * @sideEffects:  Todos os criar uma copia do Object referênciado por var, e passa uma string do nome referênciado para o seu SYNTH_OBJECT
  * */
-Object* refCopyOfVariable(TableEntry* var);
+Object *refCopyOfVariable(TableEntry *varLang, EnvController *controller);
 
 /**
  * Escolhe entre update/create Assign de casos init/next tratando casos de redefinição e condições
  * @param
  * @SideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
-void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
-           Object *newValue, int redef, int typeExpr, int C_TIME);
+void
+specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
+           Object *newValue, int redef, int typeExpr, int C_TIME, EnvController *controller);
 
 /**
  * Cria um nome ativo para uma TDS da forma tds_{declaredName}
@@ -203,6 +203,16 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
  * @param currentScope o escopo corrente usado para outras passagens necessárias de informação.
  */
 void updateTdsOnSmv(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope);
+
+
+/**
+ * Dado um valor sintetizado (em string) um type-set e criado com esse valor (e o default NULL)
+ * e a palavra e adicionada ao dicionario do controller (caso seja necessario)
+ * @param controllerSmv o controller que contem o dicionario
+ * @param sint_value o valor sintetizado em string
+ * @return um novo type-set que pode ser usado para realizar referencias
+ */
+TypeSet *computeTypeSet(EnvController *controllerSmv, char *sint_value);
 
 /**
  * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
