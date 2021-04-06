@@ -22,7 +22,7 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%
                           "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s > %d & %s = NULL : %s;\n\t\t%s > %d & %s = NULL : %s;",
                           "MODULE %s\n" };
 
-int  ALOC_SIZE_LINE = 300;
+
 int  MULTIPLIER_SIMPLE_HASH = 1;
 
 /**
@@ -140,13 +140,6 @@ void bindCondition(STable* scope, Object* conditionExpr){
     }
 }
 
-
-
-char* formatDirective(int ctime){
-    char* directiveValueBind = malloc(sizeof(char)*ALOC_SIZE_LINE/10);
-    sprintf(directiveValueBind, "%d", ctime);
-    return directiveValueBind;
-}
 
 char* formatCondtion(STable* scope, int ignoreCond, int ignoreTemporal, char* valueBind, char* directiveValueBind, int firstCondition){
     char* condition = !ignoreCond &&  (scope->type == IF_BLOCK || scope->type == ELSE_BLOCK) ? scope->conditionBind : NULL; // SINTH_BIND do escopo
@@ -489,7 +482,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     if((-1*((pointEnd-pointIni+1) - sizeNew) + size)  >= ALOC_SIZE_LINE)
     {
         char* newStrSize = realloc(header->assignBuffer[pos],ALOC_SIZE_LINE*2);
-        ALOC_SIZE_LINE = ALOC_SIZE_LINE*2;
+        //ALOC_SIZE_LINE = ALOC_SIZE_LINE*2;
         if(newStrSize == NULL)
         {
             fprintf(stderr, "FAIL IN REALLOCATE HEADER SIZE FOR %s !",upVar);
