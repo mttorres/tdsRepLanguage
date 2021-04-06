@@ -2,14 +2,24 @@
 // Created by mateus on 27/03/2021.
 //
 
-#include "Hash.h"
+#include "../headers/Hash.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-int hash(char* str, int SIZE_ED){
-    int hash = 401;
-    while (*str != '\0') {
-        hash = ((hash << 4) + (int)(*str)) % SIZE_ED;
-        str++;
+int hash(char *str, int SIZE_ED)
+{
+    int hash = 5381;
+    int c;
+    char* strpt = str;
+
+    while (c = *strpt++){
+        hash = (( ( (hash << 5) + hash) + c )  % SIZE_ED); /* hash * 33 + c */
     }
-    return hash % SIZE_ED;
+    int final = hash % SIZE_ED;
+    if(final > SIZE_ED-1){
+        fprintf(stderr,"[hash] Error in generating HASH\n");
+        exit(-1);
+    }
+    return final;
 }
 
