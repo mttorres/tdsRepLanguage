@@ -207,7 +207,7 @@ char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *
 
 
 void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, char *newValueBind, Object *newValue,
-                int type)
+                int type, EnvController* controller)
 {
     char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
     int pos = header->VAR_POINTER;
@@ -243,7 +243,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     {
         sprintf(newType, SmvConversions[SET], varName, newValueBind);
         int tam = strlen(newType);
-        addTypeSetSmv(varName,pos,tam,newValueBind,type,writeSmvTypeTable);
+        addTypeSetSmv(varName, pos, tam, newValueBind, type, writeSmvTypeTable, controller);
     }
     // cria uma variável que é instancia de modulo nuXmv
     else{
@@ -264,7 +264,7 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
  * @param header o header
  * @SideEffects: Altera as informações do objeto type-set recuperado da tabela auxiliar
  */
-void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, HeaderSmv* header)
+void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, HeaderSmv* header, EnvController* controller)
 {
     TableEntry* entryTypeSetInfo;
     entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
@@ -275,6 +275,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
 
     int hashForNewValue = hash(newValue, MAX_SIMPLE);
     if(!hash_set[hashForNewValue]) {
+        addTypeSetWordToDict(newValue,controller);
         hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
         char* original = header->varBuffer[pos];
         char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
@@ -288,7 +289,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
 }
 
 void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type, int minmax,
-                Object *newValue)
+                Object *newValue, EnvController* controller)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
@@ -346,7 +347,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
     if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY){
         char rawValueBind[ALOC_SIZE_LINE/2];
         copyValueBind(newValue,rawValueBind,0,0,1);
-        updateTypeSet(rawValueBind,varName,writeSmvTypeTable,header);
+        updateTypeSet(rawValueBind,varName,writeSmvTypeTable,header,controller);
     }
 }
 /**
@@ -638,7 +639,7 @@ void createDefaultNext(char* useVar, HeaderSmv* header, STable* writeSmvTypeTabl
 }
 
 void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
-           Object *newValue, int redef, int typeExpr, int C_TIME)
+           Object *newValue, int redef, int typeExpr, int C_TIME, EnvController *controller)
 {
     // strings para binds
     //binds da expressão
@@ -691,7 +692,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
             createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, NEXT, NULL, 1, 0);
         }
         //Object* auxRefValue = newValue->type == NUMBER_ENTRY? newValue : NULL;
-        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax, newValue);
+        updateType(useVar, header, writeSmvTypeTable, newValueBind, newValue->type, minmax, newValue,controller);
         free(directiveValueBind);
     }
     // init casos
@@ -702,14 +703,14 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
 
             conditionCube = formatCondtion(scope,1,1,newValueBind,directiveValueBind,1);
 
-            createType(useVar, header, writeSmvTypeTable, defaultValueBind, newValue, newValue->type);
+            createType(useVar, header, writeSmvTypeTable, defaultValueBind, newValue, newValue->type,controller);
             createAssign(useVar, header, writeSmvTypeTable, defaultValueBind, conditionCube, INIT, defaultValueBind, 1,
                          0);
         }
         else{
             conditionCube = formatCondtion(scope,0,1,newValueBind,directiveValueBind,1);
 
-            createType(useVar, header, writeSmvTypeTable, newValueBind, newValue, newValue->type);
+            createType(useVar, header, writeSmvTypeTable, newValueBind, newValue, newValue->type,controller);
             createAssign(useVar, header, writeSmvTypeTable, newValueBind, conditionCube, INIT, defaultValueBind, 1, 0);
             createDefaultNext(useVar,header,writeSmvTypeTable);
         }
@@ -721,7 +722,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
 
 void updateTime(HeaderSmv* main , STable * writeSmvTypeTable, char* newValue, int type, int typeExpr, int minmax)
 {
-    updateType("time", main, writeSmvTypeTable, newValue, type, minmax, NULL);
+    updateType("time", main, writeSmvTypeTable, newValue, type, minmax, NULL,NULL);
     typeExpr ? updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,NEXT,minmax) :
     updateAssign("time",main,writeSmvTypeTable,newValue,NULL,type,INIT,minmax);
 }
@@ -752,21 +753,6 @@ HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int trans
     selectBuffer(VAR,"VAR\n",newHeader,0);
     selectBuffer(ASSIGN,"ASSIGN\n",newHeader,0);
     return newHeader;
-}
-
-void validateTdsDeclaration(char* declarationName, EnvController* controller){
-    TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
-    if(expected_entry){
-        Object* info = expected_entry->val;
-        int* isDeclared = info->values[0];
-        if(!(*isDeclared)){
-            controller->validPorts++;
-            *isDeclared = 1;
-        }
-        else{
-            controller->multiPortDeclartion = 1;
-        }
-    }
 }
 
 /***
@@ -1007,7 +993,7 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Env
     removeAfter(nameWithNoBreakL,declarationDetails,'\n');
     char* declarationName = newTDS->name? newTDS->name : newEncapsulatedTDS->SINTH_BIND;
     createType(declarationName,accessHeader(controller, PORTS, 0),
-               accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC);
+               accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC,controller);
 }
 
 void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
@@ -1024,7 +1010,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     STable* auxTable = createTable(SMV_PORTS, NULL, 0, 0, -1);
     addNewAuxInfo(controller,auxTable);
 
-    createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY);
+    createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY,controller);
 
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
@@ -1056,7 +1042,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
                 createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL",
                              1, 0);
             }
-            updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
+            updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue,controller);
         }
     }
         // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
@@ -1200,7 +1186,7 @@ void letGoOldEntry(TableEntry* var, STable* refAuxTable){
 }
 */
 
-void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable)
+void addTypeSetSmv(char *varName, int pos, int tam, char *newValueBind, int type, STable *writeSmvTypeTable, EnvController *controller)
 {
     int usedSize = MAX_SIMPLE*MULTIPLIER_SIMPLE_HASH;
     int* typeSetHashMap = malloc(sizeof(int)*usedSize); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
@@ -1218,6 +1204,7 @@ void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type
     }
     else{
         typeSetHashMap[hash(newValueBind, usedSize)] = 1;
+        addTypeSetWordToDict(newValueBind,controller);
     }
     void* po[] = {&pos, &tam,typeSetHashMap};
     addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
@@ -1230,7 +1217,7 @@ void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller
 
     char rawValueBind[ALOC_SIZE_LINE/2];
     copyValueBind(dependence->DATA_TIME[C_TIME],rawValueBind,0,0,1);
-    updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant);
+    updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant,controller);
 }
 
 void writeResultantHeaders(EnvController* controller, const char* path){

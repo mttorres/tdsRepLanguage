@@ -145,7 +145,7 @@ Object* refCopyOfVariable(TableEntry* var);
  * @SideEffects:  Todos os colaterais de updateAssign ou createAssign
  * */
 void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header, STable *scope, STable *writeSmvTypeTable,
-           Object *newValue, int redef, int typeExpr, int C_TIME);
+           Object *newValue, int redef, int typeExpr, int C_TIME, EnvController *controller);
 
 /**
  * Cria um nome ativo para uma TDS da forma tds_{declaredName}
@@ -222,7 +222,8 @@ void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller
 																											tabela ---y entradas--->entradas --> Objeto(bool))
 				Mais coisas para centralizar e dar free
 */
-void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable);
+void addTypeSetSmv(char *varName, int pos, int tam, char *newValueBind, int type, STable *writeSmvTypeTable,
+                   EnvController *controller);
 
 void writeResultantHeaders(EnvController* controller, const char* path);
 
