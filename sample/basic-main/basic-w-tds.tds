@@ -1,6 +1,6 @@
 INTERVAL: 0 ~ 20
 
-x = 2  //redef =0 , context =0
+x = -2  //redef =0 , context =0
 // usei aqui o x
 
 
@@ -23,18 +23,14 @@ if(zeta){
 
 tdsA = {
 	portname : 'a',
-	data-time: {0: x, 1: 1, 2: z, 21:4}
+	data-time: {0: x, 1: 1, 2: 10, 21:4}
 }
 
-tdsB = {
-	portname : 'b',
-	data-time: {3: 3, 4:4, 5:5, 6:z}
-}
+
 
 //(tdsA) => c // funciona
 
-(tdsA,tdsB) ==> c // funciona
-(c) -||> d // funciona
+
 
 //tdsC = {
 //	portname : 'c',
@@ -75,12 +71,20 @@ C_TIME = 2
 
 //(c) -||> d // funciona
 
-x = 4 //redef =1 , context =2
+x = -4 //redef =1 , context =2
 
 
 C_TIME = 2
 
 y = 5
+
+tdsB = {
+	portname : 'b',
+	data-time: {3: 3, 4:4, 5:5, 6:y-x}
+}
+
+(tdsA,tdsB) ==> c // funciona
+(c) -||> d // funciona
 
 
 C_TIME = 3
@@ -105,5 +109,6 @@ else{
     y = 6
 }
 
+stu = x/y
 
 
