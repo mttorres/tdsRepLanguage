@@ -953,11 +953,11 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
                 if(expr->type != NULL_ENTRY && !scope->notWrite){
                     if(changeContext){
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME, controllerSmv);
                     }
                     else{
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
                     }
                 }
             }
@@ -968,7 +968,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                 // tempo > 0 e não ocorreu redefinição
                 if((expr->type != NULL_ENTRY && !scope->notWrite)){
                     if(changeContext){
-                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
+                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
+                                   C_TIME, controllerSmv);
                     }
                 }
             }
@@ -1201,8 +1202,8 @@ void startInterpreter(Node* n, STable* scope, EnvController* controller){
     /*
     * Realização de estrutura auxiliar
     */
-    Object ** REALIZATION = malloc(sizeof(Object*)*DEFAULT_MEMOI);
-    MEMOI = REALIZATION;
+    //Object ** REALIZATION = malloc(sizeof(Object*)*DEFAULT_MEMOI);
+    //MEMOI = REALIZATION;
     eval(n,scope,controller);
     commitCurrentTime(scope,controller,*(int*) lookup(scope,"F_TIME")->val->values[0]);
     letgoNode(n);

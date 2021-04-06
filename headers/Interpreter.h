@@ -8,10 +8,10 @@
 
 #include "Visitor.h"
 
-#define DEFAULT_MEMOI 300
+//#define DEFAULT_MEMOI 300
 
 
-Object** MEMOI;
+//Object** MEMOI;
 
 
 /*
