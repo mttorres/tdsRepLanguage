@@ -283,8 +283,11 @@ void letgoObject(Object *o)
 
 Object* copyObject(Object* o) 
 {
-	Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
-	return newOb;
+    if(o){
+        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
+        return newOb;
+    }
+    return NULL;
 }
 
 void updateNullRef(Object *var, Object *expr){

@@ -177,7 +177,7 @@ void letGoOldEntry(TableEntry* var, STable* auxTable);
  * Essas devem ser liberadas assim como as outras. Realiza declaração da tds em ports module (linha que deve ser liebrada depois)
  */
 
-void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP);
+void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME);
 
 /**
  * Define um módulo smv para a TDS associada ao parâmetro. Recupera as informações da encapsulatedTDS avaliada, seus dados, seu header,
@@ -192,13 +192,12 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
 /**
  * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
  * para atualizar um type-set. Delega as demais operações para o updateTypeSet depois
- * @param dependence a TDS fornecedora de valor
  * @param dependant a TDS que recebe valores
  * @param controller o controlador de ambiente
  * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller, int C_TIME );
+void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*
