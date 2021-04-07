@@ -284,7 +284,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
         free(original);
     }
     else{
-        // warning
+        // warning [realocação]
     }
 }
 
@@ -559,6 +559,7 @@ Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
+    int C_TIME = *(int*) lookup(var->parentScope,"C_TIME")->val->values[0];
     useVar = processActiveName(var->parentScope, var->name, 1, var->val->timeContext, var->val->type);
     Object* copyRef = copyObject(var->val);
     if(useVar){
