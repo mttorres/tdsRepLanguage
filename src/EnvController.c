@@ -200,7 +200,7 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo){
  */
 int addParamToModule(EnvController* controller, char* param, smvtype cat, int indexOfHeader){
     HeaderSmv* updated = accessHeader(controller,cat,indexOfHeader);
-    int possibleParamPos = hash(param,MAX_SIMPLE);
+    int possibleParamPos = hash(param,MAX_PARAM);
     if(updated->PARAM_MAP[possibleParamPos]){
         return 0;
     }
