@@ -279,7 +279,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
         hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
         char* original = header->varBuffer[pos];
         char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
-        char* newTypeSet = addParams(original,newValue,"{","}");
+        char* newTypeSet = addParams(original, newValue, "{", "}", 0);
         header->varBuffer[pos] = newTypeSet;
         free(original);
     }
@@ -675,7 +675,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
         char statevarname[ALOC_SIZE_LINE];
         sprintf(statevarname,SmvConversions[NEXT],useVar);
         //verifica se existe next(statevarname)
-        directiveValueBind = formatDirective(C_TIME);
+        directiveValueBind = formatNumeric(C_TIME);
         //defaultValueBind = formatValueBind(newValue,0,1); // vai ser só para o caso de ref de uma variável que foi atualizada dentro de um if (já existe fora do escopo atual)
 
         if(lookup(writeSmvTypeTable,statevarname)){
@@ -1017,7 +1017,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
             createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, NULL, INIT, NULL, 1, 0);
         } else {
             char *conditionCube = NULL;
-            char *directiveValueBind = formatDirective(C_TIME);
+            char *directiveValueBind = formatNumeric(C_TIME);
             if (lookup(currentInfo, "next(value)")) {
                 conditionCube = formatCondtion(currentScope, 0, 0, lazyValue->SINTH_BIND, directiveValueBind, 0);
                 updateAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, TDS_ENTRY, NEXT,
