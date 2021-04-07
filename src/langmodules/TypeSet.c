@@ -59,6 +59,19 @@ int addElementToTypeSet(TypeSet* ts, char* newElement){
     return 0;
 }
 
+/*Será atualizado  após descobrir o memory leak*/
+/**
+ * Dado uma variável de interesse de um módulo (ex: value (tds) return (funções de tds). Atualiza
+ * o type-set dessa variável baseado no tipo SMV de uma outra variável de dependência (min max ou outro type-set).
+ * @param var o nome da variável de interesse
+ * @param headerModule o header do módulo em que a alteração será feita
+ * @param auxTableModule a tabela de simbolos auxiliar desse módulo
+ * @param varD o nome (referência) da variável dependência
+ * @param auxTableDependency  a tabela auxiliar que tem as inforamções do tipo da dependência
+ * @SideEffects: Realoca a string da declaração de var para comportar cada valor possível do tipo da dependência
+ */
+//void createUnionAtSmvType(char* var, HeaderSmv* headerModule, STable* auxTableModule, char* varD, STable* auxTableDependency);
+
 void letGoTypeSet(TypeSet* ts){
     if(ts){
         int i;

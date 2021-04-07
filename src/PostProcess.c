@@ -543,6 +543,18 @@ char *processActiveName(STable *currentScope, char *varName, int notExistsOutSco
     return activeName;
 }
 
+/**
+* Retorna um bind para um valor. Seja uma versão em String do mesmo ou ainda o nome de variável desse valor dentro do
+* contexto do nuXmv.
+* @param varName o nome da variável recuperado do escopo
+* @param parentScope o escopo da entrada da tabela de simbolos
+* @param expr o objeto associado
+* @param index o indice caso seja uma estrutura de dados
+* @param isDefault flag para avaliar para o valor default daquele tipo (0 inteiro, NULL : labels, FALSE : booleans)
+* @param isSelf é usado para retornar o bind como sendo o próprio nome da variável (independente do estado, sem init ou next).
+* Caso seja usado, esse sobrescreve o isDefault.
+* @return retorna uma string alocada com o nome da variável dentro do contexto do nuXmv.
+*/
 char *formatValueBind(char *varName, STable *parentScope, Object *expr, int index, int isDefault, int isSelf) {
     if(isSelf){
         char* useVar = processActiveName(parentScope, varName, 1, 0, expr->type);
@@ -1066,7 +1078,7 @@ void addTypeSetSmv(char *varName, int pos, int tam, char *newValueBind, int type
     addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
 }
 
-void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME){
+void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME){
     STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
 
     HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);

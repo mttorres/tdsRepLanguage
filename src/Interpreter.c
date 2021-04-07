@@ -54,7 +54,7 @@ void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TI
         resolveMergerTdsDependencies(currentTDS, C_TIME);
     }
     if(currentTDS->DATA_TIME[C_TIME]){
-        propagateTypeSet(currentTDS,controllerSmv,C_TIME);
+        propagateValueToTypeSet(currentTDS, controllerSmv, C_TIME);
     }
 }
 

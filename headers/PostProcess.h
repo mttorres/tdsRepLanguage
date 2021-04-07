@@ -197,7 +197,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
  * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
+void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*

@@ -5,7 +5,7 @@
 #ifndef TDSREPLANGUAGE_HASH_H
 #define TDSREPLANGUAGE_HASH_H
 
-#define MAX_SIMPLE 200
+#define MAX_SIMPLE 203
 
 int hash(char* str, int SIZE_ED);
 
