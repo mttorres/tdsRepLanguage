@@ -223,6 +223,7 @@ void validateTdsDeclaration(char* declarationName, EnvController* controller){
         else{
             controller->multiPortDeclartion = 1;
             fprintf(stderr,"ERROR: Same TDS redeclared. Name: %s\n",declarationName);
+            exit(-1);
         }
     }
 }
@@ -251,6 +252,15 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
     }
 }
 
+/**
+ * Adiciona parâmetro para módulo qualquer do nuXmv.
+ * @param controller o controlador de ambiente e contexto
+ * @param param a string do parâmetro
+ * @param cat a categoria do header/tabela auxuliar a ser recuperada
+ * @param indexOfHeader o indice do header
+ * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
+ * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
+ */
 void addParamToPortsModule(EnvController *controller, char *param) {
 
     int paramAdd = addParamToModule(controller,param,PORTS,0); // deve adicionar ao portsModule É SEMPRE O PRIMEIRO
