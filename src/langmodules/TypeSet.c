@@ -11,7 +11,7 @@
 
 TypeSet* createTypeSet(char* defaultWord){
     TypeSet* ts = malloc(sizeof(TypeSet));
-    ts->usedSize = MAX_SIMPLE*1;
+    ts->usedSize = MAX_SIMPLE;
     ts->hash_set = malloc(sizeof(char*)*ts->usedSize);
     int i;
     for (i = 0; i < ts->usedSize; i++) {
