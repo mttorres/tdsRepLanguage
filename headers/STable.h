@@ -129,4 +129,18 @@ void letgoEntry(TableEntry *e);
  * */
 void letGoEntryByName(STable* table, char* name);
 
+
+/**
+ * Chama o addValue, porém, como o objeto salvo na tabela de simbolos auxiliar é um type-min-max/type-info,
+ * passamos o type_smv_info_dc como parâmetro para setar ao objeto recebem escrito.
+ * @param name o nome da variável na tabela de simbols auxiliar (e no nuXmv)
+ * @param any os valores da declaração (ex: pos, size, ptini, ptend)
+ * @param any_type o tipo (WRITE_SMV_INFO, TYPE_SET)
+ * @param object_size o tamanho do objeto
+ * @param current a tabela de simbolos auxiliar usada no momento
+ * @param type_smv_info_dc a informação adicional para escrever o domínio de valores de uma variável
+ * @SideEffects: Aloca um objeto e entrada na tabela de simbolos auxiliar assim como addValue,
+ */
+void addSmvInfoDeclaration(char *name, void **any, int any_type, int object_size, STable *current, void* type_smv_info_dc);
+
 #endif

@@ -128,7 +128,7 @@ Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
     sint = atoi(n->leafs[0]);
     printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0]);
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0], NULL);
     return o;
 }
 
@@ -146,7 +146,7 @@ Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 
     void* bp[] = {&sint};
 
-    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, sint? trueString : falseString);
+    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, sint ? trueString : falseString, NULL);
 
     return o;
 }
@@ -161,7 +161,7 @@ Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 
     printf("[evalSTRING] SINTH: %s \n",sint);
 
-    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint);
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint, NULL);
 
     return o;
 }
@@ -182,7 +182,7 @@ Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 
     printf("[evalNULL] SINTH: %s \n",sint);
 
-    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint);
+    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint, NULL);
 
     return o;
 }
@@ -266,7 +266,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
     else
     {
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
-        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, "time");
+        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, "time", NULL);
     }
 }
 
@@ -312,7 +312,7 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "+");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else if(!o1->aList && !o2->aList && o1->type == LABEL_ENTRY && o2->type == o1->type){
         char* str1 = o1->values[0];
@@ -324,7 +324,7 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         void* rp[] = {r};
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, r);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, r, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -359,7 +359,7 @@ Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
     if(o2){
         letgoObject(o2);
     }
-    return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+    return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
 }
 
 Object * notObjectOperation(Object* o){
@@ -374,7 +374,7 @@ Object * notObjectOperation(Object* o){
     char resultingBind[strlen(o->SINTH_BIND)+2];
     createExprBind(resultingBind, o, NULL, "!");
     letgoObject(o);
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
 }
 
 Object* evalNOT(Node* n, STable* scope, EnvController* controller)
@@ -396,7 +396,7 @@ Object* evalMULTI(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "*");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (*) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
     exit(-1);
@@ -423,7 +423,7 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, op);
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (%s) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND,op);
     exit(-1);
@@ -441,7 +441,7 @@ Object * evalLE(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, "<=");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -454,7 +454,7 @@ Object * evalLE(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -475,7 +475,7 @@ Object * evalGE(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, ">=");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -488,7 +488,7 @@ Object * evalGE(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -508,7 +508,7 @@ Object * evalLT(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, "<");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -521,7 +521,7 @@ Object * evalLT(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -541,7 +541,7 @@ Object * evalGT(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, ">");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -554,7 +554,7 @@ Object * evalGT(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -585,7 +585,7 @@ Object* evalEQUAL(Node* n, STable* scope, EnvController* controller){
     void* rp[] = {&r};
     char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
     createExprBind(resultingBind, o1, o2, "=");
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
 }
 
 Object* evalNEQUAL(Node* n, STable* scope, EnvController* controller){
@@ -595,7 +595,7 @@ Object* evalNEQUAL(Node* n, STable* scope, EnvController* controller){
     void* rp[] = {&r};
     char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
     createExprBind(resultingBind, o1, o2, "!=");
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
 }
 
 
@@ -612,7 +612,7 @@ Object* evalAND(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "&");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (and) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -633,7 +633,7 @@ Object* evalOR(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "|");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (or) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -670,7 +670,7 @@ Object* evalIMP(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "->");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -692,7 +692,7 @@ Object* evalBIMP(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "<->");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);

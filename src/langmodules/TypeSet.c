@@ -20,8 +20,11 @@ TypeSet* createTypeSet(char* defaultWord){
     if(defaultWord){
         int hashDefaultWord = hash(defaultWord,ts->usedSize);
         ts->hash_set[hashDefaultWord] = defaultWord;
+        ts->lastIndex = hashDefaultWord;
     }
-    ts->lastIndex = 0;
+    else{
+        ts->lastIndex = 0;
+    }
     return ts;
 }
 

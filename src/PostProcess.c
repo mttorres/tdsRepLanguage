@@ -23,7 +23,6 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%
                           "MODULE %s\n" };
 
 
-int  MULTIPLIER_SIMPLE_HASH = 1;
 
 /**
  *
@@ -239,11 +238,13 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
         addValue(varName, po, WRITE_SMV_INFO, 2, 0, writeSmvTypeTable, 0);
 
     }
-    else if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY)
+    else if(type == LABEL_ENTRY || type == NULL_ENTRY)
     {
         sprintf(newType, SmvConversions[SET], varName, newValueBind);
         int tam = strlen(newType);
-        addTypeSetSmv(varName, pos, tam, newValueBind, type, writeSmvTypeTable, controller);
+        void* po[] = {&pos, &tam};
+        addSmvInfoDeclaration(varName,po,WRITE_SMV_INFO,2,writeSmvTypeTable,newValue->type_smv_info);
+        //addTypeSetSmv(varName, pos, tam, newValueBind, type, writeSmvTypeTable, controller);
     }
     // cria uma variável que é instancia de modulo nuXmv
     else{
@@ -268,23 +269,16 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
 {
     TableEntry* entryTypeSetInfo;
     entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
-    int pos = *(int*) entryTypeSetInfo->val->values[0];
-    int size = *(int*) entryTypeSetInfo->val->values[1];
-    int* hash_set = (int*) entryTypeSetInfo->val->values[2];
-    //int usedSize = *(int*) entryTypeSetInfo->val->values[3];
-
-    int hashForNewValue = hash(newValue, MAX_SIMPLE);
-    if(!hash_set[hashForNewValue]) {
-        addTypeSetWordToDict(newValue,controller);
-        hash_set[hashForNewValue] = 1; // por ser uma ED nao precisa "reatualizar"
-        char* original = header->varBuffer[pos];
-        char* originalRef = original; // impede sideEffects (exemplo ele incrementar dentro de addparams e dar free errado mais a diante)
+    int* pos = (int*) entryTypeSetInfo->val->values[0];
+    int* size = (int*) entryTypeSetInfo->val->values[1];
+    TypeSet* typeSet = entryTypeSetInfo->val->type_smv_info;
+    addTypeSetWordToDict(newValue,controller);
+    if(addElementToTypeSet(typeSet,getTypeSetWordFromDict(newValue,controller))){
+        char* original = header->varBuffer[*pos];
         char* newTypeSet = addParams(original, newValue, "{", "}", 0);
-        header->varBuffer[pos] = newTypeSet;
+        header->varBuffer[*pos] = newTypeSet;
         free(original);
-    }
-    else{
-        // warning [realocação]
+        *size = strlen(newTypeSet);
     }
 }
 
@@ -992,6 +986,35 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Env
     }
 }
 
+TypeSet *computeTypeSet(EnvController *controllerSmv, char *sint_value) {
+    addTypeSetWordToDict(sint_value, controllerSmv);
+    TypeSet* newTypeSet = createTypeSet(getTypeSetWordFromDict("NULL",controllerSmv));
+    addElementToTypeSet(newTypeSet,getTypeSetWordFromDict(sint_value,controllerSmv));
+    return newTypeSet;
+}
+
+/**
+ * Para uma TDS processada, cria a declaração da variável "value" em seu módulo. Que tem o type-set default com os valores
+ * NULL, 0, 1
+ * @param tdsHeader o header (módulo) associado a tds
+ * @param auxTable a tabela de simbolos auxiliar
+ * @param controller o controlador de ambiente (útil para consultar o dicionário de type-sets)
+ */
+void createDefaultTypeSetTDS(HeaderSmv *tdsHeader, STable* auxTable, EnvController* controller) {
+    TypeSet* tdsValueTypeSet = computeTypeSet(controller,"0");
+    addElementToTypeSet(tdsValueTypeSet,getTypeSetWordFromDict("1",controller));
+    char* newType = malloc(sizeof(char)*ALOC_SIZE_LINE);
+    sprintf(newType, SmvConversions[SET], "value", "NULL, 0, 1");
+    int pos = tdsHeader->VAR_POINTER;
+    int tam = strlen(newType);
+    void* po[] = {&pos, &tam};
+    addSmvInfoDeclaration("value",po,WRITE_SMV_INFO,2,auxTable,tdsValueTypeSet);
+    tdsHeader->varBuffer[tdsHeader->VAR_POINTER] = newType;
+    tdsHeader->VAR_POINTER += 1;
+}
+
+
+
 void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME){
     TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
 
@@ -1006,7 +1029,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     STable* auxTable = createTable(SMV_PORTS, NULL, 0, 0, -1);
     addNewAuxInfo(controller,auxTable);
 
-    createType("value",newTdsHeader,auxTable,"NULL, 0, 1",NULL,TDS_ENTRY,controller);
+    createDefaultTypeSetTDS(newTdsHeader,auxTable,controller);
 
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
@@ -1054,38 +1077,14 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
     updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,-1,lazyValue,controller);
 }
 
-void addTypeSetSmv(char *varName, int pos, int tam, char *newValueBind, int type, STable *writeSmvTypeTable, EnvController *controller)
-{
-    int usedSize = MAX_SIMPLE*MULTIPLIER_SIMPLE_HASH;
-    int* typeSetHashMap = malloc(sizeof(int)*usedSize); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
-    int i;
-    for (i = 0; i < MAX_SIMPLE*MULTIPLIER_SIMPLE_HASH; i++) {
-        typeSetHashMap[i] = 0;
-    }
-    if(type == TDS_ENTRY){
-        int hashNULL = hash("NULL", usedSize);
-        int hashZERO = hash("0", usedSize);
-        int hashONE = hash("1", usedSize);
-        typeSetHashMap[hashNULL] = 1;
-        typeSetHashMap[hashZERO] = 1;
-        typeSetHashMap[hashONE] = 1;
-    }
-    else{
-        typeSetHashMap[hash(newValueBind, usedSize)] = 1;
-        addTypeSetWordToDict(newValueBind,controller);
-    }
-    void* po[] = {&pos, &tam,typeSetHashMap};
-    addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
-}
 
 void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME){
     STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
-
     HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);
-
     char rawValueBind[ALOC_SIZE_LINE/2];
     copyValueBind(dependant->DATA_TIME[C_TIME],rawValueBind,0,0,1);
     updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant,controller);
+    //free(rawValueBind);
 }
 
 void writeResultantHeaders(EnvController* controller, const char* path){

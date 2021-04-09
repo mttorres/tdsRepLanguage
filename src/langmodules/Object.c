@@ -94,9 +94,10 @@ Object* setUpForNewObject(object_type type, int OBJECT_SIZE, int timeContext, ch
     return newOb;
 }
 
-Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND)
+Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND, void *TYPE_SMV_INFO)
 {
     Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND);
+    newOb->type_smv_info = TYPE_SMV_INFO;
  /*
     if(type == LABEL_ENTRY)
     {
@@ -134,6 +135,7 @@ Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeC
 Object* createObjectDS(object_type type, int OBJECT_SIZE, void ** values, int timeContext, char *BIND, int aList) {
     Object* newOb = setUpForNewObject(type,OBJECT_SIZE,timeContext,BIND);
     newOb->aList = aList;
+    newOb->type_smv_info = NULL;
     int i;
     for (i = 0; i < OBJECT_SIZE; i++) {
         newOb->values[i] = values[i];
@@ -250,7 +252,7 @@ void letgoObject(Object *o)
             for (i = 0; i < o->OBJECT_SIZE; i++)
             {
                 if(o->OBJECT_SIZE == 1 || o->type == WRITE_SMV_INFO || o->type == TYPE_SET) {
-                    free(o->values[i]);  // não precisa mais do mapeamento para type-sets
+                    free(o->values[i]);  // não precisa mais do mapeamento para type-sets (vai ser só um pos x size agora que tem type_smv_info um type-set)
                 }
                 // listas padrões
                 else{
@@ -277,6 +279,19 @@ void letgoObject(Object *o)
 	    free(o->SINTH_BIND);
 	}
     o->SINTH_BIND = NULL;
+    if(o->type == SMV_PORTS){
+        //letgo min max verificando se o type_smv_info não é null
+        if(o->type_smv_info){
+            letGoTypeMinMax(o->type_smv_info);
+        }
+    }
+    if(o->type == TYPE_SET){
+        //let go type-set
+        if(o->type_smv_info){
+            letGoTypeSet(o->type_smv_info);
+        }
+    }
+    o->type_smv_info = NULL;
 	free(o);
 }
 
@@ -284,7 +299,7 @@ void letgoObject(Object *o)
 Object* copyObject(Object* o) 
 {
     if(o){
-        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND);
+        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, o->SINTH_BIND, NULL);
         return newOb;
     }
     return NULL;

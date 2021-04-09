@@ -224,6 +224,15 @@ void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TI
 void addTypeSetSmv(char *varName, int pos, int tam, char *newValueBind, int type, STable *writeSmvTypeTable,
                    EnvController *controller);
 
+/**
+ * Dado um valor sintetizado (em string) um type-set e criado com esse valor (e o default NULL)
+ * e a palavra e adicionada ao dicionario do controller (caso seja necessario)
+ * @param controllerSmv o controller que contem o dicionario
+ * @param sint_value o valor sintetizado em string
+ * @return um novo type-set que pode ser usado para realizar referencias
+ */
+TypeSet *computeTypeSet(EnvController *controllerSmv, char *sint_value);
+
 void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif
