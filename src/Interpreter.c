@@ -72,7 +72,6 @@ void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int 
 void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME,
                               Node *PROGRAM_PATH, TDS *currentTDS, Object *timeComponent) {
     PROGRAM_PATH = (Node*) timeComponent->values[1];
-    controllerSmv->currentTDScontext = currentTDS;
     resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
 }
 
@@ -83,6 +82,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
     for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
         // resolve call-by-need cada expressão ativa da TDS.
         TDS* currentTDS = controllerSmv->declaredPorts[i];
+        controllerSmv->currentTDScontext = currentTDS;
         if(currentTDS->type == DATA_LIST){
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
             if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
@@ -126,9 +126,9 @@ Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
 {
     int sint;
     sint = atoi(n->leafs[0]);
-    printf("[evalNUM] SINTH: %d \n",sint);
+    //printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0], NULL);
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0],  createMinMaxByOneValue(sint));
     return o;
 }
 
@@ -154,15 +154,14 @@ Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalSTRING] \n");
+    //printf("[evalSTRING] \n");
     char* sint =  n->leafs[0];
 
     void* sp[] = {sint};
 
-    printf("[evalSTRING] SINTH: %s \n",sint);
-
-    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint, NULL);
-
+    //printf("[evalSTRING] SINTH: %s \n",sint);
+    TypeSet *newTypeSet = computeTypeSet(controllerSmv, sint);
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint, newTypeSet);
     return o;
 }
 
@@ -175,15 +174,10 @@ Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 {
     printf("[evalNULL] \n");
-    // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
+    // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?) SIM NULL SERÁ UMA "LABEL" ESPECIAL
     char* sint =  n->leafs[0];
-
-//    void* np[] = {sint};
-
-    printf("[evalNULL] SINTH: %s \n",sint);
-
-    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint, NULL);
-
+    // TALVEZ TENHAMOS QUE ADICIONAR AO NULL o 0 (para não ficar uma constante)
+    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint, computeTypeSet(controllerSmv,sint));
     return o;
 }
 
@@ -228,24 +222,23 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         }
         else
         {
-/*
-            if(entry->val->type == NULL_ENTRY){
-
-            }
-            else{
-                // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
-*/
-                Object* copy = refCopyOfVariable(entry);
-                //addParamToPortsModule()
-                //updatePortsVariableReference(controllerSmv->currentTDScontext,copy);
-                if(controllerSmv->currentTDScontext){
-                    addParamToTds(controllerSmv,entry->name,controllerSmv->currentTDScontext);
-                    // encapsular em método depois
-                    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
-                    //addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+            if(controllerSmv->currentTDScontext) {
+                if (entry->val->type == LOGICAL_ENTRY) {
+                    fprintf(stderr,
+                            "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. ONLY SYMBOLIC VALUES ARE ACCEPTED, %s is a BOOLEAN value",
+                            controllerSmv->currentTDScontext->name, entry->name);
+                    // poderia ter um cast implicito também...
+                    exit(-1);
                 }
-                return copy;
-//            }
+            }
+            Object *copy = refCopyOfVariable(entry, controllerSmv);
+            if (controllerSmv->currentTDScontext) {
+                    addParamToTds(controllerSmv, entry->name, controllerSmv->currentTDScontext);
+                    // encapsular em método depois
+                    //int C_TIME = *(int *) lookup(scope, "C_TIME")->val->values[0];
+                    //addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+            }
+            return copy;
         }
     }
 }
@@ -253,8 +246,8 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalTIME_DIRECTIVE] \n");
-
+    //printf("[evalTIME_DIRECTIVE] \n");
+    // TODO mudar a referencia para não ser time sempre (#68)
     TableEntry* entry = lookup(scope,n->leafs[0]);
 
     // teoricamente é impossível uma time Directive não estar na tabela mas é só um check
@@ -310,9 +303,11 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         r =  (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '+' + 1
         createExprBind(resultingBind, o1, o2, "+");
+        Object* SUM_OBJECT =  createObject(NUMBER_ENTRY, 1, rp, -1,
+                                           resultingBind, computeMinMaxSum(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return SUM_OBJECT;
     }
     else if(!o1->aList && !o2->aList && o1->type == LABEL_ENTRY && o2->type == o1->type){
         char* str1 = o1->values[0];
@@ -322,9 +317,11 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         char* refToEnd = customCat(r,str1,0,0);
         customCat(refToEnd,str2,0,0);
         void* rp[] = {r};
+        Object* CONCAT_OBJECT = createObject(LABEL_ENTRY, 1, rp,
+                                             -1, r,computeTypeSet(controller,r));
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, r, NULL);
+        return CONCAT_OBJECT;
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -355,11 +352,13 @@ Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
     void* rp[] = {&r};
     char resultingBind[o2? strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4: strlen(o1->SINTH_BIND) +2]; // + espaco + espaco + '-' + 1 ou  '-' + +1
     createExprBind(resultingBind, o1, o2, "-");
+    Object* MINUS_OBJECT =  createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
+                                         o2? computeMinMaxSub(o1->type_smv_info,o2->type_smv_info) : computeMinMaxNeg(o1->type_smv_info));
     letgoObject(o1);
     if(o2){
         letgoObject(o2);
     }
-    return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
+    return MINUS_OBJECT;
 }
 
 Object * notObjectOperation(Object* o){
@@ -394,9 +393,11 @@ Object* evalMULTI(Node* n, STable* scope, EnvController* controller)
         r =  (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '*' + 1
         createExprBind(resultingBind, o1, o2, "*");
+        Object* MULT_OBJECT = createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
+                                           computeMinMaxMul(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return MULT_OBJECT;
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (*) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
     exit(-1);
@@ -421,9 +422,11 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
         r =  isDivision? (*(int*)o1->values[0]) / (SYNTH_O2) : (*(int*)o1->values[0]) % (SYNTH_O2);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +aloca]; // + espaco + espaco + '/' + 1
         createExprBind(resultingBind, o1, o2, op);
+        Object* DIV_OBJECT = createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
+                                          computeMinMaxDiv(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return DIV_OBJECT;
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (%s) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND,op);
     exit(-1);
@@ -782,7 +785,7 @@ Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv)
         else
         {
             // copia o objeto atomico
-            return refCopyOfVariable(entry);
+            return refCopyOfVariable(entry, NULL);
         }
     }
 }
@@ -838,7 +841,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->MAIN,controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,0,0);
+        updateTime(controllerSmv->MAIN, controllerSmv->mainInfo, smvBind, T_DIRECTIVE_ENTRY, 0, *ptitime);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -846,7 +849,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->MAIN,controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,1,1);
+        updateTime(controllerSmv->MAIN, controllerSmv->mainInfo, smvBind, T_DIRECTIVE_ENTRY, 1, *ptftime);
     }
     return NULL;
 }
@@ -948,8 +951,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
-        STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
         // ports ou main
+        STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
         HeaderSmv* refHeader = selectSMV_INFO(scope,NULL,controllerSmv);
 
         TableEntry* itimeEntry = lookup(scope,"I_TIME");
@@ -962,7 +965,6 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
             //primeira vez da variavel (ou não inicializada, mudança para depois)
             if(!var)
             {
-                //int isTDS = expr->type == TDS_ENTRY;
                 if(!scope->notEvaluated){
                     addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
                 }

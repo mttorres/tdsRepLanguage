@@ -38,7 +38,7 @@ TypeMinMax* computeMinMaxSub(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
 }
 
 TypeMinMax* computeMinMaxNeg(TypeMinMax* typeRefMinMax1){
-    int eNegativo = typeRefMinMax1->max <= 0;
+    int eNegativo = typeRefMinMax1->max < 0;
     int min;
     int max;
     // maior positivo
@@ -49,7 +49,7 @@ TypeMinMax* computeMinMaxNeg(TypeMinMax* typeRefMinMax1){
         // maior negativo
     else{
         min = (-1)*typeRefMinMax1->max;
-        max = (-1)*typeRefMinMax1->min;;
+        max = (-1)*typeRefMinMax1->min;
     }
     return createMinMax(min,max);
 }
