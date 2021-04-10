@@ -279,19 +279,16 @@ void letgoObject(Object *o)
 	    free(o->SINTH_BIND);
 	}
     o->SINTH_BIND = NULL;
-    if(o->type == SMV_PORTS){
-        //letgo min max verificando se o type_smv_info não é null
-        if(o->type_smv_info){
-            letGoTypeMinMax(o->type_smv_info);
-        }
-    }
-    if(o->type == TYPE_SET){
-        //let go type-set
-        if(o->type_smv_info){
+	//letgo min max verificando se o type_smv_info não é null
+	if(o->type_smv_info && (o->type == NUMBER_ENTRY || o->type == WRITE_SMV_INFO)){
+	    letGoTypeMinMax(o->type_smv_info);
+        o->type_smv_info = NULL;
+	}
+	//let go type-set
+	if(o->type_smv_info && (o->type == LABEL_ENTRY || o->type == TYPE_SET)){
             letGoTypeSet(o->type_smv_info);
-        }
-    }
-    o->type_smv_info = NULL;
+            o->type_smv_info = NULL;
+	}
 	free(o);
 }
 

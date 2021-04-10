@@ -356,7 +356,14 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 void addSmvInfoDeclaration(char *name, void **any, int any_type, int object_size, STable *current, void* type_smv_info_dc){
     addValue(name,any,any_type,object_size,0,current,-1);
     Object* VAR_DECLARATION_SMV_INFO = lookup(current,name)->val;
-    VAR_DECLARATION_SMV_INFO->type_smv_info = type_smv_info_dc;
+    void* copy_type_smv_info_dc = NULL;
+    if(any_type == WRITE_SMV_INFO){
+       copy_type_smv_info_dc = copyTypeMinMax(type_smv_info_dc);
+    }
+    else{
+        copy_type_smv_info_dc = copyTypeSet(type_smv_info_dc);
+    }
+    VAR_DECLARATION_SMV_INFO->type_smv_info = copy_type_smv_info_dc;
 }
 
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto

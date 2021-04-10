@@ -276,7 +276,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
 }
 
 void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type,
-                Object *newValue, EnvController* controller)
+                void *newValue, EnvController* controller)
 {
     // começando com numérico x..y;
     // criar enum mapeador ao decorrer...
@@ -591,6 +591,10 @@ Object *refCopyOfVariable(TableEntry *varLang, EnvController *controller) {
         STable* smv_info = accessSmvInfo(controller,varLang->parentScope->type == GLOBAL || !varLang->parentScope->childOfFunction?
         MAIN : FUNCTION_SMV,0);
         Object* var_dec_info_smv = lookup(smv_info,varDeclarationNameRefSmv)->val;
+        if(varLang->val->type != LOGICAL_ENTRY && !var_dec_info_smv->type_smv_info){
+            fprintf(stderr,"[refCopyOfVariable] %s missing type SMV info!\n",varLang->name);
+            exit(-1);
+        }
         if (var_dec_info_smv->type == TYPE_SET) {
             copyRef->type_smv_info = copyTypeSet(var_dec_info_smv->type_smv_info);
         } else {
@@ -1020,7 +1024,7 @@ void createDefaultTypeSetTDS(HeaderSmv *tdsHeader, STable* auxTable, EnvControll
     int pos = tdsHeader->VAR_POINTER;
     int tam = strlen(newType);
     void* po[] = {&pos, &tam};
-    addSmvInfoDeclaration("value",po,WRITE_SMV_INFO,2,auxTable,tdsValueTypeSet);
+    addSmvInfoDeclaration("value",po,TYPE_SET,2,auxTable,tdsValueTypeSet);
     tdsHeader->varBuffer[tdsHeader->VAR_POINTER] = newType;
     tdsHeader->VAR_POINTER += 1;
 }
