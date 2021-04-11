@@ -98,7 +98,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
                 Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
                 resolveTimeComponentSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS,timeComponent);
             }
-/*          int j;
+            int j;
             for (j = 0; j < currentTDS->TOTAL_WATCH; j++) {
                 // chamada de antes para todos as variáveis que estão em observação
                 if(currentTDS->WATCH_LIST[j] != -1 && currentTDS->WATCH_LIST[j] != C_TIME ){
@@ -106,7 +106,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
                     Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[currentWatchTime]];
                     resolveWatchVariable(currentTDS,timeComponent,controllerSmv,currentScope,currentWatchTime);
                 }
-            }*/
+            }
         }else{
             // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
             if(currentTDS->type != TDS_DEPEN){
@@ -259,7 +259,7 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
                     addParamToTds(controllerSmv,entry->name,controllerSmv->currentTDScontext);
                     // encapsular em método depois
                     int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
-                    //addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+                    addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
                 }
                 return copy;
 //            }
