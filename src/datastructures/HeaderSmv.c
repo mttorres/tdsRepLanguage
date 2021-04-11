@@ -7,17 +7,27 @@
 HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assignP, int transP) {
 
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
+  if(type != MAIN){
+      header->PARAM_MAP = malloc(sizeof(int)*MAX_PARAM); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
+      for (int i = 0; i < 200; i++) {
+            header->PARAM_MAP[i] = 0;
+      }
+  }
 
   if(type == PORTS){
       char* refOldPt;
       // só adiciona parâmetro se for portsModule
       refOldPt = moduleName;
-      char* newDeclaration = addParams(refOldPt,"time","(",")");
+      char* newDeclaration = addParams(refOldPt, "time", "(", ")", 0);
       header->moduleName = newDeclaration;
+      int mapTime = hash("time",MAX_PARAM);
+      header->PARAM_MAP[mapTime] = 1;
   }
   else{
       if(type == AUTOMATA){
           header->moduleName = overwriteParam(moduleName,"ports");
+          int mapPorts = hash("ports",MAX_PARAM);
+          header->PARAM_MAP[mapPorts] = 1;
       }
       else{
           char* name = malloc((strlen(moduleName)+1) * sizeof(char));
@@ -261,12 +271,19 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
     }
 }
 
+void addParamToHeader(HeaderSmv* headerSmv, char* param){
+    char* refOldPt = headerSmv->moduleName;
+    char* newDeclaration = addParams(refOldPt, param, "(", ")", 0);
+    free(headerSmv->moduleName);
+    headerSmv->moduleName = newDeclaration;
+}
+
 void propagParamDependence(HeaderSmv** headers, char* param, int sizeHeaders){
     int i;
     char* refOldPt;
     for(i = 0; i < sizeHeaders; i++){
         refOldPt = headers[i]->varBuffer[headers[i]->VAR_RENAME_POINTER];
-        char* newDeclaration = addParams(refOldPt,param,"(",")");
+        char* newDeclaration = addParams(refOldPt, param, "(", ")", 0);
         free(refOldPt);
         headers[i]->varBuffer[headers[i]->VAR_RENAME_POINTER] = newDeclaration;
     }

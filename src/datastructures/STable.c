@@ -218,8 +218,8 @@ void letgoTable(STable *t)
 		free(t->children);
 	}
 	if(t->tableData){
-		int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
-		for(i=0; i < size; i++)
+		//int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
+		for(i=0; i < MAX_TABLE; i++)
 		{
 		    if(t->tableData[i]) {
                 letgoEntry(t->tableData[i]);
@@ -365,6 +365,19 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 }
 */
 
+void addSmvInfoDeclaration(char *name, void **any, int any_type, int object_size, STable *current, void* type_smv_info_dc){
+    addValue(name,any,any_type,object_size,0,current,-1);
+    Object* VAR_DECLARATION_SMV_INFO = lookup(current,name)->val;
+    void* copy_type_smv_info_dc = NULL;
+    if(any_type == WRITE_SMV_INFO){
+       copy_type_smv_info_dc = copyTypeMinMax(type_smv_info_dc);
+    }
+    else{
+        copy_type_smv_info_dc = copyTypeSet(type_smv_info_dc);
+    }
+    VAR_DECLARATION_SMV_INFO->type_smv_info = copy_type_smv_info_dc;
+}
+
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
@@ -373,7 +386,7 @@ void addValue(char *name, void **any, int any_type, int object_size, int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any, timeContext, name);
+	Object* o = createObject(any_type, object_size, any, timeContext, name, NULL);
 	addValueCurrentScope(name,o,methodParam,current);
 }
 

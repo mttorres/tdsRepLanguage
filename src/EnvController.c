@@ -7,6 +7,18 @@
 #include <string.h>
 #include <stdlib.h>
 
+void setUpTypeSetDict(EnvController* controller){
+    char** dict = malloc(sizeof(char*)*TYPE_SET_DIR_SIZE);
+    int i;
+    for (i = 0; i  < TYPE_SET_DIR_SIZE ; i++) {
+        dict[i] = NULL;
+    }
+    controller->typeSetWords = dict;
+    addTypeSetWordToDict("0",controller);
+    addTypeSetWordToDict("1",controller);
+    addTypeSetWordToDict("NULL",controller);
+}
+
 
 EnvController *createController() {
 
@@ -45,6 +57,7 @@ EnvController *createController() {
         Hcontrol->FUNCTIONS[i] = NULL;
     }
 
+    setUpTypeSetDict(Hcontrol);
     return Hcontrol;
 }
 
@@ -74,7 +87,15 @@ void letGoHeadersStruct(EnvController *H) {
             }
         }
     }
-    //letgoTable(H->portsInfo);
+    if(H->typeSetWords){
+        int i;
+        for (i = 0; i < TYPE_SET_DIR_SIZE; i++) {
+            if(H->typeSetWords[i]){
+                free(H->typeSetWords[i]);
+            }
+        }
+    }
+    free(H->portsInfo);
     letgoTable(H->originalPorts);
     free(H);
 }
@@ -167,19 +188,45 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo){
     }
 }
 
+
+/**
+ * Adiciona parâmetro para módulo qualquer do nuXmv.
+ * @param controller o controlador de ambiente e contexto
+ * @param param a string do parâmetro
+ * @param cat a categoria do header/tabela auxuliar a ser recuperada
+ * @param indexOfHeader o indice do header
+ * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
+ * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
+ */
 int addParamToModule(EnvController* controller, char* param, smvtype cat, int indexOfHeader){
     HeaderSmv* updated = accessHeader(controller,cat,indexOfHeader);
-    int possibleParamPos = hash(param,MAX_SIMPLE);
+    int possibleParamPos = hash(param,MAX_PARAM);
     if(updated->PARAM_MAP[possibleParamPos]){
-       return 0;
+        return 0;
     }
-    char* newName = addParams(updated->moduleName,param,"(",")");
+    char* newName = addParams(updated->moduleName, param, "(", ")", 0);
     free(updated->moduleName);
     updated->moduleName = newName;
     updated->PARAM_MAP[possibleParamPos] = 1;
     return 1;
 }
 
+void validateTdsDeclaration(char* declarationName, EnvController* controller){
+    TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
+    if(expected_entry){
+        Object* info = expected_entry->val;
+        int* isDeclared = info->values[0];
+        if(!(*isDeclared)){
+            controller->validPorts++;
+            *isDeclared = 1;
+        }
+        else{
+            controller->multiPortDeclartion = 1;
+            fprintf(stderr,"ERROR: Same TDS redeclared. Name: %s\n",declarationName);
+            exit(-1);
+        }
+    }
+}
 
 void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
     addParamToPortsModule(controller,param);
@@ -196,7 +243,7 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
 
         HeaderSmv* portsHeader =  accessHeader(controller,PORTS,0);
         char* bufferToUpdate = portsHeader->varBuffer[pos];
-        char* newNameDeclaration = addParams(bufferToUpdate,param,"(",")");
+        char* newNameDeclaration = addParams(bufferToUpdate, param, "(", ")", 0);
         free(bufferToUpdate);
         portsHeader->varBuffer[pos] = newNameDeclaration;
         size = strlen(newNameDeclaration);
@@ -205,6 +252,15 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
     }
 }
 
+/**
+ * Adiciona parâmetro para módulo qualquer do nuXmv.
+ * @param controller o controlador de ambiente e contexto
+ * @param param a string do parâmetro
+ * @param cat a categoria do header/tabela auxuliar a ser recuperada
+ * @param indexOfHeader o indice do header
+ * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
+ * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
+ */
 void addParamToPortsModule(EnvController *controller, char *param) {
 
     int paramAdd = addParamToModule(controller,param,PORTS,0); // deve adicionar ao portsModule É SEMPRE O PRIMEIRO
@@ -214,7 +270,7 @@ void addParamToPortsModule(EnvController *controller, char *param) {
         HeaderSmv* mainUpdate = accessHeader(controller,MAIN,-1);
         char* refOldPt;
         refOldPt = mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER];
-        char* newDeclaration = addParams(refOldPt,param,"(",")");
+        char* newDeclaration = addParams(refOldPt, param, "(", ")", 0);
         free(refOldPt);
         mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER] = newDeclaration;
 
@@ -225,3 +281,32 @@ void addParamToPortsModule(EnvController *controller, char *param) {
     }
 }
 
+
+char* getTypeSetWordFromDict(char* wordRef, EnvController* controller){
+    int hashWord = hash(wordRef,TYPE_SET_DIR_SIZE);
+    if(controller->typeSetWords[hashWord]){
+        return controller->typeSetWords[hashWord];
+    }
+    else{
+        // cria uma entrada para essa
+        addTypeSetWordToDict(wordRef,controller);
+        return controller->typeSetWords[hashWord];
+    }
+    //return NULL; // garantia (até porque na verdade já preenchemos com null antes)
+}
+
+void addTypeSetWordToDict(char* word, EnvController* controller){
+    int hashWord = hash(word,TYPE_SET_DIR_SIZE);
+    if(controller->typeSetWords[hashWord]){
+        if(strcmp(controller->typeSetWords[hashWord],word) != 0){
+            fprintf(stderr,"[addTypeSetWordToDict] DICT WORD COLLISION!\n");
+            exit(-1);
+        }
+    }
+    else{
+        //char* newWord = formatString(word);
+        char* newWord = malloc(sizeof(char)*strlen(word)+1);
+        strcpy(newWord,word);
+        controller->typeSetWords[hashWord] = newWord;
+    }
+}

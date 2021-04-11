@@ -1,4 +1,3 @@
-//
 // Created by mateus on 22/03/2021.
 //
 
@@ -10,10 +9,15 @@
 #include "textManager.h"
 #include "HeaderSmv.h"
 #include "TDS.h"
+#include "TypeSet.h"
+#include "TypeMinMax.h"
+
+#define TYPE_SET_DIR_SIZE 9999
 
 
 typedef struct envcontroller
 {
+    // info
     HeaderSmv* MAIN;
     HeaderSmv** AUTOMATA_RELATED;
     HeaderSmv** PORTS_RELATED; // ports module e as tds (vão ter referência para esse header na sua declaração, assim como tabela auxiliar)
@@ -28,14 +32,16 @@ typedef struct envcontroller
     STable** portsInfo; // para cada tds (talvez não va precisar, a lógica vai estar TODA nas funções ou nele mesmo (de maneira constante)
     STable** functionsInfo; // para cada função
 
-    STable* originalPorts; // tabela de simbolos auxiliar para ports (necessária?) (só vai ter o módulo de cada porta) (pode ser na verdade para as portas declaradas)
+    char** typeSetWords; // dict para "otmização"
+
+    // validação
+    STable* originalPorts;
     int expectedPorts;
     int validPorts;
     // ai ele verifica se foram usadas (não tem declarações de funções)
     int declaredPortsNumber;
     TDS** declaredPorts;
     TDS* currentTDScontext;
-
     // avisa caso não tenha nenhuma TDS linkada uma com a outra
     int IO_RELATION;
     // avisa caso uma porta tenha tido declaração repetida
@@ -99,6 +105,13 @@ void addNewHeader(EnvController* controller, HeaderSmv* newHeader);
 void addNewAuxInfo(EnvController* controller, STable* newTableInfo);
 
 /**
+ * Valida a declaração de uma TDS, vendo se os nomes bateram com os que vieram do modelo de input.
+ * @param declarationName o nome da declaração da TDS
+ * @param controller o controlador
+ */
+void validateTdsDeclaration(char* declarationName, EnvController* controller);
+
+/**
  * Tendo um controller com o contexto e associação Header e AuxTable,
  * adiciona um parâmetro (se necessário) para o header do módulo da TDS.
  * Também propaga as dependências relacionadas a esse parâmetro para o portsModule
@@ -117,6 +130,22 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS);
  * o módulo textManager e seus método addParams, criando uma string nova e liberando a antiga
  */
 void addParamToPortsModule(EnvController *controller, char *param);
+
+/**
+ * Recupera uma palavra do dicionário de type-set do ambiente.
+ * @param word uma palavra já utilizada anteriomente em um type-set
+ * @param controller o controlador de ambiente
+ * @return um ponteiro para a palavra, ou NULL caso essa não exista
+ */
+char* getTypeSetWordFromDict(char* wordRef, EnvController* controller);
+
+/**
+ * Adiciona uma palavra ao dicionário de type-set do ambiente
+ * @param word a palavra nova
+ * @param controller o controlador
+ * @SideEffects: Aloca uma string nova de tamanho da word +1 (deve ser liberada no final do programa)
+ */
+void addTypeSetWordToDict(char* word, EnvController* controller);
 
 
 #endif //TDSREPLANGUAGE_ENVCONTROLLER_H
