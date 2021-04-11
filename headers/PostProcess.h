@@ -4,7 +4,6 @@
 
 #include "EnvController.h"
 #include "Object.h"
-#include "TypeSet.h"
 
 
 /**
@@ -92,21 +91,6 @@ void bindCondition(STable* scope, Object* conditionExpr);
 
 char *formatBinds(int ctime, int changeContext, char *directiveValueBind, char *valueBind, char *defaultValueBind,
                   Object *expr, STable *scope, int firstCondition, int initVar, int ignoreTemporal, int ignoreCond);
-
-
-/**
- * Retorna um bind para um valor. Seja uma versão em String do mesmo ou ainda o nome de variável desse valor dentro do
- * contexto do nuXmv.
- * @param varName o nome da variável recuperado do escopo
- * @param parentScope o escopo da entrada da tabela de simbolos
- * @param expr o objeto associado
- * @param index o indice caso seja uma estrutura de dados
- * @param isDefault flag para avaliar para o valor default daquele tipo (0 inteiro, NULL : labels, FALSE : booleans)
- * @param isSelf é usado para retornar o bind como sendo o próprio nome da variável (independente do estado, sem init ou next).
- * Caso seja usado, esse sobrescreve o isDefault.
- * @return retorna uma string alocada com o nome da variável dentro do contexto do nuXmv.
- */
-char *formatValueBind(char *varName, STable *parentScope, Object *expr, int index, int isDefault, int isSelf);
 
 /**
  *  Cria uma declaração do tipo init(varName) := newValue ; ou  init(varName) := case condition : newValue esac;
@@ -213,7 +197,7 @@ void updateTdsOnSmv(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, 
  * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
+void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*
@@ -240,18 +224,6 @@ void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TI
 void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable);
 
 void updateTypeSetWatchTds(TDS* current, EnvController* controller, Object* lazyValue);
-
-/**
- * Dado uma variável de interesse de um módulo (ex: value (tds) return (funções de tds). Atualiza
- * o type-set dessa variável baseado no tipo SMV de uma outra variável de dependência (min max ou outro type-set).
- * @param var o nome da variável de interesse
- * @param headerModule o header do módulo em que a alteração será feita
- * @param auxTableModule a tabela de simbolos auxiliar desse módulo
- * @param varD o nome (referência) da variável dependência
- * @param auxTableDependency  a tabela auxiliar que tem as inforamções do tipo da dependência
- * @SideEffects: Realoca a string da declaração de var para comportar cada valor possível do tipo da dependência
- */
-void createUnionAtSmvType(char* var, HeaderSmv* headerModule, STable* auxTableModule, char* varD, STable* auxTableDependency);
 
 void writeResultantHeaders(EnvController* controller, const char* path);
 
