@@ -2,69 +2,99 @@ MODULE main
 VAR
 	time: 0..20;
 	finalAutomata: finalAutomata(ports);
-	ports: portsModule(time, x, z);
-	x : -1..4;
-	z : boolean;
-	zeta : boolean;
-	w_scope1_0 : 0..1;
-	r_scope1_1 : boolean;
-	u_scope1_1_2_0 : boolean;
-	y : 0..6;
-	w_scope1_2 : boolean;
-	u_scope1_2_2_0 : boolean;
+	ports: portsModule(time);
+	x : 0..4;
+	t : 0..20;
+	A : 0..31;
+	B : 0..31;
+	C : 0..25;
+	D : 0..7;
+	ED : 0..7;
+	DIV : 0..3;
+	DIVC : 0..28;
+	P : 0..3;
+	y : 0..8;
+	w : {NULL, batata};
+	a : boolean;
+	b : boolean;
+	logand : boolean;
+	lognot : boolean;
+	logandT : boolean;
+	logor : boolean;
+	logIMP : boolean;
+	logBIMP : boolean;
 ASSIGN
 	init(time) := 0;
 	next(time) := case
 		time < 20: time + 1;
 		TRUE: time;
 esac;
-	init(x):= 2;
-	next(x):= case 
-		next(time) = 2 : 4;
-		next(time) = 3 : -1;
-		TRUE : 0; 
+	init(x):= 2 + 2;
+	next(x):= x;
+	init(t):= 4 * 5;
+	next(t):= t;
+	init(A):= 4 * 7 + 3;
+	next(A):= A;
+	init(B):= 3 + 4 * 7;
+	next(B):= B;
+	init(C):= -3 + 4 * 7;
+	next(C):= C;
+	init(D):= 4 - -3;
+	next(D):= D;
+	init(ED):= 3 + 4 - 2 + 2;
+	next(ED):= ED;
+	init(DIV):= ED / 2;
+	next(DIV):= DIV;
+	init(DIVC):= 4 * 7 + 3 / 10;
+	next(DIVC):= DIVC;
+	init(P):= (4 * 7 + 3) / 10;
+	next(P):= P;
+	init(y):= 4 + x;
+	next(y):= y;
+	init(w):= NULL;
+	next(w):= case 
+		next(time) = 12 : batata;
+		TRUE : w; 
 	esac;
-	init(z):= TRUE;
-	next(z):= case 
-		next(time) = 4 : TRUE;
-		TRUE : FALSE; 
+	init(a):= FALSE;
+	next(a):= case 
+		next(time) = 12 : TRUE;
+		TRUE : a; 
 	esac;
-	init(zeta):= FALSE;
-	next(zeta):= case 
-		next(time) = 4 : FALSE;
-		TRUE : FALSE; 
+	init(b):= FALSE;
+	next(b):= case 
+		next(time) = 12 : FALSE;
+		TRUE : b; 
 	esac;
-	init(w_scope1_0):= case 
-		!z : 1;
-		TRUE : 0; 
+	init(logand):= FALSE;
+	next(logand):= case 
+		next(time) = 12 : next(a) & next(b);
+		TRUE : logand; 
 	esac;
-	next(w_scope1_0):= w_scope1_0;
-	init(r_scope1_1):= case 
-		zeta : FALSE;
-		TRUE : FALSE; 
+	init(lognot):= FALSE;
+	next(lognot):= case 
+		next(time) = 12 : !next(b);
+		TRUE : lognot; 
 	esac;
-	next(r_scope1_1):= r_scope1_1;
-	init(u_scope1_1_2_0):= case 
-		zeta & z : FALSE;
-		TRUE : FALSE; 
+	init(logandT):= FALSE;
+	next(logandT):= case 
+		next(time) = 12 : next(a) & !next(b);
+		TRUE : logandT; 
 	esac;
-	next(u_scope1_1_2_0):= u_scope1_1_2_0;
-	init(y):= 0;
-	next(y):= case 
-		next(time) = 2 : 5;
-		next(time) = 4 & !next(zeta) : 2;
-		next(time) = 4 & !!next(zeta) : 6;
-		TRUE : y; 
+	init(logor):= FALSE;
+	next(logor):= case 
+		next(time) = 12 : next(a) | next(b);
+		TRUE : logor; 
 	esac;
-	init(w_scope1_2):= FALSE;
-	next(w_scope1_2):= case 
-		next(time) = 4 & !next(zeta) : TRUE;
-		TRUE : w_scope1_2; 
+	init(logIMP):= FALSE;
+	next(logIMP):= case 
+		next(time) = 12 : !next(a) -> !next(b);
+		TRUE : logIMP; 
 	esac;
-	init(u_scope1_2_2_0):= FALSE;
-	next(u_scope1_2_2_0):= case 
-		next(time) = 4 & !next(zeta) & next(w_scope1_2) : FALSE;
-		TRUE : u_scope1_2_2_0; 
+	init(logBIMP):= FALSE;
+	next(logBIMP):= case 
+		next(time) = 12 : !next(a) <-> next(b);
+		TRUE : logBIMP; 
 	esac;
 
 MODULE merger1(ports)
@@ -106,61 +136,7 @@ INVAR
 	(((prod1.cs = q0) & (prod2.cs = p0)) <-> (cs = q0p0)) &
 	(((prod1.cs = q0) & (prod2.cs = p1)) <-> (cs = q0p1));
 
-MODULE portsModule(time, x, z)
+MODULE portsModule(time)
 VAR 
-	a : tds_a(time, x, z);
-	b : tds_b(time, z);
-	c : tds_c(time);
-	d : tds_d(time);
-ASSIGN
-	init(c.value):= case 
-		b.value = NULL : a.value;
-		a.value = NULL : b.value;
-		TRUE : NULL; 
-	esac;
-	next(c.value):= case 
-		next(b.value) = NULL : next(a.value);
-		next(a.value) = NULL : next(b.value);
-		TRUE : NULL; 
-	esac;
-	init(d.value):= NULL;
-	next(d.value):= case 
-		d.value = NULL : c.value;
-		c.value = NULL & d.value != NULL : NULL;
-		TRUE : d.value; 
-	esac;
-
-MODULE tds_a(time, x, z)
-VAR
-	value : {NULL, 0, 1, 2, TRUE, 4, -1};
-ASSIGN
-	init(value):= x;
-	next(value):= case 
-		next(time) = 1 : 1;
-		next(time) = 2 : next(z);
-		TRUE : NULL; 
-	esac;
-
-MODULE tds_b(time, z)
-VAR
-	value : {NULL, 0, 1, 3, 4, 5, TRUE};
-ASSIGN
-	init(value):= NULL;
-	next(value):= case 
-		next(time) = 3 : 3;
-		next(time) = 4 : 4;
-		next(time) = 5 : 5;
-		next(time) = 6 : next(z);
-		TRUE : NULL; 
-	esac;
-
-MODULE tds_c(time)
-VAR
-	value : {NULL, 0, 1, 2, TRUE, 4, -1, 3, 5};
-ASSIGN
-
-MODULE tds_d(time)
-VAR
-	value : {NULL, 0, 1, 2, TRUE, 4, -1, 3, 5};
 ASSIGN
 
