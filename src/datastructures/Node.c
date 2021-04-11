@@ -24,7 +24,7 @@ const char* mappingEnumNode[] =  {
 
         "ASSIGN_IDVAR", "ASSIGN_AC_V", "ASSIGN_TDIRECTIVE",
 
-        "DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
+        "DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED", "DEF_EXTRAS_FILTER",
 
         "HEADERS_E_PROG", "PROG", "FUNC_DEFS", "CMD",
 
@@ -32,7 +32,7 @@ const char* mappingEnumNode[] =  {
 
         "CMD_OTHER",
 
-        "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
+        "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS", "TDS_ANON_OP_FPASS",
 
         "OTHER_LOOP", "FUNC_CALL", "PROC_CALL",
 

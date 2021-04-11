@@ -95,6 +95,7 @@
 %token <sval> INTERVAL
 %token <sval> BETWEEN
 %token <sval> SHOW
+%token <sval> FILTER
 
 %type <ast> prog
 %type <ast> cmds
@@ -118,7 +119,7 @@
 %type <ast> matchornot
 %type <ast> extraaccesses
 %type <ast> extras
-%type <ast> delayedoption
+%type <ast> passoption
 %type <ast> dataflow
 %type <ast> tdsprop
 %type <ast> domain
@@ -299,8 +300,13 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	 // jogar para nó mais abaixo a operação para avaliar antes de toda a expressão!
 
 	 | LPAREN params RPAREN anonimtdsop ID {
-        if($2->type != IDVAR && $4->type == TDS_ANON_OP_DPASS){
-                fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
+        if($2->type != IDVAR && ($4->type == TDS_ANON_OP_DPASS || $4->type == TDS_ANON_OP_FPASS) ){
+                if($4->type == TDS_ANON_OP_DPASS){
+                    fprintf(stderr, "\n[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
+                }
+                else{
+                    fprintf(stderr, "\n[PARSING ERROR] FILTER option for %s not valid for multiples inputs! \n",$5);
+                }
                 exit(-1);
         }
 		Node* cmd = createNode(9,2,3,"CMD -  Comando (criação TDS-anonima)",  CMD_TDS_ANON ,$2,$4,  $1,$3,$5); 
@@ -319,7 +325,10 @@ anonimtdsop: PASS  {
         		Node* p = createNode(5,0,1,"CMD -  DPASS", TDS_ANON_OP_DPASS ,$1);
         		$$ = p;
         }
-
+        | MINUS LBRACE expr RBRACE GT {
+        		Node* p = createNode(9,1,4, "CMD -  FPASS", TDS_ANON_OP_FPASS,   $3,  $1, $2, $4, $5);
+        		$$ = p;
+        }
 
 paramsCall: expr {
 		
@@ -767,14 +776,19 @@ timelist: timecomponent {
 
 
 
-extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
+extras: COMMA LINKED COLON LBRACE params RBRACE passoption {
 	
 	   	 	Node* extra;
 	   	 	if($7){
 	   	 	    // NOVA VALIDAÇÃO DE PARSING:
 	   	 	    Node* synth_params = $5;
 	   	 	    if(synth_params->nchild > 1){
-                   fprintf(stderr, "[PARSING ERROR] DELAYED-FIFO option not valid for multiples inputs! \n");
+	   	 	       if($7->type == DEF_EXTRAS_DELAYED){
+                        fprintf(stderr, "\n[PARSING ERROR] DELAYED-FIFO option not valid for multiples inputs! \n");
+	   	 	       }
+	   	 	       else{
+                        fprintf(stderr, "\n[PARSING ERROR] FILTER option not valid for multiples inputs! \n");
+	   	 	       }
                    exit(-1);
 	   	 	    }
 	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5, $7, $1,$2,$3,$4,$6);
@@ -784,18 +798,22 @@ extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
 	   	 	}
 	   	 	$$ = extra;
 	}
-	| delayedoption {
+	| passoption {
 			
 			//Node* extra = createNode(4,1,0,"DELAYED-EXTRA-ARGS-TDS",$1);
 	   	 	$$ = $1;
 	}
 	
 
-delayedoption: COMMA DELAYED {
+passoption: COMMA DELAYED {
 	   		
 		Node* extra = createNode(6,0,2,"DELAYED-EXTRA-ARGS-TDS", DEF_EXTRAS_DELAYED ,  $1,$2);
 	   	$$ = extra;
 	   }
+	   | COMMA FILTER COLON expr {
+       		Node* extra = createNode(8,1,3,"FILTER-EXTRA-ARGS-TDS", DEF_EXTRAS_FILTER,  $4,  $1,$2,$3);
+       	   	$$ = extra;
+       }
 	   | /* empty */ {  $$ = NULL;}
        ; 
 
