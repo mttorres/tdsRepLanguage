@@ -17,10 +17,12 @@ int main(int argc, char* argv[]) {
   
   
 	FILE *fp; // .tds file
-	FILE *smvP; // .smv file;
+	FILE *smvP = NULL; // .smv file
 	fp = fopen(argv[1], "r");
 	astout = fopen("results/astOutput", "w");
-	smvP = fopen(argv[2], "r+");
+	if(argv[2]){
+        smvP = fopen(argv[2], "r+");
+	}
 	
 	//printf("%s \n",argv[1]);
 	//printf("%s \n",argv[2]);
@@ -42,7 +44,12 @@ int main(int argc, char* argv[]) {
 	STable* global = createTable(GLOBAL, NULL, 0, 0, -1);
 
 	//pré processamento
-	preProcessSmv(smvP,controller);
+	if(smvP){
+        preProcessSmv(smvP,controller);
+	}
+	else{
+	    setDefaultSmv(controller);
+	}
 	setUpMainSmvTable(controller,global);
 
   	printf("--------------------------------- EVAL ---------------------------------------------\n");
@@ -104,8 +111,9 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "[WARNING] NO TDS RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
  	}
  	writeResultantHeaders(controller,"results/newSmvfile.smv");
-	fclose(smvP);
-
+ 	if(smvP) {
+ 	    fclose(smvP);
+    }
 
 
 //  char* temp = controller->PORTS_RELATED[0]->varBuffer[1];

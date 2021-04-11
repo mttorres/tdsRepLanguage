@@ -47,6 +47,10 @@ typedef struct envcontroller
     // avisa caso uma porta tenha tido declaração repetida
     int multiPortDeclartion;
 
+    // validações para o filter e recuperar o header correto
+    int hasFilter;
+    int* automatasToChange;
+
 }EnvController;
 
 

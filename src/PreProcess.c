@@ -123,6 +123,33 @@ void processPorts(char* buffer, char* varString, char *fVarString, int stage, En
     }
 }
 
+void setDefaultMainSmv(EnvController* controllerSmv){
+    saveLineOnBuffer(MAIN,VAR,"VAR\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,VAR,"\ttime: 0..3;\n",controllerSmv,0);
+    HeaderSmv* MAIN_HEADER = accessHeader(controllerSmv,MAIN,0);
+    MAIN_HEADER->VAR_RENAME_POINTER = MAIN_HEADER->VAR_POINTER;
+    saveLineOnBuffer(MAIN,VAR,"\tports: portsModule(time);\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"ASSIGN\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"\tinit(time) := 0;\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"\tnext(time) := case\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"\t\ttime < 3: time + 1;\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"\t\tTRUE: time;\n",controllerSmv,0);
+    saveLineOnBuffer(MAIN,ASSIGN,"esac;\n",controllerSmv,0);
+}
+
+void setDefaultPortsSmv(EnvController* controllerSmv){
+    saveLineOnBuffer(PORTS,VAR,"VAR\n",controllerSmv,0);
+    saveLineOnBuffer(PORTS,ASSIGN,"ASSIGN\n",controllerSmv,0);
+    addNewAuxInfo(controllerSmv,createTable(SMV_PORTS,NULL,0,0,-1));
+}
+
+void setDefaultSmv(EnvController* controllerSmv){
+    initPreProcessHeader(MAIN,"MODULE main\n",controllerSmv);
+    setDefaultMainSmv(controllerSmv);
+    initPreProcessHeader(PORTS,"MODULE portsModule\n",controllerSmv);
+    setDefaultPortsSmv(controllerSmv);
+}
+
 void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {
 	/*Strings que são usadas para a busca no arquivo*/
 	char varString[] = "VAR \n";

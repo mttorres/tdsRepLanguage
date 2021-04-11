@@ -41,6 +41,12 @@ void processPhase(smvtype stage, headerpart part, EnvController *Hcontrol, char 
 void preProcessSmv(FILE *smvP, EnvController *Hcontrol);
 
 /**
+ * Operação oposta ao pré processamento padrão o qual um arquivo default é "pré processado"
+ * @param controller o controlaod de ambiente para manter as informações dos headers default que iremos criar
+ */
+void setDefaultSmv(EnvController* controller);
+
+/**
  *  Configura a tabela de controle SMV info da main para a variável time a incializando
  *  com uma tupla de inteiros (que não possui typeset, por so poder ser X..Y). Além disso,
  *  inicializa as diretivas temporais no escopo global (main).
