@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ *
+ * djb2 * This algorithm was first reported by Dan Bernstein
+ */
 int hash(char *str, int SIZE_ED)
 {
     int hash = 5381;
