@@ -66,7 +66,7 @@ Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE t
  * @return a TDS com as dependencias computadas
  * @SideEffects: Aloca e posições no vetor de dependências de uma TDS se for necessário
  */
-void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME);
+TDS** computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* newTDS, EnvController* controller, int I_TIME, int C_TIME);
 
 /**
  * Resolve a dependencia de todas as TDS's associadas a TDS corrente durante a avaliação lazy

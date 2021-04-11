@@ -18,8 +18,8 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
                           "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s", "%s.value",
-                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;",  "next(time) >= %d & %s = NULL : %s.value;\n\t\tnext(time) >= %d & %s.value = NULL & %s != NULL : NULL;",
-                          "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s >= %d & %s = NULL : %s;\n\t\t%s >= %d & %s = NULL : %s;",
+                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;",  "next(time) > %d & %s = NULL : %s.value;\n\t\tnext(time) > %d & %s.value = NULL & %s != NULL : NULL;",
+                          "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s > %d & %s = NULL : %s;\n\t\t%s > %d & %s = NULL : %s;",
                           "MODULE %s\n" };
 
 int  MULTIPLIER_SIMPLE_HASH = 1;
@@ -779,7 +779,6 @@ void specAssignForInvalidTds(TDS* newTDS, EnvController* controller, int initial
         }
     }
 }
-
 /**
  * Valida se a nova TDS de time-component é válida, isto é, se nenhuma especificação para instantes exatos de tempo
  * violam I_TIME ~ F_TIME. Ou ainda, se a especificação da time-component é de um tempo já do passado
@@ -847,13 +846,12 @@ void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, EnvController* co
 
 /**
  * Para uma TDS que possuia dependencias, cria os assigns apropriados baseado nas diretivas (delayed, link e filter).
- * Essas são especificadas no portsModule para explicitar o relacionamento entre as TDS's.
  * @param newTDS a nova TDS
  * @param controller a
+ * @param dependencies
  */
-void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller){
+void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller, TDS** dependencies){
     // adiciona informações de relacionamento no nuXmv (separar em método)
-    TDS** dependencies = newTDS->linkedDependency;
     int i;
     if(newTDS->delayed){
         if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
@@ -898,7 +896,7 @@ void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller){
         sprintf(refNextToDepTdsValue,SmvConversions[NEXT],refToDepTdsValue);
         if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
             char resultExprInit[ALOC_SIZE_LINE*2];
-            char resultExprNext[ALOC_SIZE_LINE*2+(newTDS->TOTAL_DEPENDENCIES_PT*6)];
+            char resultExprNext[ALOC_SIZE_LINE*2+(newTDS->TOTAL_DEPENDENTS_PT*6)];
 
             TDS* secondDependence = dependencies[1];
             char refToDep2TdsValue[strlen(secondDependence->name)+8];
@@ -973,14 +971,14 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Env
                accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC);
     if(newTDS->type == MATH_EXPRESSION || newTDS->type == FUNCTION_APPLY){
         // deve criar um init e next identicos para ambos os casos com apenas a diferença da limitação temporal
-        //specTdsExpression()
+        specTDS()
         if(newTDS->type == FUNCTION_APPLY){
             // deve-se instanciar a funçao dentro do modulo SMV dessa TDS.
         }
     }
 }
 
-void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME){
+void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
     TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
 
     SYNTH_TDS->AUX_REF = controller->PORTS_INFO_CURRENT_SIZE;
@@ -999,7 +997,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
     addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
-    addTdsRelationOnSmv(SYNTH_TDS,controller);
+    addTdsRelationOnSmv(SYNTH_TDS,controller,SYNTH_DEP);
 
     addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
     validateTdsDeclaration(declarationName,controller);
@@ -1011,11 +1009,10 @@ void updateTypeSetWatchTds(TDS* current, EnvController* controller, Object* lazy
     updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
 }
 
-void updateTdsOnSmv(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
+void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
 
     HeaderSmv *currentHeader = accessHeader(controller, PORTS, currentTDS->SMV_REF);
     STable *currentInfo = accessSmvInfo(controller, PORTS, currentTDS->AUX_REF);
-    // só necessita de atualizações complexas para a data-list
     if (currentTDS->type == DATA_LIST) {
         if (C_TIME == I_TIME) {
             createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, NULL, INIT, NULL, 1, 0);
@@ -1031,6 +1028,15 @@ void updateTdsOnSmv(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, 
                 createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL",
                              1, 0);
             }
+        }
+    }
+    // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
+    else {
+        // se essa TDS já foi avaliada, senão...
+        if (currentTDS) {
+
+        } else {
+
         }
     }
     // sempre deve atualizar o type-set (ou pelo menos verificar se necessita atualização)
@@ -1061,11 +1067,13 @@ void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type
     addValue(varName, po, TYPE_SET, 3, 0, writeSmvTypeTable, 0);
 }
 
-void propagateTypeSet(TDS* dependant, EnvController* controller, int C_TIME){
+void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller, int C_TIME){
     STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
+
     HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);
+
     char rawValueBind[ALOC_SIZE_LINE/2];
-    copyValueBind(dependant->DATA_TIME[C_TIME],rawValueBind,0,0,1);
+    copyValueBind(dependence->DATA_TIME[C_TIME],rawValueBind,0,0,1);
     updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant);
 }
 
