@@ -28,14 +28,15 @@ typedef struct TDS
   int SMV_REF; // por outro lado, os HEADERS SÃO USADOS POR AMBOS!
   // watch-list não será reintroduzida
   int noValue;
-  Object* limitCondition; // provavelmente vai ter que ser um path
   int LAST_DELAYED_ACCEPT_TIME;
+  void* limitCondition; // provavelmente vai ter que ser um path
+  int currentCondEval;
 
 
 } TDS;
 
 // passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
-TDS * createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *functionRef, int I_INTERVAL, int F_INTERVAL, Object *limitCondition);
+TDS * createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *functionRef, int I_INTERVAL, int F_INTERVAL, void *limitCondition);
 
 /**
  * Linka duas TDS's.

@@ -54,11 +54,12 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
  * @param tdsSpec o objeto que representa a especificaçao da TDS
  * @param delayed o parametro delayed de uma TDS
  * @param scope o scopo corrente
+ * @param pathForCond o caminho para recuperar a condição a ser avaliada para essa TDS
  * @param controller o controlador de ambiente
  * @return um objeto sintetizado com a TDS criada.
  * @SideEffects: Aloca uma TDS, e posições no vetor de dependências de uma TDS se for necessário
  */
-Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, EnvController* controller);
+Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE type, Object *tdsSpec, int delayed, STable *scope, Node *pathForCond, EnvController *controller);
 
 
 /**

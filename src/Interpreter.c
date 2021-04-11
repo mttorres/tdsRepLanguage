@@ -985,7 +985,8 @@ void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* n
     controller->IO_RELATION = 1;
 }
 
-Object* computeTDSBasicOperations(Node* pathForDepen, char* portName, TDS_TYPE type, Object* tdsSpec, int delayed, STable* scope, EnvController* controller){
+Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE type, Object *tdsSpec, int delayed,
+                                  STable *scope, Node *pathForCond, EnvController *controller) {
     int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
     int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
@@ -1013,14 +1014,16 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerS
     Object * domainInfo = eval(n->children[0],scope,controllerSmv);
     TDS_TYPE type =  domainInfo->type == TIME_COMPONENT? DATA_LIST :
                      domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
-    return computeTDSBasicOperations(NULL,portName,type,domainInfo,0,scope,controllerSmv);
+    return computeTDSBasicOperations(NULL, portName, type, domainInfo, 0, scope, NULL, controllerSmv);
 }
 
 Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv){
-    //printf("teste \n %d",n->type == CMD_TDS_ANON);
-    //Object* SYNTH_OBJECT = evalIDVAR() // VAI TER QUE CHAMAR O ITERATOR! que nem antes só que para PARAM!
-    Object* encapsulatedTDS = computeTDSBasicOperations(n,n->leafs[2],TDS_DEPEN,NULL,
-                                                        n->children[1]->type == TDS_ANON_OP_DPASS,scope,controllerSmv);
+    int isDelayed = n->children[1]->type == TDS_ANON_OP_DPASS;
+    int hasFilter = n->children[1]->type == TDS_ANON_OP_FPASS;
+    Node* pathFilter = hasFilter ? n->children[1]->children[0] : NULL;
+    Object* encapsulatedTDS = computeTDSBasicOperations(n, n->leafs[2], TDS_DEPEN, NULL,
+                                                        n->children[1]->type == TDS_ANON_OP_DPASS, scope, pathFilter,
+                                                        controllerSmv);
     TDS* newTDS = encapsulatedTDS->values[0];
     addReferenceCurrentScope(newTDS->name,encapsulatedTDS,0,scope);
     return encapsulatedTDS;
@@ -1028,8 +1031,13 @@ Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv){
 
 
 Object* evalTDS_DEF_DEPENDECE(Node* n, STable* scope, EnvController* controllerSmv){
-    return computeTDSBasicOperations(n->children[0],n->leafs[3],TDS_DEPEN,NULL,
-                                     n->children[0]->nchild == 2,scope,controllerSmv);
+    int hasOption = n->children[0]->nchild == 2;
+    int isDelayed = hasOption && n->children[0]->children[1]->type == DEF_EXTRAS_DELAYED;
+    Node* pathFilter = hasOption && !isDelayed ?
+            n->children[0]->children[1]->children[0]
+            : NULL;
+    return computeTDSBasicOperations(n->children[0], n->leafs[3], TDS_DEPEN, NULL,
+                                     isDelayed, scope, pathFilter, controllerSmv);
 }
 
 Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope, EnvController* controllerSmv){
