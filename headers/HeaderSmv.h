@@ -4,7 +4,6 @@
 
 #include "Enum.h"
 #include "textManager.h"
-#include "Hash.h"
 #include <stdio.h>
 
 typedef enum headerpart {CREATE_MODULE = -1, VAR = 0, ASSIGN = 1, TRANS = 2} headerpart;
@@ -20,7 +19,6 @@ typedef struct headersmv
   int TRANS_POINTER;
   int ASSIGN_POINTER;
   int VAR_RENAME_POINTER; // aponta para a referência a portsModule que vai ser passada para os demais módulos (e será centralizada no main agora)
-  int* PARAM_MAP;
 
 }HeaderSmv;
 
