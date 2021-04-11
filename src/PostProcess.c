@@ -250,16 +250,62 @@ void createType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, cha
     header->VAR_POINTER += 1;
 }
 
+void unionTypeSetMinMaX(HeaderSmv* headerOriginal, TableEntry* entry_info_type_smv, TypeMinMax* other, EnvController* controller){
+    TypeSet* original = entry_info_type_smv->val->type_smv_info;
+    int i;
+    int *pos = entry_info_type_smv->val->values[0];
+    int *size = entry_info_type_smv->val->values[1];
+    for(i = other->min; i <= other->max; i++){
+        char numString[ALOC_SIZE_LINE/2];
+        sprintf(numString,"%d",i);
+        if(addElementToTypeSet(original,getTypeSetWordFromDict(numString,controller))){
+            headerOriginal->varBuffer[*pos] = addParams(headerOriginal->varBuffer[*pos],numString,"{","}",1);
+        }
+    }
+    *size = strlen(headerOriginal->varBuffer[*pos]);
+}
+
+void unionTypeSets(HeaderSmv* headerOriginal, TableEntry* entry_info_type_smv, TypeSet* other) {
+    TypeSet* original = entry_info_type_smv->val->type_smv_info;
+    char** hash_set_other = other->hash_set;
+    int i;
+    int *pos = entry_info_type_smv->val->values[0];
+    int *size = entry_info_type_smv->val->values[1];
+    for (i = 0; i <= other->lastIndex; i++) {
+        if(hash_set_other[i]){
+            if(addElementToTypeSet(original,hash_set_other[i])){
+                headerOriginal->varBuffer[*pos] = addParams(headerOriginal->varBuffer[*pos],hash_set_other[i],"{","}",1);
+            }
+        }
+    }
+    *size = strlen(headerOriginal->varBuffer[*pos]);
+}
+
 /**
  * Realiza as operações de hash e atualização de um type-set
- * @param newValue o novo valor a ser adicionado ao conjunto
+ * @param newValue o novo objeto que foi sintetizado e sua equivalencia em strin vai ser adicionada ao conjunto
  * @param varName o nome da variável
  * @param writeSmvTypeTable a tabela de simbolos auxiliar
  * @param header o header
  * @SideEffects: Altera as informações do objeto type-set recuperado da tabela auxiliar
  */
-void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, HeaderSmv* header, EnvController* controller)
+void updateTypeSet(Object* newValue, char* varName, STable* writeSmvTypeTable, HeaderSmv* header, EnvController* controller)
 {
+    if(!newValue->type_smv_info){
+        fprintf(stderr,"[updateTypeSet] ERROR: No SMV_INFO!\n");
+    }
+    TableEntry* entryTypeSetInfo;
+    entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
+    if(newValue->type == NUMBER_ENTRY || newValue->type == WRITE_SMV_INFO){
+        unionTypeSetMinMaX(header,entryTypeSetInfo,newValue->type_smv_info,controller);
+    }
+    else{
+        if(newValue->type == LABEL_ENTRY || newValue->type == TYPE_SET){
+            unionTypeSets(header,entryTypeSetInfo,newValue->type_smv_info);
+        }
+    }
+
+    /*
     TableEntry* entryTypeSetInfo;
     entryTypeSetInfo =  lookup(writeSmvTypeTable,varName);
     int* pos = (int*) entryTypeSetInfo->val->values[0];
@@ -273,6 +319,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
         free(original);
         *size = strlen(newTypeSet);
     }
+    */
 }
 
 void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, const char *newValueBind, int type,
@@ -346,9 +393,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
         }
     }
     if(type == TDS_ENTRY || type == LABEL_ENTRY || type == NULL_ENTRY){
-        char rawValueBind[ALOC_SIZE_LINE/2];
-        copyValueBind(newValue,rawValueBind,0,0,1);
-        updateTypeSet(rawValueBind,varName,writeSmvTypeTable,header,controller);
+        updateTypeSet(newValue,varName,writeSmvTypeTable,header,controller);
     }
 }
 /**
@@ -1093,13 +1138,11 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
 }
 
 
-void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME){
-    STable* auxTableDependant = accessSmvInfo(controller,PORTS,dependant->AUX_REF);
-    HeaderSmv* headerDependant = accessHeader(controller,PORTS,dependant->SMV_REF);
-    char rawValueBind[ALOC_SIZE_LINE/2];
-    copyValueBind(dependant->DATA_TIME[C_TIME],rawValueBind,0,0,1);
-    updateTypeSet(rawValueBind,"value",auxTableDependant,headerDependant,controller);
-    //free(rawValueBind);
+void propagateValueToTypeSet(TDS* currentTDS, TDS* dependency, EnvController* controller){
+    STable* auxTdsDependant = accessSmvInfo(controller,PORTS,currentTDS->AUX_REF);
+    HeaderSmv* headerDependant = accessHeader(controller,PORTS,currentTDS->AUX_REF);
+    Object* newValue = lookup(accessSmvInfo(controller,PORTS,dependency->AUX_REF),"value")->val;
+    updateTypeSet(newValue,"value",auxTdsDependant,headerDependant,controller);
 }
 
 void writeResultantHeaders(EnvController* controller, const char* path){

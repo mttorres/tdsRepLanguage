@@ -53,8 +53,11 @@ void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TI
     else{
         resolveMergerTdsDependencies(currentTDS, C_TIME);
     }
-    if(currentTDS->DATA_TIME[C_TIME]){
-        propagateValueToTypeSet(currentTDS, controllerSmv, C_TIME);
+    int i;
+    // sempre deve resolver as dependencias de uma TDS já que a embora a dependente possa não ter recebido valores diretamente esse instante
+    // o "tipo" do type-set da outra pode ter mudado (nuXmv é bem rigido a respeito disso)
+    for (i = 0; i < currentTDS->TOTAL_DEPENDENCIES_PT; i++) {
+        propagateValueToTypeSet(currentTDS, currentTDS->linkedDependency[i],controllerSmv);
     }
 }
 

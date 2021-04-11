@@ -110,7 +110,12 @@ char *addParams(char *original, char *param, char *delim1, char *delim2, int use
             exit(-1);
         }
         auxNewAdd = newString;
-        auxNewAdd = customCat(auxNewAdd,original,delim2[0],0);
+        if(!useRealloc){
+            auxNewAdd = customCat(auxNewAdd,original,delim2[0],0);
+        }
+        else{
+            auxNewAdd[tamOriginal-3] = '\0';
+        }
         //printf("caso 1... %s \n",newString);
         auxNewAdd = customCat(auxNewAdd,", ",0,0);
         //printf("caso 1... %s \n",newString);
@@ -127,11 +132,16 @@ char *addParams(char *original, char *param, char *delim1, char *delim2, int use
             exit(-1);
         }
         auxNewAdd = newString;
-        if(statementEnd){
-            auxNewAdd = customCat(auxNewAdd,original,';',0);
+        if(!useRealloc){
+            if(statementEnd){
+                auxNewAdd = customCat(auxNewAdd,original,';',0);
+            }
+            else{
+                auxNewAdd = customCat(auxNewAdd,original,'\n',0);
+            }
         }
         else{
-            auxNewAdd = customCat(auxNewAdd,original,'\n',0);
+            auxNewAdd[tamOriginal-1] = '\0';
         }
         auxNewAdd = customCat(auxNewAdd,delim1,0,0);
         auxNewAdd = customCat(auxNewAdd,param,0,0);

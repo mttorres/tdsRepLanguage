@@ -189,14 +189,18 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope);
 
 /**
- * Faz as operações iniciais para recuperar a tabela de simbolos auxiliar e header apropriados
+ * Dada uma TDS sintetizada e sua dependencia,  atualiza o type-set em seu header baseado no
+ * type-set do header da dependencia. "Unindo" os type-sets caso seja necessário
+ *
+ * Faz as operações para recuperar a tabela de simbolos auxiliar e header apropriados
  * para atualizar um type-set. Delega as demais operações para o updateTypeSet depois
- * @param dependant a TDS que recebe valores
+ *
+ * @param currentTDS a TDS que recebe valores
+ * @param dependency a TDS que fornece valores
  * @param controller o controlador de ambiente
- * @param C_TIME o tempo corrente para recuperar os valores.
  * @SideEffects: O mesmos do updateTypeSet
  */
-void propagateValueToTypeSet(TDS* dependant, EnvController* controller, int C_TIME );
+void propagateValueToTypeSet(TDS* currentTDS, TDS* dependency, EnvController* controller);
 // doc antiga
 // método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto))
 /*

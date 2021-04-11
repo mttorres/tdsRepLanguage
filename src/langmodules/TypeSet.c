@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "../headers/TypeSet.h"
 
 //int MULTIPLIER_SIMPLE_HASH = 1;
@@ -33,7 +34,7 @@ TypeSet* copyTypeSet(TypeSet* original){
         TypeSet* newCopy = createTypeSet(NULL);
         int i;
         int tempIndex = 0;
-        for (i = 0; i < original->lastIndex; i++) {
+        for (i = 0; i <= original->lastIndex; i++) {
             if(original->hash_set[i]){
                 addElementToTypeSet(newCopy,original->hash_set[i]);
                 tempIndex = i;
@@ -57,6 +58,7 @@ int addElementToTypeSet(TypeSet* ts, char* newElement){
     }
     if(strcmp(newElement,ts->hash_set[pos]) != 0){
         // politica de redistribuição (podemos tentar implementar de novo)
+        fprintf(stderr,"[addElementToTypeSet] Collision !\n");
         exit(-1);
     }
     return 0;
