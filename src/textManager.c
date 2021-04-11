@@ -47,8 +47,7 @@ char* formatNumeric(int num){
 }
 
 char* formatString(char* str){
-    int size = strlen(str);
-    char* strValueBind = malloc((sizeof(char)*size)+1);
+    char* strValueBind = malloc(sizeof(char) * ALOC_SIZE_LINE);
     strcpy(strValueBind,str);
     return str;
 }

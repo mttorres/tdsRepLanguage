@@ -3,8 +3,6 @@
 #define OBJECT_H
 
 #include "Enum.h"
-#include "TypeMinMax.h"
-#include "TypeSet.h"
 
 // melhor do que retornar void! criar "proxy" (guarda o tipo ! e o valor (evita ter problemas de derefernciação))
 // pode permitir lazy evalution no futuro
@@ -18,7 +16,6 @@ typedef struct SYNTH_OBJECT
     char* SINTH_BIND; // auxilia a variavel anterior, // serve para auxiliar a limpeza de memória e escrever no nuXmv
     int timeContext;
     int aList;
-    void * type_smv_info;
 
 } Object;
 
@@ -34,8 +31,7 @@ typedef struct SYNTH_OBJECT
  * @SideEffects: Aloca uma lista de ponteiros para void de tamanho OBJECT_SIZE e para parte da lista aloca um
  * ponteiro para o tipo apropriado. Ver métodos: allocatePtObjects e allocateTypeSetObjects
  */
-Object *
-createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND, void *TYPE_SMV_INFO);
+Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeContext, char *BIND);
 
 /**
  * Aloca um Object em forma de estrutura dados composta de objetos

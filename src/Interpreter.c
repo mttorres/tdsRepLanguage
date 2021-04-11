@@ -14,7 +14,7 @@
 STable* selectSMV_SCOPE(STable* scope, EnvController* controllerSmv){
     if(scope->type == FUNC || scope->childOfFunction){
         return accessSmvInfo(controllerSmv,FUNCTION_SMV,scope->indexRef);
-        //return controllerSmv->functionsInfo[scope->indexRef];
+//        return controllerSmv->functionsInfo[scope->indexRef];
     }
     else{
         return controllerSmv->mainInfo; // só vai retornar ports em casos de declarações de tds
@@ -52,40 +52,18 @@ void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TI
         resolveMergerTdsDependencies(currentTDS, C_TIME);
     }
     if(currentTDS->DATA_TIME[C_TIME]){
-        propagateValueToTypeSet(currentTDS, controllerSmv, C_TIME);
+        propagateTypeSet(currentTDS,controllerSmv,C_TIME);
     }
 }
 
-/*
-void revaluateVariableToTypeSet(TDS* currentTDS, EnvController* controllerSmv, STable* scope, Node* PROGRAM_PATH){
-    Object*  revaluateVariable = eval(PROGRAM_PATH, scope, controllerSmv);
-    updateTypeSetWatchTds(currentTDS,controllerSmv,revaluateVariable);
-    //currentTDS->DATA_TIME[currentWatchTime] = lazyValue;
-    //resolveDependencies(currentTDS,controllerSmv,currentWatchTime);
-}
-*/
 
-void resolveAllVariableWatchs(TDS* currentTDS, EnvController* controller){
-    int i;
-    if(currentTDS->type == TDS_DEPEN){
-        for (i = 0; i < currentTDS->TOTAL_DEPENDENCIES_PT; i++) {
-            // atualiza o type-set do value dessa tds
-            TDS* dependency = currentTDS->linkedDependency[i];
-            createUnionAtSmvType("value",accessHeader(controller,PORTS,currentTDS->SMV_REF),
-                                  accessSmvInfo(controller,PORTS,currentTDS->AUX_REF),"value",accessSmvInfo(controller,PORTS,dependency->AUX_REF));
-        }
-    }
-    else{
-        /*
-        for (i = 0; i < currentTDS->PT_TOTAL_WATCH; i++) {
-            char* varRefDep = currentTDS->WATCH_LIST[i];
-            if(varRefDep){
-                createUnionAtSmvType("value",accessHeader(controller,PORTS,currentTDS->SMV_REF),
-                                  accessSmvInfo(controller,PORTS,currentTDS->AUX_REF),varRefDep,accessSmvInfo(controller,MAIN,0));
-            }
-        }
-         */
-    }
+void resolveWatchVariable(TDS* currentTDS, Object* timeComponent, EnvController* controllerSmv, STable* scope, int currentWatchTime){
+
+    Node* PROGRAM_PATH = (Node*) timeComponent->values[1];
+    Object*  lazyValue = eval(PROGRAM_PATH, scope, controllerSmv);
+    updateTypeSetWatchTds(currentTDS,controllerSmv,lazyValue);
+    currentTDS->DATA_TIME[currentWatchTime] = lazyValue;
+    resolveDependencies(currentTDS,controllerSmv,currentWatchTime);
 }
 
 void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME, Node *PROGRAM_PATH, TDS *currentTDS) {
@@ -102,6 +80,7 @@ void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int 
 void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME,
                               Node *PROGRAM_PATH, TDS *currentTDS, Object *timeComponent) {
     PROGRAM_PATH = (Node*) timeComponent->values[1];
+    controllerSmv->currentTDScontext = currentTDS;
     resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
 }
 
@@ -112,13 +91,21 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
     for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
         // resolve call-by-need cada expressão ativa da TDS.
         TDS* currentTDS = controllerSmv->declaredPorts[i];
-        controllerSmv->currentTDScontext = currentTDS;
         if(currentTDS->type == DATA_LIST){
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
             if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
                 Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
                 resolveTimeComponentSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS,timeComponent);
             }
+/*          int j;
+            for (j = 0; j < currentTDS->TOTAL_WATCH; j++) {
+                // chamada de antes para todos as variáveis que estão em observação
+                if(currentTDS->WATCH_LIST[j] != -1 && currentTDS->WATCH_LIST[j] != C_TIME ){
+                    int currentWatchTime = currentTDS->WATCH_LIST[j];
+                    Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[currentWatchTime]];
+                    resolveWatchVariable(currentTDS,timeComponent,controllerSmv,currentScope,currentWatchTime);
+                }
+            }*/
         }else{
             // é só uma expressão simples
             if(currentTDS->type != TDS_DEPEN){
@@ -129,7 +116,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
                 resolveDependencies(currentTDS,controllerSmv,C_TIME);
             }
         }
-        //resolveAllVariableWatchs(currentTDS,controllerSmv);
+
     }
     controllerSmv->currentTDScontext = NULL;
 }
@@ -155,9 +142,9 @@ Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
 {
     int sint;
     sint = atoi(n->leafs[0]);
-    //printf("[evalNUM] SINTH: %d \n",sint);
+    printf("[evalNUM] SINTH: %d \n",sint);
     void* ip[] = {&sint};
-    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0], createMinMaxByOneValue(sint));
+    Object* o = createObject(NUMBER_ENTRY, 1, ip, -1, n->leafs[0]);
     return o;
 }
 
@@ -175,7 +162,7 @@ Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 
     void* bp[] = {&sint};
 
-    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, sint ? trueString : falseString, NULL);
+    Object* o = createObject(LOGICAL_ENTRY, 1, bp, -1, sint? trueString : falseString);
 
     return o;
 }
@@ -183,31 +170,48 @@ Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    //printf("[evalSTRING] \n");
+    printf("[evalSTRING] \n");
     char* sint =  n->leafs[0];
+
     void* sp[] = {sint};
-    TypeSet *newTypeSet = computeTypeSet(controllerSmv, sint);
-    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint, newTypeSet);
+
+    printf("[evalSTRING] SINTH: %s \n",sint);
+
+    Object* o = createObject(LABEL_ENTRY, 1, sp, -1, sint);
+
     return o;
 }
 
+
 /*
-	Pensar... encapsular NULL ?
+	Pensar depois... encapsular NULL ?
+
 */
+
 Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    //printf("[evalNULL] \n");
-    // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?) SIM
+    printf("[evalNULL] \n");
+    // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?)
     char* sint =  n->leafs[0];
-    //void* np[] = {sint};
-    //printf("[evalNULL] SINTH: %s \n",sint);
-    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint, computeTypeSet(controllerSmv,sint));
+
+//    void* np[] = {sint};
+
+    printf("[evalNULL] SINTH: %s \n",sint);
+
+    Object* o = createObject(NULL_ENTRY, 0, NULL, -1, sint);
+
     return o;
 }
 
 
 Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 {
+    printf("[evalIDVAR] \n");
+
+    // VAI RECUPERAR UM OBJETO NA TABELA DE SIMBOLOS e então SUBIR COM ELE
+    //(já que o tipo pode ser qualquer e a gente vai decidir o que fazer com ele ainda)
+
+
     TableEntry* entry = lookup(scope,n->leafs[0]);
 
     if(!entry)
@@ -240,20 +244,22 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         }
         else
         {
-            if(controllerSmv->currentTDScontext){
-                if(entry->val->type == LOGICAL_ENTRY){
-                    fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. ONLY SYMBOLIC VALUES ARE ACCEPTED, %s is a BOOLEAN value", controllerSmv->currentTDScontext->name,entry->name);
-                    // poderia ter um cast implicito também...
-                    exit(-1);
-                }
-                //addParamToTds(controllerSmv,entry->name,controllerSmv->currentTDScontext);
-                int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
-                //addToTdsWatchList(controllerSmv->currentTDScontext,
-                //                  formatValueBind(entry->name,scope,entry->val,-1,0,1));
+/*
+            if(entry->val->type == NULL_ENTRY){
+
             }
-            // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
-            Object* copy = refCopyOfVariable(entry, controllerSmv);
-            return copy;
+            else{
+                // copia o objeto atomico (TEM QUE PASSAR O BIND NOVO!)
+*/
+                Object* copy = refCopyOfVariable(entry);
+                if(controllerSmv->currentTDScontext){
+                    addParamToTds(controllerSmv,entry->name,controllerSmv->currentTDScontext);
+                    // encapsular em método depois
+                    int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
+                    //addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+                }
+                return copy;
+//            }
         }
     }
 }
@@ -261,8 +267,7 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    //printf("[evalTIME_DIRECTIVE] \n");
-    // TODO mudar a referencia para não ser time sempre (#68)
+    printf("[evalTIME_DIRECTIVE] \n");
 
     TableEntry* entry = lookup(scope,n->leafs[0]);
 
@@ -275,7 +280,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
     else
     {
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
-        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, "time", NULL);
+        return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, "time");
     }
 }
 
@@ -319,11 +324,9 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         r =  (*(int*)o1->values[0]) + (*(int*)o2->values[0]);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '+' + 1
         createExprBind(resultingBind, o1, o2, "+");
-        Object* SUM_OBJECT =  createObject(NUMBER_ENTRY, 1, rp, -1,
-                                           resultingBind, computeMinMaxSum(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return SUM_OBJECT;
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
     }
     else if(!o1->aList && !o2->aList && o1->type == LABEL_ENTRY && o2->type == o1->type){
         char* str1 = o1->values[0];
@@ -333,11 +336,9 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
         char* refToEnd = customCat(r,str1,0,0);
         customCat(refToEnd,str2,0,0);
         void* rp[] = {r};
-        Object* CONCAT_OBJECT = createObject(LABEL_ENTRY, 1, rp,
-                                             -1, r,computeTypeSet(controller,r));
         letgoObject(o1);
         letgoObject(o2);
-        return CONCAT_OBJECT;
+        return createObject(NUMBER_ENTRY, 1, rp, -1, r);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (+) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -368,13 +369,11 @@ Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
     void* rp[] = {&r};
     char resultingBind[o2? strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4: strlen(o1->SINTH_BIND) +2]; // + espaco + espaco + '-' + 1 ou  '-' + +1
     createExprBind(resultingBind, o1, o2, "-");
-    Object* MINUS_OBJECT =  createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
-                                         o2? computeMinMaxSub(o1->type_smv_info,o2->type_smv_info) : computeMinMaxNeg(o1->type_smv_info));
     letgoObject(o1);
     if(o2){
         letgoObject(o2);
     }
-    return MINUS_OBJECT;
+    return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
 }
 
 Object * notObjectOperation(Object* o){
@@ -389,7 +388,7 @@ Object * notObjectOperation(Object* o){
     char resultingBind[strlen(o->SINTH_BIND)+2];
     createExprBind(resultingBind, o, NULL, "!");
     letgoObject(o);
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
 Object* evalNOT(Node* n, STable* scope, EnvController* controller)
@@ -409,11 +408,9 @@ Object* evalMULTI(Node* n, STable* scope, EnvController* controller)
         r =  (*(int*)o1->values[0]) * (*(int*)o2->values[0]);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +4]; // + espaco + espaco + '*' + 1
         createExprBind(resultingBind, o1, o2, "*");
-        Object* MULT_OBJECT = createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
-                                           computeMinMaxMul(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return MULT_OBJECT;
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (*) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
     exit(-1);
@@ -438,11 +435,9 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
         r =  isDivision? (*(int*)o1->values[0]) / (SYNTH_O2) : (*(int*)o1->values[0]) % (SYNTH_O2);
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +aloca]; // + espaco + espaco + '/' + 1
         createExprBind(resultingBind, o1, o2, op);
-        Object* DIV_OBJECT = createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
-                                          computeMinMaxDiv(o1->type_smv_info,o2->type_smv_info));
         letgoObject(o1);
         letgoObject(o2);
-        return DIV_OBJECT;
+        return createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind);
     }
     fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (%s) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND,op);
     exit(-1);
@@ -460,7 +455,7 @@ Object * evalLE(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, "<=");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -473,7 +468,7 @@ Object * evalLE(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -494,7 +489,7 @@ Object * evalGE(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, ">=");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -507,7 +502,7 @@ Object * evalGE(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>=) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -527,7 +522,7 @@ Object * evalLT(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, "<");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -540,7 +535,7 @@ Object * evalLT(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -560,7 +555,7 @@ Object * evalGT(Node* n, STable* scope, EnvController* controller){
         createExprBind(resultingBind, o1, o2, ">");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else if(o1->type != TDS_ENTRY && o1->type != LOGICAL_ENTRY && o2->type != TDS_ENTRY && o2->type != LOGICAL_ENTRY){
         // compara tamanhos
@@ -573,7 +568,7 @@ Object * evalGT(Node* n, STable* scope, EnvController* controller){
         if(!o2->aList){
             letgoObject(o2);
         }
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (>) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -604,7 +599,7 @@ Object* evalEQUAL(Node* n, STable* scope, EnvController* controller){
     void* rp[] = {&r};
     char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
     createExprBind(resultingBind, o1, o2, "=");
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
 Object* evalNEQUAL(Node* n, STable* scope, EnvController* controller){
@@ -614,7 +609,7 @@ Object* evalNEQUAL(Node* n, STable* scope, EnvController* controller){
     void* rp[] = {&r};
     char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
     createExprBind(resultingBind, o1, o2, "!=");
-    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+    return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
 }
 
 
@@ -631,7 +626,7 @@ Object* evalAND(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "&");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (and) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -652,7 +647,7 @@ Object* evalOR(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "|");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (or) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -689,7 +684,7 @@ Object* evalIMP(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "->");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -711,7 +706,7 @@ Object* evalBIMP(Node* n, STable* scope, EnvController* controller)
         createExprBind(resultingBind, o1, o2, "<->");
         letgoObject(o1);
         letgoObject(o2);
-        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind, NULL);
+        return createObject(LOGICAL_ENTRY, 1, rp, -1, resultingBind);
     }
     else{
         fprintf(stderr, "INCOMPATIBLE OPERANDS %s and %s FOR THE (<->) OPERATION!",o1->SINTH_BIND,o2->SINTH_BIND);
@@ -801,7 +796,7 @@ Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv)
         else
         {
             // copia o objeto atomico
-            return refCopyOfVariable(entry, NULL);
+            return refCopyOfVariable(entry);
         }
     }
 }
@@ -857,7 +852,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
         void* vp[] = {ptitime};
         updateValue("I_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",I_TIME);
-        updateTime(controllerSmv->MAIN, controllerSmv->mainInfo, smvBind, T_DIRECTIVE_ENTRY, 0, *ptitime);
+        updateTime(controllerSmv->MAIN,controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,0,0);
         // necessita atualizar C_TIME
         updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
     }
@@ -865,7 +860,7 @@ Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSm
         void* vp[] = {ptftime};
         updateValue("F_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
         sprintf(smvBind,"%d",F_TIME);
-        updateTime(controllerSmv->MAIN, controllerSmv->mainInfo, smvBind, T_DIRECTIVE_ENTRY, 1, *ptftime);
+        updateTime(controllerSmv->MAIN,controllerSmv->mainInfo,smvBind,NUMBER_ENTRY,1,1);
     }
     return NULL;
 }
@@ -967,8 +962,8 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
         TableEntry* varEntry = lookup(scope,varName);
         Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
-        // ports ou main
         STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
+        // ports ou main
         HeaderSmv* refHeader = selectSMV_INFO(scope,NULL,controllerSmv);
 
         TableEntry* itimeEntry = lookup(scope,"I_TIME");
@@ -981,17 +976,18 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
             //primeira vez da variavel (ou não inicializada, mudança para depois)
             if(!var)
             {
+                //int isTDS = expr->type == TDS_ENTRY;
                 if(!scope->notEvaluated){
                     addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
                 }
                 //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
                 if(expr->type != NULL_ENTRY && !scope->notWrite){
                     if(changeContext){
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME, controllerSmv);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME);
                     }
                     else{
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
+                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME);
                     }
                 }
             }
@@ -1002,8 +998,7 @@ Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
                 // tempo > 0 e não ocorreu redefinição
                 if((expr->type != NULL_ENTRY && !scope->notWrite)){
                     if(changeContext){
-                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
-                                   C_TIME, controllerSmv);
+                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1, C_TIME);
                     }
                 }
             }

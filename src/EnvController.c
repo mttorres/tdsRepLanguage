@@ -7,18 +7,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-void setUpTypeSetDict(EnvController* controller){
-    char** dict = malloc(sizeof(char*)*TYPE_SET_DIR_SIZE);
-    int i;
-    for (i = 0; i  < TYPE_SET_DIR_SIZE ; i++) {
-        dict[i] = NULL;
-    }
-    controller->typeSetWords = dict;
-    addTypeSetWordToDict("0",controller);
-    addTypeSetWordToDict("1",controller);
-    addTypeSetWordToDict("NULL",controller);
-}
-
 
 EnvController *createController() {
 
@@ -57,7 +45,10 @@ EnvController *createController() {
         Hcontrol->FUNCTIONS[i] = NULL;
     }
 
-    setUpTypeSetDict(Hcontrol);
+    Hcontrol->typeSetWords = malloc(sizeof(char*)*TYPE_SET_DIR_SIZE);
+    for (i = 0; i  < TYPE_SET_DIR_SIZE ; i++) {
+        Hcontrol->typeSetWords[i] = NULL;
+    }
     return Hcontrol;
 }
 
@@ -260,34 +251,6 @@ void addParamToPortsModule(EnvController *controller, char *param) {
 //        propagParamDependence(controller->MAIN_RELATED,param,controller->H_MAIN_CURRENT_SIZE);
 //    }
 //    propagParamDependence(controller->AUTOMATA_RELATED,param,controller->H_AUTOMATA_CURRENT_SIZE);
-    }
-}
-
-
-char* getTypeSetWordFromDict(char* wordRef, EnvController* controller){
-    int hashWord = hash(wordRef,TYPE_SET_DIR_SIZE);
-    if(controller->typeSetWords[hashWord]){
-        return controller->typeSetWords[hashWord];
-    }
-    else{
-        // cria uma entrada para essa
-        addTypeSetWordToDict(wordRef,controller);
-        return controller->typeSetWords[hashWord];
-    }
-    //return NULL; // garantia (até porque na verdade já preenchemos com null antes)
-}
-
-void addTypeSetWordToDict(char* word, EnvController* controller){
-    int hashWord = hash(word,TYPE_SET_DIR_SIZE);
-    if(controller->typeSetWords[hashWord]){
-        if(strcmp(controller->typeSetWords[hashWord],word) != 0){
-            fprintf(stderr,"[addTypeSetWordToDict] DICT WORD COLLISION!\n");
-            exit(-1);
-        }
-    }
-    else{
-        char* newWord = formatString(word);
-        controller->typeSetWords[hashWord] = newWord;
     }
 }
 

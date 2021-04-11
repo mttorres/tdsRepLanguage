@@ -353,13 +353,6 @@ void addWriteInfo(char* name, void** any, int any_type, int object_size, STable*
 }
 */
 
-void addSmvInfoDeclaration(char *name, void **any, int any_type, int object_size, STable *current, void* type_smv_info_dc){
-    addValue(name,any,any_type,object_size,0,current,-1);
-    Object* VAR_DECLARATION_SMV_INFO = lookup(current,name)->val;
-    VAR_DECLARATION_SMV_INFO->type_smv_info = type_smv_info_dc;
-}
-
-
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
 void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
@@ -368,7 +361,7 @@ void addValue(char *name, void **any, int any_type, int object_size, int methodP
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any, timeContext, name, NULL);
+	Object* o = createObject(any_type, object_size, any, timeContext, name);
 	addValueCurrentScope(name,o,methodParam,current);
 }
 

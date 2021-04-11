@@ -111,24 +111,6 @@ TypeMinMax* computeMinMaxSum(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
 TypeMinMax* computeMinMaxSub(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinMax2);
 
 /**
- * Realiza a operação de negativo de um valor único de type-min-max. Seguindo a regra:
- *
- * Se o número é positivo:
- * min:  -max1
- * max:  -min1
- *
- * Se o número é negativo:
- *
- * min: -max1
- * max: -min1
- *
- * A ideia é tratar a distancia em módulo de valores
- * @param typeRefMinMax1
- * @return o novo type-set com o min max que segue a regra
- */
-TypeMinMax* computeMinMaxNeg(TypeMinMax* typeRefMinMax1);
-
-/**
  * Cria um novo min-max que representa a multiplicação de outros dois tipos inteiros seguindo a seguinte regra:
  *
  *   min:
@@ -189,25 +171,5 @@ TypeMinMax* computeMinMaxDiv(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
  * @return retorna um novo type-min-max que resolva o intervalo
  */
 TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1);
-
-/**
-**
- * Cria um novo objeto type-min-max
- * @return uma copia do type-min-max original
- */
-TypeMinMax* copyTypeMinMax(TypeMinMax* original);
-
-/**
- * Decide o min-max de um type-min-max baseado em uma nova informação sintetizada.
- * Após realizar a decisão retorna um código que irá sinalizar qual parte da declaração deve ser alterada na string.
- * @param original o type-min-max que já está contido na declaração
- * @param newInfo a nova informação de type-min-max sintetizada
- * @return -1 caso nenhum tenha sido alterado, 0 se o minimo necessita de alteração, 1, se o maximo necessita, 2 se ambos necessitam
- */
-int mergeTypeMinMax(TypeMinMax* original, TypeMinMax* newInfo);
-
-int changeMinMax(TypeMinMax* tmm, int value);
-
-void letGoTypeMinMax(TypeMinMax* tmm);
 
 #endif //TDSREPLANGUAGE_TYPEMINMAX_H
