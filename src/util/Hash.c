@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "../headers/Hash.h"
+#include "Hash.h"
 
 /*
 int hash(char* str, int SIZE_ED){
@@ -29,7 +29,7 @@ int hash(char *str, int SIZE_ED)
         hash = (( ( (hash << 5) + hash) + c )  % SIZE_ED); /* hash * 33 + c */
     }
     int final = hash % SIZE_ED;
-    if(final > SIZE_ED-1){
+    if(final >= SIZE_ED-1){
         fprintf(stderr,"[hash] Error in generating HASH\n");
         exit(-1);
     }
