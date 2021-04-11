@@ -47,7 +47,7 @@ tdsA = {
 //	delayed
 //}  // da erro (como esperado)
 
-C_TIME = 2
+C_TIME TO  2
 
 //(tdsA) -||> d realiza a operação com warning
 
@@ -75,7 +75,7 @@ C_TIME = 2
 x = -4 //redef =1 , context =2
 
 
-C_TIME = 2
+C_TIME TO  2
 
 y = 5
 
@@ -84,16 +84,17 @@ tdsB = {
 	data-time: {3: 3, 4:4, 5:5, 6:y-x}
 }
 
-(tdsA,tdsB) -{x == true}> c // funciona
+(tdsA,tdsB) ==> c // funciona
+//(tdsA,tdsB) -{x == true}> c // funciona
 (c) -||> d // funciona
 
 
-C_TIME = 3
+C_TIME TO  3
 
 x = -1 // corrigido
 
 
-C_TIME = 4
+C_TIME TO  4
 
 zeta = false
 

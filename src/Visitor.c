@@ -8,7 +8,7 @@
 Object* (*realizacaoAvaliaco[160]) (Node* n, STable* scope, EnvController* controllerSmv) = {
         evalNUM, evalBOOL, evalSTRING, evalNULL, evalIDVAR, evalTIME_DIRECTIVE,
         evalDataV, evalPARAMS_CALL, evalPARAMS ,evalDEFINE_INTERVAL ,evalAC_V,
-        evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
+        eval_ASSIGN_TDIRECTIVE, evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
         evalMINUS, evalPLUS, evalMULTI, evalDIV, evalLE, evalGE, evalLT, evalGT, evalEQUAL, evalNEQUAL, evalNOT, evalAND, evalOR, evalIMP, evalBIMP,
         evalPRI_EXPR, evalCMD_IF,
         evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, evalANON_TDS, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT

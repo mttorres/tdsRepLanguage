@@ -394,7 +394,7 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
         	$$ = optionalreturn;
 	 }
 	 | CURRENTTIME TO expr {
-			Node* data = createNode(5,1,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);
+			Node* data = createNode(7,1,2,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE , $3  ,$1,$2);
 			$$ = data;
 	 }
 	 | SHOW LPAREN expr RPAREN {
@@ -419,13 +419,7 @@ assignable : ID extraaccesses {
 				$$ = assignment;	
 		}
 	 }
-	 | CURRENTTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;	
-
-	  }
-	  ;
+	 ;
 
 
 

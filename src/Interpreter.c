@@ -266,23 +266,7 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
     }
 }
 
-
-
-Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv)
-{
-    printf("[evalDataV] \n");
-
-
-    //str= evalSTRING(n,  scope, writeSmvTypeTable, controllerSmv);
-
-    //printf("[evalDataV] DATA_V SINTH: %s \n",str);
-
-    //return sint;
-
-    // esse vai ser bem diferente...
-
-    // vai chamar evalParams , e sintetizar um Object Vetor (ou um vetor void que será jogado em um object)
-}
+Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 
 Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv)
 {
@@ -726,83 +710,11 @@ Object* evalEXPR(Node* n, STable* scope, EnvController* controllerSmv)
 }
 
 
-Object* evalProp(Node* fatherRef, Node* n, STable* scope, EnvController* controllerSmv)
-{
-    printf("[evalProp] \n");
-    if(!n)
-    {
-        printf("[evalProp] VARIAVEL: \n");
-        // NÃO PRECISA RETORNAR NADA, já temos a referência no nó acima
-        // até porque não temos nada
-        return NULL;
-    }
-    if(n->type == V_PROP)
-    {
-
-        char* propName;
-
-        printf("[evalProp] PROP VARIAVEL: %s \n",propName);
-        //return createObject();
-        return NULL;
-    }
-    if(n->type == ADD_V)
-    {
-        Object* expr = evalEXPR(n->children[0],scope, controllerSmv);
-        if(expr->type != NUMBER_ENTRY)
-        {
-            fprintf(stderr, "%s: INVALID INDEX!", fatherRef->leafs[0]);
-            exit(-1);
-        }
-        // printf("[evalProp] VARIAVEL pos: %d \n",expr->values[0]);
-        return expr;
-    }
-
-    char* propName;
-    //printf("[evalProp] VARIAVEL pos prop %d \n",propName);
-    return NULL;
-
-}
-
-
-Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv)
-{
-    printf("[evalAC_V] \n");
-
-    // recupera a variável e o nome do atributo dela logo após
-    TableEntry* entry = lookup(scope,n->leafs[0]);
-
-    if(!entry)
-    {
-        fprintf(stderr, "%s NOT DECLARED!", n->leafs[0]);
-        exit(-1);
-    }
-    else
-    {
-        Object* prop = evalProp(n,n->children[0], scope, controllerSmv);
-
-        if(entry->val->OBJECT_SIZE > 1)
-        {
-            // retorna a referência (ai pode sim ter colaterais)
-            return entry->val;
-        }
-        else
-        {
-            // copia o objeto atomico
-            return refCopyOfVariable(entry, NULL);
-        }
-    }
-}
-
-Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv){
-    printf("[evalV_PROP] \n");
-
-}
-Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv){
-    printf("[evalADD_V] \n");
-}
-Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv){
-    printf("[evalADD_V_PROP] \n");
-}
+Object* evalProp(Node* fatherRef, Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
+Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
+Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
+Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
+Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 
 Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv){
     printf("[evalV_PROP_TDS] \n");
@@ -895,156 +807,118 @@ void updateVariable(char* varName, Object *var, Object *expr, STable* scope, int
     }
 }
 
-Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
-{
+Object* eval_ASSIGN_TDIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv){
     Object* expr = NULL;
     Object** sintExpr = NULL;
     // recuperação de diretiva temporal principal para uso
     TableEntry* ctimeEntry = lookup(scope, "C_TIME");
     int C_TIME = *(int*) ctimeEntry->val->values[0];
     // caso de atribuição de diretiva
-    if(n->children[0]->type == ASSIGN_TDIRECTIVE)
+    // verificação semântica (se pode atribuir)(essas atribuições só são válidas no programa principal) ? seria uma boa tratar na gramática (?)
+    if(scope->type != GLOBAL)
     {
-        // verificação semântica (se pode atribuir)(essas atribuições só são válidas no programa principal) ? seria uma boa tratar na gramática (?)
-        if(scope->type != GLOBAL)
-        {
-            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, THE CONTEXT IS LOCKED! \n", n->children[0]->leafs[0]);
-            exit(-1);
-        }
-        // dois casos: alterar o valor na tabela de simbolos
-        //Mudou intervalos: alterar intervalo no main do SMV e mudar o init ou next (dependendo da diretiva)
-        //Mudou CONTEXTO (C_TIME) : seguir o caso default
-        // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
-        expr = eval(n->children[1], scope, controllerSmv);
-        if(expr && expr->type != NUMBER_ENTRY && expr->OBJECT_SIZE > 1)
-        {
-            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->children[0]->leafs[0]);
-            exit(-1);
-        }
-        if(*(int*)expr->values[0] < C_TIME ){
-            fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, IMPOSSIBLE TO RETURN TO PAST CONTEXTS  \n", n->children[0]->leafs[0]);
-            exit(-1);
-        }
-        // validaçao de intervalo
-        TableEntry* itimeEntry = lookup(scope,"F_TIME");
-        int ftime = *(int*)itimeEntry->val->values[0];
-        if(C_TIME > ftime){
-            fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL. The statement has no effect \n", n->children[0]->leafs[0]);
-        }
-            /* TOMAR NOTA: NUNCA MAIS FAZER ISSO
-             * 		int* v;
-             *       v = 5;  (PODE LITERALMENTE ALOCAR QUALQUER, REPITO QUALQUER REGIÃO DE MEMÓRIA PARA MEU 5!
-             *       void* vp[] = {v};
-             * */
-            // só fazer isso se eu tiver dado malloc em v!
-            // antes de realizar a mudança, devemos dar commit da TDS! (Nada atualmente impede o usuario de commitar "duas vezes", isso e um fail safe)
-        else if(*(int*) expr->values[0] != C_TIME){
-            commitCurrentTime(scope,controllerSmv,*(int*) expr->values[0]);
-            void* vp[] = {expr->values[0]};
-            updateValue(n->children[0]->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
-            letgoObject(expr);
-        }
+        fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, THE CONTEXT IS LOCKED! \n", n->leafs[0]);
+        exit(-1);
     }
-    else{
-        // busca expressão
-        expr = eval(n->children[1], scope, controllerSmv);
+    // dois casos: alterar o valor na tabela de simbolos
+    //Mudou CONTEXTO (C_TIME) : seguir o caso default
+    // objeto sintetizado (chamar fora ou dentro do if depois das validações? avisa erros mais rapido)
+    expr = eval(n->children[0], scope, controllerSmv);
+    if(expr && expr->type != NUMBER_ENTRY || expr->OBJECT_SIZE > 1)
+    {
+        fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, ONLY NUMERICAL VALUES ARE ACCEPTED \n", n->leafs[0]);
+        exit(-1);
+    }
+    if(*(int*)expr->values[0] < C_TIME ){
+        fprintf(stderr, "ERROR: BAD USE OF %s TIME DIRECTIVE, IMPOSSIBLE TO RETURN TO PAST CONTEXTS  \n", n->leafs[0]);
+        exit(-1);
+    }
+    // validaçao de intervalo
+    TableEntry* itimeEntry = lookup(scope,"F_TIME");
+    int ftime = *(int*)itimeEntry->val->values[0];
+    if(*(int*)expr->values[0]  > ftime){
+        fprintf(stderr, "WARNING: %s IS BEYOND THE OBSERVATION INTERVAL. The statement has no effect \n", n->leafs[0]);
+    }
+    else if(*(int*) expr->values[0] != C_TIME){
+        commitCurrentTime(scope,controllerSmv,*(int*) expr->values[0]);
+        void* vp[] = {expr->values[0]};
+        updateValue(n->leafs[0], vp, T_DIRECTIVE_ENTRY, 1, -1, -1, scope, 0);
+        letgoObject(expr);
+    }
+    return NULL;
+}
 
-        // busca a variável e seu contexto
-        char* varName = n->children[0]->leafs[0];
-        TableEntry* varEntry = lookup(scope,varName);
-        Object* var = varEntry == NULL ?  NULL : varEntry->val;
+Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv)
+{
+    Object* expr = NULL;
+    Object** sintExpr = NULL;
+    // busca expressão
+    expr = eval(n->children[1], scope, controllerSmv);
+    // busca a variável e seu contexto
+    char* varName = n->children[0]->leafs[0];
+    TableEntry* varEntry = lookup(scope,varName);
+    Object* var = varEntry == NULL ?  NULL : varEntry->val;
 
-        // ports ou main
-        STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
-        HeaderSmv* refHeader = selectSMV_INFO(scope,NULL,controllerSmv);
+    // ports ou main
+    STable* refAuxTable = selectSMV_SCOPE(scope,controllerSmv);
+    HeaderSmv* refHeader = selectSMV_INFO(scope,NULL,controllerSmv);
 
-        TableEntry* itimeEntry = lookup(scope,"I_TIME");
-        int I_TIME = *(int*)itimeEntry->val->values[0];
-        int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto
+    // validação de tempo
+    TableEntry* ctimeEntry = lookup(scope, "C_TIME");
+    int C_TIME = *(int*) ctimeEntry->val->values[0];
+    TableEntry* itimeEntry = lookup(scope,"I_TIME");
+    int I_TIME = *(int*)itimeEntry->val->values[0];
+    int changeContext = C_TIME > I_TIME; // verifica se mudou o contexto
 
-        // atribuição simples
-        if(expr && (expr->type != TDS_ENTRY || expr->aList ) && n->children[0]->type == ASSIGN_IDVAR)
+    // atribuição simples
+    if(expr && (expr->type != TDS_ENTRY || expr->aList ) && n->children[0]->type == ASSIGN_IDVAR)
+    {
+        //primeira vez da variavel (ou não inicializada, mudança para depois)
+        if(!var)
         {
-            //primeira vez da variavel (ou não inicializada, mudança para depois)
-            if(!var)
-            {
-                if(!scope->notEvaluated){
-                    addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
-                }
-                //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
-                if(expr->type != NULL_ENTRY && !scope->notWrite){
-                    if(changeContext){
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME, controllerSmv);
-                    }
-                    else{
-                        specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
-                    }
-                }
+            if(!scope->notEvaluated){
+                addValue(varName, expr->values, expr->type, expr->OBJECT_SIZE, 0, scope, C_TIME);
             }
-            else{
-                if(!scope->notEvaluated){
-                    updateVariable(varName,var,expr,scope,-1,C_TIME);
+            //inicialização "com next", necessita criar um default para os instantes anteriores e o seu next
+            if(expr->type != NULL_ENTRY && !scope->notWrite){
+                if(changeContext){
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 1, C_TIME, controllerSmv);
                 }
-                // tempo > 0 e não ocorreu redefinição
-                if((expr->type != NULL_ENTRY && !scope->notWrite)){
-                    if(changeContext){
-                        specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
-                                   C_TIME, controllerSmv);
-                    }
-                }
-            }
-            letgoObject(expr);
-        }
-        else if(expr){
-            if(var && expr->type != var->type){
-                fprintf(stderr, "TYPE ERROR: %s datastructure type is imutable \n",varName);
-                exit(-1); // por enquanto declarações unicas de estruturas de dados
-            }
-            if(!var)
-            {
-                addReferenceCurrentScope(varName,expr,0,scope);
-                if(expr->type != TDS_ENTRY){
-                    // spec de lista
-                }
-            }
-            else{
-                // update ref
-            }
-
-/*            Node* ref = n->children[0]->children[0];
-            Object* indexRef = ref->type == V_PROP ? NULL : eval(n, scope, controllerSmv);
-
-            if(ref->type == V_PROP || ref->type == ADD_V_PROP)
-            {
-                if(var->type != TDS_ENTRY)
-                {
-                    // TODO:  FUNÇÃO AVALIADORA DE TDS_PROP
-                    fprintf(stderr, "ERROR: %s does not contain the %s property \n",varName,ref->children[0]->leafs[0]);
-                    exit(-1);
-                }
-
                 else{
-                    // retorna a prop...
+                    specAssign(1, varName, changeContext, refHeader, scope, refAuxTable, expr, 0, 0, C_TIME, controllerSmv);
                 }
             }
-            else{
-                if(indexRef->type != NUMBER_ENTRY || indexRef->OBJECT_SIZE > 1)
-                {
-                    fprintf(stderr, "ERROR: %s cannot be indexed by non numerical values! \n",varName);
-                    exit(-1);
-                }
-                int index = *(int*) indexRef->values[0];
-                if(index >= var->OBJECT_SIZE){
-                    fprintf(stderr, "ERROR: %s[%d] is out of bounds! \n",varName,index);
-                    exit(-1);
-                }
-                // ainda parcialmente incompleto
-                updateValue(varName, expr->values, var->type, var->OBJECT_SIZE, index, -1, scope, 0);
-            }
-                    */
         }
-
+        else{
+            if(!scope->notEvaluated){
+                updateVariable(varName,var,expr,scope,-1,C_TIME);
+            }
+            // tempo > 0 e não ocorreu redefinição
+            if((expr->type != NULL_ENTRY && !scope->notWrite)){
+                if(changeContext){
+                    specAssign(0, varName, changeContext, refHeader, scope, refAuxTable, expr, var->redef, 1,
+                                   C_TIME, controllerSmv);
+                }
+            }
+        }
+        letgoObject(expr);
+    }
+    else if(expr){
+        if(var && expr->type != var->type){
+            fprintf(stderr, "TYPE ERROR: %s datastructure type is imutable \n",varName);
+            exit(-1); // por enquanto declarações unicas de estruturas de dados
+        }
+        if(!var)
+        {
+            addReferenceCurrentScope(varName,expr,0,scope);
+            if(expr->type != TDS_ENTRY){
+                // spec de lista
+            }
+        }
+        else{
+            // update ref
+        }
     }
     return NULL;
 }

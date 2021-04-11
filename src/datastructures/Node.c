@@ -11,7 +11,7 @@ const char* mappingEnumNode[] =  {
 
         "DATA_V", "PARAMS_CALL", "PARAMS", "DEFINE_INTERVAL",
 
-        "AC_V", "OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
+        "AC_V", "ASSIGN_TDIRECTIVE" ,"OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
 
         "EXPR", "MINUS_EXPR", "PLUS_EXPR", "MULTI_EXPR", "DIV_EXPR", "LE_EXPR", "GE_EXPR", "LT_EXPR", "GT_EXPR", "EQUAL_EXPR", "NEQUAL_EXPR",
         "NOT_EXPR", "AND_EXPR", "OR_EXPR", "IMP_EXPR", "BIMP_EXPR", "PRI_EXPR",

@@ -19,6 +19,7 @@ Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv);
+Object* eval_ASSIGN_TDIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalOTHER_ASSIGN(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv);
 Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv);
