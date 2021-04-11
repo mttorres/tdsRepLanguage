@@ -234,14 +234,7 @@ void letgoTable(STable *t)
 }
 
 
-int hash(char* str, int SIZE_ED){
-	int hash = 401;
-	while (*str != '\0') {
-		hash = ((hash << 4) + (int)(*str)) % SIZE_ED;
-		str++;
-	}
-	return hash % SIZE_ED;
-}
+
 
 
 
