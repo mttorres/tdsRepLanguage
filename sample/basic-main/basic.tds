@@ -4,7 +4,7 @@ x = 2 + 2
 
 t = 4 * 5
 
-ABA = 4 * 7 + 3
+A = 4 * 7 + 3
 
 B = 3 + 4 * 7
 
@@ -28,9 +28,7 @@ y = 4 + x
 
 C_TIME = x + y
 
-//bn = 4*y+x
-
-z = NULL  // temos que permitir isso na verdade...
+z = NULL
 
 w = 'batata'
 
@@ -50,17 +48,3 @@ logor = a or b
 logIMP = not a -> not b
 
 logBIMP = not a <-> b
-
-lesst = x < y
-
-lesseq = x <= y
-
-great = x > y
-
-//greateq = x > a
-
-greateq = x >= y
-
-dif = x != y
-
-eq = x == y
