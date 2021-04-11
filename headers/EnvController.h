@@ -99,13 +99,6 @@ void addNewHeader(EnvController* controller, HeaderSmv* newHeader);
 void addNewAuxInfo(EnvController* controller, STable* newTableInfo);
 
 /**
- * Valida a declaração de uma TDS, vendo se os nomes bateram com os que vieram do modelo de input.
- * @param declarationName o nome da declaração da TDS
- * @param controller o controlador
- */
-void validateTdsDeclaration(char* declarationName, EnvController* controller);
-
-/**
  * Tendo um controller com o contexto e associação Header e AuxTable,
  * adiciona um parâmetro (se necessário) para o header do módulo da TDS.
  * Também propaga as dependências relacionadas a esse parâmetro para o portsModule

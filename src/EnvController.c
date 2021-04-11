@@ -167,16 +167,6 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo){
     }
 }
 
-
-/**
- * Adiciona parâmetro para módulo qualquer do nuXmv.
- * @param controller o controlador de ambiente e contexto
- * @param param a string do parâmetro
- * @param cat a categoria do header/tabela auxuliar a ser recuperada
- * @param indexOfHeader o indice do header
- * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
- * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
- */
 int addParamToModule(EnvController* controller, char* param, smvtype cat, int indexOfHeader){
     HeaderSmv* updated = accessHeader(controller,cat,indexOfHeader);
     int possibleParamPos = hash(param,MAX_SIMPLE);
@@ -190,20 +180,6 @@ int addParamToModule(EnvController* controller, char* param, smvtype cat, int in
     return 1;
 }
 
-void validateTdsDeclaration(char* declarationName, EnvController* controller){
-    TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
-    if(expected_entry){
-        Object* info = expected_entry->val;
-        int* isDeclared = info->values[0];
-        if(!(*isDeclared)){
-            controller->validPorts++;
-            *isDeclared = 1;
-        }
-        else{
-            controller->multiPortDeclartion = 1;
-        }
-    }
-}
 
 void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
     addParamToPortsModule(controller,param);

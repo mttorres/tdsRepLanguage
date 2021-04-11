@@ -561,7 +561,7 @@ Object* refCopyOfVariable(TableEntry* var){
     Object* copyRef = copyObject(var->val);
     if(useVar){
         free(copyRef->SINTH_BIND);
-        //copyRef->SINTH_BIND[0] = '\0';
+//      copyRef->SINTH_BIND[0] = '\0';
         copyRef->SINTH_BIND =  malloc(sizeof(char)*(strlen(useVar)+ 1));
         strcpy(copyRef->SINTH_BIND,useVar);
     }
@@ -753,6 +753,20 @@ HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int trans
     return newHeader;
 }
 
+void validateTdsDeclaration(char* declarationName, EnvController* controller){
+    TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
+    if(expected_entry){
+        Object* info = expected_entry->val;
+        int* isDeclared = info->values[0];
+        if(!(*isDeclared)){
+            controller->validPorts++;
+            *isDeclared = 1;
+        }
+        else{
+            controller->multiPortDeclartion = 1;
+        }
+    }
+}
 
 /***
  * Baseada na validação anterior (para tds's de time-components) verifica se deve criar init vazio ou init e next vazios.
@@ -818,6 +832,9 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
         }
     }
     specAssignForInvalidTds(newTDS,controller,initialIsInvalid,someIsValidToLazy);
+//    if(initialIsInvalid && someIsValidToLazy){
+//        someIsValidToLazy = -1; // senão vai ficar como 0 (então TODOS são invalidos)
+//    }
     return someIsValidToLazy;
 }
 
@@ -845,7 +862,7 @@ void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, EnvController* co
 
 
 /**
- * Para uma TDS que possuia dependencias, cria os assigns apropriados baseado nas diretivas (delayed, link e filter).
+ * Para uma TDS que possuia dependencias, cria os assigns apropriados.
  * @param newTDS a nova TDS
  * @param controller a
  * @param dependencies
@@ -945,6 +962,27 @@ void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller, TDS** dependenc
                              refNextToDepTdsValue, NULL, NEXT, NULL, 0, 0);
             }
         }
+        // limitado a duas dependencias
+        /*
+        for (i=0; i < newTDS->TOTAL_DEPENDENCIES_PT; i++){
+
+            TDS* dependence = dependencies[i];
+            char refToDepTdsValue[strlen(dependence->name)];
+            sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
+            char refNextToDepTdsValue[strlen(dependence->name)+10];
+            sprintf(refNextToDepTdsValue,SmvConversions[NEXT],newTDS->name);
+
+            char* current = i+1 == newTDS->TOTAL_DEPENDENTS_PT? end: continuation;
+            if(i == 0){
+                sprintf(resultExprInit,SmvConversions[FirstcondType],,current);
+                sprintf(resultExprNext,SmvConversions[FirstcondType],,current);
+            }
+            else{
+                sprintf(resultExprInit,SmvConversions[InducondType],,current);
+                sprintf(resultExprNext,SmvConversions[InducondType],,current);
+            }
+        }
+         */
     }
 }
 
@@ -961,7 +999,7 @@ void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller, TDS** dependenc
  * @param F_TIME
  */
 
-void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, EnvController* controller){
+void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME){
     char  nameWithNoBreakL[ALOC_SIZE_LINE];
     nameWithNoBreakL[0] = '\0';
     char* declarationDetails = strstr(moduleName,"t");
@@ -969,13 +1007,6 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Env
     char* declarationName = newTDS->name? newTDS->name : newEncapsulatedTDS->SINTH_BIND;
     createType(declarationName,accessHeader(controller, PORTS, 0),
                accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC);
-    if(newTDS->type == MATH_EXPRESSION || newTDS->type == FUNCTION_APPLY){
-        // deve criar um init e next identicos para ambos os casos com apenas a diferença da limitação temporal
-        specTDS()
-        if(newTDS->type == FUNCTION_APPLY){
-            // deve-se instanciar a funçao dentro do modulo SMV dessa TDS.
-        }
-    }
 }
 
 void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIME, int I_TIME, int F_TIME, TDS** SYNTH_DEP){
@@ -996,7 +1027,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
 
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
-    addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
+    addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller, C_TIME, I_TIME, F_TIME);
     addTdsRelationOnSmv(SYNTH_TDS,controller,SYNTH_DEP);
 
     addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
@@ -1011,6 +1042,8 @@ void updateTypeSetWatchTds(TDS* current, EnvController* controller, Object* lazy
 
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
 
+    //HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
+    //TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
     HeaderSmv *currentHeader = accessHeader(controller, PORTS, currentTDS->SMV_REF);
     STable *currentInfo = accessSmvInfo(controller, PORTS, currentTDS->AUX_REF);
     if (currentTDS->type == DATA_LIST) {
@@ -1028,9 +1061,10 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
                 createAssign("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, conditionCube, NEXT, "NULL",
                              1, 0);
             }
+            updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
         }
     }
-    // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
+        // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
     else {
         // se essa TDS já foi avaliada, senão...
         if (currentTDS) {
@@ -1039,10 +1073,137 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
 
         }
     }
-    // sempre deve atualizar o type-set (ou pelo menos verificar se necessita atualização)
-    updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
 }
+//    updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,-1,lazyValue);
 
+
+//    char* valueString = "value";
+//    char* defaultConditionEval = "NULL";
+//    char* valueOnZero = "NULL"; // para caso a inicialização seja com NULL
+
+    //Object* firstTimeComponent = (Object*) SYNTH_TDS->DATA_SPEC->values[0];
+
+
+
+    // testando synth (de ponteiro de funçoes) (tenho que salvar tambem o caminho do programa) (o escopo e controller mudam mas isso nao)
+
+    //Object* valueComponent = (Object*) timeComponent->values[1];
+    //(n,scope,controllerSmv);
+
+
+ /*
+    if(SYNTH_TDS->type == DATA_LIST){
+
+        char result[ALOC_SIZE_LINE];
+        char* parcialResult = malloc(sizeof(ALOC_SIZE_LINE)*sizeof(char));
+
+        char* limitCondition = NULL;
+        int limitedByTime = 0;
+
+        char* components[SYNTH_TDS->DATA_SPEC->OBJECT_SIZE]; // N strings. (no caso teste 3)
+
+        int hasZeroTimeComponent = 0;
+        int i;
+
+
+        for (i = 0; i < SYNTH_TDS->DATA_SPEC->OBJECT_SIZE; ++i) {
+
+            Object* timeComponent = (Object*) SYNTH_TDS->DATA_SPEC->values[1];
+            int time = *(int*) timeComponent->values[0];
+            Object* valueComponent = (Object*) timeComponent->values[1];
+            char timeBind[ALOC_SIZE_LINE];
+            sprintf(timeBind, "%d", time);
+
+
+            // deve dar free
+            char* valueBind = formatValueBind(NULL,NULL,valueComponent,0,0,0);
+
+            if(C_TIME > time){
+                fprintf(stderr, "[WARNING] DATA-LIST-DEFINITION FOR %s IS NOT VALID IN THE CURRENT TEMPORAL CONTEXT.\n CURRENT TIME = %d, USED TIME = %d,",
+                        varName,C_TIME,time);
+                limitedByTime = 1;
+                // alocar limited condition (se já não foi alocada)
+                if(!limitCondition) {
+                    char CtimeBind[ALOC_SIZE_LINE];
+                    sprintf(CtimeBind, "%d", C_TIME);
+                    limitCondition = createConditionCube("next(time)", CtimeBind, "=", NULL, 0);
+                }
+            }
+            if(!hasZeroTimeComponent && time == I_TIME) {
+                hasZeroTimeComponent = 1;
+            }
+            // criar a string de múltiplas condições (lista)
+            else{
+                // deve criar a condição e avaliação
+                char* componentConversion = createConditionCube("next(time)", timeBind, "=", NULL, 0);
+
+                char* conditionCube = limitCondition ?
+                createConditionCube(limitCondition, componentConversion, "&", valueBind, 1) :
+                createConditionCube(componentConversion, "", "", valueBind, 1);
+                free(componentConversion);
+                if(i+1 == SYNTH_TDS->DATA_SPEC->OBJECT_SIZE){
+                    sprintf(parcialResult,)
+                }
+                else{
+
+                }
+            }
+
+            else{
+                if(i == 0){
+                    sprintf(assignTo, SmvConversions[INIT], "value");
+                    sprintf(componentBind,SmvConversions[ASSIGN_TO_TAB_BREAK_LINE],assignTo,"NULL");
+                }
+                if(time != 0){
+                    char timeBind[ALOC_SIZE_LINE/2];
+                    sprintf(timeBind,"%d",time);
+                    sprintf(assignTo, SmvConversions[NEXT], valueString);
+
+                }
+            }
+
+
+
+                // deve agora condiçao: next(time)
+                char* specifiedCondition = createConditionCube("next(time)", timeBind, "=", NULL, 1);
+
+
+        }
+        // cria init(value) = NULL ou valor;
+        createAssign(valueString,newTdsHeader,NULL,valueOnZero,limitCondition,INIT,"NULL");
+        if(hasZeroTimeComponent && i == 1) {
+            // sub-caso onde só temos a inicialização (e o next deve atribuir como NULL para todos os seguintes)
+            createAssign(valueString,newTdsHeader,NULL,"NULL",NULL,NEXT,"NULL");
+        }
+        else{
+            // caso onde temos (OU NÃO) a zeroTime)
+            // deve criar um next para os demais (fazendo uso de todas as componentes)
+            selectBuffer(ASSIGN,result,newTdsHeader,0);
+        }
+    }
+    */
+
+
+
+/*
+void letGoOldEntry(TableEntry* var, STable* refAuxTable){
+    char* useVar = NULL;
+    // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
+    // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
+
+    int redefNum = var->val->redef == 0? 0 : var->val->redef-1;
+    useVar = processActiveName(var->parentScope, var->name, 1, 0, 0);
+    char varInit[ALOC_SIZE_LINE/2];
+    char varNext[ALOC_SIZE_LINE/2];
+    sprintf(varInit,SmvConversions[INIT],useVar);
+    sprintf(varNext,SmvConversions[NEXT],useVar);
+
+    letGoEntryByName(refAuxTable,useVar);
+    letGoEntryByName(refAuxTable,varInit);
+    letGoEntryByName(refAuxTable,varNext);
+    free(useVar);
+}
+*/
 
 void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable)
 {
