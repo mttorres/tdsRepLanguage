@@ -224,8 +224,6 @@ void propagateTypeSet(TDS* dependence, TDS* dependant, EnvController* controller
 */
 void addTypeSetSmv(char* varName, int pos, int tam, char *newValueBind, int type, STable* writeSmvTypeTable);
 
-void updateTypeSetWatchTds(TDS* current, EnvController* controller, Object* lazyValue);
-
 void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif

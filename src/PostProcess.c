@@ -22,6 +22,7 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%
                           "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s > %d & %s = NULL : %s;\n\t\t%s > %d & %s = NULL : %s;",
                           "MODULE %s\n" };
 
+int  ALOC_SIZE_LINE = 300;
 int  MULTIPLIER_SIMPLE_HASH = 1;
 
 /**
@@ -137,6 +138,14 @@ void bindCondition(STable* scope, Object* conditionExpr){
             strcpy(scope->conditionBind,conditionExpr->SINTH_BIND);
         }
     }
+}
+
+
+
+char* formatDirective(int ctime){
+    char* directiveValueBind = malloc(sizeof(char)*ALOC_SIZE_LINE/10);
+    sprintf(directiveValueBind, "%d", ctime);
+    return directiveValueBind;
 }
 
 char* formatCondtion(STable* scope, int ignoreCond, int ignoreTemporal, char* valueBind, char* directiveValueBind, int firstCondition){
@@ -281,7 +290,7 @@ void updateTypeSet(char* newValue, char* varName, STable* writeSmvTypeTable, Hea
         free(original);
     }
     else{
-        // warning [realocação]
+        // warning
     }
 }
 
@@ -480,7 +489,7 @@ void updateAssign(char* varName ,HeaderSmv* header, STable* writeSmvTypeTable, c
     if((-1*((pointEnd-pointIni+1) - sizeNew) + size)  >= ALOC_SIZE_LINE)
     {
         char* newStrSize = realloc(header->assignBuffer[pos],ALOC_SIZE_LINE*2);
-        //ALOC_SIZE_LINE = ALOC_SIZE_LINE*2;
+        ALOC_SIZE_LINE = ALOC_SIZE_LINE*2;
         if(newStrSize == NULL)
         {
             fprintf(stderr, "FAIL IN REALLOCATE HEADER SIZE FOR %s !",upVar);
@@ -556,8 +565,7 @@ Object* refCopyOfVariable(TableEntry* var){
     char* useVar = NULL;
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
-    int C_TIME = *(int*) lookup(var->parentScope,"C_TIME")->val->values[0];
-    useVar = processActiveName(var->parentScope, var->name, 1, C_TIME, var->val->type);
+    useVar = processActiveName(var->parentScope, var->name, 1, var->val->timeContext, var->val->type);
     Object* copyRef = copyObject(var->val);
     if(useVar){
         free(copyRef->SINTH_BIND);
@@ -1032,12 +1040,6 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
 
     addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
     validateTdsDeclaration(declarationName,controller);
-}
-
-void updateTypeSetWatchTds(TDS* current, EnvController* controller, Object* lazyValue) {
-    HeaderSmv* currentHeader = accessHeader(controller,PORTS,current->SMV_REF);
-    STable* currentInfo = accessSmvInfo(controller,PORTS,current->AUX_REF);
-    updateType("value", currentHeader, currentInfo, lazyValue->SINTH_BIND, TDS_ENTRY, -1, lazyValue);
 }
 
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
