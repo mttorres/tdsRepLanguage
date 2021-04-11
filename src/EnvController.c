@@ -45,10 +45,6 @@ EnvController *createController() {
         Hcontrol->FUNCTIONS[i] = NULL;
     }
 
-    Hcontrol->typeSetWords = malloc(sizeof(char*)*TYPE_SET_DIR_SIZE);
-    for (i = 0; i  < TYPE_SET_DIR_SIZE ; i++) {
-        Hcontrol->typeSetWords[i] = NULL;
-    }
     return Hcontrol;
 }
 
@@ -187,7 +183,7 @@ int addParamToModule(EnvController* controller, char* param, smvtype cat, int in
     if(updated->PARAM_MAP[possibleParamPos]){
        return 0;
     }
-    char* newName = addParams(updated->moduleName, param, "(", ")", 0);
+    char* newName = addParams(updated->moduleName,param,"(",")");
     free(updated->moduleName);
     updated->moduleName = newName;
     updated->PARAM_MAP[possibleParamPos] = 1;
@@ -205,7 +201,6 @@ void validateTdsDeclaration(char* declarationName, EnvController* controller){
         }
         else{
             controller->multiPortDeclartion = 1;
-            fprintf(stderr,"ERROR: Same TDS redeclared. Name: %s\n",declarationName);
         }
     }
 }
@@ -225,7 +220,7 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
 
         HeaderSmv* portsHeader =  accessHeader(controller,PORTS,0);
         char* bufferToUpdate = portsHeader->varBuffer[pos];
-        char* newNameDeclaration = addParams(bufferToUpdate, param, "(", ")", 0);
+        char* newNameDeclaration = addParams(bufferToUpdate,param,"(",")");
         free(bufferToUpdate);
         portsHeader->varBuffer[pos] = newNameDeclaration;
         size = strlen(newNameDeclaration);
@@ -243,7 +238,7 @@ void addParamToPortsModule(EnvController *controller, char *param) {
         HeaderSmv* mainUpdate = accessHeader(controller,MAIN,-1);
         char* refOldPt;
         refOldPt = mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER];
-        char* newDeclaration = addParams(refOldPt, param, "(", ")", 0);
+        char* newDeclaration = addParams(refOldPt,param,"(",")");
         free(refOldPt);
         mainUpdate->varBuffer[mainUpdate->VAR_RENAME_POINTER] = newDeclaration;
 

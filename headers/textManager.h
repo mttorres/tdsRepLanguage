@@ -40,7 +40,7 @@ char * customCat(char* dest, char* src, char toIgnore, int ignoreMode);
  *
  *  @return A nova string alocada em outro ponteiro (a responsabilidade de free ou realloc fica fora dessa função)
  * */
-char *addParams(char *original, char *param, char *delim1, char *delim2, int userealoc);
+char *addParams(char *original, char *param, char *delim1, char *delim2);
 
 
 
@@ -90,20 +90,11 @@ char* overwriteParam(char* moduleName, char* param);
 void removeAfter(char* dest, char* src, char stop);
 
 /**
- * Converte um número ou diretiva para uma string da mesma
- * @param num o número ou diretiva passada
- * @return uma string alocada com o valor
- * @SideEffects: Aloca uma string com o valor do número que deve ser liberado pelo chamador
+ * Converte uma diretiva para uma string da mesma
+ * @param ctime o diretiva passada
+ * @return uma string alocada com o valor da diretiva passada
+ * @SideEffects: Aloca uma string com o valor da diretiva que deve ser liberado pelo chamador
  */
-char* formatNumeric(int num);
-
-/**
- * ALoca uma string dado uma outra cadeia de caracteres anterior/label qualquer.
- * Já que qualquer string que não fica no programa principal deve ser alocada para ser usada ao redor do código
- * @param str a string que será alocada
- * @return uma string alocada com o valor
- * @SideEffects: Aloca uma string com o exato mesmo texto e deverá ser liberado pelo chamador
- */
-char* formatString(char* str);
+char* formatDirective(int ctime);
 
 #endif

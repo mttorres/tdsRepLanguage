@@ -11,12 +11,9 @@
 #include "HeaderSmv.h"
 #include "TDS.h"
 
-#define TYPE_SET_DIR_SIZE 9999
-
 
 typedef struct envcontroller
 {
-    // info
     HeaderSmv* MAIN;
     HeaderSmv** AUTOMATA_RELATED;
     HeaderSmv** PORTS_RELATED; // ports module e as tds (vão ter referência para esse header na sua declaração, assim como tabela auxiliar)
@@ -31,16 +28,14 @@ typedef struct envcontroller
     STable** portsInfo; // para cada tds (talvez não va precisar, a lógica vai estar TODA nas funções ou nele mesmo (de maneira constante)
     STable** functionsInfo; // para cada função
 
-    char** typeSetWords; // "otmização"
-
-    // validação
-    STable* originalPorts;
+    STable* originalPorts; // tabela de simbolos auxiliar para ports (necessária?) (só vai ter o módulo de cada porta) (pode ser na verdade para as portas declaradas)
     int expectedPorts;
     int validPorts;
     // ai ele verifica se foram usadas (não tem declarações de funções)
     int declaredPortsNumber;
     TDS** declaredPorts;
     TDS* currentTDScontext;
+
     // avisa caso não tenha nenhuma TDS linkada uma com a outra
     int IO_RELATION;
     // avisa caso uma porta tenha tido declaração repetida
