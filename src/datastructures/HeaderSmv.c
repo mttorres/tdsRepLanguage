@@ -9,7 +9,7 @@ HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assi
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
 
   if(type != MAIN){
-      header->PARAM_MAP = malloc(sizeof(int)*MAX_PARAM); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
+      header->PARAM_MAP = malloc(sizeof(int)*200); // NOTE ! ele não inicia com zeros! Deve fazer limpeza.
       for (int i = 0; i < 200; i++) {
           header->PARAM_MAP[i] = 0;
       }
@@ -21,13 +21,13 @@ HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assi
       refOldPt = moduleName;
       char* newDeclaration = addParams(refOldPt, "time", "(", ")", 0);
       header->moduleName = newDeclaration;
-      int mapTime = hash("time",MAX_PARAM);
+      int mapTime = hash("time",200);
       header->PARAM_MAP[mapTime] = 1;
   }
   else{
       if(type == AUTOMATA){
           header->moduleName = overwriteParam(moduleName,"ports");
-          int mapPorts = hash("ports",MAX_PARAM);
+          int mapPorts = hash("ports",200);
           header->PARAM_MAP[mapPorts] = 1;
       }
       else{
