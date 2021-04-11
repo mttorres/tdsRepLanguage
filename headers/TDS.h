@@ -4,7 +4,6 @@
 
 #include "Enum.h"
 #include "Object.h"
-#include "Hash.h"
 
 #define MAX_DEPEND 150
 
@@ -39,8 +38,6 @@ typedef struct TDS
   int* COMPONENT_TIMES;
   int AUX_REF; // devemos ter duas referências porque a tabela de simbolos auxiliar NÃO É USADA POR PORTS MODULE. (NA VERDADE É USADO SIM AGORA)
   int SMV_REF; // por outro lado, os HEADERS SÃO USADOS POR AMBOS!
-  int* WATCH_LIST;
-  int TOTAL_WATCH;
 
 
 
@@ -56,8 +53,6 @@ createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *funct
  * @param dependent a TDS que recebe a dependência
  */
 void addTdsDependent(TDS* tds, TDS* dependent);
-
-void addToTdsWatchList(TDS *pTds, char* name, int C_TIME);
 
 void* letGoTDS(struct TDS* tds);
 

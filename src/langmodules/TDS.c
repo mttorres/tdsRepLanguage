@@ -34,13 +34,6 @@ TDS * createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char 
             newTDS->COMPONENT_TIMES[i] = -1;
         }
     }
-    newTDS->WATCH_LIST = type == DATA_LIST? malloc(sizeof(int)*F_INTERVAL+1) : NULL;
-    if(newTDS->WATCH_LIST){
-        for (i = 0; i < F_INTERVAL; i++) {
-            newTDS->WATCH_LIST[i] = -1;
-        }
-    }
-    newTDS->TOTAL_WATCH = 0;
 
 	return newTDS;						
 }
@@ -68,17 +61,6 @@ void addTdsDependent(TDS* tds, TDS* dependent){
     dependent->TOTAL_DEPENDENCIES_PT++;
 }
 
-void addToTdsWatchList(TDS *pTds, char* name, int C_TIME) {
-    int pos = hash(name,((pTds->F_INTERVAL+1)*2)+3); // só pode ter F_INTERVAL variáveis, o resto da conta é heuristica para hash
-    int original = pTds->WATCH_LIST[pos];
-    if(original == -1){
-        pTds->WATCH_LIST[pos] = C_TIME;
-        pTds->TOTAL_WATCH = pos+1;
-    }
-    else{
-        // possibilidade de colisão
-    }
-}
 
 void* letGoTDS(TDS* tds){
 

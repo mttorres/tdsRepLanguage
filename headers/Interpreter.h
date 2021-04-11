@@ -23,6 +23,13 @@ STable* selectSMV_SCOPE(STable* scope, EnvController* controllerSmv);
 HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController* controllerSmv);
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
+/**
+ * Resolve a dependencia de todas as TDS's associadas a TDS corrente durante a avaliação lazy
+ * @param currentTDS a TDS corrente
+ * @param controllerSmv o controller usado para atualizar o type-set das TDS's dependentes.
+ * @param C_TIME para indexar o data-time correto
+ */
+void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME);
 
 /**
  * Resolve a avaliação lazy das TDS's pendentes após uma mudança de contexto temporal. E salva seus dados para Memoization.
