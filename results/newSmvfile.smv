@@ -140,7 +140,6 @@ ASSIGN
 	next(value):= case 
 		next(time) = 1 : 1;
 		next(time) = 2 : 10;
-		next(time) = 20 : next(x);
 		TRUE : NULL; 
 	esac;
 
@@ -154,7 +153,6 @@ ASSIGN
 		next(time) = 4 : 4;
 		next(time) = 5 : 5;
 		next(time) = 6 : next(y) - next(x);
-		next(time) = 20 : 3;
 		TRUE : NULL; 
 	esac;
 
