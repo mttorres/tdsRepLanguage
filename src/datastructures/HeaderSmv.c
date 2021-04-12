@@ -3,8 +3,20 @@
 #include <stdlib.h>
 #include "../../headers/HeaderSmv.h"
 
-
+/**
+ * Adiciona a um header as informaçoes de filter (caso seja necessario)
+ * @param header o header corrente
+ * @param finalAutomataFilterModel a informaçao de contexto fornecida pelo controlador de ambiente que diz se o modelo lido tem filter no final automata
+ */
 void filterAutomataHeaderCheck(HeaderSmv* header, int finalAutomataFilterModel);
+
+/**
+ * Adiciona os pontos de interesse da transiçao de um automato as informaçoes do header.
+ * NOTA: Assume que as strings do modelo sejam da forma xxxxxxxxxx & TRUE) ... Onde o true é uma condição parametrizável,
+ * o primeiro a ser encontrado deve a condição de negação e o segundo a condição em si
+ * @param pHeadersmv o header tendo a transiçao avaliada
+ */
+void getFilterPoints(HeaderSmv *pHeadersmv);
 
 HeaderSmv * createHeader(enum smvtype type, char *moduleName, int varP, int assignP, int transP, int finalAutomataFilterModel) {
 
@@ -269,9 +281,34 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
         {
             clearOldPortsRefs(line,aloc);
             header->transBuffer[pt] = aloc;
+            if(header->expectFilter){
+                getFilterPoints(header);
+            }
         }
         header->TRANS_POINTER += 1;
 
+    }
+}
+
+void getFilterPoints(HeaderSmv *pHeadersmv) {
+    char* transString = pHeadersmv->transBuffer[pHeadersmv->TRANS_POINTER];
+    char* ref = strstr(transString," TRUE");
+    if(ref){
+        int ini = (ref-transString)+1;
+        int end = ini+3;
+
+        int negPos = pHeadersmv->filterPosNeg[0];
+
+        if(!negPos){
+            pHeadersmv->filterPosNeg[0] = pHeadersmv->TRANS_POINTER;
+            pHeadersmv->filterPosNeg[1] = ini;
+            pHeadersmv->filterPosNeg[2] = end;
+        }
+        else{
+            pHeadersmv->filterPosCond[0] = pHeadersmv->TRANS_POINTER;
+            pHeadersmv->filterPosCond[1] = ini;
+            pHeadersmv->filterPosCond[2] = end;
+        }
     }
 }
 
@@ -279,7 +316,7 @@ void filterAutomataHeaderCheck(HeaderSmv* header, int finalAutomataFilterModel){
     int nameFilter = 0;
     int nameFinal = 0;
     if(header->type == AUTOMATA){
-        if(header->moduleName[0] == 'f'){
+        if(header->moduleName[7] == 'f'){
             nameFilter = !!strstr(header->moduleName,"filter");
             if(finalAutomataFilterModel && !nameFilter){
                 nameFinal = !!strstr(header->moduleName,"final");
