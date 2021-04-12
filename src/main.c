@@ -114,13 +114,5 @@ int main(int argc, char* argv[]) {
  	if(smvP) {
  	    fclose(smvP);
     }
-
-
-//  char* temp = controller->PORTS_RELATED[0]->varBuffer[1];
-//  char* result = addParams(temp,"BATATA","{","}");
-//  printf("%s\n",result);
-//  char* testAgain = addParams(result,"JUDGEMENT AHS COME TO YOU","{","}");
-//  printf("%s\n",testAgain);
-
 	letGoHeaderControl(controller);
 }
