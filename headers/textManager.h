@@ -62,8 +62,10 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult);
  *                          (usado para updateAssign)
  *  @sideEffects :  Atualiza o updated, seja lá de onde que essa string veio em primeiro lugar
  *  (a responsabilidade de free ou realloc fica fora dessa função)
+ *  Caso o tamanho da string venha a VIOLAR o tamanho padrão de texto, a string passada é realocada!
+ *  @returns um ponteiro da string atualizada (justamente para o caso de realocação)
  * */
-void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
+char* updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
                              int *newPointInit, int *newPointEnd, int variantPointIni);
 
 /**

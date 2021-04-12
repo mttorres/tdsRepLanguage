@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "../headers/textManager.h"
 
+int multiFactor = 1;
 
 char * customCat(char* dest, char* src, char toIgnore, int ignoreMode) {
 
@@ -158,9 +159,22 @@ char *addParams(char *original, char *param, char *delim1, char *delim2, int use
     return newString;
 }
 
-void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
+char* updateSubStringInterval(const char *newValue, char *updated, int sizeNew, int pointIni, int pointEnd, int size,
                              int *newPointInit, int *newPointEnd, int variantPointIni)
 {
+
+    if(size + sizeNew >= ALOC_SIZE_LINE*multiFactor)
+    {
+        multiFactor = multiFactor*2;
+        char* newStrSize = realloc(updated,ALOC_SIZE_LINE*multiFactor);
+        if(newStrSize == NULL)
+        {
+            fprintf(stderr, "[updateSubStringInterval] FAIL IN REALLOCATE STRING SIZE FOR %s !",updated);
+            exit(-1);
+        }
+        updated = newStrSize;
+    }
+
     char aux[size - (pointEnd+1)]; // pointEnd+1 (é o indice(tamanho) sem ser 0-index) (+1 é para estarmos fora da zona da sobrescrita)
     int i;
     // deve-se copiar os caracteres que vem após a zona de sobrescrita
@@ -203,7 +217,7 @@ void updateSubStringInterval(const char *newValue, char *updated, int sizeNew, i
     }
     updated[size] = '\0';
     (*newPointInit) = variantPointIni? (*newPointEnd) : pointIni;
-
+    return updated;
 }
 
 
