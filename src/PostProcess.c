@@ -366,7 +366,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
             }
             if(minmax == 2 || minmax == 0){
                 // atualiza o inicio
-                updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
+                header->varBuffer[pos] = updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
                                         &newPointEnd, 0);
                 void* vpInEnd[] = {&newPointEnd};
                 updateValue(varName, vpInEnd, WRITE_SMV_INFO, 1, 3, -1, writeSmvTypeTable, 0);
@@ -377,7 +377,7 @@ void updateType(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, con
                 // nota! o size já está indexbased!
                 pointEnd = header->varBuffer[pos][size-1] == '\n' ? size-3  : size-2; // max;\n (-1 do index based) - (-2 ou -1 dependendo do fim)
                 //size = header->varBuffer[pos][size-1] == '\n' ? size-1 : size;
-                updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
+                header->varBuffer[pos]= updateSubStringInterval(newValueBind, header->varBuffer[pos], sizeNew, pointIni, pointEnd, size, &newPointIni,
                                         &newPointEnd, 0);
             }
             if(minmax != -1){
@@ -524,24 +524,13 @@ void updateAssign(char *varName, HeaderSmv *header, STable *writeSmvTypeTable, c
     int newPointInit = 0;
     int newPointEnd = 0;
 
-    // verifica o tamanho possível após a mudança (o +1 é justamente porque se o intervalo é x-y = 0, o tamanho é 1,
+    // verifica o tamanho possível após audan mça (o +1 é justamente porque se o intervalo é x-y = 0, o tamanho é 1,
     // ou seja torna como size based ao inves de index based)
-    if((-1*((pointEnd-pointIni+1) - sizeNew) + size)  >= ALOC_SIZE_LINE)
-    {
-        char* newStrSize = realloc(header->assignBuffer[pos],ALOC_SIZE_LINE*2);
-        //ALOC_SIZE_LINE = ALOC_SIZE_LINE*2;
-        if(newStrSize == NULL)
-        {
-            fprintf(stderr, "FAIL IN REALLOCATE HEADER SIZE FOR %s !",upVar);
-            exit(-1);
-        }
-        header->assignBuffer[pos] = newStrSize;
-    }
     updated = header->assignBuffer[pos];
 
     // é um simples next(x)/init(x):= yyyyyyy;  -> substituir y's por expressão nova em newValue antes do delmitador (;)
     // os delmitadores podem variar, ex: em caso de next(time) o delimitador é (:)
-    updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd, 1);
+    header->assignBuffer[pos] = updateSubStringInterval(newValue, updated, sizeNew, pointIni, pointEnd, size, &newPointInit, &newPointEnd, 1);
 
     // atualizar range de interesse e tamanho da string na tabela!
     // fazer duas chamadas por enquanto

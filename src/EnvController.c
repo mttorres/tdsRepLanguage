@@ -90,6 +90,11 @@ void letGoHeadersStruct(EnvController *H) {
             }
         }
     }
+    if(H->portsInfo){
+        free(H->portsInfo);
+        H->portsInfo = NULL;
+    }
+
     if(H->typeSetWords){
         int i;
         for (i = 0; i < TYPE_SET_DIR_SIZE; i++) {
@@ -98,7 +103,15 @@ void letGoHeadersStruct(EnvController *H) {
             }
         }
     }
-    free(H->portsInfo);
+
+    if(H->declaredPorts){
+        free(H->declaredPorts);
+        H->declaredPorts = NULL;
+    }
+    if(H->automatasToChange){
+        free(H->automatasToChange);
+        H->automatasToChange = NULL;
+    }
     letgoTable(H->originalPorts);
     free(H);
 }

@@ -84,6 +84,7 @@ void letgoHeader(HeaderSmv* h){
 	}
   	//printf("[letgoHeader] DEBUG: liberando %s \n",h->moduleName);
 	free(h->moduleName);
+	h->moduleName = NULL;
 	int i;
  	
  	for(i = 0; i< h->VAR_POINTER; i++){
@@ -98,7 +99,8 @@ void letgoHeader(HeaderSmv* h){
 
   	//rintf("[letgoHeader] DEBUG: liberando buffer VAR! \n");
   	free(h->varBuffer);
-	
+	h->varBuffer = NULL;
+
  	for(i = 0; i< h->ASSIGN_POINTER; i++) {
 		if(h->assignBuffer[i]){
 			free(h->assignBuffer[i]); 
@@ -106,19 +108,30 @@ void letgoHeader(HeaderSmv* h){
   	}
   	//printf("[letgoHeader] DEBUG: liberando buffer ASSIGN! \n");
   	free(h->assignBuffer);		
+    h->assignBuffer = NULL;
 
   	if(h->transBuffer) {
-		for(i = 0; i< h->TRANS_POINTER; i++) {
-			//printf("???\n");
-			if(h->transBuffer[i]){
-				free(h->transBuffer[i]); 
-			}					 
-  		}
-  		//printf("[letgoHeader] DEBUG: liberando buffer TRANS! \n");
-  		free(h->transBuffer);
+        for (i = 0; i < h->TRANS_POINTER; i++) {
+            if (h->transBuffer[i]) {
+                free(h->transBuffer[i]);
+            }
+        }
+        //printf("[letgoHeader] DEBUG: liberando buffer TRANS! \n");
+        free(h->transBuffer);
+        h->transBuffer = NULL;
+    }
+  	if(h->PARAM_MAP){
+  	    free(h->PARAM_MAP);
+  	    h->PARAM_MAP = NULL;
   	}
-  		
-
+  	if(h->filterPosNeg){
+  	    free(h->filterPosNeg);
+  	    h->filterPosNeg = NULL;
+  	}
+  	if(h->filterPosCond){
+  	    free(h->filterPosCond);
+  	    h->filterPosCond = NULL;
+  	}
   	free(h);  				
 }
 
@@ -236,8 +249,7 @@ void writeHeader(HeaderSmv* header, FILE* smvoutput){
 
 void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename) {
     int pt;
-    int tam = strlen(line);
-    char* aloc = malloc((tam+2) * sizeof(char)); //  o +2 é estritamente para acomodar tamanho extra do buffer
+    char* aloc = malloc(ALOC_SIZE_LINE*sizeof(char)); //  o +2 é estritamente para acomodar tamanho extra do buffer
     if(part != TRANS)
     {
         if(part == VAR)
