@@ -13,6 +13,8 @@
 #include "TypeMinMax.h"
 
 #define TYPE_SET_DIR_SIZE 9999
+#define DEFAULT_HEADERS_AUX_SIZE 100
+
 
 
 typedef struct envcontroller
@@ -48,8 +50,9 @@ typedef struct envcontroller
     int multiPortDeclartion;
 
     // validações para o filter e recuperar o header correto
-    int hasFilter;
+    int modelHasFilter;
     int* automatasToChange;
+    int F_AUTOMATAS_CHANGE_POINTER;
 
 }EnvController;
 

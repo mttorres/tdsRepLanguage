@@ -23,6 +23,9 @@ typedef struct headersmv
   int ASSIGN_POINTER;
   int VAR_RENAME_POINTER; // aponta para a referência a portsModule que vai ser passada para os demais módulos (e será centralizada no main agora)
   int* PARAM_MAP;
+  int expectFilter;
+  int* filterPosNeg;
+  int* filterPosCond;
 
 }HeaderSmv;
 
@@ -35,11 +38,12 @@ typedef struct headersmv
  * @param varP o ponteiro de controle para a parte var
  * @param assignP o ponteiro de controle para a parte assign
  * @param transP o ponteiro de controle para a parte trans
+ * @param finalAutomataFilterModel usado para otimizar a verificação na hora que um automato filter é criado
  * @return O novo Header do novo módulo
  * @SideEffects: Aloaca um header que deve ser liberado como responsabilidade do chamador
  */
 
-HeaderSmv* createHeader(enum smvtype type, char* moduleName, int varP, int assignP, int transP);
+HeaderSmv * createHeader(enum smvtype type, char *moduleName, int varP, int assignP, int transP, int finalAutomataFilterModel);
 
 void letgoHeader(HeaderSmv* h);
 

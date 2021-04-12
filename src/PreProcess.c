@@ -13,7 +13,15 @@
 
 void initPreProcessHeader(smvtype type, char* moduleName, EnvController* Hcontrol) {
 	int transP = type == AUTOMATA? 0 : -1;
-    HeaderSmv* newHeader = createHeader(type, moduleName, 0, 0, transP);
+    HeaderSmv* newHeader = createHeader(type, moduleName, 0, 0, transP, Hcontrol->modelHasFilter);
+    if(type == AUTOMATA && newHeader->expectFilter){
+        Hcontrol->modelHasFilter = 1;
+        if(!Hcontrol->automatasToChange){
+            Hcontrol->automatasToChange = malloc(sizeof(int)*100);
+        }
+        Hcontrol->automatasToChange[Hcontrol->F_AUTOMATAS_CHANGE_POINTER] = Hcontrol->H_AUTOMATA_CURRENT_SIZE;
+        Hcontrol->F_AUTOMATAS_CHANGE_POINTER++;
+    }
     addNewHeader(Hcontrol,newHeader);
 }
 
@@ -148,6 +156,7 @@ void setDefaultSmv(EnvController* controllerSmv){
     setDefaultMainSmv(controllerSmv);
     initPreProcessHeader(PORTS,"MODULE portsModule\n",controllerSmv);
     setDefaultPortsSmv(controllerSmv);
+    controllerSmv->modelHasFilter = -1;
 }
 
 void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {

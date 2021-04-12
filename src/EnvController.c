@@ -22,7 +22,7 @@ void setUpTypeSetDict(EnvController* controller){
 
 EnvController *createController() {
 
-    int DEFAULT_HEADERS_SIZE = 100;
+
 
     EnvController* Hcontrol = malloc(sizeof(EnvController));
     Hcontrol->H_AUTOMATA_CURRENT_SIZE = 0;
@@ -32,24 +32,24 @@ EnvController *createController() {
 
     Hcontrol->originalPorts = createTable(SMV_PORTS, NULL, 0, 0, -1);
     Hcontrol->mainInfo = createTable(SMV_V_MAIN, NULL, 0, 0, -1);
-    Hcontrol->functionsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->portsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_SIZE);
+    Hcontrol->functionsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_AUX_SIZE);
+    Hcontrol->portsInfo = malloc(sizeof(STable*)*DEFAULT_HEADERS_AUX_SIZE);
 
     Hcontrol->MAIN = NULL;
-    Hcontrol->AUTOMATA_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
-    Hcontrol->FUNCTIONS = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_SIZE);
+    Hcontrol->AUTOMATA_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_AUX_SIZE);
+    Hcontrol->PORTS_RELATED = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_AUX_SIZE);
+    Hcontrol->FUNCTIONS = malloc(sizeof(HeaderSmv*)*DEFAULT_HEADERS_AUX_SIZE);
 
     Hcontrol->expectedPorts = 0;
     Hcontrol->validPorts = 0;
     Hcontrol->declaredPortsNumber= 0;
     Hcontrol->IO_RELATION = 0;
     Hcontrol->multiPortDeclartion = 0;
-    Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_SIZE); // NULL até sabermos o intervalo de tempo
+    Hcontrol->declaredPorts = malloc(sizeof(TDS*)*DEFAULT_HEADERS_AUX_SIZE); // NULL até sabermos o intervalo de tempo
     Hcontrol->currentTDScontext = NULL;
 
     int i;
-    for (i = 0; i < DEFAULT_HEADERS_SIZE; i++) {
+    for (i = 0; i < DEFAULT_HEADERS_AUX_SIZE; i++) {
         Hcontrol->functionsInfo[i] = NULL;
         Hcontrol->portsInfo[i] =  NULL;
         Hcontrol->AUTOMATA_RELATED[i] = NULL;
@@ -58,6 +58,9 @@ EnvController *createController() {
     }
 
     setUpTypeSetDict(Hcontrol);
+    Hcontrol->modelHasFilter = 0;
+    Hcontrol->automatasToChange = NULL;
+    Hcontrol->F_AUTOMATAS_CHANGE_POINTER = 0;
     return Hcontrol;
 }
 

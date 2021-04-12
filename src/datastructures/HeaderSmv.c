@@ -4,7 +4,9 @@
 #include "../../headers/HeaderSmv.h"
 
 
-HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assignP, int transP) {
+void filterAutomataHeaderCheck(HeaderSmv* header, int finalAutomataFilterModel);
+
+HeaderSmv * createHeader(enum smvtype type, char *moduleName, int varP, int assignP, int transP, int finalAutomataFilterModel) {
 
   HeaderSmv* header = (HeaderSmv*) malloc(sizeof(HeaderSmv));
   if(type != MAIN){
@@ -33,6 +35,7 @@ HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assi
           char* name = malloc((strlen(moduleName)+1) * sizeof(char));
           strcpy(name, moduleName);
           header->moduleName = name;
+          header->expectFilter = -1;
       }
   }
   
@@ -50,6 +53,7 @@ HeaderSmv* createHeader(enum smvtype type , char* moduleName, int varP, int assi
   else{
   	header->transBuffer = NULL;
   }
+  filterAutomataHeaderCheck(header,finalAutomataFilterModel);
 
 //  if(type == MAIN){
 //      header->VAR_RENAME_POINTER = 2;
@@ -268,6 +272,28 @@ void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRen
         }
         header->TRANS_POINTER += 1;
 
+    }
+}
+
+void filterAutomataHeaderCheck(HeaderSmv* header, int finalAutomataFilterModel){
+    int nameFilter = 0;
+    int nameFinal = 0;
+    if(header->type == AUTOMATA){
+        if(header->moduleName[0] == 'f'){
+            nameFilter = !!strstr(header->moduleName,"filter");
+            if(finalAutomataFilterModel && !nameFilter){
+                nameFinal = !!strstr(header->moduleName,"final");
+            }
+        }
+    }
+    header->expectFilter = nameFilter || nameFinal;
+    if(header->expectFilter){
+        header->filterPosNeg = malloc(sizeof(int)*3);
+        header->filterPosCond = malloc(sizeof(int)*3);
+    }
+    else{
+        header->filterPosNeg = NULL;
+        header->filterPosCond = NULL;
     }
 }
 

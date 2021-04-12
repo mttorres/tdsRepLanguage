@@ -816,7 +816,7 @@ char* createReferenceTDS(char* declaredName){
  * @SideEffects: Aloaca um header que deve ser liberado como responsabilidade do chamador
  */
 HeaderSmv* specHeader(smvtype type, char* name, int varP, int assignP, int transP, EnvController* controller){
-    HeaderSmv* newHeader = createHeader(type,name,varP,assignP,transP);
+    HeaderSmv* newHeader = createHeader(type, name, varP, assignP, transP, 0);
     addNewHeader(controller,newHeader);
     selectBuffer(VAR,"VAR\n",newHeader,0);
     selectBuffer(ASSIGN,"ASSIGN\n",newHeader,0);
