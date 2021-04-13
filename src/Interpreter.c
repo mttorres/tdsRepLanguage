@@ -992,7 +992,7 @@ Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE t
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
 
     TDS* newTDS = createTDS(portName, type, tdsSpec, delayed,
-                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL, C_TIME, F_TIME, NULL);
+                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL, C_TIME, F_TIME, pathForCond);
     if(type == TDS_DEPEN){
         computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
     }

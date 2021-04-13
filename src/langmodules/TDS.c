@@ -34,9 +34,9 @@ TDS* createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *
             newTDS->COMPONENT_TIMES[i] = -1;
         }
     }
-
     newTDS->noValue = 1;
     newTDS->limitCondition = limitCondition;
+    newTDS->currentCondEval = limitCondition?  0 : 1;
 
 	return newTDS;						
 }

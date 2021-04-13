@@ -909,9 +909,10 @@ void addTdsToLazyControl(Object* encapsulatedTDS, TDS* newTDS, EnvController* co
  * @param newTDS a nova TDS
  * @param controller o controlador de ambiente
  */
-void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller){
+void addTdsRelationOnSmv(TDS *newTDS, EnvController *controller, int I_TIME) {
     // adiciona informações de relacionamento no nuXmv (separar em método)
     TDS** dependencies = newTDS->linkedDependency;
+    int limitedByTime = newTDS->I_INTERVAL > I_TIME;
     int i;
     if(newTDS->delayed){
         if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
@@ -922,7 +923,7 @@ void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller){
         char refToTdsValue[ALOC_SIZE_LINE];
         sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
         char defaultDelayedEvalCond[ALOC_SIZE_LINE];
-        if(newTDS->I_INTERVAL > 0){
+        if(newTDS->I_INTERVAL > I_TIME){
             sprintf(defaultDelayedEvalCond, SmvConversions[TDS_DELAYED_EXPR_NEXT_TIMEV], newTDS->I_INTERVAL, refToTdsValue,
                     dependencies[0]->name, newTDS->I_INTERVAL ,dependencies[0]->name, refToTdsValue);
         }
@@ -941,73 +942,79 @@ void addTdsRelationOnSmv(TDS* newTDS, EnvController* controller){
 
         char refToTdsValue[ALOC_SIZE_LINE];
         sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
-        char defaultDelayedEvalCond[ALOC_SIZE_LINE];
-        char refNextToTdsValue[strlen(newTDS->name)+14];
-        sprintf(refNextToTdsValue,SmvConversions[NEXT],refToTdsValue);
 
-        int limitedByTime = newTDS->I_INTERVAL > 0;
-
-
-
-        TDS* firstDependence = dependencies[0];
-        char refToDepTdsValue[strlen(firstDependence->name)+8];  // .value0
-        sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],firstDependence->name);
-        char refNextToDepTdsValue[strlen(firstDependence->name)+14]; // next(.value)
-        sprintf(refNextToDepTdsValue,SmvConversions[NEXT],refToDepTdsValue);
-        if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
-            char resultExprInit[ALOC_SIZE_LINE*2];
-            char resultExprNext[ALOC_SIZE_LINE*2+(newTDS->TOTAL_DEPENDENCIES_PT*6)];
-
-            TDS* secondDependence = dependencies[1];
-            char refToDep2TdsValue[strlen(secondDependence->name)+8];
-            sprintf(refToDep2TdsValue,SmvConversions[TDS_VALUE_REF],secondDependence->name);
-            char refNextToDep2TdsValue[strlen(secondDependence->name)+14];
-            sprintf(refNextToDep2TdsValue,SmvConversions[NEXT],refToDep2TdsValue);
-            if(limitedByTime){
-                sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR_TIMEV],
-                        "next(time)",newTDS->I_INTERVAL,refNextToDep2TdsValue, refNextToDepTdsValue,
-                        "next(time)",newTDS->I_INTERVAL,refNextToDepTdsValue,refNextToDep2TdsValue);
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
-                             accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
-                             INIT, NULL, 0, 0);
-            }
-            else{
-                sprintf(resultExprInit,SmvConversions[TDS_INPUT_EXPR],
-                        refToDep2TdsValue, refToDepTdsValue,
-                        refToDepTdsValue,refToDep2TdsValue);
-                sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR],
-                        refNextToDep2TdsValue, refNextToDepTdsValue,
-                        refNextToDepTdsValue,refNextToDep2TdsValue);
-
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
-                             NULL, resultExprInit, INIT, "NULL", 0, 0);
-            }
-            createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
-                         NULL, resultExprNext, NEXT, "NULL", 0, 0);
+        if(newTDS->limitCondition){
+            createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                         accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+                         INIT, NULL, 0, 0);
         }
         else{
-            if(limitedByTime){
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
-                             accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
-                             INIT, NULL, 0, 0);
+            char defaultDelayedEvalCond[ALOC_SIZE_LINE];
+            char refNextToTdsValue[strlen(newTDS->name)+14];
+            sprintf(refNextToTdsValue,SmvConversions[NEXT],refToTdsValue);
 
-                char timeBind[ALOC_SIZE_LINE/2];
-                sprintf(timeBind,"%d",newTDS->I_INTERVAL);
-                char* evalByTimeNext = createConditionCube("next(time)",timeBind,">",refNextToDepTdsValue,1);
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
-                             accessSmvInfo(controller, PORTS, 0), "NULL", evalByTimeNext,
-                             NEXT, NULL, 1, 0);
+            TDS* firstDependence = dependencies[0];
+            char refToDepTdsValue[strlen(firstDependence->name)+8];  // .value0
+            sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],firstDependence->name);
+            char refNextToDepTdsValue[strlen(firstDependence->name)+14]; // next(.value)
+            sprintf(refNextToDepTdsValue,SmvConversions[NEXT],refToDepTdsValue);
+
+            if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
+                char resultExprInit[ALOC_SIZE_LINE*2];
+                char resultExprNext[ALOC_SIZE_LINE*2+(newTDS->TOTAL_DEPENDENCIES_PT*6)];
+
+                TDS* secondDependence = dependencies[1];
+                char refToDep2TdsValue[strlen(secondDependence->name)+8];
+                sprintf(refToDep2TdsValue,SmvConversions[TDS_VALUE_REF],secondDependence->name);
+                char refNextToDep2TdsValue[strlen(secondDependence->name)+14];
+                sprintf(refNextToDep2TdsValue,SmvConversions[NEXT],refToDep2TdsValue);
+                if(limitedByTime){
+                    sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR_TIMEV],
+                            "next(time)",newTDS->I_INTERVAL,refNextToDep2TdsValue, refNextToDepTdsValue,
+                            "next(time)",newTDS->I_INTERVAL,refNextToDepTdsValue,refNextToDep2TdsValue);
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                                 accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+                                 INIT, NULL, 0, 0);
+                }
+                else{
+                    sprintf(resultExprInit,SmvConversions[TDS_INPUT_EXPR],
+                            refToDep2TdsValue, refToDepTdsValue,
+                            refToDepTdsValue,refToDep2TdsValue);
+                    sprintf(resultExprNext,SmvConversions[TDS_INPUT_EXPR],
+                            refNextToDep2TdsValue, refNextToDepTdsValue,
+                            refNextToDepTdsValue,refNextToDep2TdsValue);
+
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
+                                 NULL, resultExprInit, INIT, "NULL", 0, 0);
+                }
+                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
+                             NULL, resultExprNext, NEXT, "NULL", 0, 0);
             }
             else{
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
-                             refToDepTdsValue, NULL, INIT, NULL, 0, 0);
-                createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
-                             refNextToDepTdsValue, NULL, NEXT, NULL, 0, 0);
+                if(limitedByTime){
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                                 accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
+                                 INIT, NULL, 0, 0);
+
+                    char timeBind[ALOC_SIZE_LINE/2];
+                    sprintf(timeBind,"%d",newTDS->I_INTERVAL);
+                    char* evalByTimeNext = createConditionCube("next(time)",timeBind,">",refNextToDepTdsValue,1);
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                                 accessSmvInfo(controller, PORTS, 0), "NULL", evalByTimeNext,
+                                 NEXT, NULL, 1, 0);
+                }
+                else{
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
+                                 refToDepTdsValue, NULL, INIT, NULL, 0, 0);
+                    createAssign(refToTdsValue, accessHeader(controller, PORTS, 0), accessSmvInfo(controller, PORTS, 0),
+                                 refNextToDepTdsValue, NULL, NEXT, NULL, 0, 0);
+                }
             }
         }
         // limitado a duas dependencias
     }
 }
+
 
 
 /**
@@ -1084,7 +1091,7 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
     addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
-    addTdsRelationOnSmv(SYNTH_TDS,controller);
+    addTdsRelationOnSmv(SYNTH_TDS, controller, I_TIME);
 
     addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
     validateTdsDeclaration(declarationName,controller);
