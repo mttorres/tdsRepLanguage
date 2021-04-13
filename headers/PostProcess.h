@@ -234,6 +234,23 @@ void propagateValueToTypeSet(TDS* currentTDS, TDS* dependency, EnvController* co
  */
 TypeSet *computeTypeSet(EnvController *controllerSmv, char *sint_value);
 
+/**
+ * Formata o nome de uma variável da forma init/next(varName)
+ * @param varName o nome original da variável
+ * @param stateId o id do estado init ou next (recuperado do enum)
+ * @param refToUpdate a string que vai ser atualizada (optamos pelo sideEffect por flexibilidade)
+ * @SideEffects: Atualiza a string refToUpdate
+ */
+void formatStateVar(char* varName, int stateId, char* refToUpdate);
+
+/**
+ * Cria a string de referencia ao valor de uma TDS, da forma, nomeTds.value
+ * @param currentTds a tds corrente
+ * @param refToUpdate a string que vai ser atualizada (optamos pelo sideEffect por flexibilidade)
+ * @SideEffects: Atualiza a string refToUpdate
+ */
+void formatTdsValueRef(TDS* currentTds, char* refToUpdate);
+
 void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif

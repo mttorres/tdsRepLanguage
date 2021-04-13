@@ -29,8 +29,11 @@ typedef struct TDS
   // watch-list não será reintroduzida
   int noValue;
   int LAST_DELAYED_ACCEPT_TIME;
+
+  // usados pelo filter
   void* limitCondition; // provavelmente vai ter que ser um path
   int currentCondEval;
+  char* currenCondBindRef;
 
 
 } TDS;
@@ -92,6 +95,19 @@ void resolveDelayedTdsDependencies(TDS* tds, int C_TIME);
  * @SideEffects: Aloca um novo object que deve ser liberado pelo chamador depois
  */
 Object* getTdsValue(TDS* tds, int C_TIME);
+
+/**
+ * Atualiza a condição de uma TDS realizando as validações corretas
+ * @param tds a tds a qual o filtro é aplicado
+ * @param condExpr a condição que foi avaliada no instante de tempo atual
+ */
+void updateLimitCondition(TDS* tds, Object* condExpr);
+
+/**
+ * Reseta uma condição de filtro para a próxima iteração da TDS.
+ * @param tds a tds atual
+ */
+void resetLimitConditionEval(TDS* tds);
 
 void* letGoTDS(struct TDS* tds);
 

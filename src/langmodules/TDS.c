@@ -126,6 +126,24 @@ int addDataToTds(TDS* currentTDS, int C_TIME, Object* value){
     return 0;
 }
 
+void updateLimitCondition(TDS* tds, Object* condExpr){
+    if(condExpr){
+        if(condExpr->type != LOGICAL_ENTRY){
+            fprintf(stderr,"Invalid filter expression used on %s. Specified condition was not a boolean type",tds->name);
+            exit(-1);
+        }
+        else{
+            int eval = *(int*)condExpr->values[0];
+            tds->currentCondEval = eval;
+            tds->currenCondBindRef = condExpr->SINTH_BIND;
+        }
+    }
+}
+
+void resetLimitConditionEval(TDS* tds){
+    tds->currentCondEval = 0;
+}
+
 void* letGoTDS(TDS* tds){
 
 }

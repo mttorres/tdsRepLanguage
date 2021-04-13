@@ -641,14 +641,14 @@ Object *refCopyOfVariable(TableEntry *varLang, EnvController *controller) {
 }
 
 /**
- * Dado que é possível criar ASSIGNS NEXT default, vale verificar se devemos sobrescrever esse após a variável
+ * Dado que é possível criar ASSIGNS default, vale verificar se devemos sobrescrever esse após a variável
  * não ser mais não deterministica.
  * @param writeSmvTypeTable a tabela de simbolos auxiliar
  * @param statevarname o nome de estado da variável
  * @param headerSmv o header auxiliar
  * @return 1 caso exista um assign next default
  */
-int checkFristNext(STable* writeSmvTypeTable, char* statevarname, HeaderSmv* headerSmv){
+int checkFristDefaultAssign(STable* writeSmvTypeTable, char* statevarname, HeaderSmv* headerSmv){
     TableEntry * defaultNextReg = lookup(writeSmvTypeTable,statevarname);
     int isFirst = *(int*) defaultNextReg->val->values[4];
     if(defaultNextReg && isFirst){
@@ -736,7 +736,7 @@ void specAssign(int varInit, char *varName, int contextChange, HeaderSmv *header
         //defaultValueBind = formatValueBind(newValue,0,1); // vai ser só para o caso de ref de uma variável que foi atualizada dentro de um if (já existe fora do escopo atual)
 
         if(lookup(writeSmvTypeTable,statevarname)){
-            if(checkFristNext(writeSmvTypeTable,statevarname,header)){
+            if(checkFristDefaultAssign(writeSmvTypeTable, statevarname, header)){
                 conditionCube = formatCondtion(scope,0,0,newValueBind,directiveValueBind,1);
                 overwriteAssign(statevarname,varName,header,writeSmvTypeTable,newValueBind,conditionCube,defaultValueBind);
             }
@@ -946,14 +946,17 @@ void addTdsRelationOnSmv(TDS *newTDS, EnvController *controller, int I_TIME) {
         if(newTDS->limitCondition){
             createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
                          accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
-                         INIT, NULL, 0, 0);
+                         INIT, NULL, 0, 1);
+            createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
+                         accessSmvInfo(controller, PORTS, 0), refToTdsValue, NULL,
+                         NEXT, NULL, 0, 1);
         }
-        else{
+        else {
             char defaultDelayedEvalCond[ALOC_SIZE_LINE];
             char refNextToTdsValue[strlen(newTDS->name)+14];
             sprintf(refNextToTdsValue,SmvConversions[NEXT],refToTdsValue);
-
             TDS* firstDependence = dependencies[0];
+
             char refToDepTdsValue[strlen(firstDependence->name)+8];  // .value0
             sprintf(refToDepTdsValue,SmvConversions[TDS_VALUE_REF],firstDependence->name);
             char refNextToDepTdsValue[strlen(firstDependence->name)+14]; // next(.value)
@@ -1097,12 +1100,45 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     validateTdsDeclaration(declarationName,controller);
 }
 
+void specTdsAssignOnRevaluation(TDS* currentTDS, char* name, char* eval, int stateId, int I_TIME,
+                                HeaderSmv* currentHeader, STable* currentInfo, EnvController* controller){
+
+    // validaçoes
+    // next/init
+    char stateVarNameTds[strlen(name)+2+4+1+1]; // () init ou next \0
+    formatStateVar(name,stateId,stateVarNameTds);
+    // condição em conjunto (filter + temporal) (se for necessario alguma delas for necessária)
+    char* condition = NULL;
+    char* temporalCondition = NULL; //  caso seja next, vamos atribuir com uma condição que considera tempo > initTDS
+    char* cubeFinal = NULL;
+    //deve então verificar se tem que criar assign ou overwrite para o state selecionado
+    int hasDefault = checkFristDefaultAssign(currentInfo, stateVarNameTds, currentHeader);
+    if(hasDefault){
+        if(stateId == NEXT && currentTDS->I_INTERVAL != I_TIME){
+            char* directiveValueBind = formatNumeric(currentTDS->I_INTERVAL);
+            temporalCondition = createConditionCube("next(time)", directiveValueBind, ">=", NULL, 1);
+        }
+        if(currentTDS->limitCondition){
+            condition = currentTDS->currenCondBindRef;
+        }
+        cubeFinal = temporalCondition && condition ?
+                    createConditionCube(temporalCondition, condition, "&", eval, 1) :
+                    temporalCondition ? createConditionCube(temporalCondition, "", "", eval,1) :
+                    condition ? createConditionCube(condition, "", "", eval, 1) :
+                    NULL;
+        overwriteAssign(stateVarNameTds,name,currentHeader,currentInfo,eval,cubeFinal,"NULL");
+    }
+}
+
 void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvController *controller, STable *currentScope) {
 
-    //HeaderSmv* newTdsHeader = specHeader(PORTS, encapsulatedTDS->SINTH_BIND, 0, 0, -1, controller);
-    //TDS* SYNTH_TDS =  (TDS*)encapsulatedTDS->values[0];
-    HeaderSmv *currentHeader = accessHeader(controller, PORTS, currentTDS->SMV_REF);
-    STable *currentInfo = accessSmvInfo(controller, PORTS, currentTDS->AUX_REF);
+    HeaderSmv *currentHeader = !currentTDS->limitCondition?
+            accessHeader(controller, PORTS, currentTDS->SMV_REF)
+            : accessHeader(controller,PORTS,0);
+    STable *currentInfo = !currentTDS->limitCondition?
+            accessSmvInfo(controller, PORTS, currentTDS->AUX_REF)
+            : accessSmvInfo(controller,PORTS,0);
+
     // só necessita de atualizações complexas para data-list as demais vão ser feitas só uma vez
     if (currentTDS->type == DATA_LIST) {
         if (C_TIME == I_TIME) {
@@ -1123,14 +1159,34 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
     }
     // só tem que criar um init e next unicos ou somente atualizar o type-set (na verdade essa atualização deve ser feita sempre)
     else {
-        // se essa TDS já foi avaliada, senão...
-        if (currentTDS) {
-
-        } else {
-
+        int stateId = C_TIME > I_TIME? NEXT : INIT;
+        char* evalBind = NULL;
+        if(currentTDS->limitCondition){
+            //{nome_da_TDS}.value
+            char refToTdsValue[strlen(currentTDS->name)+1+5+1]; // .value\0
+            formatTdsValueRef(currentTDS,refToTdsValue);
+            char* evalRef = NULL;
+            //{nome_da_dependencia_filtro}.value
+            char depNameOnSmv[strlen(currentTDS->name)+1+5+1]; // .value\0
+            formatTdsValueRef(currentTDS->linkedDependency[0],depNameOnSmv);
+            //nome da dependencia com next ou o nome anterior
+            char depNameOnSmvNext[strlen(depNameOnSmv)+2+4+1+1]; // () next \0
+            if(stateId == NEXT){
+                formatStateVar(depNameOnSmv,stateId,depNameOnSmvNext);
+                evalBind = depNameOnSmvNext;
+            }
+            else{
+                evalBind = depNameOnSmv;
+            }
+            specTdsAssignOnRevaluation(currentTDS, refToTdsValue, evalBind, stateId, I_TIME, currentHeader, currentInfo, controller);
+        }
+        else{
+            //specTdsAssignOnRevaluation("value", I_TIME, C_TIME, controller);
         }
     }
-    updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,lazyValue,controller);
+    if(lazyValue){
+        updateType("value",currentHeader,currentInfo,lazyValue->SINTH_BIND,TDS_ENTRY,lazyValue,controller);
+    }
 }
 
 
@@ -1199,6 +1255,18 @@ void updateAllAutomataFilter(char* condFilter, EnvController* controller){
         }
     }
     // free nas duas condições?
+}
+
+void formatStateVar(char* varName, int stateId, char* refToUpdate){
+    // init/next(nomeVariavel) (statevar)
+    //char stateVarNameOnSmv[strlen(varName) + 14];
+    sprintf(refToUpdate, SmvConversions[stateId], varName);
+}
+
+void formatTdsValueRef(TDS* currentTds, char* refToUpdate){
+    //{nome_da_TDS}.value
+    //char refToTdsValue[strlen(currentTds->name)+1+5+1]; // .value\0
+    sprintf(refToUpdate,SmvConversions[TDS_VALUE_REF],currentTds->name);
 }
 
 void writeResultantHeaders(EnvController* controller, const char* path){

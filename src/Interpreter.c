@@ -43,21 +43,32 @@ HeaderSmv * selectSMV_INFO(STable* scope, Object* functionPointer, EnvController
 // avaliar a importancia dos métodos acima, e se possível movimentar eles para o HeaderSmv.c ou para um Novo Controller.h
 
 
-void resolveDependencies(TDS* currentTDS, EnvController* controllerSmv, int C_TIME){
-    //updateLimitCondition(currentTDS, C_TIME); (se a condição limite atual for true ele vai conseguir realizar
-    // as operações dos métodos que vem a seguir, senão NULL vai ser retornado
-    //Object* resolvedValueRef = NULL;
-    if(currentTDS->delayed){
-        resolveDelayedTdsDependencies(currentTDS,C_TIME);
+void resolveDependencies(TDS* currentTDS, STable* scope, EnvController* controllerSmv, int I_TIME, int C_TIME){
+
+    Object* resolvedCondFilter = NULL;
+    if(currentTDS->limitCondition){
+        resolvedCondFilter = eval(currentTDS->limitCondition,scope,controllerSmv);
+        updateLimitCondition(currentTDS, resolvedCondFilter);
+        addDataToTds(currentTDS,C_TIME,currentTDS->linkedDependency[0]->DATA_TIME[C_TIME]);
     }
     else{
-        resolveMergerTdsDependencies(currentTDS, C_TIME);
+        if(currentTDS->delayed){
+            resolveDelayedTdsDependencies(currentTDS,C_TIME);
+        }
+        else{
+            resolveMergerTdsDependencies(currentTDS, C_TIME);
+        }
     }
     int i;
     // sempre deve resolver as dependencias de uma TDS já que a embora a dependente possa não ter recebido valores diretamente esse instante
     // o "tipo" do type-set da outra pode ter mudado (nuXmv é bem rigido a respeito disso)
     for (i = 0; i < currentTDS->TOTAL_DEPENDENCIES_PT; i++) {
         propagateValueToTypeSet(currentTDS, currentTDS->linkedDependency[i],controllerSmv);
+    }
+    if(currentTDS->limitCondition){
+        resetLimitConditionEval(currentTDS);
+        specTDS(currentTDS,NULL,C_TIME,I_TIME,controllerSmv,scope);
+        letgoObject(resolvedCondFilter);
     }
 }
 
@@ -100,7 +111,7 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
             }
             else{
                 // senão deve verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
-                resolveDependencies(currentTDS,controllerSmv,C_TIME);
+                resolveDependencies(currentTDS,currentScope,controllerSmv,I_TIME,C_TIME);
             }
 
         }
@@ -118,6 +129,11 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
     int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
     for (i = C_TIME; i < changedTo; i++) {
         resolveTdsLazyEvaluation(currentScope, controllerSmv, i);
+        int next = i+1;
+        if(next != changedTo){
+            void* vp[] = {&next};
+            updateValue("C_TIME", vp, T_DIRECTIVE_ENTRY, 1, -1, -1, currentScope, 0);
+        }
     }
 }
 
@@ -571,7 +587,7 @@ int comparator(Object* o1, Object* o2, char* op){
 Object* evalEQUAL(Node* n, STable* scope, EnvController* controller){
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
-    int r = comparator(o1,o2,"=");
+    int r = comparator(o1,o2,"==");
     void* rp[] = {&r};
     char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +5];
     createExprBind(resultingBind, o1, o2, "=");
