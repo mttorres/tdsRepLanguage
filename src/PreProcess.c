@@ -21,6 +21,9 @@ void initPreProcessHeader(smvtype type, char* moduleName, EnvController* Hcontro
         }
         Hcontrol->automatasToChange[Hcontrol->F_AUTOMATAS_CHANGE_POINTER] = Hcontrol->H_AUTOMATA_CURRENT_SIZE;
         Hcontrol->F_AUTOMATAS_CHANGE_POINTER++;
+        if(strstr(newHeader->moduleName,"final")){
+            Hcontrol->modelHasFinalAutomata = 1;
+        }
     }
     addNewHeader(Hcontrol,newHeader);
 }
@@ -268,6 +271,15 @@ void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {
                 {
                     if(readPortsModule){
                         processPorts(buffer,varString,fVarString,stage,Hcontrol);
+                    }
+                    if(stage == AUTOMATA){
+                        if(bufferAux[1] == 'p'){
+                            HeaderSmv* current = accessHeader(Hcontrol,AUTOMATA,-1);
+                            char* depCenterFilter = "filter";
+                            if(strstr(bufferAux,depCenterFilter)){
+                                current->VAR_RENAME_POINTER = current->VAR_POINTER;
+                            }
+                        }
                     }
                 }
                 else

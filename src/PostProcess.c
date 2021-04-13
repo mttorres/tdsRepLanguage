@@ -1100,6 +1100,17 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     validateTdsDeclaration(declarationName,controller);
 }
 
+/**
+ * Para tds's de avaliação "constante" atualiza seu init e next caso seja necessário
+ * @param currentTDS a tds corrente
+ * @param name o nome da variável de atualização
+ * @param eval o resultado de avaliação (que será da condição ou atribuido direto)
+ * @param stateId se é init ou next
+ * @param I_TIME o tempo inicial usado para controle temporal
+ * @param currentHeader o header usado
+ * @param currentInfo a info usada
+ * @param controller o controlador de ambiente
+ */
 void specTdsAssignOnRevaluation(TDS* currentTDS, char* name, char* eval, int stateId, int I_TIME,
                                 HeaderSmv* currentHeader, STable* currentInfo, EnvController* controller){
 
@@ -1127,6 +1138,9 @@ void specTdsAssignOnRevaluation(TDS* currentTDS, char* name, char* eval, int sta
                     condition ? createConditionCube(condition, "", "", eval, 1) :
                     NULL;
         overwriteAssign(stateVarNameTds,name,currentHeader,currentInfo,eval,cubeFinal,"NULL");
+        if(temporalCondition){
+            free(temporalCondition);
+        }
     }
 }
 
@@ -1197,64 +1211,23 @@ void propagateValueToTypeSet(TDS* currentTDS, TDS* dependency, EnvController* co
     updateTypeSet(newValue,"value",auxTdsDependant,headerDependant,controller);
 }
 
-/**
- * Atualiza uma transição do automáto com a condição de filtro apropriada
- * @param cond a condição
- * @param automata o header do automato
- * @param type o tipo de transição (negativa ou não negativa)
- * @SideEffects: Altera a string dessa transição, e caso o tamanho seja suficientemente grande, ocorre realloc
- * já que usa o updateString intervals
- */
-void updateAutomataFilterCond(const char *cond, const HeaderSmv *automata, int type) {
-    int pos;
-    int newIni;
-    int newEnd;
-    if(type){
-        pos = automata->filterPosCond[0];
-        newIni = automata->filterPosCond[1];
-        newEnd = automata->filterPosCond[2];
-    }
-    else{
-        pos = automata->filterPosNeg[0];
-        newIni = automata->filterPosNeg[1];
-        newEnd = automata->filterPosNeg[2];
-    }
-    char* refLine = automata->transBuffer[pos];
-    int sizeOld = strlen(refLine);
-    int sizeCond = strlen(cond);
-    automata->transBuffer[pos] = updateSubStringInterval(cond,refLine,sizeCond,newIni,newEnd,
-                                                         sizeOld,&newIni,&newEnd,0);
-    if(type){
-        automata->filterPosCond[1] = newIni;
-        automata->filterPosCond[2] = newEnd;
-    }
-    else{
-        automata->filterPosNeg[1] = newIni;
-        automata->filterPosNeg[2] = newEnd;
-    }
-}
 
-/**
- * Atualiza a referencia de todas as transições de automato que receberiam a condição de filtor
- * @param condFilter condição de filtro
- * @param controller o controlador de ambiente que
- */
-void updateAllAutomataFilter(char* condFilter, EnvController* controller){
+void updateAllAutomataFilter(Object* condFilter, EnvController* controller){
     int i;
-    if(controller->modelHasFilter){
-        /**
-         * vai ter que criar uma negativa da condição
-         */
+    if(controller->F_AUTOMATAS_CHANGE_POINTER && controller->modelHasFilter){
         //char* cond = "next(x) = 2"; // onde X já vai estar no parâmetro
         //char* condNeg = "!next(x) = 2"; // essas condições só estão marretadas ai para testes
+        char condNeg[strlen(condFilter->SINTH_BIND)+2];
+        createExprBind(condNeg,condFilter,NULL,"");
         for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; i++) {
             int id_automata = controller->automatasToChange[i];
             HeaderSmv* automata = accessHeader(controller,AUTOMATA,id_automata);
-            updateAutomataFilterCond("!next(x) = 2", automata,0);
-            updateAutomataFilterCond("next(x) = 2", automata,1);
+            updateAutomataFilterCond(condNeg, automata,0);
+            updateAutomataFilterCond(condFilter->SINTH_BIND, automata,1);
         }
     }
-    // free nas duas condições?
+    controller->F_AUTOMATAS_CHANGE_POINTER = 0;
+    // poderia até dar free nesses caras
 }
 
 void formatStateVar(char* varName, int stateId, char* refToUpdate){

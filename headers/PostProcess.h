@@ -251,6 +251,13 @@ void formatStateVar(char* varName, int stateId, char* refToUpdate);
  */
 void formatTdsValueRef(TDS* currentTds, char* refToUpdate);
 
+/**
+ * Atualiza a referencia de todas as transições de automato que receberiam a condição de filtor
+ * @param condFilter condição de filtro sintetizada
+ * @param controller o controlador de ambiente que
+ */
+void updateAllAutomataFilter(Object* condFilter, EnvController* controller);
+
 void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif

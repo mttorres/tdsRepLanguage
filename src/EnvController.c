@@ -61,6 +61,8 @@ EnvController *createController() {
     Hcontrol->modelHasFilter = 0;
     Hcontrol->automatasToChange = NULL;
     Hcontrol->F_AUTOMATAS_CHANGE_POINTER = 0;
+    Hcontrol->filterContext = 0;
+    Hcontrol->modelHasFinalAutomata = 0;
     return Hcontrol;
 }
 
@@ -205,27 +207,6 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo){
 }
 
 
-/**
- * Adiciona parâmetro para módulo qualquer do nuXmv.
- * @param controller o controlador de ambiente e contexto
- * @param param a string do parâmetro
- * @param cat a categoria do header/tabela auxuliar a ser recuperada
- * @param indexOfHeader o indice do header
- * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
- * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
- */
-int addParamToModule(EnvController* controller, char* param, smvtype cat, int indexOfHeader){
-    HeaderSmv* updated = accessHeader(controller,cat,indexOfHeader);
-    int possibleParamPos = hash(param,MAX_PARAM);
-    if(updated->PARAM_MAP[possibleParamPos]){
-        return 0;
-    }
-    char* newName = addParams(updated->moduleName, param, "(", ")", 0);
-    free(updated->moduleName);
-    updated->moduleName = newName;
-    updated->PARAM_MAP[possibleParamPos] = 1;
-    return 1;
-}
 
 void validateTdsDeclaration(char* declarationName, EnvController* controller){
     TableEntry* expected_entry =  lookup(controller->originalPorts,declarationName);
@@ -244,11 +225,41 @@ void validateTdsDeclaration(char* declarationName, EnvController* controller){
     }
 }
 
+/**
+ * Método auxiliar que para cada header de autta passado atualiza a referencia de sua variavel que tenha filter e/ou
+ * atualiza a referencia em main. Colocando um parametro novo nessa referencia
+ * @param controller o controlador de ambiente
+ * @param paramName a string do parametro
+ * @param automata o header do automato
+ */
+void addParamToAutomata(EnvController* controller, char* paramName, HeaderSmv* automata){
+    if(addParamToModule(automata,paramName)){
+        // mudar o main (se for o final automata) e também o ponto de interesse
+        if(controller->modelHasFinalAutomata && strstr(automata->moduleName,"final")){
+            addParamInterestPointHeader(accessHeader(controller,MAIN,-1), paramName,1);
+            addParamInterestPointHeader(automata,paramName,0);
+        }
+        // só tem um filter
+        if(!controller->modelHasFinalAutomata){
+            addParamInterestPointHeader(accessHeader(controller,MAIN,-1),paramName,1);
+        }
+    }
+}
+
+void addParamToAutomatasFilter(EnvController* controller, char* paramName){
+    // deve adicioanr a todos os automatos esse parâmetro, e deve atualizar também as referencias desses no main e no final automata
+    int i;
+    for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; ++i) {
+        HeaderSmv* automata =  accessHeader(controller,AUTOMATA,i);
+        addParamToAutomata(controller,paramName,automata);
+    }
+}
+
 void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
     addParamToPortsModule(controller,param);
-
     // adiciona a TDS (tem uma variável de retorno dizendo se foi necessário adicionar esse parâmetro ou não
-    int paramAdd = addParamToModule(controller,param,PORTS,currentTDS->SMV_REF);
+    HeaderSmv* headerTDS = accessHeader(controller,PORTS,currentTDS->SMV_REF);
+    int paramAdd = addParamToModule(headerTDS,param);
     if(paramAdd){
         // DEVE AGORA PROPAGAR A DEPENDENCIA PARA A DECLARAÇÃO DELE EM PORTS MODULE
         // recuperar o indice da declaração
@@ -256,7 +267,6 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
         TableEntry* infoOfTdsDec = lookup(portsAux,currentTDS->name);
         int pos = *(int*) infoOfTdsDec->val->values[0];
         int size = *(int*) infoOfTdsDec->val->values[1];
-
         HeaderSmv* portsHeader =  accessHeader(controller,PORTS,0);
         char* bufferToUpdate = portsHeader->varBuffer[pos];
         char* newNameDeclaration = addParams(bufferToUpdate, param, "(", ")", 0);
@@ -279,7 +289,8 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
  */
 void addParamToPortsModule(EnvController *controller, char *param) {
 
-    int paramAdd = addParamToModule(controller,param,PORTS,0); // deve adicionar ao portsModule É SEMPRE O PRIMEIRO
+    HeaderSmv* portsModuleHeader = accessHeader(controller,PORTS,0);
+    int paramAdd = addParamToModule(portsModuleHeader,param); // deve adicionar ao portsModule É SEMPRE O PRIMEIRO
     if(paramAdd){
         // agora deve propagar as alterações para todos os demais módulos
         // OU SEJA JÁ QUE ESTÁ CENTRALIZADO NO MAIN (posição 3 do buffer de VAR), deve-se substituir esse

@@ -71,7 +71,7 @@ HeaderSmv * createHeader(enum smvtype type, char *moduleName, int varP, int assi
 //      header->VAR_RENAME_POINTER = 2;
 //  }
 //  else{
-      header->VAR_RENAME_POINTER = -1; // ref a ports Module ficará em main
+      header->VAR_RENAME_POINTER = -1; // ref a ports Module ficará em main e filter de finalAutomata
 //  }
 
   return header; 
@@ -344,6 +344,57 @@ void filterAutomataHeaderCheck(HeaderSmv* header, int finalAutomataFilterModel){
         header->filterPosNeg = NULL;
         header->filterPosCond = NULL;
     }
+}
+
+
+void updateAutomataFilterCond(const char *cond, const HeaderSmv *automata, int type) {
+    int pos;
+    int newIni;
+    int newEnd;
+    if(type){
+        pos = automata->filterPosCond[0];
+        newIni = automata->filterPosCond[1];
+        newEnd = automata->filterPosCond[2];
+    }
+    else{
+        pos = automata->filterPosNeg[0];
+        newIni = automata->filterPosNeg[1];
+        newEnd = automata->filterPosNeg[2];
+    }
+    char* refLine = automata->transBuffer[pos];
+    int sizeOld = strlen(refLine);
+    int sizeCond = strlen(cond);
+    automata->transBuffer[pos] = updateSubStringInterval(cond,refLine,sizeCond,newIni,newEnd,
+                                                         sizeOld,&newIni,&newEnd,0);
+    if(type){
+        automata->filterPosCond[1] = newIni;
+        automata->filterPosCond[2] = newEnd;
+    }
+    else{
+        automata->filterPosNeg[1] = newIni;
+        automata->filterPosNeg[2] = newEnd;
+    }
+}
+
+int addParamToModule(HeaderSmv* updated , char* param){
+    int possibleParamPos = hash(param,MAX_PARAM);
+    if(updated->PARAM_MAP[possibleParamPos]){
+        return 0;
+    }
+    char* newName = addParams(updated->moduleName, param, "(", ")", 0);
+    free(updated->moduleName);
+    updated->moduleName = newName;
+    updated->PARAM_MAP[possibleParamPos] = 1;
+    return 1;
+}
+
+
+void addParamInterestPointHeader(HeaderSmv* header, char *paramName, int offSetPointer) {
+    char* refOldPt;
+    refOldPt = header->varBuffer[header->VAR_RENAME_POINTER-offSetPointer];
+    char* newDeclaration = addParams(refOldPt, paramName, "(", ")", 0);
+    free(refOldPt);
+    header->varBuffer[header->VAR_RENAME_POINTER-offSetPointer] = newDeclaration;
 }
 
 void addParamToHeader(HeaderSmv* headerSmv, char* param){

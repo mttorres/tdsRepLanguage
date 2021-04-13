@@ -52,7 +52,9 @@ typedef struct envcontroller
     // validações para o filter e recuperar o header correto
     int modelHasFilter;
     int* automatasToChange;
+    int filterContext;
     int F_AUTOMATAS_CHANGE_POINTER;
+    int modelHasFinalAutomata;
 
 }EnvController;
 
@@ -153,6 +155,13 @@ char* getTypeSetWordFromDict(char* wordRef, EnvController* controller);
  * @SideEffects: Aloca uma string nova de tamanho da word +1 (deve ser liberada no final do programa)
  */
 void addTypeSetWordToDict(char* word, EnvController* controller);
+
+/**
+ * Atualizaa os parâmetros de todos os automatos que possam ter condição de filtro. E propaga os parâmetros
+ * @param controller o controlador
+ * @param paramName o parâmetro
+ */
+void addParamToAutomatasFilter(EnvController* controller, char* paramName);
 
 
 #endif //TDSREPLANGUAGE_ENVCONTROLLER_H

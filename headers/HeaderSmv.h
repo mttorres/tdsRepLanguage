@@ -63,10 +63,6 @@ void writeHeaderBuffer(HeaderSmv* h, int part, FILE* smvoutput);
 
 void writeHeader(HeaderSmv* header, FILE* smvoutput);
 
-void writeHeaderBuffer(HeaderSmv* h, int part, FILE* smvoutput);
-
-void writeHeader(HeaderSmv* header, FILE* smvoutput);
-
 /*
 	escolhe um buffer do header atual para salvar a linha (alocando sempre uma string para essa linha, que depois deve ser liberada).
 	efeitos colaterais:  * ao ter readVarPortsModule como true, ele salva as variáveis do portsModule em uma tabela de portas
@@ -74,5 +70,36 @@ void writeHeader(HeaderSmv* header, FILE* smvoutput);
 
 */
 void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename);
+
+/**
+ * Atualiza uma transição do automáto com a condição de filtro apropriada
+ * @param cond a condição
+ * @param automata o header do automato
+ * @param type o tipo de transição (negativa ou não negativa)
+ * @SideEffects: Altera a string dessa transição, e caso o tamanho seja suficientemente grande, ocorre realloc
+ * já que usa o updateString intervals
+ */
+void updateAutomataFilterCond(const char *cond, const HeaderSmv *automata, int type);
+
+/**
+ * Adiciona parâmetro para módulo qualquer do nuXmv.
+ * @param controller o controlador de ambiente e contexto
+ * @param param a string do parâmetro
+ * @param cat a categoria do header/tabela auxuliar a ser recuperada
+ * @param indexOfHeader o indice do header
+ * @return 1 se a operação foi realizada com sucesso (isto é foi necessária)
+ * ou 0 caso a operação não tenha sido realizada (o módulo já possui o parâmetro)
+ * @SideEffects: Aloca uma string nova e libera a antiga
+ */
+int addParamToModule(HeaderSmv* updated , char* param);
+
+/**
+ * Dado um header que tenha um ponto de interesse de mudança em  VAR, altera esse valor
+ * @param header o header corrente
+ * @param paramName a string do parâmetro
+ * @param offSetPointer o offset do buffer caso seja necessário
+ * @SideEffects: Altera o buffer nessa posição, e consequentemente aloca uma nova string liberando a antiga.
+ */
+void addParamInterestPointHeader(HeaderSmv* header, char *paramName, int offSetPointer);
 
 #endif

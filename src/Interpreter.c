@@ -47,7 +47,12 @@ void resolveDependencies(TDS* currentTDS, STable* scope, EnvController* controll
 
     Object* resolvedCondFilter = NULL;
     if(currentTDS->limitCondition){
+        controllerSmv->filterContext = 1;
+        controllerSmv->currentTDScontext = NULL;
         resolvedCondFilter = eval(currentTDS->limitCondition,scope,controllerSmv);
+        if(C_TIME > I_TIME){
+            updateAllAutomataFilter(resolvedCondFilter,controllerSmv);
+        }
         updateLimitCondition(currentTDS, resolvedCondFilter);
         addDataToTds(currentTDS,C_TIME,currentTDS->linkedDependency[0]->DATA_TIME[C_TIME]);
     }
@@ -231,9 +236,9 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         // criar MÉTODO DE COPIA DE OBJETO (variavel)
 
         // retorna a referência (ai pode sim ter colaterais) (não permite "passagem de referência" gerar conversão no nuXmv (não existe)
-        if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1 || entry->val->type == NULL_ENTRY)
+        if(entry->val->type == TDS_ENTRY || entry->val->OBJECT_SIZE > 1)
         {
-            if(entry->val->type != NULL_ENTRY && controllerSmv->currentTDScontext){
+            if(controllerSmv->currentTDScontext){
                 fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", controllerSmv->currentTDScontext->name);
                 exit(-1);
             }
@@ -241,21 +246,23 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
         }
         else
         {
-            if(controllerSmv->currentTDScontext) {
+            int tdsContext = !!controllerSmv->currentTDScontext;
+            int filterContext = controllerSmv->filterContext;
+            if(tdsContext) {
                 if (entry->val->type == LOGICAL_ENTRY) {
-                    fprintf(stderr,
-                            "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. ONLY SYMBOLIC VALUES ARE ACCEPTED, %s is a BOOLEAN value",
-                            controllerSmv->currentTDScontext->name, entry->name);
+                    fprintf(stderr,"TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. ONLY SYMBOLIC VALUES ARE ACCEPTED, %s is a BOOLEAN value",controllerSmv->currentTDScontext->name, entry->name);
                     // poderia ter um cast implicito também...
                     exit(-1);
                 }
             }
             Object *copy = refCopyOfVariable(entry, controllerSmv);
-            if (controllerSmv->currentTDScontext) {
+            if (tdsContext) {
                     addParamToTds(controllerSmv, entry->name, controllerSmv->currentTDScontext);
                     // encapsular em método depois
-                    //int C_TIME = *(int *) lookup(scope, "C_TIME")->val->values[0];
                     //addToTdsWatchList(controllerSmv->currentTDScontext,entry->name,C_TIME);
+            }
+            if(filterContext && controllerSmv->modelHasFilter){
+                addParamToAutomatasFilter(controllerSmv,entry->name);
             }
             return copy;
         }
