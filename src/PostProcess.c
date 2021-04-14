@@ -855,8 +855,8 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
     int initialIsInvalid = 1;
     int i;
     Object * timeComponentList = newTDS->DATA_SPEC;
-    for (i = 0; i < newTDS->DATA_SPEC->OBJECT_SIZE; i++){
-        Object* timeComponent = (Object*) newTDS->DATA_SPEC->values[i];
+    for (i = 0; i < timeComponentList->OBJECT_SIZE; i++){
+        Object* timeComponent = (Object*) timeComponentList->values[i];
         int time = *(int*) timeComponent->values[0];
         if(time < C_TIME){
             fprintf(stderr, "[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined on a C_TIME  >= %d context!  \n",
@@ -1038,10 +1038,15 @@ void addTdsOnSmv(char* moduleName, Object * newEncapsulatedTDS, TDS* newTDS, Env
     createType(declarationName,accessHeader(controller, PORTS, 0),
                accessSmvInfo(controller, PORTS, 0),nameWithNoBreakL,NULL,V_MODULE_DEC,controller);
     if(newTDS->type == MATH_EXPRESSION || newTDS->type == FUNCTION_APPLY){
-        // deve criar um init e next identicos para ambos os casos com apenas a diferença da limitação temporal
-        //specTDS()
+        // deve criar um init e next BÁSICOS
+        // deve-se instanciar a funçao dentro do modulo SMV dessa TDS. (se não fosse inline)
         if(newTDS->type == FUNCTION_APPLY){
-            // deve-se instanciar a funçao dentro do modulo SMV dessa TDS.
+            createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
+                         accessSmvInfo(controller, PORTS, newTDS->AUX_REF), "NULL", NULL,
+                         INIT, NULL, 0, 1);
+            createAssign("value", accessHeader(controller, PORTS, newTDS->SMV_REF),
+                         accessSmvInfo(controller, PORTS, newTDS->AUX_REF), "value", NULL,
+                         NEXT, NULL, 0, 1);
         }
     }
 }
@@ -1094,8 +1099,9 @@ void preProcessTDS(Object* encapsulatedTDS, EnvController* controller, int C_TIM
     char* declarationName = SYNTH_TDS->name? SYNTH_TDS->name : encapsulatedTDS->SINTH_BIND;
 
     addTdsOnSmv(newTdsHeader->moduleName, encapsulatedTDS, SYNTH_TDS, controller);
-    addTdsRelationOnSmv(SYNTH_TDS, controller, I_TIME);
-
+    if(SYNTH_TDS->type == TDS_DEPEN){
+        addTdsRelationOnSmv(SYNTH_TDS, controller, I_TIME);
+    }
     addTdsToLazyControl(encapsulatedTDS,SYNTH_TDS,controller,C_TIME,I_TIME,F_TIME);
     validateTdsDeclaration(declarationName,controller);
 }
@@ -1195,6 +1201,7 @@ void specTDS(TDS* currentTDS, Object* lazyValue, int C_TIME, int I_TIME, EnvCont
             specTdsAssignOnRevaluation(currentTDS, refToTdsValue, evalBind, stateId, I_TIME, currentHeader, currentInfo, controller);
         }
         else{
+            specTdsAssignOnRevaluation(currentTDS, "value", lazyValue->SINTH_BIND, stateId, I_TIME, currentHeader, currentInfo, controller);
             //specTdsAssignOnRevaluation("value", I_TIME, C_TIME, controller);
         }
     }

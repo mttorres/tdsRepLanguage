@@ -89,14 +89,13 @@ void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int 
 }
 
 void resolveTimeComponentSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME,
-                              Node *PROGRAM_PATH, TDS *currentTDS, Object *timeComponent) {
-    PROGRAM_PATH = (Node*) timeComponent->values[1];
-    resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
+                              TDS *currentTDS, Object *timeComponent) {
+
+    resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, timeComponent->values[1], currentTDS);
 }
 
 void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv, int C_TIME) {
     int I_TIME = *(int*) lookup(currentScope, "I_TIME")->val->values[0];
-    Node* PROGRAM_PATH = NULL;
     int i;
     for (i = 0; i < controllerSmv->declaredPortsNumber; i++) {
         // resolve call-by-need cada expressão ativa da TDS.
@@ -105,14 +104,14 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
         if(currentTDS->type == DATA_LIST){
             // eval de forma que ele deve saber qual componente temporal ele deve pegar
             if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
-                Object* timeComponent = (Object*) currentTDS->DATA_SPEC->values[currentTDS->COMPONENT_TIMES[C_TIME]];
-                resolveTimeComponentSpec(currentScope,controllerSmv,C_TIME,I_TIME,PROGRAM_PATH,currentTDS,timeComponent);
+                Object* tdsDataSpec = currentTDS->DATA_SPEC;
+                Object* timeComponent = (Object*) tdsDataSpec->values[currentTDS->COMPONENT_TIMES[C_TIME]];
+                resolveTimeComponentSpec(currentScope,controllerSmv,C_TIME,I_TIME,currentTDS,timeComponent);
             }
         }else{
             // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
             if(currentTDS->type != TDS_DEPEN){
-                // FAZ O PROCESSO
-                resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, PROGRAM_PATH, currentTDS);
+                resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, currentTDS->DATA_SPEC, currentTDS);
             }
             else{
                 // senão deve verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
@@ -1014,8 +1013,7 @@ Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE t
     int I_TIME = *(int*)lookup(scope,"I_TIME")->val->values[0];
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
 
-    TDS* newTDS = createTDS(portName, type, tdsSpec, delayed,
-                            type == FUNCTION_APPLY ? (char *) tdsSpec->values[0] : NULL, C_TIME, F_TIME, pathForCond);
+    TDS* newTDS = createTDS(portName, type, tdsSpec, delayed, C_TIME, F_TIME, pathForCond);
     if(type == TDS_DEPEN){
         computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
     }
@@ -1034,9 +1032,16 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerS
         fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv.\nPlease refer to the documentation for further info. \n");
     }
     char* portName = n->leafs[3];
-    Object * domainInfo = eval(n->children[0],scope,controllerSmv);
-    TDS_TYPE type =  domainInfo->type == TIME_COMPONENT? DATA_LIST :
-                     domainInfo->type == FUNCTION_ENTRY? FUNCTION_APPLY : MATH_EXPRESSION;
+    void* domainInfo = NULL;
+    TDS_TYPE  type;
+    if(n->children[0]->type == DOMAIN_FUNCTION){
+        domainInfo = n->children[0]->children[0];
+        type = FUNCTION_APPLY;
+    }
+    else{
+        domainInfo = eval(n->children[0],scope,controllerSmv);
+        type = DATA_LIST;
+    }
     return computeTDSBasicOperations(NULL, portName, type, domainInfo, 0, scope, NULL, controllerSmv);
 }
 

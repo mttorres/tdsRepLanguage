@@ -15,11 +15,10 @@ typedef struct TDS
 {
   char* name;
   TDS_TYPE type;
-  Object* DATA_SPEC; // especificação da TDS, ou seja o PATH DO PROGRAMA
+  void* DATA_SPEC; // especificação da TDS, ou seja o PATH DO PROGRAMA (referencia a função também vai ficar aqui)
   Object** DATA_TIME; // todos os objetos de valor por tempo sintetizados para a TDS, usado para memoization
   struct TDS** linkedDependency; // tds's que estão sendo observadas por essa (são dependencias)
   int TOTAL_DEPENDENCIES_PT; // total de dependencias dessa TDS (quando aplicavel)
-  char* functionRef;  // a referência a função
   int delayed; // se ela é delayed ou não
   int I_INTERVAL;
   int F_INTERVAL;
@@ -39,7 +38,7 @@ typedef struct TDS
 } TDS;
 
 // passar valores e função para construtor? (função já vai estar definida, valores só vai estar definido se a TDS for linked!)
-TDS * createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *functionRef, int I_INTERVAL, int F_INTERVAL, void *limitCondition);
+TDS * createTDS(char *name, TDS_TYPE type, void *valueList, int delayed, int I_INTERVAL, int F_INTERVAL, void *limitCondition);
 
 /**
  * Linka duas TDS's.

@@ -3,7 +3,7 @@
 #include "../../headers/TDS.h"
 
 
-TDS* createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *functionRef, int I_INTERVAL, int F_INTERVAL, void *limitCondition) {
+TDS* createTDS(char *name, TDS_TYPE type, void *valueList, int delayed, int I_INTERVAL, int F_INTERVAL, void *limitCondition) {
 
     TDS* newTDS = (TDS*) malloc(sizeof(TDS));
 
@@ -25,7 +25,6 @@ TDS* createTDS(char *name, TDS_TYPE type, Object *valueList, int delayed, char *
 	newTDS->delayed = delayed;
     newTDS->I_INTERVAL = I_INTERVAL;
     newTDS->F_INTERVAL = F_INTERVAL;
-	newTDS->functionRef = functionRef;
     newTDS->SMV_REF = -1;
 
     newTDS->COMPONENT_TIMES = type == DATA_LIST?  malloc(sizeof(int)*F_INTERVAL+1) : NULL;
@@ -116,7 +115,7 @@ void resolveMergerTdsDependencies(TDS *tds, int C_TIME){
 
 int addDataToTds(TDS* currentTDS, int C_TIME, Object* value){
     int currentLimitCond = currentTDS->limitCondition? currentTDS->currentCondEval : 1;
-    if(value && value->type != NULL_ENTRY && currentTDS->DATA_TIME[C_TIME] == NULL && currentLimitCond) {
+    if(value && C_TIME >= currentTDS->I_INTERVAL && currentTDS->DATA_TIME[C_TIME] == NULL && currentLimitCond) {
         currentTDS->DATA_TIME[C_TIME] = value;
         if(currentTDS->noValue){
             currentTDS->noValue = 0;
