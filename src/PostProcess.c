@@ -18,7 +18,7 @@ char* SmvConversions[] = {"%s", "%s;",  "%s\n", "%s%s", "%s %s %s", "%s_redef%d%
                           "\t%s:= %s;\n",  "case \n\t\t%s\n\t\tTRUE : %s; \n\tesac",
                           "%s : %s;", "\n\t\t%s : %s;\n", "TRUE : %s; \n", "%s = %s : %s; \n",
                           "\t%s : %d..%d;\n", "\t%s : boolean;\n" , "\t%s : {%s};\n", "\t%s : %s;\n", "%s, %s", "tds_%s", "%s.value",
-                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;",  "next(time) >= %d & %s = NULL : %s.value;\n\t\tnext(time) >= %d & %s.value = NULL & %s != NULL : NULL;",
+                          "%s = NULL : %s.value;\n\t\t%s.value = NULL & %s != NULL : NULL;",  "next(time) > %d & %s = NULL : %s.value;\n\t\tnext(time) > %d & %s.value = NULL & %s != NULL : NULL;",
                           "%s = NULL : %s;\n\t\t%s = NULL : %s;",  "%s >= %d & %s = NULL : %s;\n\t\t%s >= %d & %s = NULL : %s;",
                           "MODULE %s\n" };
 
@@ -1001,7 +1001,7 @@ void addTdsRelationOnSmv(TDS *newTDS, EnvController *controller, int I_TIME) {
 
                     char timeBind[ALOC_SIZE_LINE/2];
                     sprintf(timeBind,"%d",newTDS->I_INTERVAL);
-                    char* evalByTimeNext = createConditionCube("next(time)",timeBind,">",refNextToDepTdsValue,1);
+                    char* evalByTimeNext = createConditionCube("next(time)",timeBind,">=",refNextToDepTdsValue,1);
                     createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
                                  accessSmvInfo(controller, PORTS, 0), "NULL", evalByTimeNext,
                                  NEXT, NULL, 1, 0);
