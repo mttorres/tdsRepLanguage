@@ -36,14 +36,18 @@ typedef struct envcontroller
 
     char** typeSetWords; // dict para "otmização"
 
+    //contexto tds
+    TDS** declaredPorts;
+    TDS* currentTDScontext;
+
+
+
     // validação
     STable* originalPorts;
     int expectedPorts;
     int validPorts;
     // ai ele verifica se foram usadas (não tem declarações de funções)
     int declaredPortsNumber;
-    TDS** declaredPorts;
-    TDS* currentTDScontext;
     // avisa caso não tenha nenhuma TDS linkada uma com a outra
     int IO_RELATION;
     // avisa caso uma porta tenha tido declaração repetida
@@ -55,11 +59,15 @@ typedef struct envcontroller
     int filterContext;
     int F_AUTOMATAS_CHANGE_POINTER;
     int modelHasFinalAutomata;
+    int filterUsed;
+
+    // interactive
+    int interactiveMode;
 
 }EnvController;
 
 
-EnvController *createController();
+EnvController *createController(int enableInteractive);
 
 /**
  * Libera o controlador e todas as estruturas armazenadas por ele
@@ -162,6 +170,12 @@ void addTypeSetWordToDict(char* word, EnvController* controller);
  * @param paramName o parâmetro
  */
 void addParamToAutomatasFilter(EnvController* controller, char* paramName);
+
+/**
+ * Realiza diversas validações de contexto.
+ * @param controller o controller que contem todas as informações de necessárias
+ */
+void validateAfterInterPost(EnvController* controller);
 
 
 #endif //TDSREPLANGUAGE_ENVCONTROLLER_H

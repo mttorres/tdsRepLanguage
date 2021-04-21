@@ -71,7 +71,6 @@ void resolveDependencies(TDS* currentTDS, STable* scope, EnvController* controll
         propagateValueToTypeSet(currentTDS, currentTDS->linkedDependency[i],controllerSmv);
     }
     if(currentTDS->limitCondition){
-        resetLimitConditionEval(currentTDS);
         specTDS(currentTDS,NULL,C_TIME,I_TIME,controllerSmv,scope);
         letgoObject(resolvedCondFilter);
     }
@@ -101,23 +100,42 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
         // resolve call-by-need cada expressão ativa da TDS.
         TDS* currentTDS = controllerSmv->declaredPorts[i];
         controllerSmv->currentTDScontext = currentTDS;
-        if(currentTDS->type == DATA_LIST){
-            // eval de forma que ele deve saber qual componente temporal ele deve pegar
-            if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
-                Object* tdsDataSpec = currentTDS->DATA_SPEC;
-                Object* timeComponent = (Object*) tdsDataSpec->values[currentTDS->COMPONENT_TIMES[C_TIME]];
-                resolveTimeComponentSpec(currentScope,controllerSmv,C_TIME,I_TIME,currentTDS,timeComponent);
-            }
-        }else{
-            // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
-            if(currentTDS->type != TDS_DEPEN){
-                resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, currentTDS->DATA_SPEC, currentTDS);
-            }
-            else{
-                // senão deve verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
-                resolveDependencies(currentTDS,currentScope,controllerSmv,I_TIME,C_TIME);
-            }
+        if(C_TIME >=  currentTDS->I_INTERVAL){
+            if(currentTDS->type == DATA_LIST){
+                // eval de forma que ele deve saber qual componente temporal ele deve pegar
+                if(currentTDS->COMPONENT_TIMES[C_TIME] != -1){
+                    Object* tdsDataSpec = currentTDS->DATA_SPEC;
+                    Object* timeComponent = (Object*) tdsDataSpec->values[currentTDS->COMPONENT_TIMES[C_TIME]];
+                    resolveTimeComponentSpec(currentScope,controllerSmv,C_TIME,I_TIME,currentTDS,timeComponent);
+                }
+            }else{
+                // tds_dependentes já são resolvidas sempre (tds desse tipo deveria ser adicionada aos lazy?)
+                if(currentTDS->type != TDS_DEPEN){
+                    resolveLazyTdsSpec(currentScope, controllerSmv, C_TIME, I_TIME, currentTDS->DATA_SPEC, currentTDS);
+                }
+                else{
+                    // senão deve verificar a dependência dessa TDS para atribuir o DATA_TIME também e resolver seu type-set
+                    resolveDependencies(currentTDS,currentScope,controllerSmv,I_TIME,C_TIME);
+                }
 
+            }
+        }
+        if(currentTDS->limitCondition && currentTDS->type == TDS_DEPEN){
+            resetLimitConditionEval(currentTDS);
+        }
+
+        if(controllerSmv->interactiveMode){
+            printTDS(currentTDS,C_TIME);
+            char awns[50];
+            printf("Continue(y/n)?");
+            scanf("%s", awns);
+            if((awns[0] == 'n' || awns[0] == 'N') && awns[1] == '\0'){
+                printf("Interpretation interrupted by user.\n");
+                exit(0);
+            }
+            printf("\n");
+            printf("\n\n");
+            printf("---------------------------------------------------------\n\n\n");
         }
     }
     controllerSmv->currentTDScontext = NULL;
@@ -132,6 +150,9 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
     int i;
     int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
     for (i = C_TIME; i < changedTo; i++) {
+        if(controllerSmv->interactiveMode){
+            printf("--------------TDS EVALUATION (time = %d)------------------\n\n\n",C_TIME);
+        }
         resolveTdsLazyEvaluation(currentScope, controllerSmv, i);
         int next = i+1;
         if(next != changedTo){
@@ -157,7 +178,7 @@ Object* evalNUM(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalBOOL(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalBOOL] \n");
+    //printf("[evalBOOL] \n");
     int sint;
 
     char* trueString = "TRUE";
@@ -196,7 +217,7 @@ Object* evalSTRING(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalNULL] \n");
+    //printf("[evalNULL] \n");
     // se eu interpretar como "NULL" do C mesmo podemos ter problemas(?) SIM NULL SERÁ UMA "LABEL" ESPECIAL
     char* sint =  n->leafs[0];
     // TALVEZ TENHAMOS QUE ADICIONAR AO NULL o 0 (para não ficar uma constante)
@@ -207,7 +228,7 @@ Object* evalNULL(Node* n, STable* scope, EnvController* controllerSmv)
 
 Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalIDVAR] \n");
+    //printf("[evalIDVAR] \n");
 
     // VAI RECUPERAR UM OBJETO NA TABELA DE SIMBOLOS e então SUBIR COM ELE
     //(já que o tipo pode ser qualquer e a gente vai decidir o que fazer com ele ainda)
@@ -292,12 +313,12 @@ Object* evalDataV(Node* n, STable* scope, EnvController* controllerSmv){/*notuse
 
 Object* evalPARAMS_CALL(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalPARAMS_CALL] \n");
+    //printf("[evalPARAMS_CALL] \n");
 }
 
 Object* evalPARAMS(Node* n, STable* scope, EnvController* controllerSmv)
 {
-    printf("[evalPARAMS_CALL] \n");
+    //printf("[evalPARAMS_CALL] \n");
 }
 
 
@@ -739,7 +760,7 @@ Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv){/*notuse
 Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 
 Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv){
-    printf("[evalV_PROP_TDS] \n");
+    //printf("[evalV_PROP_TDS] \n");
 }
 
 Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSmv){
@@ -951,7 +972,7 @@ Object * evalCMD_IF(Node* n, STable* scope, EnvController* controllerSmv){
 
     STable* IF_SCOPE = addSubScope(scope,IF_BLOCK);
     conditionalExpr = eval(n->children[0], scope, controllerSmv);
-    printObject(conditionalExpr);
+    //printObject(conditionalExpr);
     bindCondition(IF_SCOPE,conditionalExpr);
     IF_SCOPE->notEvaluated = !(!IF_SCOPE->parent->notEvaluated && *(int*)conditionalExpr->values[0]);
     eval(n->children[1], IF_SCOPE, controllerSmv);
@@ -1014,6 +1035,9 @@ Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE t
     int F_TIME  = *(int*) lookup(scope,"F_TIME")->val->values[0];
 
     TDS* newTDS = createTDS(portName, type, tdsSpec, delayed, C_TIME, F_TIME, pathForCond);
+    if(newTDS->limitCondition){
+        controller->filterUsed = 1;
+    }
     if(type == TDS_DEPEN){
         computeTDSDependentOperations(pathForDepen,portName,scope,newTDS,controller,I_TIME,C_TIME);
     }

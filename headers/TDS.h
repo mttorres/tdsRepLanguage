@@ -108,6 +108,8 @@ void updateLimitCondition(TDS* tds, Object* condExpr);
  */
 void resetLimitConditionEval(TDS* tds);
 
-void* letGoTDS(struct TDS* tds);
+void letGoTDS(struct TDS* tds);
+
+void printTDS(TDS* tds, int C_TIME);
 
 #endif

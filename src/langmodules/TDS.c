@@ -143,6 +143,71 @@ void resetLimitConditionEval(TDS* tds){
     tds->currentCondEval = 0;
 }
 
-void* letGoTDS(TDS* tds){
+void letGoTDS(TDS* tds){
 
+}
+
+void printTDS(TDS* tds, int C_TIME){
+    if (!tds){
+        return;
+    }
+    if(tds->type == TDS_DEPEN){
+        int i;
+        for (i = 0; i < tds->TOTAL_DEPENDENCIES_PT; i++) {
+            printTDS(tds->linkedDependency[i],C_TIME);
+            printf("->");
+            if(tds->TOTAL_DEPENDENCIES_PT > 1){
+                    if(i == (tds->TOTAL_DEPENDENCIES_PT/2)-1){
+                        printf("\n");
+                        printf("\t\t\t\t\t\t\t\t\t");
+                        printf("o TDS(%s,%d)",tds->name,C_TIME);
+                        printf("\n");
+                    }
+                    else {
+                        printf("\n");
+                    }
+            }
+            else{
+                if(tds->limitCondition){
+                    if(tds->currentCondEval){
+                        printf("o TDS(%s,%d)",tds->name,C_TIME);
+                    }
+                    else{
+                        printf("|filter block|-o TDS (%s,%d)",tds->name,C_TIME);
+                    }
+                }
+                else if (!tds->delayed){
+                    printf("o TDS(%s,%d)",tds->name,C_TIME);
+                }
+                else{
+                    Object* valueEncap = tds->DATA_TIME[tds->LAST_DELAYED_ACCEPT_TIME];
+                    if(tds->noValue || !valueEncap || valueEncap->type == NULL_ENTRY){
+                        printf("||-o TDS(%s,%d)",tds->name,C_TIME);
+                    }
+                    else{
+                        if(valueEncap->type == NUMBER_ENTRY){
+                            printf("|%d|-o TDS(%s,%d)",*(int*)valueEncap->values[0],tds->name,C_TIME);
+                        }
+                        else{
+                            printf("|%s|-o TDS(%s,%d)",(char*)valueEncap->values[0],tds->name,C_TIME);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else{
+        if(tds->noValue || !tds->DATA_TIME[C_TIME] || tds->DATA_TIME[C_TIME]->type == NULL_ENTRY){
+            printf("TDS(%s,%d) o----- NULL --------",tds->name,C_TIME);
+        }
+        else{
+            Object* valueEncap = tds->DATA_TIME[C_TIME];
+            if(valueEncap->type == NUMBER_ENTRY){
+                printf("TDS(%s,%d) o----> value: %d --->---",tds->name,C_TIME,*(int*)valueEncap->values[0]);
+            }
+            else{
+                printf("TDS(%s,%d) o----> value: %s --->---",tds->name,C_TIME,(char*)valueEncap->values[0]);
+            }
+        }
+    }
 }

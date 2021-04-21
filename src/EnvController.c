@@ -20,11 +20,12 @@ void setUpTypeSetDict(EnvController* controller){
 }
 
 
-EnvController *createController() {
+EnvController *createController(int enableInteractive) {
 
 
 
     EnvController* Hcontrol = malloc(sizeof(EnvController));
+    Hcontrol->interactiveMode = enableInteractive;
     Hcontrol->H_AUTOMATA_CURRENT_SIZE = 0;
     Hcontrol->H_PORTS_CURRENT_SIZE = 0;
     Hcontrol->PORTS_INFO_CURRENT_SIZE = 0;
@@ -63,6 +64,7 @@ EnvController *createController() {
     Hcontrol->F_AUTOMATAS_CHANGE_POINTER = 0;
     Hcontrol->filterContext = 0;
     Hcontrol->modelHasFinalAutomata = 0;
+    Hcontrol->filterUsed = 0;
     return Hcontrol;
 }
 
@@ -249,7 +251,7 @@ void addParamToAutomata(EnvController* controller, char* paramName, HeaderSmv* a
 void addParamToAutomatasFilter(EnvController* controller, char* paramName){
     // deve adicioanr a todos os automatos esse parâmetro, e deve atualizar também as referencias desses no main e no final automata
     int i;
-    for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; ++i) {
+    for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; i++) {
         HeaderSmv* automata =  accessHeader(controller,AUTOMATA,i);
         addParamToAutomata(controller,paramName,automata);
     }
@@ -335,5 +337,37 @@ void addTypeSetWordToDict(char* word, EnvController* controller){
         char* newWord = malloc(sizeof(char)*strlen(word)+1);
         strcpy(newWord,word);
         controller->typeSetWords[hashWord] = newWord;
+    }
+}
+
+void validateAfterInterPost(EnvController* controller){
+    if(controller->declaredPortsNumber != controller->expectedPorts){
+        printf("\n");
+        if(!controller->declaredPortsNumber){
+            fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, NO VALID TDS DEFINITION WAS FOUND.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE\n");
+        }
+        else{
+            if(controller->validPorts != controller->expectedPorts){
+                if(controller->validPorts){
+                    fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED ONLY %d of %d PORTS WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
+                            controller->declaredPortsNumber, controller->validPorts,controller->expectedPorts);
+                }
+                else{
+                    fprintf(stderr, "[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED NONE WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
+                            controller->declaredPortsNumber);
+                }
+            }
+        }
+    }
+    if(!controller->IO_RELATION){
+        fprintf(stderr, "[WARNING] NO TDS RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
+    }
+    if(controller->modelHasFilter == 1 && !controller->filterUsed){
+        fprintf(stderr, "[WARNING] FILTER WAS USED IN THE ORIGINAL MODEL, HOWEVER, NO FILTER RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
+    }
+    else{
+        if(controller->filterUsed){
+            fprintf(stderr, "[WARNING] FILTER WAS NOT USED IN THE ORIGINAL MODEL. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
+        }
     }
 }
