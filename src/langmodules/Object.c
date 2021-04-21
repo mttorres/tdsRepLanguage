@@ -223,7 +223,7 @@ void printObject(Object* o)
  */
 void letGoTimeComponent(Object* o){
     if(o->OBJECT_SIZE < 2 && !o->aList){
-        fprintf(stderr, "[letGoTimeComponent] Possible error while freeing memory \n");
+        fprintf(stderr, "\n[letGoTimeComponent] Possible error while freeing memory \n");
         //exit(-1);
     }
     int i;

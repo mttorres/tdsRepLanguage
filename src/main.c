@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 	    else{
             smvP = fopen(argv[2], "r+");
             sizeSmvName = strlen(argv[2]);
-            if(argv[2][sizeFpName-1] != 'v' || argv[2][sizeFpName-2] != 'm' || argv[2][sizeFpName-3] != 's'){
+            if(argv[2][sizeSmvName-1] != 'v' || argv[2][sizeSmvName-2] != 'm' || argv[2][sizeSmvName-3] != 's'){
                 fprintf(stderr,"Expected .smv input file \n");
                 exit(-1);
             }
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 	    if(argv[3]){
             smvP = fopen(argv[3], "r+");
             sizeSmvName = strlen(argv[3]);
-            if(argv[3][sizeFpName-1] != 'v' || argv[3][sizeFpName-2] != 'm' || argv[3][sizeFpName-3] != 's'){
+            if(argv[3][sizeSmvName-1] != 'v' || argv[3][sizeSmvName-2] != 'm' || argv[3][sizeSmvName-3] != 's'){
                 fprintf(stderr,"Expected .smv input file \n");
                 exit(-1);
             }

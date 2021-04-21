@@ -110,6 +110,6 @@ void resetLimitConditionEval(TDS* tds);
 
 void letGoTDS(struct TDS* tds);
 
-void printTDS(TDS* tds, int C_TIME);
+void printTDS(TDS* tds, TDS* dependent, int C_TIME);
 
 #endif

@@ -120,23 +120,25 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
 
             }
         }
+        if(controllerSmv->interactiveMode){
+            printTDS(currentTDS,NULL,C_TIME);
+            printf("\n\n");
+        }
         if(currentTDS->limitCondition && currentTDS->type == TDS_DEPEN){
             resetLimitConditionEval(currentTDS);
         }
-
-        if(controllerSmv->interactiveMode){
-            printTDS(currentTDS,C_TIME);
-            char awns[50];
-            printf("Continue(y/n)?");
-            scanf("%s", awns);
-            if((awns[0] == 'n' || awns[0] == 'N') && awns[1] == '\0'){
-                printf("Interpretation interrupted by user.\n");
-                exit(0);
-            }
-            printf("\n");
-            printf("\n\n");
-            printf("---------------------------------------------------------\n\n\n");
+    }
+    if(controllerSmv->interactiveMode){
+        char awns[50];
+        printf("\n\n");
+        printf("Continue(y/n)?");
+        scanf("%s", awns);
+        if((awns[0] == 'n' || awns[0] == 'N') && awns[1] == '\0'){
+            printf("Interpretation interrupted by user.\n");
+            exit(0);
         }
+        printf("\n\n\n");
+        printf("---------------------------------------------------------\n\n\n");
     }
     controllerSmv->currentTDScontext = NULL;
 }
@@ -149,9 +151,9 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
     // deve resolver a avaliação para cada TDS "n" vezes. Antes do proximo intervalo ou fim do programa.
     int i;
     int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
-    for (i = C_TIME; i < changedTo; i++) {
+    for (i = C_TIME; i <= changedTo; i++) {
         if(controllerSmv->interactiveMode){
-            printf("--------------TDS EVALUATION (time = %d)------------------\n\n\n",C_TIME);
+            printf("--------------TDS EVALUATION (time = %d)------------------\n\n\n",i);
         }
         resolveTdsLazyEvaluation(currentScope, controllerSmv, i);
         int next = i+1;

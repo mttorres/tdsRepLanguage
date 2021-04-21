@@ -147,20 +147,65 @@ void letGoTDS(TDS* tds){
 
 }
 
-void printTDS(TDS* tds, int C_TIME){
+void printTdsValues(TDS* tds, int C_TIME){
+    if(!tds){
+        return;
+    }
+
+    if (!tds->delayed){
+        if(tds->noValue || !tds->DATA_TIME[C_TIME] || tds->DATA_TIME[C_TIME]->type == NULL_ENTRY){
+            printf("TDS(%s,%d) o----- NULL --------",tds->name,C_TIME);
+        }
+        else{
+            Object* valueEncap = tds->DATA_TIME[C_TIME];
+            if(valueEncap->type == NUMBER_ENTRY){
+                printf("TDS(%s,%d) o----> value: %d --->---",tds->name,C_TIME,*(int*)valueEncap->values[0]);
+            }
+            else{
+                printf("TDS(%s,%d) o----> value: %s --->---",tds->name,C_TIME,(char*)valueEncap->values[0]);
+            }
+        }
+    }
+    else{
+        Object* valueEncap = tds->DATA_TIME[tds->LAST_DELAYED_ACCEPT_TIME];
+        printf("-");
+        if(tds->noValue || !valueEncap || valueEncap->type == NULL_ENTRY){
+            printf("||-o TDS(%s,%d)",tds->name,C_TIME);
+        }
+        else{
+            if(valueEncap->type == NUMBER_ENTRY){
+                printf("|  %d  |-o TDS(%s,%d)",*(int*)valueEncap->values[0],tds->name,C_TIME);
+            }
+            else{
+                printf("|  %s  |-o TDS(%s,%d)",(char*)valueEncap->values[0],tds->name,C_TIME);
+            }
+        }
+    }
+}
+
+void printTDS(TDS* tds, TDS* dependent, int C_TIME){
     if (!tds){
         return;
     }
     if(tds->type == TDS_DEPEN){
         int i;
         for (i = 0; i < tds->TOTAL_DEPENDENCIES_PT; i++) {
-            printTDS(tds->linkedDependency[i],C_TIME);
-            printf("->");
+            TDS* depRefFifo = NULL;
+            if(tds->delayed){
+                depRefFifo = tds;
+            }
+            printTDS(tds->linkedDependency[i],depRefFifo,C_TIME);
+            if(!depRefFifo){
+                printf("->");
+            }
             if(tds->TOTAL_DEPENDENCIES_PT > 1){
                     if(i == (tds->TOTAL_DEPENDENCIES_PT/2)-1){
                         printf("\n");
                         printf("\t\t\t\t\t\t\t\t\t");
                         printf("o TDS(%s,%d)",tds->name,C_TIME);
+                        if(dependent){
+                            printTdsValues(dependent,C_TIME);
+                        }
                         printf("\n");
                     }
                     else {
@@ -180,34 +225,14 @@ void printTDS(TDS* tds, int C_TIME){
                     printf("o TDS(%s,%d)",tds->name,C_TIME);
                 }
                 else{
-                    Object* valueEncap = tds->DATA_TIME[tds->LAST_DELAYED_ACCEPT_TIME];
-                    if(tds->noValue || !valueEncap || valueEncap->type == NULL_ENTRY){
-                        printf("||-o TDS(%s,%d)",tds->name,C_TIME);
-                    }
-                    else{
-                        if(valueEncap->type == NUMBER_ENTRY){
-                            printf("|%d|-o TDS(%s,%d)",*(int*)valueEncap->values[0],tds->name,C_TIME);
-                        }
-                        else{
-                            printf("|%s|-o TDS(%s,%d)",(char*)valueEncap->values[0],tds->name,C_TIME);
-                        }
+                    if(tds->linkedDependency[i]->TOTAL_DEPENDENCIES_PT == 1){
+                        printTdsValues(tds,C_TIME);
                     }
                 }
             }
         }
     }
     else{
-        if(tds->noValue || !tds->DATA_TIME[C_TIME] || tds->DATA_TIME[C_TIME]->type == NULL_ENTRY){
-            printf("TDS(%s,%d) o----- NULL --------",tds->name,C_TIME);
-        }
-        else{
-            Object* valueEncap = tds->DATA_TIME[C_TIME];
-            if(valueEncap->type == NUMBER_ENTRY){
-                printf("TDS(%s,%d) o----> value: %d --->---",tds->name,C_TIME,*(int*)valueEncap->values[0]);
-            }
-            else{
-                printf("TDS(%s,%d) o----> value: %s --->---",tds->name,C_TIME,(char*)valueEncap->values[0]);
-            }
-        }
+        printTdsValues(tds,C_TIME);
     }
 }
