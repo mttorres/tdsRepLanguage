@@ -2,7 +2,7 @@
 // Created by mateus on 27/03/2021.
 //
 
-#include "../headers/Hash.h"
+#include "../../headers/Hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 

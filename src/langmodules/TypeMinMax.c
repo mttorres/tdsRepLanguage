@@ -3,7 +3,7 @@
 //
 
 #include <stdlib.h>
-#include "../headers/TypeMinMax.h"
+#include "../../headers/TypeMinMax.h"
 
 
 TypeMinMax* createMinMaxByOneValue(int valSin){

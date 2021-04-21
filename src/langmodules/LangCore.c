@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "../headers/LangCore.h"
+#include "../../headers/LangCore.h"
 
 
 /*

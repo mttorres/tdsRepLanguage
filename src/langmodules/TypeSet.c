@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "../headers/TypeSet.h"
+#include "../../headers/TypeSet.h"
 
 //int MULTIPLIER_SIMPLE_HASH = 1;
 
