@@ -314,7 +314,6 @@ void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {
    			//printf("[preProcessSmv] módulo acabou \n\n");
    		}
    	}
-   	Hcontrol->IO_RELATION = Hcontrol->H_AUTOMATA_CURRENT_SIZE == 0;
    	free(buffer);
     //printf("terminou! \n");
 //    addParamToPortsModule(Hcontrol, "random", 1);

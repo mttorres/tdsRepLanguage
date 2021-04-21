@@ -944,6 +944,10 @@ void addTdsRelationOnSmv(TDS *newTDS, EnvController *controller, int I_TIME) {
         sprintf(refToTdsValue,SmvConversions[TDS_VALUE_REF],newTDS->name);
 
         if(newTDS->limitCondition){
+            if(newTDS->TOTAL_DEPENDENCIES_PT > 1){
+                fprintf(stderr, "[WARNING] %s with filter property and more than one dependency  \n",newTDS->name);
+                exit(-1);
+            }
             createAssign(refToTdsValue, accessHeader(controller, PORTS, 0),
                          accessSmvInfo(controller, PORTS, 0), "NULL", NULL,
                          INIT, NULL, 0, 1);
