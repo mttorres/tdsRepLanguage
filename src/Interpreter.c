@@ -121,10 +121,10 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
             }
         }
         if(controllerSmv->interactiveMode){
-            printTDS(currentTDS,NULL,C_TIME);
+            prepareToPrintTDS(currentTDS,C_TIME);
             printf("\n\n");
         }
-        if(currentTDS->limitCondition && currentTDS->type == TDS_DEPEN){
+        else{
             resetLimitConditionEval(currentTDS);
         }
     }

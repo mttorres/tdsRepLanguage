@@ -183,6 +183,13 @@ void printTdsValues(TDS* tds, int C_TIME){
     }
 }
 
+void prepareToPrintTDS(TDS* tds, int C_TIME){
+    printTDS(tds,NULL,C_TIME);
+    if(tds->limitCondition && tds->type == TDS_DEPEN){
+        resetLimitConditionEval(tds);
+    }
+}
+
 void printTDS(TDS* tds, TDS* dependent, int C_TIME){
     if (!tds){
         return;
