@@ -30,7 +30,7 @@ Object *eval(Node *n, STable *scope, EnvController *controllerSmv)
 
         if(executores[n->type])
         {
-            printf("[PostProcess - eval] eval especifico \n\n");
+            //printf("[PostProcess - eval] eval especifico \n\n");
             // o nó pode ou não ter mais dem filho, e esse trata o processamento desses nao sendo somente uma varredura e largura.
             SYNTH_O = executores[n->type](n,scope,controllerSmv);
         }

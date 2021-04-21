@@ -38,7 +38,7 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
     }
     *dest = '\0';
 
-    printf("[createEntry] novo nome: %s \n",newName);
+    //printf("[createEntry] novo nome: %s \n",newName);
     
     newEntry->name = newName; 
     newEntry->val = val;   // objects sempre vão ser alocados, string devemos ter tratativa! (a não ser que essa seja alocada pelo bison?)
@@ -292,7 +292,7 @@ void redistributeHashs(STable* t, TableEntry* e)
 void insert(STable* t, TableEntry* e) {
     
     int index = calculateHashPos(e->name, t);
-    printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
+    //printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
     
     if(lookup(t,e->name))
     {
@@ -319,8 +319,8 @@ TableEntry* lookup(STable* t, char* name) {
     	return e;
     }
     // não achou procura na hierarquia de escopos acima
-    printf("[lookup] WARNING %s not in scope : ",name);
-    printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+    //printf("[lookup] WARNING %s not in scope : ",name);
+    //printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
     STable* parent = t->parent;
    	while(!e && parent)
     {
@@ -335,7 +335,7 @@ TableEntry* lookup(STable* t, char* name) {
 
 void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
 
-    printf("[addNumericalIntervalSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+    //printf("[addNumericalIntervalSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 
     max = newValue > max && newValue > min ? newValue : max;
     max = newValue < max && newValue < min ? newValue : min;
@@ -432,7 +432,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 
 	STable* child = createTable(type, parent, parent->level + 1, parent->nchild, -1);
 	
-	printf("[addSubScope] alocando filho: %d \n",parent->nchild);
+	//printf("[addSubScope] alocando filho: %d \n",parent->nchild);
 
 	if(!parent->nchild) {
 		parent->children = (STable**) malloc((parent->nchild+1)*sizeof(STable*));
@@ -441,7 +441,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	{
 		if(!parent->backup)
 		{
-			printf("[addSubScope] realocando filhos: %d \n",parent->nchild);
+			//printf("[addSubScope] realocando filhos: %d \n",parent->nchild);
 			STable** newbuffer = realloc(parent->children, (parent->nchild+1)*sizeof(STable*));
 		
 			if(newbuffer == NULL)

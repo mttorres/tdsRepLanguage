@@ -380,7 +380,7 @@ void updateObject(Object *o, void **any, int any_type, int object_size, int inde
 //	int typeChanged = 0;
 	if(o->type != any_type)
 	{
-		printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
+		//printf("[updateObject] -------type-change----> %s \n",mappingEnumObjectType[any_type]);
 		exit(-1);
 		//typeChanged = 1;
 	}
