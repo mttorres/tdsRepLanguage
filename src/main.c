@@ -117,27 +117,19 @@ int main(int argc, char* argv[]) {
 	printf("\n");
 	printf("------------------------------------------------------------------------------\n");
 
- 	printf("\n");	
- 	printf("\n");
- 	printf("\n");
- 	printf("\n");
+ 	//printf("\n\n\n\n");
 
- 	printf("--------------------------------- PROGRAM TABLES ---------------------------------------------\n");
+// 	printf("--------------------------------- PROGRAM TABLES ---------------------------------------------\n");
 
-	printTable(global);
-    printf("\n");
+//	printTable(global);
+//    printf("\n");
 
-    printf("--------------------------------- smv-INFO TABLES ---------------------------------------------\n");
+//    printf("--------------------------------- smv-INFO TABLES ---------------------------------------------\n");
 
-    printTable(controller->mainInfo);
-    printf("\n");
-    printf("\n");
-    printf("\n");
-    printTable(controller->originalPorts);
-    printf("\n");
- 	printf("\n");
- 	printf("\n");
-
+//    printTable(controller->mainInfo);
+    printf("\n\n\n\n");
+//    printTable(controller->originalPorts);
+    printf("\n\n\n");
     letgoTable(global);
 
  	//printf("--------------------------------- HEADERS ---------------------------------------------\n");

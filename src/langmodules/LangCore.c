@@ -240,11 +240,11 @@ void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* n
     if(DEP_HEAD && DEP_HEAD->type == TDS_ENTRY || dependenceList->type == TDS_ENTRY) {
         if (dependenceList->OBJECT_SIZE > 2) {
             fprintf(stderr,
-                    "[WARNING] %s definition uses more than 2 inputs.\nIt is recommended to check the input model, for instance, reo2nuXmv only generates merge-like connections with at most 2 inputs  \n",
+                    "[WARNING] %s definition uses more than 2 inputs.\nIt is recommended to check the input model, for instance, reo2nuXmv only generates merge-like connections with at most 2 inputs\n",
                     portName);
         }
         if(( newTDS->delayed || dependenceList->OBJECT_SIZE > 1) && C_TIME > I_TIME){
-            fprintf(stderr, "[WARNING] %s uses a temporal condition to initialization.\nIt is recommended to review your specification. This behaviour is usually acceptable in case the modeled port is lossy (eg: LossySync)\n",
+            fprintf(stderr, "[WARNING] %s uses a temporal condition to initialization. It is recommended to review your specification.\nThis behaviour is usually acceptable in case the modeled port is lossy (eg: LossySync)\n",
                     portName);
         }
 

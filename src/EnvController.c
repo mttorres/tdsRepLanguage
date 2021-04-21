@@ -349,11 +349,11 @@ void validateAfterInterPost(EnvController* controller){
         else{
             if(controller->validPorts != controller->expectedPorts){
                 if(controller->validPorts){
-                    fprintf(stderr, "\n[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED ONLY %d of %d PORTS WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
+                    fprintf(stderr, "\n[WARNING] THE MODEL GENERATION WAS SUCCESSFUL,\nHOWEVER, OF THE %d PORTS DECLARED ONLY %d of %d PORTS WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
                             controller->declaredPortsNumber, controller->validPorts,controller->expectedPorts);
                 }
                 else{
-                    fprintf(stderr, "\n[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, OF THE %d PORTS DECLARED NONE WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
+                    fprintf(stderr, "\n[WARNING] THE MODEL GENERATION WAS SUCCESSFUL,\nHOWEVER, OF THE %d PORTS DECLARED NONE WERE COMPLIANT TO THE ORIGINAL MODEL.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n",
                             controller->declaredPortsNumber);
                 }
             }
@@ -363,11 +363,11 @@ void validateAfterInterPost(EnvController* controller){
         fprintf(stderr, "\n[WARNING] NO TDS RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
     }
     if(controller->modelHasFilter == 1 && !controller->filterUsed){
-        fprintf(stderr, "\n[WARNING] FILTER WAS USED IN THE ORIGINAL MODEL, HOWEVER, NO FILTER RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
+        fprintf(stderr, "\n[WARNING] FILTER WAS USED IN THE ORIGINAL MODEL, HOWEVER, NO FILTER RELATIONSHIP WAS DECLARED. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
     }
     else{
         if(controller->filterUsed){
-            fprintf(stderr, "\n[WARNING] FILTER WAS NOT USED IN THE ORIGINAL MODEL. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
+            fprintf(stderr, "\n[WARNING] FILTER WAS NOT USED IN THE ORIGINAL MODEL. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
         }
     }
 }

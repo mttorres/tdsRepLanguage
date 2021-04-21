@@ -859,12 +859,12 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
         Object* timeComponent = (Object*) timeComponentList->values[i];
         int time = *(int*) timeComponent->values[0];
         if(time < C_TIME){
-            fprintf(stderr, "\n[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined on a C_TIME  >= %d context!  \n",
+            fprintf(stderr, "\n[WARNING] %s TDS's specification on time = %d was not evaluated.\nThe specification was defined on a C_TIME  >= %d context!  \n",
                     encapsulatedTDS->SINTH_BIND,time,C_TIME);
             initialIsInvalid = time == 0?  1 : initialIsInvalid;
         }
         else if(time < I_TIME || time > F_TIME){
-            fprintf(stderr, "\n[WARNING] %s TDS's specification on time = %d was not evaluated. The specification was defined out of the model time interval: %d ~ %d  \n",
+            fprintf(stderr, "\n[WARNING] %s TDS's specification on time = %d was not evaluated.\nThe specification was defined out of the model time interval: %d ~ %d  \n",
                     encapsulatedTDS->SINTH_BIND,time,I_TIME,F_TIME);
         }
         else{

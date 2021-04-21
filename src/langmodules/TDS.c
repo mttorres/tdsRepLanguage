@@ -208,7 +208,7 @@ void printTDS(TDS* tds, TDS* dependent, int C_TIME){
             if(tds->TOTAL_DEPENDENCIES_PT > 1){
                     if(i == (tds->TOTAL_DEPENDENCIES_PT/2)-1){
                         printf("\n");
-                        printf("\t\t\t\t\t\t\t\t\t");
+                        printf("\t\t\t\t\t");
                         printf("o TDS(%s,%d)",tds->name,C_TIME);
                         if(dependent){
                             printTdsValues(dependent,C_TIME);
