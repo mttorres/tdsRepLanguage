@@ -95,7 +95,7 @@ void resolveDependencies(TDS* currentTDS, STable* scope, EnvController* controll
 void resolveLazyTdsSpec(STable *currentScope, EnvController *controllerSmv, int C_TIME, int I_TIME, Node *PROGRAM_PATH, TDS *currentTDS) {
 
     Object*  lazyValue = eval(PROGRAM_PATH, currentScope, controllerSmv);
-    if(lazyValue->aList){
+    if(lazyValue->aList || lazyValue->type == LOGICAL_ENTRY){
         fprintf(stderr, "TDS VALIDATION ERROR: INCOMPATIBLE SPECIFICATION FOR TDS %s. DATA STRUCTURES ARE NOT ACCEPTED AS VALUES, ONLY SYMBOLIC VALUES.", currentTDS->name);
         exit(-1);
     }
@@ -242,6 +242,7 @@ void computeTDSDependentOperations(Node*n, char* portName, STable* scope, TDS* n
             fprintf(stderr,
                     "[WARNING] %s definition uses more than 2 inputs.\nIt is recommended to check the input model, for instance, reo2nuXmv only generates merge-like connections with at most 2 inputs\n",
                     portName);
+            exit(-1); // enquanto o modelo do daniel não é estendido para mais de 2 portas para o merger
         }
         if(( newTDS->delayed || dependenceList->OBJECT_SIZE > 1) && C_TIME > I_TIME){
             fprintf(stderr, "[WARNING] %s uses a temporal condition to initialization. It is recommended to review your specification.\nThis behaviour is usually acceptable in case the modeled port is lossy (eg: LossySync)\n",

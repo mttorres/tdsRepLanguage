@@ -758,6 +758,7 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerS
 
     if(scope->type != GLOBAL){
         fprintf(stderr, "ERROR: BAD USE OF TDS DEFINITION, CONDITIONAL DEFINITIONS OF MODULES ARE NOT SUPPORTED BY nuXmv.\nPlease refer to the documentation for further info. \n");
+        exit(-1);
     }
     char* portName = n->leafs[3];
     void* domainInfo = NULL;
