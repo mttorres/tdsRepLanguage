@@ -267,7 +267,7 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
     int isDivision = n->leafs[0][0] == DIVIDE;
-    char* op = isDivision ? "/" : "MOD";
+    char* op = isDivision ? "/" : "mod";
 
     if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
         int r;
@@ -282,7 +282,8 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
         char resultingBind[strlen(o1->SINTH_BIND)+strlen(o2->SINTH_BIND) +aloca]; // + espaco + espaco + '/' + 1
         createExprBind(resultingBind, o1, o2, op);
         Object* DIV_OBJECT = createObject(NUMBER_ENTRY, 1, rp, -1, resultingBind,
-                                          computeMinMaxDiv(o1->type_smv_info,o2->type_smv_info));
+                                          isDivision? computeMinMaxDiv(o1->type_smv_info,o2->type_smv_info) :
+                                          computeMinMaxMod(o1->type_smv_info,SYNTH_O2 == 2));
         letgoObject(o1);
         letgoObject(o2);
         return DIV_OBJECT;
@@ -859,7 +860,7 @@ void startInterpreter(Node* n, STable* scope, EnvController* controller){
     //Object ** REALIZATION = malloc(sizeof(Object*)*DEFAULT_MEMOI);
     //MEMOI = REALIZATION;
     eval(n,scope,controller);
-    commitCurrentTime(scope,controller,*(int*) lookup(scope,"F_TIME")->val->values[0]);
+    commitCurrentTime(scope,controller,*(int*) lookup(scope,"F_TIME")->val->values[0]+1);
     letgoNode(n);
 }
 

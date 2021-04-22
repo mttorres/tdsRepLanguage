@@ -184,7 +184,7 @@ TypeMinMax* computeMinMaxDiv(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
  * @param typeRefMinMax2 o type-min-max do segundo operando
  * @return retorna um novo type-min-max que resolva o intervalo
  */
-TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1);
+TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1, int by2);
 
 /**
 **

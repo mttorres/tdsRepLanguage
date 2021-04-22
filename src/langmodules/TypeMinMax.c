@@ -148,9 +148,21 @@ TypeMinMax* computeMinMaxDiv(TypeMinMax* typeRefMinMax1, TypeMinMax* typeRefMinM
 }
 
 
-TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1){
-    int min = typeRefMinMax1->min < 0? typeRefMinMax1->min : 0; // o mínimo é o resto da divisão ser zero ou ser o menor número possível
-    int max = typeRefMinMax1->max; // o máximo é ser o próprio número em seu valor máximo
+TypeMinMax* computeMinMaxMod(TypeMinMax* typeRefMinMax1, int by2){
+
+    int min;
+    int max;
+    // nuXmv é muito rigido quanto aos valores possíveis...
+    /*
+    if(by2){
+        min = 0;
+        max = 1;
+    }
+    else{
+    */
+        min = typeRefMinMax1->min < 0? typeRefMinMax1->min : 0; // o mínimo é o resto da divisão ser zero ou ser o menor número possível
+        max = typeRefMinMax1->max; // o máximo é ser o próprio número em seu valor máximo
+    //}
     return createMinMax(min,max);
 }
 

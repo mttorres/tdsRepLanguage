@@ -29,7 +29,7 @@ TDS* createTDS(char *name, TDS_TYPE type, void *valueList, int delayed, int I_IN
 
     newTDS->COMPONENT_TIMES = type == DATA_LIST?  malloc(sizeof(int)*F_INTERVAL+1) : NULL;
     if(newTDS->COMPONENT_TIMES){
-        for (i = 0; i < F_INTERVAL; i++) {
+        for (i = 0; i <= F_INTERVAL; i++) {
             newTDS->COMPONENT_TIMES[i] = -1;
         }
     }
