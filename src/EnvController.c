@@ -341,8 +341,6 @@ void addTypeSetWordToDict(char* word, EnvController* controller){
 }
 
 void validateAfterInterPost(EnvController* controller){
-    if(controller->declaredPortsNumber != controller->expectedPorts){
-
         if(!controller->declaredPortsNumber){
             fprintf(stderr, "\n[WARNING] THE MODEL GENERATION WAS SUCCESSFUL, HOWEVER, NO VALID TDS DEFINITION WAS FOUND.\nIT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE\n");
         }
@@ -358,7 +356,6 @@ void validateAfterInterPost(EnvController* controller){
                 }
             }
         }
-    }
     if(!controller->IO_RELATION){
         fprintf(stderr, "\n[WARNING] NO TDS RELATIONSHIP WAS DECLARED. IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
     }
