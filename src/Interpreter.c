@@ -137,7 +137,6 @@ Object* evalIDVAR(Node* n, STable* scope, EnvController* controllerSmv)
 Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
 {
     //printf("[evalTIME_DIRECTIVE] \n");
-    // TODO mudar a referencia para não ser time sempre (#68)
     TableEntry* entry = lookup(scope,n->leafs[0]);
 
     // teoricamente é impossível uma time Directive não estar na tabela mas é só um check
