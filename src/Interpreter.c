@@ -147,7 +147,15 @@ Object* evalTIME_DIRECTIVE(Node* n, STable* scope, EnvController* controllerSmv)
     }
     else
     {
-        char* bind = n->leafs[0][0] != 'C'? entry->val->SINTH_BIND  : "time";
+        char* bind;
+        char smvBind[150];
+        if(n->leafs[0][0] != 'C'){
+            sprintf(smvBind,"%d",*(int*)entry->val->values[0]);
+            bind = smvBind;
+        }
+        else{
+            bind = "time";
+        }
         // retorna cópia numérica das TIME_DIRECTIVES (elas SÃO UNICAS NO CÓDIGO, só alteradas mas não copiadas )
         return createObject(NUMBER_ENTRY, 1, entry->val->values, -1, bind, createMinMaxByOneValue(*(int*)entry->val->values[0]));
     }
