@@ -156,7 +156,7 @@ void commitCurrentTime(STable* currentScope, EnvController* controllerSmv, int c
     // deve resolver a avaliação para cada TDS "n" vezes. Antes do proximo intervalo ou fim do programa.
     int i;
     int C_TIME = *(int*) lookup(currentScope,"C_TIME")->val->values[0];
-    for (i = C_TIME; i <= changedTo; i++) {
+    for (i = C_TIME; i < changedTo; i++) {
         if(controllerSmv->interactiveMode){
             printf("--------------TDS EVALUATION (time = %d)------------------\n\n\n",i);
         }
