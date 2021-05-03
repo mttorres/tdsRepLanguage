@@ -187,7 +187,7 @@ void preProcessSmv(FILE *smvP, EnvController *Hcontrol) {
 	
 	char* buffer;
 	char* bufferAux;
-    size_t bufsize = 1000;
+    size_t bufsize = ALOC_SIZE_LINE;
    	buffer = (char *) malloc(bufsize * sizeof(char));
 	//bufferAux = (char *) malloc(bufsize * sizeof(char));
 

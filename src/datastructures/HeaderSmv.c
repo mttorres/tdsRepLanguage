@@ -249,8 +249,7 @@ void writeHeader(HeaderSmv* header, FILE* smvoutput){
 
 void selectBuffer(headerpart part, char* line, HeaderSmv* header, int controlRename) {
     int pt;
-    int sizeLine = strlen(line);
-    char* aloc = malloc(sizeLine*sizeof(char)+2); //  o +2 é estritamente para acomodar tamanho extra do buffer
+    char* aloc = malloc(ALOC_SIZE_LINE*sizeof(char)); //  o +2 é estritamente para acomodar tamanho extra do buffer
     if(part != TRANS)
     {
         if(part == VAR)

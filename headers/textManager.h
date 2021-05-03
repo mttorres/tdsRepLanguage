@@ -3,7 +3,7 @@
 #define TM_H
 
 
-#define  ALOC_SIZE_LINE 300
+#define  ALOC_SIZE_LINE 1000
 
 /**
  *  Concatena strings, porém sempre retornando o final da string como ponteiro, servindo para evitar percorrer a mesma
