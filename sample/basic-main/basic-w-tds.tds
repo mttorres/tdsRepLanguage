@@ -26,9 +26,21 @@ tdsA = {
 	data-time: {0: x, 1: 1, 2: 10, 21:4}
 }
 
+//tdsB= {
+//    portname: 'b',
+//    data-time: {function-domain: x+x }
+//}
 
+(tdsA) -{x == -2}> c // funciona
+// FILTER COM DEF COMPLETA
 
-//(tdsA) => c // funciona
+//tdsC = {
+//    portname: 'c',
+//    linked: {tdsA},
+//    filter: x == -2
+//}
+
+//(tdsA) -{x == -2}> c // funciona
 
 //(tdsA,tdsB) ==> c // funciona
 //(c) -||> d // funciona
@@ -79,14 +91,23 @@ C_TIME TO  2
 
 y = 5
 
-tdsB = {
-	portname : 'b',
-	data-time: {3: 3, 4:4, 5:5, 6:y-x}
-}
+//tdsB = {
+//	portname : 'b',
+//	data-time: {3: 3, 4:4, 5:5, 6:y-x}
+//}
 
-(tdsA,tdsB) ==> c // funciona
-//(tdsA,tdsB) -{x == true}> c // funciona
-(c) -||> d // funciona
+// NOVA TDS b (in line)
+
+//tdsB= {
+//    portname: 'b',
+//    data-time: {function-domain: x-x }
+//}
+
+//(tdsA,tdsB) ==> c // funciona
+
+//(tdsA,tdsB) -{x == 3}> c // funciona
+//(tdsA) -{x == -2}> c // funciona
+//(c) -||> d // funciona
 
 
 C_TIME TO  3
