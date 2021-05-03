@@ -871,7 +871,7 @@ int validateTdsTimeList(Object* encapsulatedTDS, TDS* newTDS, EnvController*  co
             if(!someIsValidToLazy){
                 someIsValidToLazy = 1;
             }
-            initialIsInvalid = time == 0?  0 : initialIsInvalid;
+            initialIsInvalid = time == I_TIME?  0 : initialIsInvalid;
             newTDS->COMPONENT_TIMES[time] = i;
         }
     }
