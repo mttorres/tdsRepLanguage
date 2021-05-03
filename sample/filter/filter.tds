@@ -1,0 +1,22 @@
+INTERVAL: 1 ~ 20
+
+x = 0
+y = I_TIME
+
+tdsA = {
+	portname : 'a',
+	data-time: {function-domain: y-x + (C_TIME + F_TIME) % 2}
+}
+
+tdsB = {
+    portname: 'b',
+    linked: {tdsA},
+    filter: x == 0
+}
+// ou
+//(tdsA) -{tdsA.value == 0 or tdsA.value == 1}> b
+
+C_TIME TO 2
+
+x = 4
+y = 3

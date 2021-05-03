@@ -1,0 +1,12 @@
+INTERVAL: 1 ~ 8
+
+tdsA = {
+	portname : 'a',
+	data-time: {1: 0, 2: 1, 3:0, 4:1}
+}
+
+(tdsA) -||> e
+(e) ==> b
+(e) -||> f
+(f) ==> c
+(f) -||> g
