@@ -1229,7 +1229,7 @@ void updateAllAutomataFilter(Object* condFilter, EnvController* controller){
         //char* cond = "next(x) = 2"; // onde X já vai estar no parâmetro
         //char* condNeg = "!next(x) = 2"; // essas condições só estão marretadas ai para testes
         char condNeg[strlen(condFilter->SINTH_BIND)+2];
-        createExprBind(condNeg,condFilter,NULL,"");
+        createExprBind(condNeg,condFilter,NULL,"!");
         for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; i++) {
             int id_automata = controller->automatasToChange[i];
             HeaderSmv* automata = accessHeader(controller,AUTOMATA,id_automata);

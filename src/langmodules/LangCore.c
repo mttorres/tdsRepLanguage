@@ -89,6 +89,7 @@ void resolveDependencies(TDS* currentTDS, STable* scope, EnvController* controll
     if(currentTDS->limitCondition){
         specTDS(currentTDS,NULL,C_TIME,I_TIME,controllerSmv,scope);
         letgoObject(resolvedCondFilter);
+        controllerSmv->filterContext = 0;
     }
 }
 
