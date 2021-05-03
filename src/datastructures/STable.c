@@ -402,6 +402,10 @@ void updateValue(char *name, void **any, int any_type, int object_size, int oInd
 }
 
 void addReferenceCurrentScope(char* name, Object* DATA_STRUCT, int methodParam, STable* current){
+    if(lookup(current,name)){
+        fprintf(stderr,"%s already declared!\n",name);
+        exit(-1);
+    }
     addValueCurrentScope(name,DATA_STRUCT,methodParam,current);
 }
 
