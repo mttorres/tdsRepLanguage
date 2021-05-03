@@ -786,9 +786,12 @@ Object * evalTDS_DEF_COMPLETE(Node* n, STable* scope, EnvController* controllerS
 Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv){
     int isDelayed = n->children[1]->type == TDS_ANON_OP_DPASS;
     int hasFilter = n->children[1]->type == TDS_ANON_OP_FPASS;
+    if(lookup(scope,n->leafs[2])){
+        fprintf(stderr,"TDS for port %s already declared!\n",n->leafs[2]);
+    }
     Node* pathFilter = hasFilter ? n->children[1]->children[0] : NULL;
     Object* encapsulatedTDS = computeTDSBasicOperations(n, n->leafs[2], TDS_DEPEN, NULL,
-                                                        n->children[1]->type == TDS_ANON_OP_DPASS, scope, pathFilter,
+                                                        isDelayed, scope, pathFilter,
                                                         controllerSmv);
     TDS* newTDS = encapsulatedTDS->values[0];
     addReferenceCurrentScope(newTDS->name,encapsulatedTDS,0,scope);
