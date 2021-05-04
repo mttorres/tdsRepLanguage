@@ -60,11 +60,11 @@ void addTdsDependency(TDS* dependency, TDS* tds){
     tds->TOTAL_DEPENDENCIES_PT++;
 }
 
-Object* getTdsValue(TDS* tds, int C_TIME){
+Object* getTdsValue(TDS* tds, int C_TIME, char* valuePath){
     if(tds->delayed){
-        return copyObject(tds->DATA_TIME[tds->LAST_DELAYED_ACCEPT_TIME]);
+        return copyObjectProperty(tds->DATA_TIME[tds->LAST_DELAYED_ACCEPT_TIME],valuePath);
     }
-    return copyObject(tds->DATA_TIME[C_TIME]);
+    return copyObjectProperty(tds->DATA_TIME[C_TIME],valuePath);
 }
 
 void resolveDelayedTdsDependencies(TDS* tds, int C_TIME){

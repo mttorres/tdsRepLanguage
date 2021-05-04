@@ -292,6 +292,15 @@ void letgoObject(Object *o)
 	free(o);
 }
 
+Object* copyObjectProperty(Object* o, char* path){
+    if(o){
+        Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, path, NULL);
+        return newOb;
+    }
+    else{
+        return NULL;
+    }
+}
 
 Object* copyObject(Object* o) 
 {
