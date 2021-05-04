@@ -257,8 +257,7 @@ void addParamToAutomatasFilter(EnvController* controller, char* paramName){
     }
 }
 
-void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
-    addParamToPortsModule(controller,param);
+void addParamToTdsDeclaration(EnvController* controller, char* param, TDS* currentTDS){
     // adiciona a TDS (tem uma variável de retorno dizendo se foi necessário adicionar esse parâmetro ou não
     HeaderSmv* headerTDS = accessHeader(controller,PORTS,currentTDS->SMV_REF);
     int paramAdd = addParamToModule(headerTDS,param);
@@ -278,6 +277,12 @@ void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
         void* vp[] = {&size};
         updateValue(currentTDS->name,vp,WRITE_SMV_INFO,1,1,-1,portsAux,-1);
     }
+}
+
+void addParamToTds(EnvController* controller, char* param, TDS* currentTDS){
+    addParamToPortsModule(controller,param);
+    // adiciona a TDS (tem uma variável de retorno dizendo se foi necessário adicionar esse parâmetro ou não
+    addParamToTdsDeclaration(controller,param,currentTDS);
 }
 
 /**

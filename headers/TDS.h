@@ -90,10 +90,11 @@ void resolveDelayedTdsDependencies(TDS* tds, int C_TIME);
  * ai ele referencia o último valor "aceito".
  * @param tds a tds a qual necessitamos do valor
  * @param C_TIME o tempo corrente
+ * @param valuePath o caminho de referencia
  * @return uma copia do valor da TDS no instante corrente
  * @SideEffects: Aloca um novo object que deve ser liberado pelo chamador depois
  */
-Object* getTdsValue(TDS* tds, int C_TIME);
+Object* getTdsValue(TDS* tds, int C_TIME, char* valuePath);
 
 /**
  * Atualiza a condição de uma TDS realizando as validações corretas

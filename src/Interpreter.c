@@ -560,16 +560,60 @@ Object* evalEXPR(Node* n, STable* scope, EnvController* controllerSmv)
     return eval(n->children[0],scope,controllerSmv);
 }
 
+Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv){
+    TableEntry* entry = lookup(scope,n->leafs[0]);
+    if(!entry)
+    {
+        fprintf(stderr, "%s NOT DECLARED!", n->leafs[0]);
+        exit(-1);
+    }
+    else{
+        if(n->children[0] && n->children[0]->type == V_PROP){
+            char* propertyName = n->children[0]->children[0]->children[0]->leafs[0];
+            if(entry->val->type != TDS_ENTRY || propertyName[0] != 'v'){
+                fprintf(stderr, "ERROR: %s does not contains %s property", n->leafs[0],propertyName);
+                exit(-1);
+            }
+            TDS* SINTH_TDS = entry->val->values[0];
+            Object* tdsValue = NULL;
+            char* pathToProp = NULL;
+
+            int C_TIME = *(int*) lookup(scope,"C_TIME")->val->values[0];
+            int I_TIME = *(int*) lookup(scope,"I_TIME")->val->values[0];
+            int tdsContext = !!controllerSmv->currentTDScontext;
+            int filterContext = controllerSmv->filterContext;
+
+            if (!filterContext && tdsContext) {
+                addParamToTdsDeclaration(controllerSmv, SINTH_TDS->name, controllerSmv->currentTDScontext);
+                pathToProp = createPropPathBind(SINTH_TDS->name,propertyName);
+            }
+            else{
+                char* pathParcial = createPropPathBind("ports",SINTH_TDS->name);
+                pathToProp = createPropPathBind(pathParcial,propertyName);
+                free(pathParcial);
+            }
+            if(C_TIME > I_TIME){
+                char* nextPathToProp = encapsulateWithNext(pathToProp);
+                tdsValue = getTdsValue(SINTH_TDS, C_TIME, nextPathToProp);
+                free(nextPathToProp);
+            }
+            else{
+                tdsValue = getTdsValue(SINTH_TDS, C_TIME, pathToProp);
+            }
+            free(pathToProp);
+            return tdsValue;
+        }
+        fprintf(stderr, "ERROR: %s does not contains any property", n->leafs[0]);
+        exit(-1);
+    }
+}
 
 Object* evalProp(Node* fatherRef, Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
-Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 Object* evalV_PROP(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 Object* evalADD_V(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 Object* evalADD_V_PROP(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
-
-Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv){
-    //printf("[evalV_PROP_TDS] \n");
-}
+Object* evalV_PROP_TDS_VALUE(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
+Object* evalV_PROP_TDS(Node* n, STable* scope, EnvController* controllerSmv){/*notused*/}
 
 Object * evalDEFINE_INTERVAL(Node* n, STable* scope, EnvController* controllerSmv){
 

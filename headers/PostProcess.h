@@ -258,6 +258,32 @@ void formatTdsValueRef(TDS* currentTds, char* refToUpdate);
  */
 void updateAllAutomataFilter(Object* condFilter, EnvController* controller);
 
+/**
+ * Cria uma expressão do tipo parcialPath.propName
+ * @param parcialPath o path da propreidade
+ * @param propName o nome da propriedade
+ * @return uma string que segue o padrão especificado
+ * @SideEffects: Aloca uma string que deve ser liberada pelo chamador
+ */
+char* createPropPathBind(char* parcialPath, char* propName);
+
+/**
+ * Encapsula uma expressão com o comando next()
+ * @param expression a epxressão original
+ * @return Uma expressão em string com o padrão especificado
+ * @SideEffects: Aloca uma string que deve ser liberada pelo chamador
+ */
+char* encapsulateWithNext(char* expression);
+
+/**
+ * É utilizado para o automato (filter) já que as expressões resultantes devem ser negadas.
+ * Como elas não vieram da arvore do interpretador o processo deve ser feito manualmente...
+ * @param expression a expressão resultante
+ * @return uma expressão da forma  !(expr)
+ * @SideEffects: aloca uma string que deve ser liberada pelo chamador
+ */
+char* encapsulateExpressionWithNegation(char* expression);
+
 void writeResultantHeaders(EnvController* controller, const char* path);
 
 #endif

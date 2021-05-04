@@ -1222,20 +1222,26 @@ void propagateValueToTypeSet(TDS* currentTDS, TDS* dependency, EnvController* co
     updateTypeSet(newValue,"value",auxTdsDependant,headerDependant,controller);
 }
 
+char* encapsulateExpressionWithNegation(char* expression){
+    int newSize = strlen(expression) + 1 + 2; // ! ( )
+    char* resultExpr = malloc(sizeof(char)*newSize+1);
+    sprintf(resultExpr,"!(%s)",expression);
+    return resultExpr;
+}
 
 void updateAllAutomataFilter(Object* condFilter, EnvController* controller){
     int i;
     if(controller->F_AUTOMATAS_CHANGE_POINTER && controller->modelHasFilter){
         //char* cond = "next(x) = 2"; // onde X já vai estar no parâmetro
         //char* condNeg = "!next(x) = 2"; // essas condições só estão marretadas ai para testes
-        char condNeg[strlen(condFilter->SINTH_BIND)+2];
-        createExprBind(condNeg,condFilter,NULL,"!");
+        char* condNeg = encapsulateExpressionWithNegation(condFilter->SINTH_BIND);
         for (i = 0; i < controller->F_AUTOMATAS_CHANGE_POINTER; i++) {
             int id_automata = controller->automatasToChange[i];
             HeaderSmv* automata = accessHeader(controller,AUTOMATA,id_automata);
             updateAutomataFilterCond(condNeg, automata,0);
             updateAutomataFilterCond(condFilter->SINTH_BIND, automata,1);
         }
+        free(condNeg);
     }
     controller->F_AUTOMATAS_CHANGE_POINTER = 0;
     // poderia até dar free nesses caras
@@ -1252,6 +1258,28 @@ void formatTdsValueRef(TDS* currentTds, char* refToUpdate){
     //char refToTdsValue[strlen(currentTds->name)+1+5+1]; // .value\0
     sprintf(refToUpdate,SmvConversions[TDS_VALUE_REF],currentTds->name);
 }
+
+char* createPropPathBind(char* parcialPath, char* propName){
+    int sizeParcial = strlen(parcialPath);
+    int sizePropName = strlen(propName);
+    char* resultPath = malloc(sizeof(char)*(sizeParcial+sizePropName)+1+1);
+    resultPath[0] = '\0';
+    char * refResultPath = resultPath;
+    refResultPath = customCat(refResultPath,parcialPath,0,0);
+    refResultPath = customCat(refResultPath,".",0,0);
+    customCat(refResultPath,propName,0,0);
+    return resultPath;
+}
+
+char* encapsulateWithNext(char* expression){
+    int originalSize = strlen(expression);
+    int newSize = originalSize + 1 +  4  + 1 + 1;
+    char* encapsulated = malloc(sizeof(char)*newSize);
+    sprintf(encapsulated,SmvConversions[NEXT],expression);
+    return encapsulated;
+}
+
+
 
 void writeResultantHeaders(EnvController* controller, const char* path){
   

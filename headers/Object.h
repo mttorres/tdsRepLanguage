@@ -56,6 +56,14 @@ void letgoObject(Object *o);
 */
 Object* copyObject(Object* o);
 
+/**
+ * Copia uma propreidade de um objeto
+ * @param o o objeto raiz
+ * @param path o caminho da propriedade
+ * @return retorna o objeto esncapsulado que possui o bind completo
+ */
+Object* copyObjectProperty(Object* o, char* path);
+
 /*
 	Atualiza as definições de um objeto "o"
 */

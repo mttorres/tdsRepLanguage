@@ -129,6 +129,14 @@ void addNewAuxInfo(EnvController* controller, STable* newTableInfo);
 void validateTdsDeclaration(char* declarationName, EnvController* controller);
 
 /**
+ * Propaga um parâmetro para o mpodulo de uma TDS recuperando os headers apropriados dessa.
+ * @param controller o controlador de ambiente
+ * @param param o identificador do parametro
+ * @param currentTDS a tds recuperada da interpretação
+ */
+void addParamToTdsDeclaration(EnvController* controller, char* param, TDS* currentTDS);
+
+/**
  * Tendo um controller com o contexto e associação Header e AuxTable,
  * adiciona um parâmetro (se necessário) para o header do módulo da TDS.
  * Também propaga as dependências relacionadas a esse parâmetro para o portsModule
