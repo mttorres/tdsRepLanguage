@@ -178,6 +178,7 @@ Object* evalPLUS(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
         int r;
@@ -229,6 +230,7 @@ Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
         }
         exit(-1);
     }
+    validateOpsTdsValue(o1,o2);
     int r;
     r =  o2 == NULL? (-1)*(*(int*) o1->values[0]) : (*(int*)o1->values[0]) - (*(int*)o2->values[0]);
     void* rp[] = {&r};
@@ -246,6 +248,7 @@ Object* evalMINUS(Node* n, STable* scope, EnvController* controller)
 Object* evalNOT(Node* n, STable* scope, EnvController* controller)
 {
     Object* o = eval(n->children[0],scope,controller);
+    validateOpsTdsValue(o,NULL);
     return notObjectOperation(o);
 }
 
@@ -253,6 +256,7 @@ Object* evalMULTI(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == NUMBER_ENTRY && o2->type == o1->type){
         int r;
@@ -274,6 +278,7 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
     int isDivision = n->leafs[0][0] == DIVIDE;
     char* op = isDivision ? "/" : "mod";
 
@@ -303,6 +308,7 @@ Object* evalDIV(Node* n, STable* scope, EnvController* controller)
 Object * evalLE(Node* n, STable* scope, EnvController* controller){
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     int r;
     void* rp[] = {&r};
@@ -337,6 +343,7 @@ Object * evalLE(Node* n, STable* scope, EnvController* controller){
 Object * evalGE(Node* n, STable* scope, EnvController* controller){
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     int r;
     void* rp[] = {&r};
@@ -370,6 +377,7 @@ Object * evalGE(Node* n, STable* scope, EnvController* controller){
 Object * evalLT(Node* n, STable* scope, EnvController* controller){
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     int r;
     void* rp[] = {&r};
@@ -403,6 +411,7 @@ Object * evalLT(Node* n, STable* scope, EnvController* controller){
 Object * evalGT(Node* n, STable* scope, EnvController* controller){
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     int r;
     void* rp[] = {&r};
@@ -459,6 +468,7 @@ Object* evalAND(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
         int r;
@@ -480,6 +490,7 @@ Object* evalOR(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
         int r;
@@ -502,6 +513,7 @@ Object* evalIMP(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
         int r;
@@ -524,6 +536,7 @@ Object* evalBIMP(Node* n, STable* scope, EnvController* controller)
 {
     Object* o1 = eval(n->children[0],scope,controller);
     Object* o2 = eval(n->children[1],scope,controller);
+    validateOpsTdsValue(o1,o2);
 
     if(!o1->aList && !o2->aList && o1->type == LOGICAL_ENTRY && o2->type == o1->type){
         int r;

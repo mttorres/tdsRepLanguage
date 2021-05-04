@@ -297,3 +297,10 @@ Object *computeTDSBasicOperations(Node *pathForDepen, char *portName, TDS_TYPE t
     return encapsulatedTDS;
 }
 
+void validateOpsTdsValue(Object* o1, Object* o2){
+    if(o1->fromTdsValue || o2->fromTdsValue){
+        fprintf(stderr, "ERROR: Non comparison operator used with tds.value expression.\nOnly == and != are supported with symbolic comparisons in nuXmv\nThe operation will be available in future language and model extensions\n");
+        exit(-1);
+    }
+}
+

@@ -126,4 +126,14 @@ _Bool BIMP(_Bool a, _Bool b);
  */
 void updateVariable(char* varName, Object *var, Object *expr, STable* scope, int index, int C_TIME);
 
+/**
+ * Considerando as limitações de enums simbolicos do nuXmv,
+ * enquanto o modelo gerado utilizar esse tipo de dado essa validação deve ser utilizada para
+ * qualquer operação diferente de != e ==. Abortando a interpretação.
+ * @param o1 objeto sintetizado em uma operação
+ * @param o2 outro objeto sintetizado em uma operação
+ *
+ */
+void validateOpsTdsValue(Object* o1, Object* o2);
+
 #endif //TDSREPLANGUAGE_LANGCORE_H
