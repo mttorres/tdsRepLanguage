@@ -94,7 +94,7 @@
 %token <sval> DPASS
 %token <sval> INTERVAL
 %token <sval> BETWEEN
-%token <sval> SHOW
+%token <sval> TDSVALUE
 %token <sval> FILTER
 
 %type <ast> prog
@@ -395,10 +395,6 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 	 }
 	 | CURRENTTIME TO expr {
 			Node* data = createNode(7,1,2,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE , $3  ,$1,$2);
-			$$ = data;
-	 }
-	 | SHOW LPAREN expr RPAREN {
-			Node* data = createNode(5,1,3,"CHANGE-CURRENTTIME-DIRECTIVE", SHOW_PRINT ,$3, $1,$2,$4);
 			$$ = data;
 	 }
 	 ;
