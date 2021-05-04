@@ -232,7 +232,7 @@ void printTDS(TDS* tds, TDS* dependent, int C_TIME){
                     printf("o TDS(%s,%d)",tds->name,C_TIME);
                 }
                 else{
-                    if(tds->linkedDependency[i]->TOTAL_DEPENDENCIES_PT == 1){
+                    if(tds->TOTAL_DEPENDENCIES_PT == 1){
                         printTdsValues(tds,C_TIME);
                     }
                 }
