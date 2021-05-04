@@ -1141,6 +1141,11 @@ void specTdsAssignOnRevaluation(TDS* currentTDS, char* name, char* eval, int sta
         }
         if(currentTDS->limitCondition){
             condition = currentTDS->currenCondBindRef;
+            if(controller->relationRef){
+                char* originalConditionRef = condition;
+                // a condição é liberada junto da expressão, podemos substituir diretamente (mas temos que liberar depois)
+                condition = removeAllSubStrings(originalConditionRef,"ports.");
+            }
         }
         cubeFinal = temporalCondition && condition ?
                     createConditionCube(temporalCondition, condition, "&", eval, 1) :
@@ -1150,6 +1155,9 @@ void specTdsAssignOnRevaluation(TDS* currentTDS, char* name, char* eval, int sta
         overwriteAssign(stateVarNameTds,name,currentHeader,currentInfo,eval,cubeFinal,"NULL");
         if(temporalCondition){
             free(temporalCondition);
+        }
+        if(controller->relationRef){
+            free(condition);
         }
     }
 }

@@ -144,6 +144,9 @@ void resolveTdsLazyEvaluation(STable *currentScope, EnvController *controllerSmv
         else{
             resetLimitConditionEval(currentTDS);
         }
+        if(currentTDS->limitCondition && controllerSmv->relationRef){
+            controllerSmv->relationRef = 0;
+        }
     }
     checkTdsEvalReview(controllerSmv);
     controllerSmv->currentTDScontext = NULL;

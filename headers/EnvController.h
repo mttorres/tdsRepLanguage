@@ -60,6 +60,7 @@ typedef struct envcontroller
     int F_AUTOMATAS_CHANGE_POINTER;
     int modelHasFinalAutomata;
     int filterUsed;
+    int relationRef;
 
     // interactive
     int interactiveMode;

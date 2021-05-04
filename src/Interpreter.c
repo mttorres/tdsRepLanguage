@@ -601,6 +601,7 @@ Object* evalAC_V(Node* n, STable* scope, EnvController* controllerSmv){
                 tdsValue = getTdsValue(SINTH_TDS, C_TIME, pathToProp);
             }
             free(pathToProp);
+            controllerSmv->relationRef = 1;
             return tdsValue;
         }
         fprintf(stderr, "ERROR: %s does not contains any property", n->leafs[0]);

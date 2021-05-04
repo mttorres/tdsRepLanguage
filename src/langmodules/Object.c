@@ -129,6 +129,7 @@ Object *createObject(object_type type, int OBJECT_SIZE, void **values, int timeC
     }
     //printf("[DEBUG - createObject] info: %d \n", info);
 	//printObject(newOb);
+	newOb->fromTdsValue = 0;
 	return newOb;
 }
 
@@ -140,6 +141,7 @@ Object* createObjectDS(object_type type, int OBJECT_SIZE, void ** values, int ti
     for (i = 0; i < OBJECT_SIZE; i++) {
         newOb->values[i] = values[i];
     }
+    newOb->fromTdsValue = 0;
     return newOb;
 }
 
@@ -295,6 +297,7 @@ void letgoObject(Object *o)
 Object* copyObjectProperty(Object* o, char* path){
     if(o){
         Object* newOb = createObject(o->type, o->OBJECT_SIZE, o->values, o->timeContext, path, NULL);
+        newOb->fromTdsValue = 1;
         return newOb;
     }
     else{

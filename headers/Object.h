@@ -19,6 +19,8 @@ typedef struct SYNTH_OBJECT
     int timeContext;
     int aList;
     void* type_smv_info;
+    int fromTdsValue; // flag apenas para restringir o comportamento já que o cast do nuXmv de int -> symbolic vale
+    // mas o contrário symbolic -> int NAO
 
 } Object;
 

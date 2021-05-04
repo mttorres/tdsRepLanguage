@@ -85,6 +85,37 @@ void clearOldPortsRefs(char* oldConstraint, char* toCopyResult) {
         //printf("[clearOldPortsRefs] copiando e filtrando... %c \n",*oldConstraintRef);
     }
 }
+// ports.
+char* removeAllSubStrings(char* string, char* toRemove){
+    int originalSize = strlen(string);
+    int toRemoveSize = strlen(toRemove);
+    char* result = malloc(sizeof(char)*originalSize);
+    char* resultRef = result;
+    char* oldRef = string;
+    int copy = 1;
+    int c = 0;
+    while(*oldRef){
+        if(copy && *oldRef != toRemove[0]){
+            *resultRef = *oldRef;
+            resultRef++;
+        }
+        else{
+            if(c > (originalSize - toRemoveSize) ){
+                *resultRef = *oldRef;
+                resultRef++;
+            }
+            else{
+                copy = 0;
+            }
+        }
+        if (*oldRef == toRemove[toRemoveSize-1]){
+            copy = 1;
+        }
+        c++;
+        oldRef++;
+    }
+    return result;
+}
 
 char *addParams(char *original, char *param, char *delim1, char *delim2, int useRealloc) {
 

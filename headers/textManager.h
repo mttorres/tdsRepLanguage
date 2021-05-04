@@ -99,4 +99,13 @@ void removeAfter(char* dest, char* src, char stop);
  */
 char* formatNumeric(int ctime);
 
+/**
+ * Remove todas as ocorrencias de uma substring
+ * @param string a string original
+ * @param toRemove a substring que deve ser removida
+ * @return uma nova string igual a antiga porém sem ocorrencias de toRemove
+ * @SideEffects: Aloca uma string no formato descrito e deve ser liberada pelo chamador
+ */
+char* removeAllSubStrings(char* string, char* toRemove);
+
 #endif

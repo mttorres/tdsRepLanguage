@@ -65,6 +65,7 @@ EnvController *createController(int enableInteractive) {
     Hcontrol->filterContext = 0;
     Hcontrol->modelHasFinalAutomata = 0;
     Hcontrol->filterUsed = 0;
+    Hcontrol->relationRef = 0;
     return Hcontrol;
 }
 
