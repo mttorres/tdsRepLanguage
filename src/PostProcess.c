@@ -607,7 +607,8 @@ Object *refCopyOfVariable(TableEntry *varLang, EnvController *controller) {
     // temos que usar escopo de VAR não o escopo atual de onde a chamada ocorre!
     // como nesse caso é necessário referênciar EXATAMENTE o nome da variável,
     int C_TIME = *(int*) lookup(varLang->parentScope, "C_TIME")->val->values[0];
-    useVar = processActiveName(varLang->parentScope, varLang->name, 1, C_TIME, varLang->val->type);
+    int I_TIME = *(int*) lookup(varLang->parentScope, "I_TIME")->val->values[0];
+    useVar = processActiveName(varLang->parentScope, varLang->name, 1, C_TIME > I_TIME, varLang->val->type);
     Object* copyRef = copyObject(varLang->val);
     if(useVar){
         if(copyRef->SINTH_BIND){
