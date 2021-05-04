@@ -15,7 +15,7 @@ VAR
 	cs: {q0};
 TRANS
      ((cs = q0 & ports.b[time] = NULL & ports.a[time] != NULL & TRUE) -> next(cs) = q0) &
-     ((cs = q0 & ports.a[time] = NULL & ports.a[time] = ports.b[time] & TRUE) -> next(cs) = q0);
+     ((cs = q0 & ports.a[time] != NULL & ports.a[time] = ports.b[time] & TRUE) -> next(cs) = q0);
 
 MODULE portsModule
 FROZENVAR
