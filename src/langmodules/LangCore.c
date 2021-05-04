@@ -54,6 +54,10 @@ void checkTdsEvalReview(EnvController* controller){
             printf("Interpretation interrupted by user.\n");
             exit(0);
         }
+        if(awns[0] == 'S' && !strcmp(awns,"SKIP")){
+            printf("Skipped next interactions.\n");
+            controller->interactiveMode = 0;
+        }
         printf("\n\n\n");
         printf("---------------------------------------------------------\n\n\n");
     }
