@@ -369,7 +369,7 @@ void validateAfterInterPost(EnvController* controller){
         fprintf(stderr, "\n[WARNING] FILTER WAS USED IN THE ORIGINAL MODEL, HOWEVER, NO FILTER RELATIONSHIP WAS DECLARED. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
     }
     else{
-        if(controller->filterUsed){
+        if(!controller->modelHasFilter && controller->filterUsed){
             fprintf(stderr, "\n[WARNING] FILTER WAS NOT USED IN THE ORIGINAL MODEL. \n IT IS RECOMMENDED THAT YOU REVIEW YOUR .tds FILE.\n");
         }
     }
