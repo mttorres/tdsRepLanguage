@@ -668,9 +668,9 @@ tdsprop: functioncall {
 		$$ = prop; 	
 
 	  }
-	  | DATATIME {
+	  | TDSVALUE {
 
-		Node* prop = createNode(5,0,1,"Props TDS - datatime",  V_PROP_TDS , $1);
+		Node* prop = createNode(5,0,1,"Props TDS - value",  V_PROP_TDS_VALUE , $1);
 		$$ = prop; 		  
 
 	  }

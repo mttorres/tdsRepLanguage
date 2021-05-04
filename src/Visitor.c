@@ -11,7 +11,8 @@ Object* (*realizacaoAvaliaco[160]) (Node* n, STable* scope, EnvController* contr
         eval_ASSIGN_TDIRECTIVE, evalOTHER_ASSIGN, evalV_PROP, evalADD_V, evalADD_V_PROP, evalV_PROP_TDS, evalEXPR,
         evalMINUS, evalPLUS, evalMULTI, evalDIV, evalLE, evalGE, evalLT, evalGT, evalEQUAL, evalNEQUAL, evalNOT, evalAND, evalOR, evalIMP, evalBIMP,
         evalPRI_EXPR, evalCMD_IF,
-        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, evalANON_TDS, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT
+        evalTDS_DEF_COMPLETE, evalTDS_DEF_DEPENDECE, evalANON_TDS, eval_ITERATOR, evalTDS_DATA_TIME_COMPONENT,
+        evalV_PROP_TDS_VALUE
 };
 
 Object* (* *executores) (Node* n, STable* scope, EnvController* controllerSmv) = realizacaoAvaliaco;

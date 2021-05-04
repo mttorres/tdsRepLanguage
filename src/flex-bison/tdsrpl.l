@@ -74,7 +74,7 @@ data-time           	{yylval.sval = strdup(yytext); return DATATIME;}
 delayed             	{yylval.sval = strdup(yytext); return DELAYED;}
 filter                  {yylval.sval = strdup(yytext); return FILTER;}
 portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
-show            	    {yylval.sval = strdup(yytext); return PORTNAME;}
+value            	    {yylval.sval = strdup(yytext); return TDSVALUE;}
 [A-Za-z_]*				{yylval.sval = strdup(yytext); return ID;}
 
 

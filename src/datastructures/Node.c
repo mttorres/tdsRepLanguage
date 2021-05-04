@@ -18,7 +18,7 @@ const char* mappingEnumNode[] =  {
 
         "CMD_IF", "TDS_DEF_COMPLETE", "TDS_DEF_DEPEN", "CMD_TDS_ANON",
 
-        "LIST_ITERATOR", "TIME_COMP", "DOMAIN_FUNCTION",
+        "LIST_ITERATOR", "TIME_COMP", "V_PROP_TDS_VALUE", "DOMAIN_FUNCTION",
 
         "MATCH_IF",
 

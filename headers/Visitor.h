@@ -49,6 +49,7 @@ Object * evalTDS_DEF_DEPENDECE(Node* n, STable* scope, EnvController* controller
 Object * evalTDS_DATA_TIME_COMPONENT(Node* n, STable* scope, EnvController* controllerSmv);
 Object * evalANON_TDS(Node* n, STable* scope, EnvController* controllerSmv);
 Object* eval_ITERATOR(Node* n, STable* scope, EnvController* controllerSmv);
+Object* evalV_PROP_TDS_VALUE(Node* n, STable* scope, EnvController* controllerSmv);
 
 Object* (* *executores) (Node* n, STable* scope, EnvController* controllerSmv);
 
