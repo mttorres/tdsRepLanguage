@@ -1,0 +1,12 @@
+merger-fifo:
+
+./tds -int sample/merger-fifo/merger-fifo.tds sample/merger-fifo/nuxmv2.smv
+
+
+filter-inte:
+
+./tds -int sample/filter/filter.tds sample/filter/nuxmv.smv
+
+sequenciador:
+
+./tds -int sample/sequenciador/seq.tds sample/sequenciador/seq.smv
