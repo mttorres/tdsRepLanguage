@@ -1,0 +1,168 @@
+MODULE main
+VAR
+	time: 0..20;
+	finalAutomata: finalAutomata(ports);
+	ports: portsModule(time, x, y);
+	x : -4..0;
+	z : boolean;
+	zeta : boolean;
+	w_scope1_0 : 0..1;
+	r_scope1_1 : boolean;
+	u_scope1_1_2_0 : boolean;
+	y : 0..6;
+	w_scope1_2 : boolean;
+	u_scope1_2_2_0 : boolean;
+	stu : -4..0;
+ASSIGN
+	init(time) := 0;
+	next(time) := case
+		time < 20: time + 1;
+		TRUE: time;
+esac;
+	init(x):= -2;
+	next(x):= case 
+		next(time) = 2 : -4;
+		next(time) = 3 : -1;
+		TRUE : x; 
+	esac;
+	init(z):= TRUE;
+	next(z):= case 
+		next(time) = 4 : TRUE;
+		TRUE : z; 
+	esac;
+	init(zeta):= FALSE;
+	next(zeta):= case 
+		next(time) = 4 : FALSE;
+		TRUE : zeta; 
+	esac;
+	init(w_scope1_0):= case 
+		!z : 1;
+		TRUE : 0; 
+	esac;
+	next(w_scope1_0):= w_scope1_0;
+	init(r_scope1_1):= case 
+		zeta : FALSE;
+		TRUE : FALSE; 
+	esac;
+	next(r_scope1_1):= r_scope1_1;
+	init(u_scope1_1_2_0):= case 
+		zeta & z : FALSE;
+		TRUE : FALSE; 
+	esac;
+	next(u_scope1_1_2_0):= u_scope1_1_2_0;
+	init(y):= 0;
+	next(y):= case 
+		next(time) = 2 : 5;
+		next(time) = 4 & !next(zeta) : 2;
+		next(time) = 4 & !!next(zeta) : 6;
+		TRUE : y; 
+	esac;
+	init(w_scope1_2):= FALSE;
+	next(w_scope1_2):= case 
+		next(time) = 4 & !next(zeta) : TRUE;
+		TRUE : w_scope1_2; 
+	esac;
+	init(u_scope1_2_2_0):= FALSE;
+	next(u_scope1_2_2_0):= case 
+		next(time) = 4 & !next(zeta) & next(w_scope1_2) : FALSE;
+		TRUE : u_scope1_2_2_0; 
+	esac;
+	init(stu):= 0;
+	next(stu):= case 
+		next(time) = 4 : next(x) / next(y);
+		TRUE : stu; 
+	esac;
+
+MODULE merger1(ports)
+VAR
+	cs: {q0};
+TRANS
+	((cs = q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & FALSE) -> next(cs) = q0) &
+	((cs = q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & FALSE) -> next(cs) = q0);
+
+MODULE fifo2(ports)
+VAR
+	cs: {q0,p0,p1};
+ASSIGN
+	init(cs) := {q0};
+TRANS
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 0 & FALSE) -> next(cs) = p0) &
+	((cs = q0 & ports.a.value = NULL & ports.b.value = NULL & ports.d.value = NULL & ports.c.value = 1 & FALSE) -> next(cs) = p1) &
+	((cs = p0 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 0) -> next(cs) = q0) &
+	((cs = p0) -> ((next(cs) != p1))) &
+	((cs = p1 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 1) -> next(cs) = q0) &
+	((cs = p1) -> ((next(cs) != p0)));
+
+MODULE finalAutomata(ports)
+VAR
+	prod1: merger1(ports);
+	prod2: fifo2(ports);
+	cs: {q0q0,q0p0,q0p1};
+ASSIGN
+	init(cs) := {q0q0};
+TRANS
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0p0) -> ((next(cs) != q0p1))) &
+	((cs = q0p1) -> ((next(cs) != q0p0)));
+INVAR
+	(((prod1.cs = q0) & (prod2.cs = q0)) <-> (cs = q0q0)) &
+	(((prod1.cs = q0) & (prod2.cs = p0)) <-> (cs = q0p0)) &
+	(((prod1.cs = q0) & (prod2.cs = p1)) <-> (cs = q0p1));
+
+MODULE portsModule(time, x, y)
+VAR 
+	a : tds_a(time, x);
+	b : tds_b(time, y, x);
+	c : tds_c(time);
+	d : tds_d(time);
+ASSIGN
+	init(c.value):= NULL;
+	next(c.value):= case 
+		next(time) >= 2 & next(b.value) = NULL : next(a.value);
+		next(time) >= 2 & next(a.value) = NULL : next(b.value);
+		TRUE : NULL; 
+	esac;
+	init(d.value):= NULL;
+	next(d.value):= case 
+		next(time) >= 2 & d.value = NULL : c.value;
+		next(time) >= 2 & c.value = NULL & d.value != NULL : NULL;
+		TRUE : d.value; 
+	esac;
+
+MODULE tds_a(time, x)
+VAR
+	value : {NULL, 0, 1, -2, -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -4, -3};
+ASSIGN
+	init(value):= x;
+	next(value):= case 
+		next(time) = 1 : 1;
+		next(time) = 2 : 10;
+		TRUE : NULL; 
+	esac;
+
+MODULE tds_b(time, y, x)
+VAR
+	value : {NULL, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+ASSIGN
+	init(value):= NULL;
+	next(value):= case 
+		next(time) = 3 : 3;
+		next(time) = 4 : 4;
+		next(time) = 5 : 5;
+		next(time) = 6 : next(y) - next(x);
+		TRUE : NULL; 
+	esac;
+
+MODULE tds_c(time)
+VAR
+	value : {NULL, 0, 1, -1, -2, 10, 2, 3, 4, 5, 6, 7, 8, 9, -3, -4};
+ASSIGN
+
+MODULE tds_d(time)
+VAR
+	value : {NULL, 0, 1, -1, -2, 10, 2, 3, 4, 5, 6, 7, 8, 9, -3, -4};
+ASSIGN
+

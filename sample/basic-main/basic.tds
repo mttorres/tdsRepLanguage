@@ -1,0 +1,66 @@
+INTERVAL: 0 ~ 20
+
+x = 2 + 2
+
+t = 4 * 5
+
+ABA = 4 * 7 + 3
+
+B = 3 + 4 * 7
+
+C = -3 + 4 * 7
+
+D = 4 - -3   // unários só conseguem ser mais a esquerda (corrigido)
+
+ED =  3+4 - 2+2
+
+DIV = ED/2
+
+DIVC = 4*7+3/10
+
+P =  (4*7+3)/10
+
+y = 4 + x
+
+// testamos todas as expressões não lógicas
+
+
+
+C_TIME = x + y
+
+//bn = 4*y+x
+
+z = NULL  // temos que permitir isso na verdade...
+
+w = 'batata'
+
+a = true
+
+b = false
+
+logand = a and b
+
+lognot = not b
+
+logandT = a and not b
+
+logor = a or b
+
+//logIMP = a -> b
+logIMP = not a -> not b
+
+logBIMP = not a <-> b
+
+lesst = x < y
+
+lesseq = x <= y
+
+great = x > y
+
+//greateq = x > a
+
+greateq = x >= y
+
+dif = x != y
+
+eq = x == y

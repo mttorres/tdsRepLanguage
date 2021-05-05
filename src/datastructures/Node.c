@@ -6,36 +6,37 @@
 
 
 const char* mappingEnumNode[] =  {
-	
-	"NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE", "AC_V", "DATA_V", 
 
-	"ADD_V", "ADD_V_PROP", "V_PROP_TDS",	
+        "NUMBER", "L_BOOL", "STRING", "D_NULL", "IDVAR", "TIME_DIRECTIVE",
 
-	"EXPR",
+        "DATA_V", "PARAMS_CALL", "PARAMS", "DEFINE_INTERVAL",
 
-	"TDS_DEF_COMPLETE", "TD_DEF_DEPEN",
+        "AC_V", "ASSIGN_TDIRECTIVE" ,"OTHER_ASSIGN", "V_PROP", "ADD_V", "ADD_V_PROP", "V_PROP_TDS",
 
-	"DOMAIN_FUNCTION", "TIME_LIST", "TIME_COMP",
+        "EXPR", "MINUS_EXPR", "PLUS_EXPR", "MULTI_EXPR", "DIV_EXPR", "LE_EXPR", "GE_EXPR", "LT_EXPR", "GT_EXPR", "EQUAL_EXPR", "NEQUAL_EXPR",
+        "NOT_EXPR", "AND_EXPR", "OR_EXPR", "IMP_EXPR", "BIMP_EXPR", "PRI_EXPR",
 
-	"DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED",
+        "CMD_IF", "TDS_DEF_COMPLETE", "TDS_DEF_DEPEN", "CMD_TDS_ANON",
 
-	"PROG", "FUNC_DEFS", "CMD", 
+        "LIST_ITERATOR", "TIME_COMP", "V_PROP_TDS_VALUE", "DOMAIN_FUNCTION",
 
-	"FUNC_DEF", "PROC_DEF", "F_BODY", "OPT_RETURN", "PARAMS", "PARAM", 
+        "MATCH_IF",
 
-	"CMD_IF", "CMD_OTHER",
-	
-	"CMD_TDS_ANON", "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS",
+        "ASSIGN_IDVAR", "ASSIGN_AC_V", "ASSIGN_TDIRECTIVE",
 
-	"MATCH_IF", 
+        "DEF_EXTRAS_LINKED", "DEF_EXTRAS_DELAYED", "DEF_EXTRAS_FILTER",
 
-	"OTHER_LOOP", "FUNC_CALL", "PROC_CALL", "OTHER_ASSIGN",
+        "HEADERS_E_PROG", "PROG", "FUNC_DEFS", "CMD",
 
-	"PARAMS_OP","PARAMS_CALL", "PARAM_CALL",  
+        "FUNC_DEF", "PROC_DEF", "OPT_RETURN", "PARAM",
 
-	"ASSIGN_IDVAR", "ASSIGN_IDVAR", "ASSIGN_TDIRECTIVE",
+        "CMD_OTHER",
 
-	"CHANGE_ITD", "CHANGE_CTD", "CHANGE_FTD", 
+        "TDS_ANON_OP_PASS", "TDS_ANON_OP_DPASS", "TDS_ANON_OP_FPASS",
+
+        "OTHER_LOOP", "FUNC_CALL", "PROC_CALL",
+
+        "SHOW_PRINT"
 };
 
 
@@ -75,11 +76,13 @@ Node* createNode(int numArgs, ...){
 
 	if(current_node->nleafs > 0){
 		//printf("CRIANDO FOLHAS \n");
+		char* ptLeaf = NULL;
 		char** leafs = (char**) malloc(current_node->nleafs*sizeof(char*));
 		int pos = 0;
 		for(i = parametrosFilhos; i <= numArgs; i++){
-		    
-		    leafs[pos] = va_arg(args, char*); 
+		    ptLeaf = va_arg(args, char*);
+		    leafs[pos] = malloc(sizeof(char)*strlen(ptLeaf)+1);
+		    strcpy(leafs[pos],ptLeaf);
 		    pos++;
 		}		
 		current_node->leafs = leafs;
@@ -179,6 +182,9 @@ void letgoNode(Node* n){
 		free(n->children);
 	}
 	if(n->leafs){
+        for(i=0; i < n->nleafs; i++){
+            free(n->leafs[i]);
+        }
 		free(n->leafs);
 	}	
 	free(n);

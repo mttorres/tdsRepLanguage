@@ -2,19 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../../headers/STable.h"
-#include "../../headers/constants.h"
 
 
 const char* mappingEnumTable[] =  {
-    "GLOBAL",
-    "FUNC",
-    "LOOP",
-    "IF_BLOCK",
-    "ELSE_BLOCK",
-    "SMV_PORTS",
-    "SMV_V_MAIN",
-    "SIMPLE_HASH",
-    "TYPE_SET"
+  "GLOBAL", "FUNC", "LOOP", "IF_BLOCK", "ELSE_BLOCK", "SMV_PORTS", "SMV_V_MAIN" ,"SIMPLE_HASH"
 };
 
 
@@ -47,7 +38,7 @@ TableEntry* createEntry(char* name, Object* val, int methodParam, STable* parent
     }
     *dest = '\0';
 
-    printf("[createEntry] novo nome: %s \n",newName);
+    //printf("[createEntry] novo nome: %s \n",newName);
     
     newEntry->name = newName; 
     newEntry->val = val;   // objects sempre vão ser alocados, string devemos ter tratativa! (a não ser que essa seja alocada pelo bison?)
@@ -73,11 +64,11 @@ void printEntry(TableEntry* e) {
 		printObject(e->val);	
 		if(e->val->type == TYPE_SET)
 		{
-			printTable((STable*)e->val->values[2]);
+			//printTable((STable*)e->val->values[2]);
 		}
 		printf(")");
 		printf("\n");
-		printf("\t ( methodParam: %d, level: %d, order: %d ) \n",e->methodParam,e->level,e->order);
+		printf("\t (context: %d, methodParam: %d, level: %d, order: %d ) \n",e->val->timeContext,e->methodParam,e->level,e->order);
 
 	}
 }
@@ -86,7 +77,7 @@ void printEntry(TableEntry* e) {
 
 /// table
 
-STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
+STable *createTable(SCOPE_TYPE type, STable *parent, int level, int order, int indexRef) {
 
 	STable* newtable = (STable*) malloc(sizeof(STable));
 	
@@ -110,10 +101,14 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	newtable->lastEntryIndex = 0;
 	newtable->backup = 0;
 	newtable->collision = 0;
+	newtable->conditionBind = NULL;
+	newtable->notEvaluated = 0;
+	newtable->notWrite = 0;
+	newtable->children = NULL;
 	
-	if(parent){
-		newtable->parent = parent;
-	}
+	newtable->parent = parent;
+    newtable->childOfFunction = parent && (parent->type == FUNC || parent->childOfFunction);
+    newtable->indexRef = newtable->type == FUNC? indexRef : newtable->childOfFunction? parent->indexRef : -1;
 
 /*
 	if(chillist){
@@ -121,12 +116,13 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	}
 */
 
-	int selectSize =  type == SIMPLE_HASH ?  15 : MAX_TABLE;
+
+
 
 /*
 	if(type == SIMPLE_HASH)
 	{
-		printf("[createTable] criando simple hash \n\n");
+		printf("[createTable] criando simple calculateHashPos \n\n");
 	}
 	else
 	{
@@ -134,12 +130,12 @@ STable* createTable(SCOPE_TYPE type, STable* parent,  int level, int order) {
 	}
 */
 	
-	newtable->tableData = (TableEntry**) malloc(selectSize*sizeof(TableEntry*));
+	newtable->tableData = (TableEntry**) malloc(MAX_TABLE*sizeof(TableEntry*));
 	
 	
 	// garantia (tudo bem que eu NÃO VOU PRECISAR PERCORRER A TABELA DE SIMBOLOS, mas ele ta quebrando no print (por existir "qualquer coisa na tabela"))
 	int i;
-	for (i = 0; i < selectSize; i++)
+	for (i = 0; i < MAX_TABLE; i++)
 	{
 		newtable->tableData[i] = NULL;	
 	}
@@ -165,20 +161,29 @@ void printTable(STable* t){
 				
 			}
 		}
+		else{
+            printf("|--> Entries: {NONE} \n");
+		}
 		if(t->nchild)
 		{
 			int i;
 			for (i = 0; i < t->nchild; i++)
 			{
-				printf("child (%d): \n",i+1);
+				printf("\tchild (%d): \n",i+1);
+				printf("\t\t");
 				printTable(t->children[i]);
 			}
 		}
 	}
 }
 
+void letGoEntryByName(STable* table, char* name){
+    int index = calculateHashPos(name, table);
+    letgoEntry(table->tableData[index]);
+    table->tableData[index] = NULL;
+}
 
-void letgoEntry(TableEntry* e) {
+void letgoEntry(TableEntry *e) {
 	if(!e) {
 	    return;
 	}
@@ -188,33 +193,43 @@ void letgoEntry(TableEntry* e) {
 	}
 	if(e->val)
 	{
-		letgoObject(e->val);
+	    //if(e->val->type == TYPE_SET){
+        //    letgoTable((STable *) e->val->values[2]);
+	    //}
+        letgoObject(e->val);
 	}
 	free(e);
 }
 
 
-void letgoTable(STable* t)
+void letgoTable(STable *t)
 {
 	if(!t) {
 	    return;
 	}
+	if(t->parent){
+	    t->parent->children[t->order] = NULL;
+	}
 	int i;
 	if(t->children){
 		for(i=0; i < t->nchild; i++){
-			letgoTable(t->children[i]);
+            letgoTable(t->children[i]);
 		}
 		free(t->children);
 	}
 	if(t->tableData){
+		//int size = t->type == SIMPLE_HASH || t->type == SMV_PORTS?  MAX_SIMPLE : MAX_TABLE;
 		for(i=0; i < MAX_TABLE; i++)
 		{
-				if(t->tableData[i]) {
-			 	letgoEntry(t->tableData[i]);   
+		    if(t->tableData[i]) {
+                letgoEntry(t->tableData[i]);
 			}
 		}
 	    free(t->tableData);
 	}
+    if(t->conditionBind){
+        free(t->conditionBind);
+    }
 	free(t);
 }
 
@@ -223,22 +238,15 @@ void letgoTable(STable* t)
 
 
 
-int hash(char * str, STable* t) {
-	int hash = 401;
-	int c;
-	int SIZE_FOR_HASH = t->collision ? t->collision : MAX_TABLE;
-	
-	if(t->collision)
+
+int calculateHashPos(char * str, STable* t) {
+
+	int SIZE_FOR_HASH = t && t->collision ? t->collision : MAX_TABLE;
+	if(t && t->collision)
 	{
-		printf("[hash] collision : (%d) \n",SIZE_FOR_HASH);
+		printf("[calculateHashPos] collision : (%d) \n",SIZE_FOR_HASH);
 	}
-
-	while (*str != '\0') {
-		hash = ((hash << 4) + (int)(*str)) % SIZE_FOR_HASH;
-		str++;
-	}
-
-	return hash % SIZE_FOR_HASH;
+	return hash(str,SIZE_FOR_HASH);
 }
 
 
@@ -264,7 +272,7 @@ void redistributeHashs(STable* t, TableEntry* e)
 	{
 		if(t->tableData[i])
 		{
-			int index = hash(t->tableData[i]->name,t);
+			int index = calculateHashPos(t->tableData[i]->name, t);
 			printf("[redistributeHashs] new index (%s) %d \n",t->tableData[i]->name,index);
 			newTableData[index] = t->tableData[i];
 		}
@@ -283,13 +291,14 @@ void redistributeHashs(STable* t, TableEntry* e)
 
 void insert(STable* t, TableEntry* e) {
     
-    int index = hash(e->name,t);
-    printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
+    int index = calculateHashPos(e->name, t);
+    //printf("[insert] HASH CALCULADO para (%s) É: %d \n",e->name,index);
     
     if(lookup(t,e->name))
     {
     	printf("[insert] COLLISION! (%s) É: %d \n",e->name,index);
-    	redistributeHashs(t,e);
+    	exit(-1);
+    	//redistributeHashs(t,e);
     }
     else
     {
@@ -300,116 +309,105 @@ void insert(STable* t, TableEntry* e) {
     
 }
 
+
 TableEntry* lookup(STable* t, char* name) {
     
-    int index = hash(name,t);
-    return t->tableData[index];
-    
+    int index = calculateHashPos(name, t);
+    TableEntry* e = t->tableData[index];
+    if(e)
+    {
+    	return e;
+    }
+    // não achou procura na hierarquia de escopos acima
+    //printf("[lookup] WARNING %s not in scope : ",name);
+    //printf("%s (%d,%d) \n",mappingEnumTable[t->type],t->level,t->order);
+    STable* parent = t->parent;
+   	while(!e && parent)
+    {
+    	//printf("[lookup] parent: %s (%d,%d)",mappingEnumTable[parent->type],parent->level,parent->order);
+    	e = parent->tableData[index];
+    	//printTable(parent);
+    	parent = parent->parent;
+    }
+   	return e;
 }
 
 
+void addNumericalIntervalSmv(char* name, int pos, int tam, int pointIni, int pointEnd, int min , int max, int newValue, STable* current){
 
-// op's novas que funcionam
+    //printf("[addNumericalIntervalSmv] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
 
-// note que ! eu poderia muito bem por que os valores FOLHA dos nós da arvore são os mesmos que ENTRY_TYPE, existe ligeira redundância...
-// QUE POR SINAL.... meu entry_type vai ser o meu "proxy" para valores? 
-		// acho que vai ter que ter proxy... senão vai ficar dificil manipular os TIPOS
-		// JÁ QUE OS TIPOS VÃO SER LITERALMENTE REALCIONADOS A DESEMPILHAR A ARVORE
-		// primeiro eu vou testar usando valores literais 
+    max = newValue > max && newValue > min ? newValue : max;
+    max = newValue < max && newValue < min ? newValue : min;
 
+    void* po[] = {&pos, &tam, &pointIni, &pointEnd, &min, &max};
+    addValue(name, po, WRITE_SMV_INFO, 4, 0, current, 0);
+}
 
 /*
-
-	Verifica se é necessário chamar addEntryToTypeSet
-*/
-int checkTypeSet(STable* current, char* name,  char* typeid)
+void addWriteInfo(char* name, void** any, int any_type, int object_size, STable* current)
 {
-	TableEntry* entry = lookup(current,name);
-	if(entry)
-	{
-		if(lookup(entry->val->values[2],typeid))
-		{
-			printf("[checkTypeSet] %s encontrado no conjunto da variável %s \n",typeid,name);
-			return 0;
-		}
-		printf("[checkTypeSet] %s não existe no conjunto da variável %s \n",typeid,name);
-		// poderiamos chamar o método add aqui né ? (problemas: efeitos colaterais demais de uma só vez (atrapalha debug, lembre-se do print haha))
-		return 1;
-	}
+    printf("[addWriteInfo] add var-name: %s to %s \n",name,mappingEnumTable[current->type]);
+    STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
+
+    void* po[] = {any[0], any[1], hashset};
+
+    printf("[addTypeSetSmv] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
+
+    addValue(name,po,any_type,object_size+1,0,current);
 }
-
-
-/*
-	Adiciona um tipo para o "conjunto de tipos das variáveis" 
-	para otimizar a escrita no arquivo SMV.
-	
 */
-void addEntryToTypeSet(STable* current, char* name, char* typeid) 
-{
-	TableEntry* entry = lookup(current,name);
-	if(entry)
-	{
-		int present = 1;
-		void* po = {&present};	
-		addValue(typeid,po,NUMBER_ENTRY,1,0,entry->val->values[2]);
-	}
+
+void addSmvInfoDeclaration(char *name, void **any, int any_type, int object_size, STable *current, void* type_smv_info_dc){
+    addValue(name,any,any_type,object_size,0,current,-1);
+    Object* VAR_DECLARATION_SMV_INFO = lookup(current,name)->val;
+    void* copy_type_smv_info_dc = NULL;
+    if(any_type == WRITE_SMV_INFO){
+       copy_type_smv_info_dc = copyTypeMinMax(type_smv_info_dc);
+    }
+    else{
+        copy_type_smv_info_dc = copyTypeSet(type_smv_info_dc);
+    }
+    VAR_DECLARATION_SMV_INFO->type_smv_info = copy_type_smv_info_dc;
 }
-
-
-
-// método especializado para adicionar valores que sejam SMV_POINTERS (indice no Header, tamanho da palavra, conjunto de tipos(hashmap ou outro objeto)) 
-/*
-
-	Objeto:  vetor dinamico[inteirosDoConjunto], nullable, vetor dinamico[labelsDoConjunto]
-
-	Prós: Menos structs para alocar,não tem que alocar uma TABELA INTEIRA só para alguns valores, 
-	a linguagem possui poucos tipos (atualmente: int, label, boolean(FALSE E TRUE são só enums no nuXmv),
-	e tds (que na verdade retorna qualquer um dos tipos anteriores))
-
-	Cons:  Outro objeto (mais coisas para dar free), 
-		   "quebaria" o conceito de hashmap que é justamente não ter duplicata, ia ser um objeto só para checar algumas coisas
-		    Toda vez que adicionar um tipo novo necessita alterar essa estrutura
-
-	Hashmap: estrutura que já temos atualmente, teria pelo menos umas 5 entras (talvez mais ou menos)
-
-		Pŕos: Não necessita criar mais nada,  não precisa alocar vetores (indexa pela string em qualquer caso),
-			  aberto para novos tipos (indexa pela string)
-
-		Cons:  Vai ficar uma estrutura "recursiva" tabela --x entradas--> entradaSmv(porta ou main) --> Objeto(iHeader,size,
-																											tabela ---y entradas--->entradas --> Objeto(bool))
-				Mais coisas para centralizar e dar free
- 
-
-*/
-void addTypeSet(char* name, void** any, int any_type, int object_size, STable* current)
-{
-	STable* hashset = createTable(SIMPLE_HASH,NULL,0,0);
-
-	void* po[] = {any[0], any[1], hashset};
-
-	printf("[addTypeSet] (index: %d, size: %d) \n",*(int*)po[0],*(int*)po[1]);
-
-	printf("[addTypeSet] var-name: %s \n",name);
-
-	addValue(name,po,any_type,object_size+1,0,current);
-}
-
 
 // refatorar? os dois métodos, usar só um que recebe "qualquer coisa" e encapsula em um objeto
-void addValue(char* name, void** any, int any_type, int object_size ,int methodParam, STable* current) 
+void addValue(char *name, void **any, int any_type, int object_size, int methodParam, STable *current, int timeContext)
 {
 
-	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ? 
-
-	// POR ENQUANTO:
-
+	// note que po é um ponteiro para objetos que o novo objeto irá encapsular, como criar ?
 	//void* pa[] = {&vali}; (pro :possibilita manipular arrays) (cons: tenho que tratar tudo como vetor até quando é um unico valor)
 
 
-	Object* o = createObject(any_type, object_size, any);
+	Object* o = createObject(any_type, object_size, any, timeContext, name, NULL);
 	addValueCurrentScope(name,o,methodParam,current);
 }
 
+
+void updateValue(char *name, void **any, int any_type, int object_size, int oIndex, int oProp, STable *current, int contextChange)
+{
+	TableEntry* e = lookup(current,name);
+	if(e){
+        //printf("[updateValue]  newValue  %d \n",*(int*)any[0]);
+        updateObject(e->val, any, any_type, object_size, oIndex, oProp, contextChange);
+	}
+	else{
+	   if(oIndex > 0){
+           fprintf(stderr, "ASSIGN ERROR: %s is not defined for reference %s[%d] \n", name,name,oIndex);
+           exit(-1);
+	   }
+	   addValue(name, any, any_type, object_size, 0, current, 0);
+	}
+
+}
+
+void addReferenceCurrentScope(char* name, Object* DATA_STRUCT, int methodParam, STable* current){
+    if(lookup(current,name)){
+        fprintf(stderr,"%s already declared!\n",name);
+        exit(-1);
+    }
+    addValueCurrentScope(name,DATA_STRUCT,methodParam,current);
+}
 
 
 void addValueCurrentScope(char* name, Object* val, int methodParam,STable* current) {
@@ -436,9 +434,9 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	
 	// LEMBRE-SE nchild usa a próxima posição para o escopo filho (inicia em 0, primeira pos)
 
-	STable* child = createTable(type,parent,parent->level+1,parent->nchild);
+	STable* child = createTable(type, parent, parent->level + 1, parent->nchild, -1);
 	
-	printf("[addSubScope] alocando filho: %d \n",parent->nchild);
+	//printf("[addSubScope] alocando filho: %d \n",parent->nchild);
 
 	if(!parent->nchild) {
 		parent->children = (STable**) malloc((parent->nchild+1)*sizeof(STable*));
@@ -447,7 +445,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 	{
 		if(!parent->backup)
 		{
-			printf("[addSubScope] realocando filhos: %d \n",parent->nchild);
+			//printf("[addSubScope] realocando filhos: %d \n",parent->nchild);
 			STable** newbuffer = realloc(parent->children, (parent->nchild+1)*sizeof(STable*));
 		
 			if(newbuffer == NULL)
@@ -486,7 +484,7 @@ STable* addSubScope(STable* parent, SCOPE_TYPE type) {
 STable * letgoSubScope(STable* current)
 {
 	STable* parent = current->parent;
-	letgoTable(current);
+    letgoTable(current);
 	parent->nchild --;
 
 	return parent;

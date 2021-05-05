@@ -1,0 +1,187 @@
+MODULE main
+VAR
+	time: 0..8;
+	automato: finalAutomata(ports);
+	ports: portsModule(time);
+ASSIGN
+	init(time) := 1;
+	next(time) := case
+		time < 8: time + 1;
+		TRUE: time;
+esac;
+
+MODULE finalAutomata(ports)
+VAR
+	cs: {q0q0q0q0q0,q0q0q0q0p0,q0q0q0q0p1,q0q0p0q0q0,q0q0p0q0p0,q0q0p0q0p1,q0q0p1q0q0,q0q0p1q0p0,q0q0p1q0p1,p0q0q0q0q0,p0q0q0q0p0,p0q0q0q0p1,p0q0p0q0q0,p0q0p0q0p0,p0q0p0q0p1,p0q0p1q0q0,p0q0p1q0p0,p0q0p1q0p1,p1q0q0q0q0,p1q0q0q0p0,p1q0q0q0p1,p1q0p0q0q0,p1q0p0q0p0,p1q0p0q0p1,p1q0p1q0q0,p1q0p1q0p0,p1q0p1q0p1};
+ASSIGN
+	init(cs) := {q0q0q0q0q0};
+TRANS
+	((cs = q0q0q0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0q0q0q0) &
+	((cs = q0q0q0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0q0q0q0) &
+	((cs = q0q0q0q0q0) -> ((next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0q0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0q0q0p0) &
+	((cs = q0q0q0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 0) -> next(cs) = p0q0q0q0q0) &
+	((cs = q0q0q0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0q0q0p0) &
+	((cs = q0q0q0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 0) -> next(cs) = p1q0q0q0q0) &
+	((cs = q0q0q0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0q0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0q0q0p1) &
+	((cs = q0q0q0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 1) -> next(cs) = p0q0q0q0q0) &
+	((cs = q0q0q0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0q0q0p1) &
+	((cs = q0q0q0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 1) -> next(cs) = p1q0q0q0q0) &
+	((cs = q0q0q0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p0q0q0) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 0 & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p0q0q0q0p0) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 0 & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p0q0q0q0p1) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p0q0q0) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 1 & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p1q0q0q0p0) &
+	((cs = q0q0p0q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 1 & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p1q0q0q0p1) &
+	((cs = q0q0p0q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p0q0p0) &
+	((cs = q0q0p0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 0) -> next(cs) = p0q0p0q0q0) &
+	((cs = q0q0p0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p0q0p0) &
+	((cs = q0q0p0q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 0) -> next(cs) = p1q0p0q0q0) &
+	((cs = q0q0p0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p0q0p1) &
+	((cs = q0q0p0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 1) -> next(cs) = p0q0p0q0q0) &
+	((cs = q0q0p0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p0q0p1) &
+	((cs = q0q0p0q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 1) -> next(cs) = p1q0p0q0q0) &
+	((cs = q0q0p0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p1q0q0) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 0 & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p0q0q0q0p0) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 0 & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p0q0q0q0p1) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p1q0q0) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 1 & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p1q0q0q0p0) &
+	((cs = q0q0p1q0q0 & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.a.value = 1 & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p1q0q0q0p1) &
+	((cs = q0q0p1q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p1q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p1q0p0) &
+	((cs = q0q0p1q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 0) -> next(cs) = p0q0p1q0q0) &
+	((cs = q0q0p1q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p1q0p0) &
+	((cs = q0q0p1q0p0 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 0) -> next(cs) = p1q0p1q0q0) &
+	((cs = q0q0p1q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p1))) &
+	((cs = q0q0p1q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 0) -> next(cs) = p0q0p1q0p1) &
+	((cs = q0q0p1q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 0 & ports.g.value = 1) -> next(cs) = p0q0p1q0q0) &
+	((cs = q0q0p1q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.a.value = 1) -> next(cs) = p1q0p1q0p1) &
+	((cs = q0q0p1q0p1 & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.a.value = 1 & ports.g.value = 1) -> next(cs) = p1q0p1q0q0) &
+	((cs = q0q0p1q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0p0) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p0))) &
+	((cs = p0q0q0q0q0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0q0) &
+	((cs = p0q0q0q0q0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0q0) &
+	((cs = p0q0q0q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p0q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0p0) &
+	((cs = p0q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0 & ports.g.value = 0) -> next(cs) = q0q0p0q0q0) &
+	((cs = p0q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0p0) &
+	((cs = p0q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1 & ports.g.value = 0) -> next(cs) = q0q0p1q0q0) &
+	((cs = p0q0q0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p0q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0p1) &
+	((cs = p0q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0 & ports.g.value = 1) -> next(cs) = q0q0p0q0q0) &
+	((cs = p0q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0p1) &
+	((cs = p0q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 0 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1 & ports.g.value = 1) -> next(cs) = q0q0p1q0q0) &
+	((cs = p0q0q0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p1q0p0) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p0q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p1q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p1q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p0q0p1q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0q0q0q0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0q0) &
+	((cs = p1q0q0q0q0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0q0) &
+	((cs = p1q0q0q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0p0) &
+	((cs = p1q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0 & ports.g.value = 0) -> next(cs) = q0q0p0q0q0) &
+	((cs = p1q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0p0) &
+	((cs = p1q0q0q0p0 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1 & ports.g.value = 0) -> next(cs) = q0q0p1q0q0) &
+	((cs = p1q0q0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0) -> next(cs) = q0q0p0q0p1) &
+	((cs = p1q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 0 & ports.g.value = 1) -> next(cs) = q0q0p0q0q0) &
+	((cs = p1q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1) -> next(cs) = q0q0p1q0p1) &
+	((cs = p1q0q0q0p1 & ports.a.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.e.value = 1 & ports.e.value != NULL & ports.e.value = ports.b.value & ports.e.value = 1 & ports.g.value = 1) -> next(cs) = q0q0p1q0q0) &
+	((cs = p1q0q0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p1q0p0) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0p0q0q0 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p1q0q0q0p0) &
+	((cs = p1q0p0q0q0 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.f.value = 0 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p1q0q0q0p1) &
+	((cs = p1q0p0q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p1q0p0q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	 &
+	((cs = p1q0p0q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p1q0q0) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0p1q0q0 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 0) -> next(cs) = p1q0q0q0p0) &
+	((cs = p1q0p1q0q0 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.g.value = NULL & ports.f.value = 1 & ports.f.value != NULL & ports.f.value = ports.c.value & ports.f.value = 1) -> next(cs) = p1q0q0q0p1) &
+	((cs = p1q0p1q0q0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p0) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0p1q0p0 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = 0) -> next(cs) = p1q0p1q0q0) &
+	((cs = p1q0p1q0p0) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p1))) &
+	((cs = p1q0p1q0p1 & ports.a.value = NULL & ports.e.value = NULL & ports.b.value = NULL & ports.f.value = NULL & ports.c.value = NULL & ports.g.value = 1) -> next(cs) = p1q0p1q0q0) &
+	((cs = p1q0p1q0p1) -> ((next(cs) != q0q0q0q0q0) & (next(cs) != q0q0q0q0p0) & (next(cs) != q0q0q0q0p1) & (next(cs) != q0q0p0q0q0) & (next(cs) != q0q0p0q0p0) & (next(cs) != q0q0p0q0p1) & (next(cs) != q0q0p1q0q0) & (next(cs) != q0q0p1q0p0) & (next(cs) != q0q0p1q0p1) & (next(cs) != p0q0q0q0q0) & (next(cs) != p0q0q0q0p0) & (next(cs) != p0q0q0q0p1) & (next(cs) != p0q0p0q0q0) & (next(cs) != p0q0p0q0p0) & (next(cs) != p0q0p0q0p1) & (next(cs) != p0q0p1q0q0) & (next(cs) != p0q0p1q0p0) & (next(cs) != p0q0p1q0p1) & (next(cs) != p1q0q0q0q0) & (next(cs) != p1q0q0q0p0) & (next(cs) != p1q0q0q0p1) & (next(cs) != p1q0p0q0q0) & (next(cs) != p1q0p0q0p0) & (next(cs) != p1q0p0q0p1) & (next(cs) != p1q0p1q0p0)));
+
+MODULE portsModule(time)
+VAR
+	a : tds_a(time);
+	e : tds_e(time);
+	b : tds_b(time);
+	f : tds_f(time);
+	c : tds_c(time);
+	g : tds_g(time);
+ASSIGN
+	init(e.value):= NULL;
+	next(e.value):= case
+		e.value = NULL : a.value;
+		a.value = NULL & e.value != NULL : NULL;
+		TRUE : e.value;
+	esac;
+	init(b.value):= e.value;
+	next(b.value):= next(e.value);
+	init(f.value):= NULL;
+	next(f.value):= case
+		f.value = NULL : e.value;
+		e.value = NULL & f.value != NULL : NULL;
+		TRUE : f.value;
+	esac;
+	init(c.value):= f.value;
+	next(c.value):= next(f.value);
+	init(g.value):= NULL;
+	next(g.value):= case
+		g.value = NULL : f.value;
+		f.value = NULL & g.value != NULL : NULL;
+		TRUE : g.value;
+	esac;
+
+MODULE tds_a(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+	init(value):= 0;
+	next(value):= case
+		next(time) = 2 : 1;
+		next(time) = 3 : 0;
+		next(time) = 4 : 1;
+		TRUE : NULL;
+	esac;
+
+MODULE tds_e(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+
+MODULE tds_b(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+
+MODULE tds_f(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+
+MODULE tds_c(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+
+MODULE tds_g(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+

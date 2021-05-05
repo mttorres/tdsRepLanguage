@@ -1,0 +1,61 @@
+MODULE main
+VAR
+	time: 0..20;
+	finalAutomata: filter(ports);
+	ports: portsModule(time, y, x);
+	x : 0..4;
+	y : 0..3;
+ASSIGN
+	init(time) := 1;
+	next(time) := case
+		time < 20: time + 1;
+		TRUE: time;
+esac;
+	init(x):= 0;
+	next(x):= case 
+		next(time) = 2 : 4;
+		TRUE : x; 
+	esac;
+	init(y):= 1;
+	next(y):= case 
+		next(time) = 2 : 3;
+		TRUE : y; 
+	esac;
+	
+CTLSPEC AG (ports.b.value != NULL & time < 10);		
+	
+
+MODULE filter(ports)
+VAR
+	cs: {q0};
+TRANS
+     ((cs = q0 & ports.b.value = NULL & ports.a.value != NULL & !((next(ports.a.value) = 0) | (next(ports.a.value) = 1))) -> next(cs) = q0) &
+     ((cs = q0 & ports.a.value != NULL & ports.a.value = ports.b.value & (next(ports.a.value) = 0) | (next(ports.a.value) = 1)) -> next(cs) = q0);
+
+MODULE portsModule(time, y, x)
+VAR 
+	a : tds_a(time, y, x);
+	b : tds_b(time);
+ASSIGN
+	init(b.value):= case 
+		(a.value = 0) | (a.value = 1) : a.value;
+		TRUE : NULL; 
+	esac;
+	next(b.value):= case 
+		(next(a.value) = 0) | (next(a.value) = 1) : next(a.value);
+		TRUE : NULL; 
+	esac;
+
+MODULE tds_a(time, y, x)
+VAR
+	value : {NULL, 0, 1, -1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, -4, -3, -2, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43};
+ASSIGN
+	init(value):= y - x + (time + 20) mod 2;
+	next(value):= next(y) - next(x) + (time + 20) mod 2;
+
+MODULE tds_b(time)
+VAR
+	value : {NULL, 0, 1, -1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 2, 3, 4, 5, 6, 7, 8, 9, -2, -3, -4, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43};
+ASSIGN
+
+

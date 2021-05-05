@@ -1,0 +1,149 @@
+MODULE main
+VAR
+	time: 0..8;
+	automato: finalAutomata(ports);
+	ports: portsModule(time, x, y);
+	x : -4..0;
+	y : 0..7;
+	z : boolean;
+	zeta : boolean;
+	w_scope1_0 : 0..1;
+	r_scope1_1 : boolean;
+	u_scope1_1_2_0 : boolean;
+	w_scope1_2 : boolean;
+	u_scope1_2_2_0 : boolean;
+ASSIGN
+	init(time) := 0;
+	next(time) := case
+		time < 8: time + 1;
+		TRUE: time;
+esac;
+	init(x):= -2;
+	next(x):= case
+		next(time) = 2 : -4;
+		next(time) = 3 : -1;
+		TRUE : x;
+	esac;
+	init(y):= 0;
+	next(y):= case
+		next(time) = 2 : 5;
+		next(time) = 4 & !next(zeta) : 3;
+		next(time) = 4 & !!next(zeta) : 7;
+		TRUE : y;
+	esac;
+	init(z):= TRUE;
+	next(z):= case
+		next(time) = 4 : TRUE;
+		TRUE : z;
+	esac;
+	init(zeta):= FALSE;
+	next(zeta):= case
+		next(time) = 4 : FALSE;
+		TRUE : zeta;
+	esac;
+	init(w_scope1_0):= case
+		!z : 1;
+		TRUE : 0;
+	esac;
+	next(w_scope1_0):= w_scope1_0;
+	init(r_scope1_1):= case
+		zeta : FALSE;
+		TRUE : FALSE;
+	esac;
+	next(r_scope1_1):= r_scope1_1;
+	init(u_scope1_1_2_0):= case
+		zeta & z : FALSE;
+		TRUE : FALSE;
+	esac;
+	next(u_scope1_1_2_0):= u_scope1_1_2_0;
+	init(w_scope1_2):= FALSE;
+	next(w_scope1_2):= case
+		next(time) = 4 & !next(zeta) : TRUE;
+		TRUE : w_scope1_2;
+	esac;
+	init(u_scope1_2_2_0):= FALSE;
+	next(u_scope1_2_2_0):= case
+		next(time) = 4 & !next(zeta) & next(w_scope1_2) : FALSE;
+		TRUE : u_scope1_2_2_0;
+	esac;
+
+-- valida se em algum momento as portas param de concorrer (e continuam sem concorrer) (LTL)
+
+LTLSPEC F(G ( (ports.a.value != NULL &  ports.b.value = NULL)
+			|(ports.a.value = NULL & ports.b.value != NULL)
+			| (ports.a.value = NULL & ports.b.value = NULL)  )) ;
+
+-- valida se em algum momento as portas param de concorrer (e continuam sem concorrer) (CTL)
+CTLSPEC EF(AG ( (ports.a.value != NULL &  ports.b.value = NULL)
+			|(ports.a.value = NULL & ports.b.value != NULL)
+			| (ports.a.value = NULL & ports.b.value = NULL)  ) ) ;
+
+
+
+MODULE finalAutomata(ports)
+VAR
+	cs: {q0q0,q0p0,q0p1};
+ASSIGN
+	init(cs) := {q0q0};
+TRANS
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.b.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.a.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 0) -> next(cs) = q0p0) &
+	((cs = q0q0 & ports.a.value = NULL & ports.d.value = NULL & ports.c.value != NULL & ports.b.value = ports.c.value & ports.c.value = 1) -> next(cs) = q0p1) &
+	((cs = q0p0 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 0) -> next(cs) = q0q0) &
+	((cs = q0p0) -> ((next(cs) != q0p1))) &
+	((cs = q0p1 & ports.a.value = NULL & ports.c.value = NULL & ports.b.value = NULL & ports.d.value = 1) -> next(cs) = q0q0) &
+	((cs = q0p1) -> ((next(cs) != q0p0)));
+
+MODULE portsModule(time, x, y)
+VAR
+	a : tds_a(time);
+	b : tds_b(time, x, y);
+	c : tds_c(time);
+	d : tds_d(time);
+ASSIGN
+	init(c.value):= case
+		b.value = NULL : a.value;
+		a.value = NULL : b.value;
+		TRUE : NULL;
+	esac;
+	next(c.value):= case
+		next(b.value) = NULL : next(a.value);
+		next(a.value) = NULL : next(b.value);
+		TRUE : NULL;
+	esac;
+	init(d.value):= NULL;
+	next(d.value):= case
+		next(time) > 2 & d.value = NULL : c.value;
+		next(time) > 2 & c.value = NULL & d.value != NULL : NULL;
+		TRUE : d.value;
+	esac;
+
+MODULE tds_a(time)
+VAR
+	value : {NULL, 0, 1};
+ASSIGN
+	init(value):= 0;
+	next(value):= case
+		next(time) = 1 : 1;
+		next(time) = 2 : 0;
+		TRUE : NULL;
+	esac;
+
+MODULE tds_b(time, x, y)
+VAR
+	value : {NULL, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19};
+ASSIGN
+	init(value):= (8 - (x - y)) mod 2;
+	next(value):= (8 - (next(x) - next(y))) mod 2;
+
+MODULE tds_c(time)
+VAR
+	value : {NULL, 0, 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19};
+ASSIGN
+
+MODULE tds_d(time)
+VAR
+	value : {NULL, 0, 1, 10, 11, 12, 13, 14, 15, 16, 17, 2, 3, 4, 5, 6, 7, 8, 9, 18, 19};
+ASSIGN
+

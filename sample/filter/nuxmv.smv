@@ -1,0 +1,34 @@
+MODULE main
+VAR
+	time: 0..3;
+	finalAutomata: filter(time);
+ASSIGN
+	init(time) := 0;
+	next(time) := case
+		time < 3: time + 1;
+		TRUE: time;
+esac;
+
+MODULE filter(time)
+VAR
+	ports: portsModule;
+	cs: {q0};
+TRANS
+     ((cs = q0 & ports.b[time] = NULL & ports.a[time] != NULL & TRUE) -> next(cs) = q0) &
+     ((cs = q0 & ports.a[time] != NULL & ports.a[time] = ports.b[time] & TRUE) -> next(cs) = q0);
+
+MODULE portsModule
+FROZENVAR
+	a : array 0..5 of {NULL, 0, 1};
+	b : array 0..5 of {NULL, 0, 1};
+ASSIGN
+	init(a[0]) := 1;
+	init(a[1]) := 0;
+	init(a[2]) := 1;
+	init(a[3]) := 0;
+	init(a[4]) := NULL;
+	init(b[0]) := NULL;
+	init(b[1]) := 0;
+	init(b[2]) := NULL;
+	init(b[3]) := 0;
+	init(b[4]) := 1;

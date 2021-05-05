@@ -7,7 +7,7 @@
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
-  #include "../headers/Node.h"	
+  #include "../../headers/Node.h"
 
   int yylex(void);
   int yyparse();
@@ -68,7 +68,8 @@
 %token <sval> NOT
 %token <sval> ELSE
 %token <sval> Null
-%token <sval> XOR
+%token <sval> IMP
+%token <sval> BIMP
 %token <sval> LE
 %token <sval> GE
 %token <sval> LT
@@ -80,7 +81,7 @@
 %token <sval> MOD
 %token <sval> FUNCTIONDOMAIN
 %token <sval> FUNCTION
-%token <sval> LABEL
+%token <sval> PLICK
 %token <sval> DATATIME
 %token <sval> DELAYED
 %token <sval> PORTNAME
@@ -90,21 +91,24 @@
 %token <sval> FINALTIME
 %token <sval> ID
 %token <sval> PASS
-%token <sval> LDPASS
-%token <sval> RDPASS
+%token <sval> DPASS
+%token <sval> INTERVAL
+%token <sval> BETWEEN
+%token <sval> TDSVALUE
+%token <sval> FILTER
 
 %type <ast> prog
 %type <ast> cmds
 %type <ast> cmd
 %type <ast> functiondefs 
 %type <ast> functiondef
-%type <ast> functionbody 
-%type <ast> params  
-%type <ast> optionalreturn
+%type <ast> param
+%type <ast> params
 %type <ast> data
 %type <ast> otherstmt
 %type <ast> assignable
 %type <ast> expr
+%type <ast> subexp
 %type <ast> multiexp
 %type <ast> ineqexp
 %type <ast> logical
@@ -115,20 +119,20 @@
 %type <ast> matchornot
 %type <ast> extraaccesses
 %type <ast> extras
-%type <ast> delayedoption
+%type <ast> passoption
 %type <ast> dataflow
 %type <ast> tdsprop
 %type <ast> domain
 %type <ast> timelist
 %type <ast> timecomponent
-%type <ast> timedirective
 %type <ast> anonimtdsop
-%type <ast> interval
+%type <ast> intervaldefs
+%type <ast> main
 %left ELSE
 %left TIMES DIVIDE MINUS PLUS LE GE GT LT EQUALS NOTEQUAL
 
 
-%start prog
+%start main
 
 
 %%
@@ -136,6 +140,37 @@
 /*
 	Gramatica para o parser 
 */
+
+
+intervaldefs: RAWNUMBERDATA BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(7,0,3,"OBSERVATION-INTERVAL-COMPLETE", DEFINE_INTERVAL,$1,$2,$3);
+			$$ = data;
+
+	  }
+	  | BETWEEN RAWNUMBERDATA {
+
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-END-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+
+	  }
+	  | RAWNUMBERDATA BETWEEN {
+			Node* data = createNode(6,0,2,"OBSERVATION-INTERVAL-BEGIN-ONLY", DEFINE_INTERVAL,$1,$2);
+			$$ = data;
+	  }
+
+main: INTERVAL COLON intervaldefs prog {
+
+        Node* main = createNode(6,2,2,"Headers + program", HEADERS_E_PROG, $3,$4, $1,$2);
+        $$ = main;
+        root = $$;
+    }
+    |
+    prog {
+        $$ = $1;
+        root = $$;
+    }
+    ;
 
 prog: functiondefs cmds  {
 		
@@ -156,15 +191,13 @@ prog: functiondefs cmds  {
 
 		//printf(" teste lineno %d",yylineno);
 
-		$$ = prog; 
-		root = $$;
+		$$ = prog;
 
 	  }
 	  | cmds {
 
 		Node* prog = createNode(5,1,0,"Prog -  comandos ", PROG, $1);	  
-	  	$$ = prog; 
-	  	root = $$;
+	  	$$ = prog;
 	  } 
       ; 
 
@@ -211,7 +244,7 @@ functiondefs: functiondefs functiondef {
 	  }  
 	  ; 	
 
-functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
+functiondef: FUNCTION ID LPAREN params RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(12,2,6,"Functiondef -  definição de função ", FUNC_DEF,  $4,$7, $1,$2,$3,$5,$6,$8);
 			//printf("DEFINICAO DE FUNÇÃO \n");
@@ -219,56 +252,26 @@ functiondef: FUNCTION ID LPAREN params RPAREN LBRACE functionbody  RBRACE  {
 			//infoNode($$);
 		
 		}
-		| FUNCTION ID LPAREN RPAREN LBRACE functionbody  RBRACE  {
+		| FUNCTION ID LPAREN RPAREN LBRACE cmds  RBRACE  {
 
 			Node* functiondef = createNode(11,1,6,"Functiondef -  definição de procedimento ", PROC_DEF, $6, $1,$2,$3,$4,$5,$7);
 			//printf("DEFINICAO DE FUNÇÃO \n");
 			$$ = functiondef; 
 			//infoNode($$);
-
 		}
 		;
 
-// MUDANÇA - NAO PERMITIR CHAMADA A TDS CREATE dentro de funções! (ou verificar em tempo de semantica?)
-functionbody: cmds optionalreturn {
-	
-			if($2){
-				Node* functionbody = createNode(6,2,0,"Functionbody - função composta/programa ", F_BODY, $1,$2);
-				$$ = functionbody; 
-			}
-			else {
-				Node* functionbody = createNode(5,1,0,"Functionbody - função composta/programa ", F_BODY, $1);
-				$$ = functionbody; 
-			}
 
-	  		
-			
+param: ID {
+    Node* params = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
+    $$ = params;
+}
+
+params: param {
+			$$ = $1;
 		}
-
-
-optionalreturn: RETURN expr {
-
-		Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
-		$$ = optionalreturn; 
-
-		//printf("RETORNO \n");
-		
-		}
-	    | /* empty */  {printf("nao teve mais(optionalreturn) \n \n"); $$ = NULL;}
-	    ;
-
-
-
-
-params: ID {
-		
-			Node* params = createNode(5,0,1,"parametro da definição de função", PARAM, $1);
-			$$ = params; 		
-
-		}
-	    | params COMMA ID {
-			
-			Node* params = createNode(7,1,2,"Paramslist - lista de parâmetros a mais de uma função ", PARAMS , $1, $2,$3);
+	    | params COMMA param {
+			Node* params = createNode(7,2,1,"Paramslist - lista de parâmetros a mais de uma função ", LIST_ITERATOR , $1,$3, $2);
 			$$ = params; 	
 	    }
 
@@ -297,7 +300,15 @@ cmd: IF LPAREN expr RPAREN LBRACE cmds RBRACE matchornot {
 	 // jogar para nó mais abaixo a operação para avaliar antes de toda a expressão!
 
 	 | LPAREN params RPAREN anonimtdsop ID {
-
+        if($2->type != IDVAR && ($4->type == TDS_ANON_OP_DPASS || $4->type == TDS_ANON_OP_FPASS) ){
+                if($4->type == TDS_ANON_OP_DPASS){
+                    fprintf(stderr, "\n[PARSING ERROR] DELAYED-FIFO option for %s not valid for multiples inputs! \n",$5);
+                }
+                else{
+                    fprintf(stderr, "\n[PARSING ERROR] FILTER option for %s not valid for multiples inputs! \n",$5);
+                }
+                exit(-1);
+        }
 		Node* cmd = createNode(9,2,3,"CMD -  Comando (criação TDS-anonima)",  CMD_TDS_ANON ,$2,$4,  $1,$3,$5); 
 		//infoNode($$);
 		//printf("(%s) (%s) (filhos: %d) \n \n",cmd->name,cmd->children[0]->name,cmd->nchild);
@@ -310,30 +321,18 @@ anonimtdsop: PASS  {
 				Node* p = createNode(5,0,1,"CMD -  PASS", TDS_ANON_OP_PASS ,$1); 
 				$$ = p;
 		}
-		| LDPASS interval RDPASS  {
-				Node* p = createNode(5,1,2,"CMD -  DPASS", TDS_ANON_OP_DPASS,  $2, $1,$3); 
-				$$ = p;
-		} 
-
-
-interval:  ID {
-
-				Node* i = createNode(5,0,1,"VARIAVEL", IDVAR ,$1); 
-				$$ = i;
-			
-		}
-		| RAWNUMBERDATA 
-		{
-				Node* i = createNode(5,0,1,"CMD -  PASS", NUMBER ,$1); 
-				$$ = i;
-		}
-
-
+		|   DPASS  {
+        		Node* p = createNode(5,0,1,"CMD -  DPASS", TDS_ANON_OP_DPASS ,$1);
+        		$$ = p;
+        }
+        | MINUS LBRACE expr RBRACE GT {
+        		Node* p = createNode(9,1,4, "CMD -  FPASS", TDS_ANON_OP_FPASS,   $3,  $1, $2, $4, $5);
+        		$$ = p;
+        }
 
 paramsCall: expr {
 		
-			Node* paramsCall = createNode(5,1,0,"Params -  parametro da chamada de função ", PARAM_CALL, $1);
-			$$ = paramsCall; 		
+			$$ = $1; 		
 
 		}
 	    | paramsCall COMMA expr {
@@ -381,7 +380,7 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//infoNode($$);
 
 	 }
-	 | assignable ASSIGN expr {
+	 | assignable ASSIGN variabledata {
 		
 		Node* assignment = createNode(7,2,1,"Assignment", OTHER_ASSIGN ,$1,$3, $2);
 		$$ = assignment;	
@@ -389,7 +388,15 @@ otherstmt: FOR ID IN expr LBRACE cmds RBRACE {
 		//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
 		//infoNode($$);
 
-	 }	 
+	 }
+	 | RETURN variabledata {
+	    	Node* optionalreturn = createNode(6,1,1,"Optionalreturn -  retorno opcional ", OPT_RETURN,  $2, $1);
+        	$$ = optionalreturn;
+	 }
+	 | CURRENTTIME TO expr {
+			Node* data = createNode(7,1,2,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE , $3  ,$1,$2);
+			$$ = data;
+	 }
 	 ;
 
 
@@ -407,158 +414,117 @@ assignable : ID extraaccesses {
 				Node* assignment = createNode(5,0,1,"VARIAVEL", ASSIGN_IDVAR, $1);
 				$$ = assignment;	
 		}
-
-
-	 }
-
-	 | INITTIME {
-		
-			Node* data = createNode(5,0,1,"CHANGE-INITTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-		
-	  }
-
-
-	  | CURRENTTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-CURRENTTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;	
-
-	  }
-
-	  | FINALTIME {
-
-			Node* data = createNode(5,0,1,"CHANGE-FINALTIME-DIRECTIVE", ASSIGN_TDIRECTIVE ,$1);	
-			$$ = data;
-
-	  }
-
-	  ;	 
-
-
-expr: MINUS expr {
-	
-		Node* expr = createNode(6,1,1,"Expressão Básica - negativo", EXPR, $2,  $1);
-		$$ = expr;		
-
-
-	 }
-	 | expr MINUS multiexp {
-		
-		Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  EXPR ,$1,$3,  $2);
-		$$ = expr;			
-
-	 }
-	 | expr PLUS multiexp {
-
-		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", EXPR ,$1,$3,  $2);
-		$$ = expr;						
-		
-
-	 }
-	 | multiexp {
-
-		$$ = $1;	
-
 	 }
 	 ;
 
 
+
+expr: expr PLUS subexp {
+		Node* expr = createNode(7,2,1,"Expressão Básica - soma ", PLUS_EXPR ,$1,$3,  $2);
+		$$ = expr;
+	 }
+	 | subexp {
+
+       Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
+       $$ = expr;
+	 }
+	 ;
+
+subexp: subexp MINUS multiexp {
+
+        Node* expr = createNode(7,2,1,"Expressão Básica - subtração ",  MINUS_EXPR ,$1,$3,  $2);
+        		$$ = expr;
+
+        }
+        | multiexp {
+
+           Node* expr = createNode(5,1,0,"Expressão Básica - Nível 2", EXPR ,$1);
+           $$ = expr;
+        }
+
 multiexp: multiexp TIMES ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  EXPR ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Multiplicação",  MULTI_EXPR ,$1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp DIVIDE ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", EXPR, $1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - Divisão ", DIV_EXPR, $1,$3,  $2);
 			$$ = multiexp;					
 		
 
 		}
 		|multiexp MOD ineqexp {
 	
-			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", EXPR ,$1,$3,  $2);
+			Node* multiexp = createNode(7,2,1,"Expressão Básica - MOD ", DIV_EXPR ,$1,$3,  $2);
 			$$ = multiexp;
 
 		}
 		|ineqexp {
 
-			$$ = $1;		
-			
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 3", EXPR ,$1);
+            $$ = expr;
 		}
 		;
 
 ineqexp:  ineqexp LE logical {
-	
-
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", EXPR, $1,$3,  $2);
-			$$ = ineqexp;						
-		
-
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor igual a ", LE_EXPR, $1,$3,  $2);
+			$$ = ineqexp;
 		}
 		| ineqexp GE logical {
-
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;				
-
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior igual a ", GE_EXPR ,$1,$3,  $2);
+			$$ = ineqexp;
 		}
 		| ineqexp LT logical {
-
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  EXPR ,$1,$3,  $2);
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Menor que ",  LT_EXPR ,$1,$3,  $2);
 			$$ = ineqexp;
-
 		}
 		| ineqexp GT logical {
-
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", EXPR, $1,$3,  $2);
-			$$ = ineqexp;			
-
-	
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Maior que ", GT_EXPR, $1,$3,  $2);
+			$$ = ineqexp;
 		}
         | ineqexp EQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;				
-		
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Igual a ", EQUAL_EXPR ,$1,$3,  $2);
+			$$ = ineqexp;
         }
         | ineqexp NOTEQUAL logical {
 
-			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", EXPR ,$1,$3,  $2);
-			$$ = ineqexp;	
-	
+			Node* ineqexp = createNode(7,2,1,"Inequação  - Diferente de ", NEQUAL_EXPR ,$1,$3,  $2);
+			$$ = ineqexp;
         }
         | logical {
-
-			$$ = $1;
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 4", EXPR ,$1);
+            $$ = expr;
         }
         ;
 
 
-logical: NOT data {
-	
-			Node* logical = createNode(6,1,1,"Lógico  - Negação ", EXPR ,$2,  $1);
-			$$ = logical;					
-
-		 }
+logical: MINUS data {
+             Node* expr = createNode(6,1,1,"Expressão Básica - negativo", MINUS_EXPR, $2,  $1);
+             $$ = expr;
+        }
 		 | logical AND data {
-
-			Node* logical = createNode(7,2,1,"Lógico  - AND ", EXPR ,$1,$3,  $2);
-			$$ = logical;	
-
+			Node* logical = createNode(7,2,1,"Lógico  - AND ", AND_EXPR ,$1,$3,  $2);
+			$$ = logical;
 		 }
 		 | logical OR data {
-
-			Node* logical = createNode(7,2,1,"Lógico  - OR ", EXPR ,$1,$3,  $2);
-			$$ = logical;			
-
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", OR_EXPR ,$1,$3,  $2);
+			$$ = logical;
+		 }
+		 | logical IMP data {
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", IMP_EXPR ,$1,$3,  $2);
+			$$ = logical;
+		 }
+		 | logical BIMP data {
+			Node* logical = createNode(7,2,1,"Lógico  - OR ", BIMP_EXPR ,$1,$3,  $2);
+			$$ = logical;
 		 }
 		 | data {
-
-		 	$$ = $1;
-
+            Node* expr = createNode(5,1,0,"Expressão Básica - Nível 5", EXPR ,$1);
+            $$ = expr;
 		 }
 		 ;
 		 
@@ -567,6 +533,10 @@ data: RAWNUMBERDATA {
 			Node* data = createNode(5,0,1,"Número", NUMBER ,$1);	
 			$$ = data;	
 
+	  }
+      | NOT data {
+			Node* logical = createNode(6,1,1,"Lógico  - Negação ", NOT_EXPR ,$2,  $1);
+			$$ = logical;
 	  }
 	  | BOOLEAN {
 
@@ -604,18 +574,36 @@ data: RAWNUMBERDATA {
 	  }
 	  	  
 
-	  | LABEL {
-			
-			Node* data = createNode(5,0,1,"LABEL", STRING ,$1);	
+	  | PLICK ID PLICK {
+			Node* data = createNode(5,0,1,"LABEL", STRING ,$2);
 			$$ = data;	
 
 	  }
 
-	  | variabledata {
+	  | functioncall {
 
 	  	$$ = $1;	
 
 	  }
+	  | ID extraaccesses {
+
+			if($2){
+				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
+				$$ = assignment;
+
+				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
+				//infoNode($$);
+			}
+			else {
+				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
+				$$ = assignment;
+
+	  		}
+	  }
+	  | LPAREN expr RPAREN {
+          Node* expr = createNode(7,1,2,"Expressão Básica - encapsulada", PRI_EXPR,  $2,  $1, $3);
+          $$ = expr;
+      }
 	  ;
 
 
@@ -627,12 +615,12 @@ extraaccesses : LBRACK expr RBRACK variableprop {
 	
 					if($4)
 					{
-			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel composta", ADD_V_PROP ,$2,$4,  $1,$3);	
+			  	 		Node* extraaccesses = createNode(8,2,2,"propriedades extra de variavel(vetor)", ADD_V_PROP ,$2,$4,  $1,$3);	
 						$$ = extraaccesses;
 					}
 					else
 					{
-			  	 		Node* extraaccesses = createNode(7,1,2,"propriedades extra de variavel composta", ADD_V ,$2, $1,$3);	
+			  	 		Node* extraaccesses = createNode(7,1,2,"indice de variavel", ADD_V ,$2, $1,$3);	
 						$$ = extraaccesses;						
 					}		
 
@@ -676,9 +664,9 @@ tdsprop: functioncall {
 		$$ = prop; 	
 
 	  }
-	  | DATATIME {
+	  | TDSVALUE {
 
-		Node* prop = createNode(5,0,1,"Props TDS - datatime",  V_PROP_TDS , $1);
+		Node* prop = createNode(5,0,1,"Props TDS - value",  V_PROP_TDS_VALUE , $1);
 		$$ = prop; 		  
 
 	  }
@@ -697,49 +685,27 @@ tdsprop: functioncall {
 
 
 
-variabledata: LBRACE PORTNAME COLON LABEL COMMA DATATIME COLON LBRACE dataflow RBRACE extras RBRACE {
+variabledata: LBRACE PORTNAME COLON PLICK ID PLICK COMMA DATATIME COLON LBRACE dataflow RBRACE RBRACE {
 		
-			Node* tdsformat = createNode(16,2,10,"Informações de TDS",  TDS_DEF_COMPLETE , $9,$11,  $1,$2,$3,$4,$5,$6,$7,$8,$10,$12);
+			Node* tdsformat = createNode(15,1,10,"Informações de TDS",  TDS_DEF_COMPLETE , $11,  $1,$2,$3,$5,$7,$8,$9,$10,$12,$13);
 			$$ = tdsformat;
 
 		}
-		| LBRACE PORTNAME COLON LABEL extras RBRACE {
+		| LBRACE PORTNAME COLON PLICK ID PLICK extras RBRACE {
 			
-			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TD_DEF_DEPEN ,$5,  $1,$2,$3,$4,$6);
+			Node* tdsformat = createNode(10,1,5,"Informações de TDS - LINKED", TDS_DEF_DEPEN ,$7,  $1,$2,$3,$5,$8);
 			$$ = tdsformat;
 		
 		}
-
-		| ID extraaccesses {
-
-			if($2){
-				Node* assignment = createNode(6,1,1,"Acesso a variavel", AC_V,  $2, $1);
-				$$ = assignment;	
-
-				//printf("(!!)atribuicao (%s) \n \n",assignment->leafs[0]);
-				//infoNode($$);
-			}
-			else {
-				Node* assignment = createNode(5,0,1,"VARIAVEL", IDVAR, $1);
-				$$ = assignment;
-
-	  		}
-	  	}
-
 	  	// VETOR
 	  	| LBRACE paramsCall RBRACE 
 	  	{
 	  		Node* data = createNode(7,1,2,"VETOR", DATA_V ,$2, $1,$3);	
 			$$ = data;	
 	  	}
-
-		// causa possível da redundancia? (podemos separar em procedure call e function call?)
-	  	| functioncall {
-
-			Node* variabledata = createNode(5,1,0,"Dados de chamada de função", FUNC_CALL, $1);	
-			$$ = variabledata;	
-
-	  	}			  
+	  	| expr {
+	  	    $$ = $1;
+	  	}
 		;
 
 	
@@ -786,13 +752,13 @@ timecomponent: RAWNUMBERDATA COLON expr {
 
 timelist: timecomponent { 
 
-			Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", TIME_LIST ,$1);
-			$$ = timelist;    			 		  
+			//Node* timelist = createNode(5,1,0,"TIME-LIST-TDS-one", LIST_ITERATOR ,$1);
+			$$ = $1;
 		  }
 
 		  |timelist COMMA timecomponent {
 
-			Node* timelist = createNode(7,2,1,"TIME-LIST-TDS-loop", TIME_LIST ,$1,$3,  $2 );
+			Node* timelist = createNode(7,2,1,"TIME-LIST-TDS-loop", LIST_ITERATOR, $1,$3,  $2 );
 			$$ = timelist;		  		  
 
 		  }
@@ -800,29 +766,44 @@ timelist: timecomponent {
 
 
 
-extras: COMMA LINKED COLON LBRACE params RBRACE delayedoption {
+extras: COMMA LINKED COLON LBRACE params RBRACE passoption {
 	
 	   	 	Node* extra;
 	   	 	if($7){
-	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5,$7,  $1,$2,$3,$4,$6);
+	   	 	    // NOVA VALIDAÇÃO DE PARSING:
+	   	 	    Node* synth_params = $5;
+	   	 	    if(synth_params->nchild > 1){
+	   	 	       if($7->type == DEF_EXTRAS_DELAYED){
+                        fprintf(stderr, "\n[PARSING ERROR] DELAYED-FIFO option not valid for multiples inputs! \n");
+	   	 	       }
+	   	 	       else{
+                        fprintf(stderr, "\n[PARSING ERROR] FILTER option not valid for multiples inputs! \n");
+	   	 	       }
+                   exit(-1);
+	   	 	    }
+	   	 		extra = createNode(11,2,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED ,$5, $7, $1,$2,$3,$4,$6);
 	   	 	}
 	   	 	else {
 	   	 		extra = createNode(10,1,5,"LINKED-EXTRA-ARGS-TDS" , DEF_EXTRAS_LINKED , $5,  $1,$2,$3,$4,$6);
 	   	 	}
 	   	 	$$ = extra;
 	}
-	| delayedoption {
+	| passoption {
 			
 			//Node* extra = createNode(4,1,0,"DELAYED-EXTRA-ARGS-TDS",$1);
 	   	 	$$ = $1;
 	}
 	
 
-delayedoption: COMMA DELAYED COLON BOOLEAN {
+passoption: COMMA DELAYED {
 	   		
-		Node* extra = createNode(8,0,4,"DELAYED-EXTRA-ARGS-TDS", DEF_EXTRAS_DELAYED ,$1,$2,$3,$4);
+		Node* extra = createNode(6,0,2,"DELAYED-EXTRA-ARGS-TDS", DEF_EXTRAS_DELAYED ,  $1,$2);
 	   	$$ = extra;
 	   }
+	   | COMMA FILTER COLON expr {
+       		Node* extra = createNode(8,1,3,"FILTER-EXTRA-ARGS-TDS", DEF_EXTRAS_FILTER,  $4,  $1,$2,$3);
+       	   	$$ = extra;
+       }
 	   | /* empty */ {  $$ = NULL;}
        ; 
 

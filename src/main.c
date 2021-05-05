@@ -2,13 +2,10 @@
   #include <stdio.h>
   #include <string.h>
   #include "../headers/STable.h"
-  #include "../headers/constants.h"
   #include "../headers/Node.h"
-  #include "../headers/Enum.h"	
-  #include "../headers/HeaderSmv.h"
   #include "../headers/PreProcess.h"
-  #include "../headers/PostProcess.h"
-  #include "../headers/STable.h" 	
+  #include "../headers/Interpreter.h"
+
 
   extern int yylex(void);
   extern int yyparse();
@@ -18,107 +15,129 @@
   extern void yyerror(const char *s);
 
 int main(int argc, char* argv[]) {
-  
-  
-	FILE *fp; // .tds file
-	FILE *smvP; // .smv file;
-	fp = fopen(argv[1], "r");
-	astout = fopen("results/astOutput", "w");
-	smvP = fopen(argv[2], "r+");
-	//printf("%s \n",argv[1]);
-	//printf("%s \n",argv[2]);
 
-	if(!fp){
-		printf("CADE MEU CODIGO!?");
-		return -1;
-	} 
+    int interactive = 0;
+    int interactiveParamPassed = 0;
+	FILE *fp = NULL; // .tds file
+	int sizeFpName;
+	FILE *smvP = NULL; // .smv file
+	int sizeSmvName;
+	if(argv[1]){
+	    int size = strlen(argv[1]);
+	    if(size == 4){
+	        interactive = 1;
+	        interactiveParamPassed = 1;
+	    }
+	    else{
+            fp = fopen(argv[1], "r");
+            sizeFpName = size;
+            if(argv[1][sizeFpName-1] != 's' || argv[1][sizeFpName-2] != 'd' || argv[1][sizeFpName-3] != 't'){
+                fprintf(stderr,"Expected .tds input file \n");
+                exit(-1);
+            }
+	    }
+	}
+	else{
+	    // não tem input tds nem -int
+	    fprintf(stderr,"No .tds input file found!\n");
+	    exit(-1);
+	}
+
+	if(argv[2]){
+	    if(interactiveParamPassed){
+            fp = fopen(argv[2], "r");
+            sizeFpName = strlen(argv[2]);
+            if(argv[2][sizeFpName-1] != 's' || argv[2][sizeFpName-2] != 'd' || argv[2][sizeFpName-3] != 't'){
+                fprintf(stderr,"Expected .tds input file \n");
+                exit(-1);
+            }
+	    }
+	    else{
+            smvP = fopen(argv[2], "r+");
+            sizeSmvName = strlen(argv[2]);
+            if(argv[2][sizeSmvName-1] != 'v' || argv[2][sizeSmvName-2] != 'm' || argv[2][sizeSmvName-3] != 's'){
+                fprintf(stderr,"Expected .smv input file \n");
+                exit(-1);
+            }
+	    }
+	}
+	else{
+	    if(interactiveParamPassed){
+            fprintf(stderr,"No .tds input file found!\n");
+            exit(-1);
+	    }
+	}
+	if(interactiveParamPassed){
+	    if(argv[3]){
+            smvP = fopen(argv[3], "r+");
+            sizeSmvName = strlen(argv[3]);
+            if(argv[3][sizeSmvName-1] != 'v' || argv[3][sizeSmvName-2] != 'm' || argv[3][sizeSmvName-3] != 's'){
+                fprintf(stderr,"Expected .smv input file \n");
+                exit(-1);
+            }
+	    }
+	}
+
+
+    if(!fp){
+        fprintf(stderr,".tds input file path not found!\n");
+        return -1;
+    }
+    astout = fopen("results/astOutput", "w");
 	yyin = fp;
 	yyparse();
-
 	fprintf(astout,"--------------TREE--------------------\n");
 	filePrintNode(root,astout);
 	fclose(astout);
 	fclose(fp);
 
 	// tabelas e componentes globais
-	HeaderController* controller = createController(5);  
+    EnvController* controller = createController(interactive);
+	STable* global = createTable(GLOBAL, NULL, 0, 0, -1);
 
-	STable* global = createTable(GLOBAL,NULL,0,0);
+	//pré processamento
+	printf("\n\n");
+	if(smvP){
+	    printf("Start PreProcess\n\n");
+        preProcessSmv(smvP,controller);
+	}
+	else{
+        printf("No .smv file detected. Using default model\n\n");
+	    setDefaultSmv(controller);
+	}
+	setUpMainSmvTable(controller,global);
 
-	STable* mainVarsTypeSmv = createTable(SMV_V_MAIN,NULL,0,0);  	
-	STable* portsTypeSmv = createTable(SMV_PORTS,NULL,0,0);
-	STable* writeSmvTypeTable[] = {mainVarsTypeSmv,portsTypeSmv}; 
-	//pré processamento 
-	preProcessSmv(smvP,controller,writeSmvTypeTable);
-	setUpMainSmvTable(controller,writeSmvTypeTable);
-  
+  	//printf("--------------------------------- EVAL ---------------------------------------------\n");
+  	printf("\n");
+  	printf("\n");
 
-	//pos processamento
-	eval(root,global,writeSmvTypeTable,controller);
+	//interpretação e pos processamento
+    startInterpreter(root,global,controller);
 
- 	printf("\n");	
- 	printf("\n");
- 	printf("\n");
- 	printf("\n");
-
- 	printf("--------------------------------- TABLES ---------------------------------------------\n");
-
-	printTable(global);
-    printf("\n");
-	printTable(writeSmvTypeTable[0]);
 	printf("\n");
-    printTable(writeSmvTypeTable[1]);
-	printf("\n");
+	printf("------------------------------------------------------------------------------\n");
 
-	//letGoHeadersStruct(headers,5);
+ 	//printf("\n\n\n\n");
 
+// 	printf("--------------------------------- PROGRAM TABLES ---------------------------------------------\n");
 
-	printf("\n");	
- 	printf("\n");
- 	printf("\n");
- 	printf("\n");
+//	printTable(global);
+//    printf("\n");
 
- 	printf("--------------------------------- HEADERS ---------------------------------------------\n");	
+//    printf("--------------------------------- smv-INFO TABLES ---------------------------------------------\n");
 
+//    printTable(controller->mainInfo);
+    printf("\n\n\n\n");
+//    printTable(controller->originalPorts);
+    printf("\n\n\n");
+    letgoTable(global);
 
-	//printHeader(controller->headers[0]);
-	//printHeader(controller->headers[1]);
-	//printHeader(controller->headers[2]);
-	//printHeader(controller->headers[3]);
-	//printHeader(controller->headers[4]);
-
-	fclose(smvP);
-	
-	letgoNode(root);
-
-//	letGoHeaderControl(controller); // BUG NO FREE DA ESTRUTURA QUE CONTROLA OS HEADERS SMV (quebra no letgoHeader(hs[i]), possívelmente memory leak de string)
-
-  	
-
-
-
-//TESTE PORTS REFS (aparentemente tudo funcionando)
-
-/*
-  	printf("TESTE PORT REFS !!! \n\n\n");
-  	char* string1 = "	((cs = q0 & ports.a[time] = NULL & ports.b[time] = NULL & ports.d[time] = NULL & ports.c[time] = 0 & FALSE) -> next(cs) = p0) &";
-  	char* nova =clearOldPortsRefs(string1);
-  	printf("ANTES:  %s \n\n\n",string1);
-    	printf("DEPOIS:  %s \n\n\n",nova);	
-    	free(nova);
-
-  	char* string2 = "	((cs = q0 & ports.a[time] = NULL & ports.d[time] = NULL & ports.c[time] != NULL & ports.b[time] = ports.c[time] & FALSE) -> next(cs) = q0);";
-  	nova =clearOldPortsRefs(string2);
-  	printf("ANTES:  %s \n\n\n",string2);
-    	printf("DEPOIS:  %s \n\n\n",nova);	
-    	free(nova); 
-
-  	char* string3 = "	((cs = q0p0) -> ((next(cs) != q0p1))) &";
-  	nova =  clearOldPortsRefs(string3);
-  	printf("ANTES:  %s \n\n\n",string3);
-    	printf("DEPOIS:  %s \n\n\n",nova);	
-    	free(nova);    
-*/
-
+ 	//printf("--------------------------------- HEADERS ---------------------------------------------\n");
+    //printAllHeaders(controller);
+    validateAfterInterPost(controller);
+ 	writeResultantHeaders(controller,"results/newSmvfile.smv");
+ 	if(smvP) {
+ 	    fclose(smvP);
+    }
+	letGoHeaderControl(controller);
 }
-

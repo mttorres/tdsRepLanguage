@@ -1,7 +1,7 @@
 %{
   #include <stdio.h>
-  #include <string.h>	
-  #include "../headers/Node.h"
+  #include <string.h>
+  #include "../../headers/Node.h"
   #include "tdsrpl.tab.h"
 
   
@@ -49,34 +49,40 @@ NULL					{yylval.sval = strdup(yytext); return Null;}
 and						{yylval.sval = strdup(yytext); return AND;}
 or						{yylval.sval = strdup(yytext); return OR;}
 not                   	{yylval.sval = strdup(yytext); return NOT;}
--\|						{yylval.sval = strdup(yytext); return LDPASS;}
-\|>						{yylval.sval = strdup(yytext); return RDPASS;}
-->						{yylval.sval = strdup(yytext); return PASS;}
-xor						{yylval.sval = strdup(yytext); return XOR;}
-[<=]              		{yylval.sval = strdup(yytext); return LE;}
-[>=]              		{yylval.sval = strdup(yytext); return GE;}
-[<]               		{yylval.sval = strdup(yytext); return LT;}
-[>]               		{yylval.sval = strdup(yytext); return GT;}
+-\|\|>					{yylval.sval = strdup(yytext); return DPASS;}
+\<-\>					{yylval.sval = strdup(yytext); return BIMP;}
+->						{yylval.sval = strdup(yytext); return IMP;}
+==>						{yylval.sval = strdup(yytext); return PASS;}
+"<="              		{yylval.sval = strdup(yytext); return LE;}
+">="             		{yylval.sval = strdup(yytext); return GE;}
+"<"               		{yylval.sval = strdup(yytext); return LT;}
+">"             		{yylval.sval = strdup(yytext); return GT;}
 [+]                 	{yylval.sval = strdup(yytext); return PLUS;}
 [-]                 	{yylval.sval = strdup(yytext); return MINUS;}
 [*]                 	{yylval.sval = strdup(yytext); return TIMES;}
 [/]                 	{yylval.sval = strdup(yytext); return DIVIDE;}
 [%]						{yylval.sval = strdup(yytext); return MOD;}
+INTERVAL                {yylval.sval = strdup(yytext); return INTERVAL;}
+~                       {yylval.sval = strdup(yytext); return BETWEEN;}
 I_TIME					{yylval.sval = strdup(yytext); return INITTIME;}
 C_TIME		    		{yylval.sval = strdup(yytext); return CURRENTTIME;}
 F_TIME		    		{yylval.sval = strdup(yytext); return FINALTIME;}
-'[A-Za-z_]*'        	{yylval.sval = strdup(yytext); return LABEL;}
+TO                      {yylval.sval = strdup(yytext); return TO;}
+'        	            {yylval.sval = strdup(yytext); return PLICK;}
 linked              	{yylval.sval = strdup(yytext); return LINKED;}
 data-time           	{yylval.sval = strdup(yytext); return DATATIME;}
 delayed             	{yylval.sval = strdup(yytext); return DELAYED;}
+filter                  {yylval.sval = strdup(yytext); return FILTER;}
 portname            	{yylval.sval = strdup(yytext); return PORTNAME;}
+value            	    {yylval.sval = strdup(yytext); return TDSVALUE;}
 [A-Za-z_]*				{yylval.sval = strdup(yytext); return ID;}
 
 
 %%
 
 void yyerror(const char *s) {
-  printf("Erro de parsing! %s, perto da linha %d \n",s,yylineno);
+  printf("\n");
+  printf("PARSING ERROR %s near line %d \n",s,yylineno);
   exit(-1);
 }
 
