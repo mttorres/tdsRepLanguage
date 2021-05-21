@@ -17,18 +17,25 @@ Instructions
     
     ./tds -int your-code.tds
     
-    The two previous execution commands also can accept a nuXmv model from [reo2nuXmv] (https://github.com/frame-lab/Reo2nuXmv).
+       
+   The two previous execution commands can also accept as input a nuXmv model from [reo2nuXmv](https://github.com/frame-lab/Reo2nuXmv), 
+   providing integration between the two tools. 
+   
+      example:
+   
+     ./tds your-code.tds  reo2nuXmvModel.smv
     
 ## 3. Results
     Check the /results folder:
     Abstract Syntax Tree (AST): results/PARSINGOUTPUT
     The new .smv file with the generated model. 
     
-    You can check some examples on the "sample" and "execution-scripts" folders.
+You can check some examples on the "sample" and "execution-scripts" folders. Those contain input code as examples and the expected output model.
     
  
-New Features for the language will be added to the future, more details in:
+New Features for the language will be added in the future, more details in:
 
-[#68] (https://github.com/mttorres/tdsRepLanguage/issues/68)
-[#73] (https://github.com/mttorres/tdsRepLanguage/issues/73)
+[#68](https://github.com/mttorres/tdsRepLanguage/issues/68),
+[#73](https://github.com/mttorres/tdsRepLanguage/issues/73)
+[General Issues](https://github.com/mttorres/tdsRepLanguage/issues/)
     
