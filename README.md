@@ -36,6 +36,7 @@ You can check some examples on the "sample" and "execution-scripts" folders. Tho
 New Features for the language will be added in the future, more details in:
 
 [#68](https://github.com/mttorres/tdsRepLanguage/issues/68),
-[#73](https://github.com/mttorres/tdsRepLanguage/issues/73)
+[#73](https://github.com/mttorres/tdsRepLanguage/issues/73),
+
 [General Issues](https://github.com/mttorres/tdsRepLanguage/issues/)
     
