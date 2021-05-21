@@ -19,7 +19,7 @@ Instructions
     
        
    The two previous execution commands can also accept as input a nuXmv model from [reo2nuXmv](https://github.com/frame-lab/Reo2nuXmv), 
-   providing integration between the two tools. 
+   providing integration between both tools. 
    
       example:
    
