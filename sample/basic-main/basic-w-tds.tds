@@ -1,11 +1,6 @@
 INTERVAL: 0 ~ 20
 
-x = -2  //redef =0 , context =0
-// usei aqui o x
-
-
-//r = true // só deve alterar para o false logo depois se a condição for verdadeira (not evaluate) (mas deve escrever correto)
-
+x = -2  
 z = true
 
 zeta = false
@@ -26,93 +21,29 @@ tdsA = {
 	data-time: {0: x, 1: 1, 2: 10, 21:4}
 }
 
-//tdsB= {
-//    portname: 'b',
-//    data-time: {function-domain: x+x }
-//}
-
-(tdsA) -{x == -2}> c // funciona
-// FILTER COM DEF COMPLETA
-
-//tdsC = {
-//    portname: 'c',
-//    linked: {tdsA},
-//    filter: x == -2
-//}
-
-//(tdsA) -{x == -2}> c // funciona
-
-//(tdsA,tdsB) ==> c // funciona
-//(c) -||> d // funciona
-
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA,tdsB}
-//}  // funciona
-
-
-//(tdsA,tdsB) -||> d // temos erro como o esperado
-
-//tdsD = {
-//	portname : 'd',
-//	linked : {tdsA,tdsB},
-//	delayed
-//}  // da erro (como esperado)
 
 C_TIME TO  2
 
-//(tdsA) -||> d realiza a operação com warning
-
-//(tdsA) ==> c // funciona
-
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA}
-//}  // funciona
-
-//(tdsA,tdsB) -> c // funciona
-
-//tdsC = {
-//	portname : 'c',
-//	linked : {tdsA,tdsB}
-//}  // funciona
-
-//(tdsA,tdsB) ==> c // funciona
-
-
-//(c) ==> d // funciona
-
-//(c) -||> d // funciona
-
-x = -4 //redef =1 , context =2
+(tdsA) -||> d 
 
 
 C_TIME TO  2
 
 y = 5
 
-//tdsB = {
-//	portname : 'b',
-//	data-time: {3: 3, 4:4, 5:5, 6:y-x}
-//}
+tdsB = {
+	portname : 'b',
+	data-time: {3: 3, 4:4, 5:5, 6:y-x}
+}
 
-// NOVA TDS b (in line)
 
-//tdsB= {
-//    portname: 'b',
-//    data-time: {function-domain: x-x }
-//}
+(tdsA,tdsB) ==> c 
 
-//(tdsA,tdsB) ==> c // funciona
-
-//(tdsA,tdsB) -{x == 3}> c // funciona
-//(tdsA) -{x == -2}> c // funciona
-//(c) -||> d // funciona
 
 
 C_TIME TO  3
 
-x = -1 // corrigido
+x = -1 
 
 
 C_TIME TO  4
@@ -131,7 +62,3 @@ if(not zeta){
 else{
     y = 6
 }
-
-stu = x/y
-
-
